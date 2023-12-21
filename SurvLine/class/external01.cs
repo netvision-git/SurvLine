@@ -259,45 +259,54 @@ namespace SurvLine
         //****************************************************************
         //  ObservationCommonAttributes
         //----------------------------------------------------------------
-        public string Number;               //As String '番号。
-        public string Name;                 //As String '名称。
-        public string GenuineNumber;        //As String '本点番号。
-        public string GenuineName;          //As String '本点名称。
-        public long ObjectType;             //As Long 'オブジェクト種別。
-        public int OldEditCode;             //As EDITCODE_STYLE '旧編集コード。
+
+        //23/12/20 K.Setoguchi---->>>>
+        //(del)     public string Number;               //As String '番号。
+        //(del)     public string Name;                 //As String '名称。
+        //(del)     public string GenuineNumber;        //As String '本点番号。
+        //(del)     public string GenuineName;          //As String '本点名称。
+        //(del)     public long ObjectType;             //As Long 'オブジェクト種別。
+        //(del)     public int OldEditCode;             //As EDITCODE_STYLE '旧編集コード。
         //****************************************************************
+        public OCA_STRUCT OCA;                  //ObservationCommonAttributes       //23/12/20 K.Setoguchi
+        //<<<<----23/12/20 K.Setoguchi
 
         //****************************************************************
         //  CoordinatePointFix
         //----------------------------------------------------------------
-        //'インプリメンテーション
-        public double m_nX;               //As Double 'X。
-        public double m_nY;               //As Double 'Y。
-        public double m_nZ;               //As Double 'Z。
-        public double m_nRoundX;          //As Double '丸めX。
-        public double m_nRoundY;          //As Double '丸めY。
-        public double m_nRoundZ;          //As Double '丸めZ。
-        public double m_nHeight;          //As Double '楕円体高。
-        public double m_nCoordinateType;  //As COORDINATE_TYPE '座標値種別。
-        public int m_nEditCode;        //As EDITCODE_STYLE '編集コード。
-        public string m_sEditX;            //As String '入力X。
-        public string m_sEditY;            //As String '入力Y。
-        public string m_sEditZ;            //As String '入力Z。
-        public string m_sEditLat;          //As String '入力緯度。
-        public string m_sEditLon;          //As String '入力経度。
-        public string m_sEditHeight;       //As String '入力高さ(ｍ)。
-        public long m_nEditCoordNum;       //As Long '入力座標系番号(1～19)。
-        //'セミ・ダイナミック変換'2009/11 H.Nakamura
-        public double m_nSemiDynaCounter;  //As Long 'セミ・ダイナミック補正変換番号。0 は未計算。
-        public double m_nLatKON;           //As Double '今期緯度(度)。
-        public double m_nLonKON;           //As Double '今期経度(度)。
-        public double m_nHeightKON;        //As Double '今期楕円体高(ｍ)。
-        public double m_nXKON;             //As Double '今期X。
-        public double m_nYKON;             //As Double '今期Y。
-        public double m_nZKON;             //As Double '今期Z。
-        public double m_nRoundXKON;        //As Double '今期丸めX。
-        public double m_nRoundYKON;        //As Double '今期丸めY。
-        public double m_nRoundZKON;        //As Double '今期丸めZ。
+        //23/12/20 K.Setoguchi---->>>>                  //
+        //'インプリメンテーション                      //
+        //(del)     public double m_nX;               //As Double 'X。
+        //(del)     public double m_nY;               //As Double 'Y。
+        //(del)     public double m_nZ;               //As Double 'Z。
+        //(del)     public double m_nRoundX;          //As Double '丸めX。
+        //(del)     public double m_nRoundY;          //As Double '丸めY。
+        //(del)     public double m_nRoundZ;          //As Double '丸めZ。
+        //(del)     public double m_nHeight;          //As Double '楕円体高。
+        //(del)     public double m_nCoordinateType;  //As COORDINATE_TYPE '座標値種別。
+        //(del)     public int m_nEditCode;        //As EDITCODE_STYLE '編集コード。
+        //(del)     public string m_sEditX;            //As String '入力X。
+        //(del)     public string m_sEditY;            //As String '入力Y。
+        //(del)     public string m_sEditZ;            //As String '入力Z。
+        //(del)     public string m_sEditLat;          //As String '入力緯度。
+        //(del)     public string m_sEditLon;          //As String '入力経度。
+        //(del)     public string m_sEditHeight;       //As String '入力高さ(ｍ)。
+        //(del)     public long m_nEditCoordNum;       //As Long '入力座標系番号(1～19)。
+        //(del)     //'セミ・ダイナミック変換'2009/11 H.Nakamura
+        //(del)     public double m_nSemiDynaCounter;  //As Long 'セミ・ダイナミック補正変換番号。0 は未計算。
+        //(del)     public double m_nLatKON;           //As Double '今期緯度(度)。
+        //(del)     public double m_nLonKON;           //As Double '今期経度(度)。
+        //(del)     public double m_nHeightKON;        //As Double '今期楕円体高(ｍ)。
+        //(del)     public double m_nXKON;             //As Double '今期X。
+        //(del)     public double m_nYKON;             //As Double '今期Y。
+        //(del)     public double m_nZKON;             //As Double '今期Z。
+        //(del)     public double m_nRoundXKON;        //As Double '今期丸めX。
+        //(del)     public double m_nRoundYKON;        //As Double '今期丸めY。
+        //(del)     public double m_nRoundZKON;        //As Double '今期丸めZ。
+        //****************************************************************
+        public OPFix_STRUCT OPFix;                      //CoordinatePointFix           //23/12/20 K.Setoguchi
+        //<<<<----23/12/20 K.Setoguchi                  //
+
 
         //****************************************************************
         //  EccentricCorrectionParam
@@ -335,14 +344,18 @@ namespace SurvLine
         //****************************************************************
         //  CoordinatePointXYZ
         //----------------------------------------------------------------
-        //'インプリメンテーション
-        public double CPXYZ_m_nX;                //As Double 'X。
-        public double CPXYZ_m_nY;                //As Double 'Y。
-        public double CPXYZ_m_nZ;                //As Double 'Z。
-        public double CPXYZ_m_nRoundX;           //As Double '丸めX。
-        public double CPXYZ_m_nRoundY;           //As Double '丸めY。
-        public double CPXYZ_m_nRoundZ;           //As Double '丸めZ。
-        public int CPXYZ_m_nCoordinateType;      //As COORDINATE_TYPE '座標値種別。
+        //23/12/20 K.Setoguchi---->>>>                  //
+        //(del)     'インプリメンテーション
+        //(del)     public double CPXYZ_m_nX;                //As Double 'X。
+        //(del)     public double CPXYZ_m_nY;                //As Double 'Y。
+        //(del)     public double CPXYZ_m_nZ;                //As Double 'Z。
+        //(del)     public double CPXYZ_m_nRoundX;           //As Double '丸めX。
+        //(del)     public double CPXYZ_m_nRoundY;           //As Double '丸めY。
+        //(del)     public double CPXYZ_m_nRoundZ;           //As Double '丸めZ。
+        //(del)     public int CPXYZ_m_nCoordinateType;      //As COORDINATE_TYPE '座標値種別。
+        //****************************************************************
+        public CPXYZ_STRUCT CPXYZ;        //CoordinatePointXYZ
+        //<<<<----23/12/20 K.Setoguchi
 
 
         //****************************************************************
@@ -367,11 +380,92 @@ namespace SurvLine
         //'*******************************************************************************
         //  ObservationPointAttributes
         //'*******************************************************************************
-        public OPA_STRUCT OPA;
+        public OPA_STRUCT OPA;                  //共通OPAデータ（処理後、OPA --> OPA_Str / OPA_End）
+
+        //23/12/20 K.Setoguchi---->>>>
+        //---------------------------------------                                  
+        //        public OPA_STRUCT OPA_Str;                  //開始OPAデータ情報        //23/12/20 K.Setoguchi
+        //        public OPA_STRUCT OPA_End;                  //終了OPAデータ情報        //23/12/20 K.Setoguchi
+        //---------------------------------------                                  
+        public OPA_STRUCT_SUB OPA_ListWork;         //共通OPAデータ詳細情報    //23/12/20 K.Setoguchi
+        public List<OPA_STRUCT_SUB> OPA_ListStr;    //->開始OPAデータ詳細情報    //23/12/20 K.Setoguchi  
+        public List<OPA_STRUCT_SUB> OPA_ListEnd;    //->終了OPAデータ詳細情報    //23/12/20 K.Setoguchi
+        //---------------------------------------                                  
+        //<<<<----23/12/20 K.Setoguchi
+
+
+
+
+        //23/12/20 K.Setoguchi---->>>>
+        //'*******************************************************************************
+        //  DepPattern Load                 位相パターンの標高
+        //'*******************************************************************************
+        public List<NSPPS3_DEP_PATTERN> m_tDepPattern;
+        //<<<<----23/12/20 K.Setoguchi
+
+        //23/12/20 K.Setoguchi---->>>>
+        //'*******************************************************************************
+        //  DepDataMask Load                衛星情報マスク
+        //'*******************************************************************************
+        public List<MaskInfo> m_tMaskInfos;         //衛星（衛星番号
+        public List<MaskInfo_T> m_tMaskInfos_T;     //衛星（マスク開始時間/マスク終了時間
+        //<<<<----23/12/20 K.Setoguchi
 
 
     }
+    //23/12/20 K.Setoguchi---->>>>
+    //'*******************************************************************************      
+    //  DepPattern Load 構造体         位相パターンの標高
+    //'*******************************************************************************      
+    public struct NSPPS3_DEP_PATTERN
+    {
+        public Single PatternEle;   //PatternEle As Single 'elevations for phase pattern (deg)
+        public Single PatternL1;    //PatternL1 As Single 'phase center pattern for L1 (meters)
+        public Single PatternL2;    //PatternL2 As Single 'phase center pattern for L2 (meters)
+        public Single PatternL5;    //PatternL5 As Single 'phase center pattern for L5 (meters)
+    }
 
+    //<<<<----23/12/20 K.Setoguchi
+
+
+    //23/12/20 K.Setoguchi---->>>>
+    //'*******************************************************************************      
+    //  DepDataMask Load 構造体        衛星情報マスク（衛星番号・マスク開始時間/マスク終了時間）
+    //'*******************************************************************************      
+    //'マスク情報。
+    public struct MaskInfo
+    {
+        public long Number;            //As Long '衛星番号。
+                                       //  '1～32＝GPSの1～32番
+                                       //  '38～63＝GLONASSの1～26番
+                                       //  '65～72＝QZSSの1～8番
+                                       //  '73～102＝Galileoの1～30番
+                                       //  '105～139＝BeiDouの1～35番
+                                       //  '140～198＝SBASの1～59番
+                                       //  '199≦不明。
+        public bool Enabled;           //As Boolean '有効フラグ。
+                                       //---------------------------
+        public long nUBound;           //(@NV)=-1:無し / =1以上は、(MaskInfo_T)マスク開始時間/マスク終了時間
+    }
+    //-----------------------------------
+    public struct MaskInfo_T
+    {
+        public DateTime StrTimes;      //()As Date 'マスク開始時間(以上)。配列の要素は(-1 To ...)、要素 -1 は未使用。
+        public DateTime EndTimes;      //()As Date 'マスク終了時間(以下)。配列の要素は(-1 To ...)、要素 -1 は未使用。
+
+//        public static implicit operator MaskInfo_T(int v)
+//        {
+//            throw new NotImplementedException();
+//        }
+    }
+    //<<<<----23/12/20 K.Setoguchi
+
+
+    //23/12/20 K.Setoguchi---->>>>
+    //'*******************************************************************************
+    //  ObservationPointAttributes Load 構造体
+    //'*******************************************************************************
+    //<<<<----23/12/20 K.Setoguchi
     public struct OPA_STRUCT
     {
         //'*******************************************************************************
@@ -418,12 +512,115 @@ namespace SurvLine
         public long SattSignalQZSS;          //'QZSS衛星信号。ビットフラグ。0x01＝L1、0x02＝L2、0x04＝L5。
         public long SattSignalGalileo;       //'Galileo衛星信号。ビットフラグ。0x01＝E1、0x02＝E5。
         public long SattSignalBeiDou;        //'BeiDou衛星信号。ビットフラグ。0x01＝B1、0x02＝B2、0x04＝B3。
-                                            //'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+                                             //'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     }
 
+    //23/12/20 K.Setoguchi---->>>>
 
-#if !DEBUG
-#endif //!DEBUG
+    public struct OPA_STRUCT_SUB
+    {
+        //****************************************************************
+        //  ObservationPoint
+        //----------------------------------------------------------------
 
+        public OPA_STRUCT OPA;                  //共通OPAデータ（処理後、OPA --> OPA_Str / OPA_End）
+
+        public OCA_STRUCT OCA;                  //ObservationCommonAttributes
+
+        public OPFix_STRUCT OPFix;              //CoordinatePointFix
+
+        public CPXYZ_STRUCT CPXYZ;              //CoordinatePointXYZ
+
+        //'プロパティ
+        public long WorkKey;                        //As Long '汎用作業キー。
+        //  public WorkObject;                      //As Object '汎用作業オブジェクト。
+        public long OP_ObjectType;                     //As Long 'オブジェクト種別。
+        //  public Owner As Object '所有者。接合観測点の場合、基線ベクトルが保持される。代表観測点の場合、チェーンリストが保持される。
+
+        //'インプリメンテーション
+        //public m_clsAttributes As New ObservationPointAttributes '観測点属性。
+        //public m_clsObservationShared As ObservationShared '観測共有情報。
+        //public m_clsParentPoint As ObservationPoint '親観測点。
+        //public m_clsChildPoint As ObservationPoint '子観測点。
+        //public m_clsPrevPoint As ObservationPoint '兄観測点。
+        //public m_clsNextPoint As ObservationPoint '弟観測点。
+        //public m_clsCorrectPoint As ObservationPoint '補正点。自オブジェクトが本点の場合は偏心点(HeadPoint)が設定される。自オブジェクトが偏心点の場合は本点(実観測点)が設定される。※相互参照なので Attributes や CommonAttributes のメンバにしてはいけない。
+        public bool m_bEnable;                      //As Boolean '有効フラグ。True=有効。False=無効。
+                                                    //----------------------------------------------------------------    
+        public bool bFirst;                         //    '長男フラグ｡ 
+        public bool bParent;                        //    '親フラグ。
+                                                    //----------------------------------------------------------------    
+    }
+    //<<<<----23/12/20 K.Setoguchi
+
+    //23/12/20 K.Setoguchi---->>>>
+    public struct OCA_STRUCT        //ObservationCommonAttributes
+    {
+        //****************************************************************
+        //  ObservationCommonAttributes
+        //----------------------------------------------------------------
+        public string Number;               //As String '番号。
+        public string Name;                 //As String '名称。
+        public string GenuineNumber;        //As String '本点番号。
+        public string GenuineName;          //As String '本点名称。
+        public long ObjectType;             //As Long 'オブジェクト種別。
+        public int OldEditCode;             //As EDITCODE_STYLE '旧編集コード。
+                                            //****************************************************************
+    }
+    //<<<<----23/12/20 K.Setoguchi
+
+    //23/12/20 K.Setoguchi---->>>>
+    public struct OPFix_STRUCT        //CoordinatePointFix
+    {
+        //****************************************************************
+        //  CoordinatePointFix
+        //----------------------------------------------------------------
+        //'インプリメンテーション
+        public double m_nX;               //As Double 'X。
+        public double m_nY;               //As Double 'Y。
+        public double m_nZ;               //As Double 'Z。
+        public double m_nRoundX;          //As Double '丸めX。
+        public double m_nRoundY;          //As Double '丸めY。
+        public double m_nRoundZ;          //As Double '丸めZ。
+        public double m_nHeight;          //As Double '楕円体高。
+        public double m_nCoordinateType;  //As COORDINATE_TYPE '座標値種別。
+        public int m_nEditCode;        //As EDITCODE_STYLE '編集コード。
+        public string m_sEditX;            //As String '入力X。
+        public string m_sEditY;            //As String '入力Y。
+        public string m_sEditZ;            //As String '入力Z。
+        public string m_sEditLat;          //As String '入力緯度。
+        public string m_sEditLon;          //As String '入力経度。
+        public string m_sEditHeight;       //As String '入力高さ(ｍ)。
+        public long m_nEditCoordNum;       //As Long '入力座標系番号(1～19)。
+                                           //'セミ・ダイナミック変換'2009/11 H.Nakamura
+        public double m_nSemiDynaCounter;  //As Long 'セミ・ダイナミック補正変換番号。0 は未計算。
+        public double m_nLatKON;           //As Double '今期緯度(度)。
+        public double m_nLonKON;           //As Double '今期経度(度)。
+        public double m_nHeightKON;        //As Double '今期楕円体高(ｍ)。
+        public double m_nXKON;             //As Double '今期X。
+        public double m_nYKON;             //As Double '今期Y。
+        public double m_nZKON;             //As Double '今期Z。
+        public double m_nRoundXKON;        //As Double '今期丸めX。
+        public double m_nRoundYKON;        //As Double '今期丸めY。
+        public double m_nRoundZKON;        //As Double '今期丸めZ。
+    }
+    //<<<<----23/12/20 K.Setoguchi
+
+    //23/12/20 K.Setoguchi---->>>>
+    public struct CPXYZ_STRUCT        //CoordinatePointXYZ
+    {
+        //****************************************************************
+        //  CoordinatePointXYZ
+        //----------------------------------------------------------------
+        //'インプリメンテーション
+        public double m_nX;                //As Double 'X。
+        public double m_nY;                //As Double 'Y。
+        public double m_nZ;                //As Double 'Z。
+        public double m_nRoundX;           //As Double '丸めX。
+        public double m_nRoundY;           //As Double '丸めY。
+        public double m_nRoundZ;           //As Double '丸めZ。
+        public int m_nCoordinateType;      //As COORDINATE_TYPE '座標値種別。
+    }
+    //<<<<----23/12/20 K.Setoguchi
 
 }

@@ -1,4 +1,5 @@
-﻿using SurvLine.mdl;
+﻿using NTS;
+using SurvLine.mdl;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -403,12 +404,35 @@ namespace SurvLine
             }
             //************************************************************************
             //[VB]  Call m_clsStrPoint.Load(nFile, nVersion, clsObservationPoints, Nothing)
+            //-----------------------------------------------------------------------
+
+            //23/12/20 K.Setoguchi---->>>>
+            //-----------------------------------------------------
+            //(del)     ObservationPoint observationPoint = new ObservationPoint();
+            //(del)     observationPoint.Load(br, nVersion, ref Genba_S);
+            //-----------------------------------------------------
+            List<OPA_STRUCT_SUB> OPA_ListStrA = new List<OPA_STRUCT_SUB>();
+            Genba_S.OPA_ListStr = OPA_ListStrA;
+            //-----------------------------------------------------
             ObservationPoint observationPoint = new ObservationPoint();
-            observationPoint.Load(br, nVersion, ref Genba_S);
+            observationPoint.Load(br, nVersion, ref Genba_S, ref Genba_S.OPA_ListStr);
+            //-----------------------------------------------------
+            //<<<<----23/12/20 K.Setoguchi
 
             //************************************************************************
             //[VB]  Call m_clsEndPoint.Load(nFile, nVersion, clsObservationPoints, Nothing)
-            observationPoint.Load(br, nVersion, ref Genba_S);
+            //------------------------------------------------------------------------
+
+            //23/12/20 K.Setoguchi---->>>>
+            //-----------------------------------------------------
+            //(del)     observationPoint.Load(br, nVersion, ref Genba_S);
+            //-----------------------------------------------------
+            List<OPA_STRUCT_SUB> OPA_ListStrB = new List<OPA_STRUCT_SUB>();
+            Genba_S.OPA_ListEnd = OPA_ListStrB;
+            //-----------------------------------------------------
+            observationPoint.Load(br, nVersion, ref Genba_S, ref Genba_S.OPA_ListEnd);
+            //-----------------------------------------------------
+            //<<<<----23/12/20 K.Setoguchi
 
 
             //----------------------------------------

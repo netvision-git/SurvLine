@@ -7,70 +7,145 @@ using static System.Net.Mime.MediaTypeNames;
 using System.Windows.Forms;
 using System.IO;
 using System.Xml.Linq;
+using NTS;
 
 namespace SurvLine
 {
     public class ObsDataMask
     {
 
+        //***************************************************************************
+        //***************************************************************************
+        /// <summary>
+        ///'読み込み。
+        ///     （VB Load関数をVC用に変更）
+        ///'
+        ///'引き数：
+        /// バイナリファイル
+        /// バージョン番号
+        /// 読み込みデータ
+        /// </summary>
+        /// <param name="BinaryReader br">
+        /// <param name="nVersion br">
+        /// <param name="Genba_S">
+        /// </param>
+        /// <returns>
+        /// 戻り値:returns = Non
+        /// </returns>
+        //***************************************************************************
         public void Load(BinaryReader br, long nVersion, ref GENBA_STRUCT_S Genba_S)
         {
-            byte[] buf = new byte[8]; int ret;
-            Document document = new Document();
 
-            //    Dim nCount As Long
-            //    Get #nFile, , nCount
-            //    ReDim m_tMaskInfos(-1 To nCount - 1)
-            //    Dim i As Long
+            //23/12/20 K.Setoguchi---->>>>
+            Document document = new Document();
+            byte[] buf = new byte[8]; int ret;
+
+            //----------------------------------------------------
             long nCount = br.ReadInt32();
 
             //----------------------------------------------------
-            long[] m_tMaskInfos = new long[nCount];
+            var m_tMaskInfos_struct = new MaskInfo();
+            List<MaskInfo> m_tMaskInfosA = new List<MaskInfo>();
+            Genba_S.m_tMaskInfos = m_tMaskInfosA;
+            //----------------------------------------------------
 
             for (long i = 0; i < nCount; i++)
             {
-                //-----------------------------------------
-                //        Get #nFile, , m_tMaskInfos(i).Number  long
-                m_tMaskInfos[i] = br.ReadInt32();
-                //        Get #nFile, , m_tMaskInfos(i).Enabled  bool
-
-
-                bool dmy;
-                dmy = document.GetFileBool(br);
-                //m_tMaskInfos[i] = (long)document.GetFileBool(br);
-
-
 
                 //-----------------------------------------
+                //Number;               //As Long '衛星番号。
+                //                      //  '1～32＝GPSの1～32番
+                //                      //  '38～63＝GLONASSの1～26番
+                //                      //  '65～72＝QZSSの1～8番
+                //                      //  '73～102＝Galileoの1～30番
+                //                      //  '105～139＝BeiDouの1～35番
+                //                      //  '140～198＝SBASの1～59番
+                //                      //  '199≦不明。
+                //public bool Enabled;  //As Boolean '有効フラグ。
+                //                      //---------------------------
+                //publiclong nUBound;   //=-1:無し / =1以上は、(MaskInfo_T)マスク開始時間/マスク終了時間
+                //-----------------------------------------
 
-                //        Dim nUBound As Long
-                //        Get #nFile, , nUBound
-                //        ReDim m_tMaskInfos(i).StrTimes(-1 To nUBound)
-                //        ReDim m_tMaskInfos(i).EndTimes(-1 To nUBound)
-                //        Dim j As Long
-                //        For j = 0 To nUBound
-                //            Get #nFile, , m_tMaskInfos(i).StrTimes(j)
-                //            Get #nFile, , m_tMaskInfos(i).EndTimes(j)
-                //        Next
-                long nUBound = br.ReadInt32();
-                if (nUBound != -1)         //47回目0xFFFFFFFFF
+
+                //-----------------------------------------
+                //[VB]  Get #nFile, , m_tMaskInfos(i).Number  long
+                //衛星番号
+                m_tMaskInfos_struct.Number = br.ReadInt32();
+
+
+                //-----------------------------------------
+                //[VB]  Get #nFile, , m_tMaskInfos(i).Enabled  bool
+                //-----------------------------------------
+                //'有効フラグ
+                m_tMaskInfos_struct.Enabled = document.GetFileBool(br);
+                //-----------------------------------------
+
+
+                //-----------------------------------------
+                //[VB]  Dim nUBound As Long
+                //[VB]  Get #nFile, , nUBound
+                //[VB]  ReDim m_tMaskInfos(i).StrTimes(-1 To nUBound)
+                //[VB]  ReDim m_tMaskInfos(i).EndTimes(-1 To nUBound)
+                //[VB]  Dim j As Long
+                //[VB]  For j = 0 To nUBound
+                //[VB]        Get #nFile, , m_tMaskInfos(i).StrTimes(j)
+                //[VB]        Get #nFile, , m_tMaskInfos(i).EndTimes(j)
+                //[VB]  Next
+                //----------------------------------------------------
+
+                ////(@NV)=-1:無し / =1以上は、(MaskInfo_T)マスク開始時間/マスク終了時間
+                m_tMaskInfos_struct.nUBound = br.ReadInt32();
+
+                //-----------------------------------------------------
+                // 再配置<-読み込みデータ情報
+                //-----------------------------------------------------
+                Genba_S.m_tMaskInfos.Add(m_tMaskInfos_struct);
+
+                //******************************************
+                //((MaskInfo_T)マスク開始時間/マスク終了時間
+                //******************************************
+                var MaskInfo_T_struct = new MaskInfo_T();
+                List<MaskInfo_T> m_tMaskInfosT = new List<MaskInfo_T>();
+                Genba_S.m_tMaskInfos_T = m_tMaskInfosT;
+
+                if (m_tMaskInfos_struct.nUBound != -1)         //47回目0xFFFFFFFFF
                 {
-                    DateTime[] m_tMaskInfos_date_StrTimes = new DateTime[nUBound + 1];
-                    DateTime[] m_tMaskInfos_date_EndTimes = new DateTime[nUBound + 1];
 
-                    for (long j = 0; j <= nUBound; j++)
+                    for (long j = 0; j <= m_tMaskInfos_struct.nUBound; j++)
                     {
                         // 4byte読み取り
                         ret = br.Read(buf, 0, 8);
-                        m_tMaskInfos_date_StrTimes[j] = DateTime.FromOADate(BitConverter.ToDouble(buf, 0));
+                        MaskInfo_T_struct.StrTimes = DateTime.FromOADate(BitConverter.ToDouble(buf, 0));
 
-                        m_tMaskInfos_date_EndTimes[j] = DateTime.FromOADate(BitConverter.ToDouble(buf, 0));
+                        MaskInfo_T_struct.EndTimes = DateTime.FromOADate(BitConverter.ToDouble(buf, 0));
+
+                        //-----------------------------------------------------
+                        // 再配置<-読み込みデータ情報
+                        //-----------------------------------------------------
+                        Genba_S.m_tMaskInfos_T.Add(MaskInfo_T_struct);
                     }
 
                 }
+                else
+                {
+                    MaskInfo_T_struct.StrTimes = DateTime.MinValue;
+                    MaskInfo_T_struct.EndTimes = DateTime.MinValue;
+                    //-----------------------------------------------------
+                    // 再配置<-読み込みデータ情報
+                    //-----------------------------------------------------
+                    Genba_S.m_tMaskInfos_T.Add(MaskInfo_T_struct);
 
-            }
+                }
 
+
+            }   // for (long i = 0; i < nCount; i++)
+
+            //<<<<----23/12/20 K.Setoguchi
+
+            //<<<<----23/12/20 K.Setoguchi  ＜＜＜　23/12/20以前の処理は削除　＞＞＞
+            //23/12/20 K.Setoguchi---->>>>  ＜＜＜　23/12/20以前の処理は削除　＞＞＞
+
+            //==================================================================
             //'読み込み。
             //'
             //'引き数：
@@ -95,6 +170,8 @@ namespace SurvLine
             //        Next
             //    Next
             //End Sub
+            //***************************************************************************
+            //***************************************************************************
 
         }
     }

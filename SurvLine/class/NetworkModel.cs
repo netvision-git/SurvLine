@@ -40,6 +40,7 @@
 //'BaseLineVector オブジェクトは m_clsBaseLineVectorHead のリストに保持される。
 //'代表観測点は m_clsRepresentPointHead のリストに保持される。
 //'孤立観測点はさらに m_clsIsolatePointHead のリストでも保持される。
+using NTS;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -82,7 +83,6 @@ namespace SurvLine
         //'*******************************************************************************
         //'*******************************************************************************
 
-
         //**************************************************************************************
         //**************************************************************************************
         /// <summary>
@@ -96,12 +96,17 @@ namespace SurvLine
         /// <returns>
         /// </returns>
         //**************************************************************************************
-        //        public void Load(BinaryReader br, long nVersion, ref GENBA_STRUCT_S Genba_S)
-        public void Load(BinaryReader br, long nVersion, ref List<GENBA_STRUCT_S> List_Genba_S)
+        //        public void Load(BinaryReader br, long nVersion, ref GENBA_STRUCT_S Genba_S)  //23/12/20 K.Setoguchi
+        public void Load(BinaryReader br, long nVersion, ref List<GENBA_STRUCT_S> List_Genba_S) //23/12/20 K.Setoguchi
         {
             //-------------------------------------------------------------------------
             GENBA_STRUCT_S Genba_S = new GENBA_STRUCT_S();
-            List_Genba_S.Add(Genba_S);
+
+            //23/12/20 K.Setoguchi---->>>>
+            GENBA_STRUCT_S Genba_S_Init = new GENBA_STRUCT_S();
+            Genba_S = Genba_S_Init;         //構造体の初期化
+            //(del)  List_Genba_S.Add(Genba_S);
+            //<<<<----23/12/20 K.Setoguchi
             //-------------------------------------------------------------------------
 
             Dispersion dispersion = new Dispersion();
@@ -111,6 +116,13 @@ namespace SurvLine
             //[VB]------------------------------------------------------------
             //[VB]      Call m_clsDispersion.Load(nFile, nVersion)
             dispersion.Load( br, ref Genba_S);
+
+            //23/12/20 K.Setoguchi---->>>>
+            //-----------------------------------------------------
+            // 再配置<-読み込みデータ情報
+            //-----------------------------------------------------
+            List_Genba_S.Add(Genba_S);
+            //<<<<----23/12/20 K.Setoguchi
 
             //[VB]------------------------------------------------------------
             //[VB]      Dim clsBaseLineVector As BaseLineVector
@@ -133,15 +145,26 @@ namespace SurvLine
             nCount = (long)br.ReadInt32();
             for (int i = 0; i < nCount; i++)            //87
             {
-                //-------------------------------------------------------------------------
-                List_Genba_S.Add(Genba_S);
-                //-------------------------------------------------------------------------
+                //23/12/20 K.Setoguchi---->>>>
+                //  //-------------------------------------------------------------------------
+                //  List_Genba_S.Add(Genba_S);
+                //  //-------------------------------------------------------------------------
+                //<<<<----23/12/20 K.Setoguchi
 
                 //------------------------------------------------------------------------------
                 //[VB]          Set clsBaseLineVector = New BaseLineVector
                 //[VB]          Call clsBaseLineVector.Load(nFile, nVersion, clsObservationPoints)
                 //[VB]          Set clsChainList = clsChainList.InsertNext(clsBaseLineVector)
                 baseLineVector.Load(br, nVersion, ref Genba_S);
+
+                //23/12/20 K.Setoguchi---->>>>
+                //-----------------------------------------------------
+                // 再配置<-読み込みデータ情報
+                //-----------------------------------------------------
+                List_Genba_S.Add(Genba_S);
+
+                Genba_S = Genba_S_Init;         //構造体の初期化
+                //<<<<----23/12/20 K.Setoguchi
 
             }
 
