@@ -1,0 +1,267 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{AECD247A-4521-4553-AF91-B336FF358765}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>SurvLine</RootNamespace>
+    <AssemblyName>SurvLine</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;SEMIDYNA</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="class\AmbInfo.cs" />
+    <Compile Include="class\BaseLineVector.cs" />
+    <Compile Include="class\CoordinatePointFix.cs" />
+    <Compile Include="class\CoordinatePointXYZ.cs" />
+    <Compile Include="class\DepPattern.cs" />
+    <Compile Include="class\Dispersion.cs" />
+    <Compile Include="class\Document.cs" />
+    <Compile Include="class\EccentricCorrectionParam.cs" />
+    <Compile Include="class\external01.cs" />
+    <Compile Include="class\NetworkModel.cs" />
+    <Compile Include="class\ObsDataMask.cs" />
+    <Compile Include="class\ObservationCommonAttributes.cs" />
+    <Compile Include="class\ObservationPoint.cs" />
+    <Compile Include="class\ObservationPointAttributes.cs" />
+    <Compile Include="class\ObsInfo.cs" />
+    <Compile Include="class\ProjectFileManager.cs" />
+    <Compile Include="class\SatelliteInfoReader.cs" />
+    <Compile Include="frmJobEdit.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmJobEdit.Designer.cs">
+      <DependentUpon>frmJobEdit.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmMain.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmMain.Designer.cs">
+      <DependentUpon>frmMain.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmJobOpen.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmJobOpen.Designer.cs">
+      <DependentUpon>frmJobOpen.cs</DependentUpon>
+    </Compile>
+    <Compile Include="mdl\mdlBaseLineAnalyser.cs" />
+    <Compile Include="mdl\mdlDefine.cs" />
+    <Compile Include="mdl\mdlListPane.cs" />
+    <Compile Include="mdl\mdlNSDefine.cs" />
+    <Compile Include="mdl\mdlNSSDefine.cs" />
+    <Compile Include="mdl\mdlUtility.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="user\ListPane.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="user\ListPane.Designer.cs">
+      <DependentUpon>ListPane.cs</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="frmJobEdit.resx">
+      <DependentUpon>frmJobEdit.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmMain.resx">
+      <DependentUpon>frmMain.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmJobOpen.resx">
+      <DependentUpon>frmJobOpen.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <EmbeddedResource Include="user\ListPane.resx">
+      <DependentUpon>ListPane.cs</DependentUpon>
+    </EmbeddedResource>
+    <None Include="..\.editorconfig">
+      <Link>.editorconfig</Link>
+    </None>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Icon1.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\PC からインポート.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\インポート CSV ベクトルデータファイル.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\インポート NetSurv ベクトルデータファイル.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\インポート RINEX ファイル.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\インポートNetSurv データファイル.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\スマートフォンからインポート.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\セッション分割.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\セッション名変更.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\データ表示.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ファイル出力.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\観測データの編集.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\観測点情報の編集.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\基線の再作成.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\基線の追加.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\基線ベクトルの向きの自動整列.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\基線ベクトルの編集.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\計算.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\結合.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\現場の編集.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\現場を選択.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\削除.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\上書き保存.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\新規現場の作成.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\前後半分割.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\他の現場からインポート.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\帳票出力n.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\帳票出力o.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\帳票出力s.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\点検計算.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\反転.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\分離.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\偏心設定.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\有効.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.8">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4.8 %28x86 および x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
