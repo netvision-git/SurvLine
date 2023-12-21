@@ -96,6 +96,7 @@
     <Compile Include="frmJobOpen.Designer.cs">
       <DependentUpon>frmJobOpen.cs</DependentUpon>
     </Compile>
+    <Compile Include="mdl\mdlAccountMake.cs" />
     <Compile Include="mdl\mdlBaseLineAnalyser.cs" />
     <Compile Include="mdl\mdlDefine.cs" />
     <Compile Include="mdl\mdlListPane.cs" />

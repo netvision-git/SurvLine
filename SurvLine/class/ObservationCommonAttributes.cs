@@ -46,43 +46,58 @@ namespace SurvLine
         {
             //-----------------------------------------------------------------------
             //[VB]  Number = GetString(nFile)   public string Number;               //As String '番号。    "305"
-            Genba_S.Number = mdiUtility.FileRead_GetString(br);
+            //(del)     Genba_S.Number = mdiUtility.FileRead_GetString(br); //23/12/20 K.Setoguchi
+            Genba_S.OCA.Number = mdiUtility.FileRead_GetString(br);         //23/12/20 K.Setoguchi
 
             //-----------------------------------------------------------------------
             //[VB]  Name = GetString(nFile)                                         "明地"
-            Genba_S.Name = mdiUtility.FileRead_GetString(br);
+            //(del)     Genba_S.Name = mdiUtility.FileRead_GetString(br);   //23/12/20 K.Setoguchi
+            Genba_S.OCA.Name = mdiUtility.FileRead_GetString(br);           //23/12/20 K.Setoguchi
             //-----------------------------------------------------------------------
             if (nVersion < 5600)
             {
-                Genba_S.GenuineNumber = Genba_S.Number;
-                Genba_S.GenuineName = Genba_S.Name;
+                //(del)     Genba_S.GenuineNumber = Genba_S.Number;     //23/12/20 K.Setoguchi
+                //(del)     Genba_S.GenuineName = Genba_S.Name;         //23/12/20 K.Setoguchi
+                Genba_S.OCA.GenuineNumber = Genba_S.OCA.Number;         //23/12/20 K.Setoguchi
+                Genba_S.OCA.GenuineName = Genba_S.OCA.Name;             //23/12/20 K.Setoguchi
             }
             else
             {
                 //-----------------------------------------
                 //[VB]  GenuineNumber = GetString(nFile)
-                Genba_S.GenuineNumber = mdiUtility.FileRead_GetString(br);
+                //(del)     Genba_S.GenuineNumber = mdiUtility.FileRead_GetString(br);  //23/12/20 K.Setoguchi
+                Genba_S.OCA.GenuineNumber = mdiUtility.FileRead_GetString(br);          //23/12/20 K.Setoguchi
+
                 //-----------------------------------------
                 //[VB]  GenuineName = GetString(nFile)
-                Genba_S.Number = mdiUtility.FileRead_GetString(br);
+
+                //(del)     Genba_S.Number = mdiUtility.FileRead_GetString(br);         //23/12/20 K.Setoguchi
+                Genba_S.OCA.GenuineNumber = mdiUtility.FileRead_GetString(br);           //23/12/20 K.Setoguchi
+
             }
             //-----------------------------------------------------------------------
             //[VB]  Get #nFile, , ObjectType
-            Genba_S.ObjectType = br.ReadInt32(); ;
-            if (nVersion < 6200){
+            //(del) Genba_S.ObjectType = br.ReadInt32();            //23/12/20 K.Setoguchi
+            Genba_S.OCA.ObjectType = br.ReadInt32();                //23/12/20 K.Setoguchi
+
+            if (nVersion < 6200)
+            {
                 //[VB]  Get #nFile, , OldEditCode
-                Genba_S.OldEditCode = br.ReadInt32();
+                //(del)     Genba_S.OldEditCode = br.ReadInt32();   //23/12/20 K.Setoguchi
+                Genba_S.OCA.OldEditCode = br.ReadInt32();           //23/12/20 K.Setoguchi
             }
             else
             {
-                Genba_S.OldEditCode = 0;
+                //(del)     Genba_S.OldEditCode = 0;                //23/12/20 K.Setoguchi
+                Genba_S.OCA.OldEditCode = 0;                        //23/12/20 K.Setoguchi
             }
 
             //------------------------------------
             //[VB]  Call m_clsCoordinateFixed.Load(nFile, nVersion)             OK
             coordinatePointFix.Load(br, nVersion, ref Genba_S);
 
-            if (nVersion >= 2100){
+            if (nVersion >= 2100)
+            {
                 //------------------------------------
                 //[VB] Call m_clsEccentricCorrectionParam.Load(nFile, nVersion)     OK
                 eccentricCorrectionParam.Load(br, nVersion, ref Genba_S);

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NTS;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -35,7 +36,8 @@ namespace SurvLine
         private void Class_Initialize(ref GENBA_STRUCT_S Genba_S)
         {
             //[VB]m_nCoordinateType = COORDINATE_XYZ
-            Genba_S.CPXYZ_m_nCoordinateType = 0;
+            //(del)     Genba_S.CPXYZ_m_nCoordinateType = 0;        //23/12/20 K.Setoguchi
+            Genba_S.CPXYZ.m_nCoordinateType = 0;                    //23/12/20 K.Setoguchi
         }
         //***************************************************************************
         //***************************************************************************
@@ -98,17 +100,6 @@ namespace SurvLine
         /// 戻り値:returns = Non
         /// </returns>
         //***************************************************************************
-#if !DEBUG
-        //'インプリメンテーション
-        public double CPXYZ_m_nX;                //As Double 'X。
-        public double CPXYZ_m_nY;                //As Double 'Y。
-        public double CPXYZ_m_nZ;                //As Double 'Z。
-        public double CPXYZ_m_nRoundX;           //As Double '丸めX。
-        public double CPXYZ_m_nRoundY;           //As Double '丸めY。
-        public double CPXYZ_m_nRoundZ;           //As Double '丸めZ。
-        public int CPXYZ_m_nCoordinateType;      //As COORDINATE_TYPE '座標値種別。
-
-#endif
         private void CoordinatePoint_Load(BinaryReader br, long nVersion, ref GENBA_STRUCT_S Genba_S)
         {
 
@@ -117,38 +108,61 @@ namespace SurvLine
 
             //-------------------------------------------
             //[VB]  Get #nFile, , m_nRoundX                         0       -3796335.47
-            Genba_S.CPXYZ_m_nRoundX = br.ReadDouble();
+            //(del)     Genba_S.CPXYZ_m_nRoundX = br.ReadDouble();  //23/12/20 K.Setoguchi
+            Genba_S.CPXYZ.m_nRoundX = br.ReadDouble();              //23/12/20 K.Setoguchi
+            //-------------------------------------------
             //[VB]  Get #nFile, , m_nRoundY                         0       3572066.263
-            Genba_S.CPXYZ_m_nRoundY = br.ReadDouble();
+            //(del)     Genba_S.CPXYZ_m_nRoundY = br.ReadDouble();  //23/12/20 K.Setoguchi
+            Genba_S.CPXYZ.m_nRoundY = br.ReadDouble();              //23/12/20 K.Setoguchi    
+            //-------------------------------------------
             //[VB]  Get #nFile, , m_nRoundZ                         0       3663194.625
-            Genba_S.CPXYZ_m_nRoundZ = br.ReadDouble();
+            //(del)     Genba_S.CPXYZ_m_nRoundZ = br.ReadDouble();  //23/12/20 K.Setoguchi
+            Genba_S.CPXYZ.m_nRoundZ = br.ReadDouble();              //23/12/20 K.Setoguchi
             //-------------------------------------------
             if (nVersion < 6400)
             {
                 //-------------------------------------------
                 //m_nX = m_nRoundX
-                Genba_S.CPXYZ_m_nX = Genba_S.CPXYZ_m_nRoundX;
+                //(del)     Genba_S.CPXYZ_m_nX = Genba_S.CPXYZ_m_nRoundX;   //23/12/20 K.Setoguchi
+                Genba_S.CPXYZ.m_nX = Genba_S.CPXYZ.m_nRoundX;               //23/12/20 K.Setoguchi
+                //-------------------------------------------
                 //m_nY = m_nRoundY
-                Genba_S.CPXYZ_m_nY = Genba_S.CPXYZ_m_nRoundX;
+                //(del)     Genba_S.CPXYZ_m_nY = Genba_S.CPXYZ_m_nRoundX;   //23/12/20 K.Setoguchi
+                Genba_S.CPXYZ.m_nY = Genba_S.CPXYZ.m_nRoundX;               //23/12/20 K.Setoguchi
+                //-------------------------------------------
                 //m_nZ = m_nRoundZ
-                Genba_S.CPXYZ_m_nZ = Genba_S.CPXYZ_m_nRoundX;
+                //(del)     Genba_S.CPXYZ_m_nZ = Genba_S.CPXYZ_m_nRoundX;   //23/12/20 K.Setoguchi
+                Genba_S.CPXYZ.m_nZ = Genba_S.CPXYZ.m_nRoundX;               //23/12/20 K.Setoguchi
 
-                //-------------------------------------------
-                //検討    //m_nRoundX = JpnRound(m_nX, ACCOUNT_DECIMAL_XYZ)
-                //検討    //m_nRoundY = JpnRound(m_nY, ACCOUNT_DECIMAL_XYZ)
-                //検討    //m_nRoundZ = JpnRound(m_nZ, ACCOUNT_DECIMAL_XYZ)
-                //-------------------------------------------
+
+
+                //-------------------------------------------//23/12/20 K.Setoguchi
+                //[VB]      m_nRoundX = JpnRound(m_nX, ACCOUNT_DECIMAL_XYZ)                                             //23/12/20 K.Setoguchi
+                MdlUtility mdlUtility = new MdlUtility();                                                               //23/12/20 K.Setoguchi
+                Genba_S.CPXYZ.m_nRoundX = mdlUtility.JpnRound(Genba_S.CPXYZ.m_nX, MdlAccountMake.ACCOUNT_DECIMAL_XYZ);  //23/12/20 K.Setoguchi
+                //[VB]      m_nRoundY = JpnRound(m_nY, ACCOUNT_DECIMAL_XYZ)     //23/12/20 K.Setoguchi                  //23/12/20 K.Setoguchi       
+                Genba_S.CPXYZ.m_nRoundY = mdlUtility.JpnRound(Genba_S.CPXYZ.m_nY, MdlAccountMake.ACCOUNT_DECIMAL_XYZ);  //23/12/20 K.Setoguchi
+                //[VB]      m_nRoundZ = JpnRound(m_nZ, ACCOUNT_DECIMAL_XYZ)     //23/12/20 K.Setoguchi                  //23/12/20 K.Setoguchi
+                Genba_S.CPXYZ.m_nRoundZ = mdlUtility.JpnRound(Genba_S.CPXYZ.m_nZ, MdlAccountMake.ACCOUNT_DECIMAL_XYZ);  //23/12/20 K.Setoguchi
+                //-------------------------------------------//23/12/20 K.Setoguchi
+
+
+
 
             }
             else
             {
                 //-------------------------------------------
-                //Get #nFile, , m_nX                                0       -3796335.4701
-                Genba_S.CPXYZ_m_nX = br.ReadDouble();
-                //Get #nFile, , m_nY                                0       3572066.2631
-                Genba_S.CPXYZ_m_nY = br.ReadDouble();
-                //Get #nFile, , m_nZ                                0       3663194.625 
-                Genba_S.CPXYZ_m_nZ = br.ReadDouble();
+                //Get #nFile, , m_nX                                0 /-3796335.4701
+                //(del)     Genba_S.CPXYZ_m_nX = br.ReadDouble();           //23/12/20 K.Setoguchi
+                Genba_S.CPXYZ.m_nX = br.ReadDouble();                       //23/12/20 K.Setoguchi
+                //-------------------------------------------   
+                //Get #nFile, , m_nY                                0 /3572066.2631
+                //(del)     Genba_S.CPXYZ_m_nY = br.ReadDouble();           //23/12/20 K.Setoguchi
+                Genba_S.CPXYZ.m_nY = br.ReadDouble();                       //23/12/20 K.Setoguchi
+                //Get #nFile, , m_nZ                                0 /3663194.625 
+                //(del)     Genba_S.CPXYZ_m_nZ = br.ReadDouble();           //23/12/20 K.Setoguchi
+                Genba_S.CPXYZ.m_nZ = br.ReadDouble();                       //23/12/20 K.Setoguchi    
                 //-------------------------------------------
             }
         }

@@ -434,6 +434,58 @@ namespace SurvLine
         //End Function
 
 
+
+        //***************************************************************************
+        //***************************************************************************
+        /// <summary>
+        ///'nDec で指定された少数点以下桁数で四捨五入する。
+        ///'
+        ///'引き数：
+        ///'nVal 値。
+        ///'nDec 少数点以下桁数。
+        /// </summary>
+        /// <param name="nVa"></param>
+        /// <param name="nDec"></param>
+        /// <returns></returns>
+        //***************************************************************************
+        public double JpnRound(double nVa, long nDec)
+        {
+
+            double ans = 0;
+            //double nFig;
+
+
+            //nFig = 10 ^ nDec;
+
+            //nVa = nVa * nFig;
+
+            ans = (double)Math.Round(nVa, (int)nDec);
+
+
+            return ans;
+
+        }
+        //--------------------------------------------------------------------------
+        //'四捨五入。
+        //'
+        //'nDec で指定された少数点以下桁数で四捨五入する。
+        //'
+        //'引き数：
+        //'nVal 値。
+        //'nDec 少数点以下桁数。
+        //'
+        //'戻り値：結果値。
+        //Public Function JpnRound(ByVal nVal As Double, ByVal nDec As Long) As Double
+        //'    Dim nFig As Double
+        //'    nFig = 10 ^ nDec
+        //'    JpnRound = Fix(nVal * nFig + 0.5 * Sgn(nVal)) / nFig
+        //    Dim sFormat As String
+        //    sFormat = "0." & String(nDec, "0")
+        //    JpnRound = Val(Format$(nVal, sFormat))
+        //End Function
+        //***************************************************************************
+        //***************************************************************************
+
     }
 
 
