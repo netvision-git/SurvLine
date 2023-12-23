@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace SurvLine
 {
@@ -260,7 +263,7 @@ namespace SurvLine
         //  ObservationCommonAttributes
         //----------------------------------------------------------------
 
-        //23/12/20 K.Setoguchi---->>>>
+        //23/12/20 K.setoguchi@NV---------->>>>>>>>>>
         //(del)     public string Number;               //As String '番号。
         //(del)     public string Name;                 //As String '名称。
         //(del)     public string GenuineNumber;        //As String '本点番号。
@@ -269,12 +272,12 @@ namespace SurvLine
         //(del)     public int OldEditCode;             //As EDITCODE_STYLE '旧編集コード。
         //****************************************************************
         public OCA_STRUCT OCA;                  //ObservationCommonAttributes       //23/12/20 K.Setoguchi
-        //<<<<----23/12/20 K.Setoguchi
+        //<<<<<<<<<-----------23/12/20 K.setoguchi@NV
 
         //****************************************************************
         //  CoordinatePointFix
         //----------------------------------------------------------------
-        //23/12/20 K.Setoguchi---->>>>                  //
+        //23/12/20 K.setoguchi@NV---------->>>>>>>>>>
         //'インプリメンテーション                      //
         //(del)     public double m_nX;               //As Double 'X。
         //(del)     public double m_nY;               //As Double 'Y。
@@ -305,7 +308,7 @@ namespace SurvLine
         //(del)     public double m_nRoundZKON;        //As Double '今期丸めZ。
         //****************************************************************
         public OPFix_STRUCT OPFix;                      //CoordinatePointFix           //23/12/20 K.Setoguchi
-        //<<<<----23/12/20 K.Setoguchi                  //
+                                                        //<<<<<<<<<-----------23/12/20 K.setoguchi@NV                  //
 
 
         //****************************************************************
@@ -344,7 +347,7 @@ namespace SurvLine
         //****************************************************************
         //  CoordinatePointXYZ
         //----------------------------------------------------------------
-        //23/12/20 K.Setoguchi---->>>>                  //
+        //23/12/20 K.setoguchi@NV---------->>>>>>>>>>
         //(del)     'インプリメンテーション
         //(del)     public double CPXYZ_m_nX;                //As Double 'X。
         //(del)     public double CPXYZ_m_nY;                //As Double 'Y。
@@ -355,7 +358,7 @@ namespace SurvLine
         //(del)     public int CPXYZ_m_nCoordinateType;      //As COORDINATE_TYPE '座標値種別。
         //****************************************************************
         public CPXYZ_STRUCT CPXYZ;        //CoordinatePointXYZ
-        //<<<<----23/12/20 K.Setoguchi
+        //<<<<<<<<<-----------23/12/20 K.setoguchi@NV
 
 
         //****************************************************************
@@ -382,7 +385,7 @@ namespace SurvLine
         //'*******************************************************************************
         public OPA_STRUCT OPA;                  //共通OPAデータ（処理後、OPA --> OPA_Str / OPA_End）
 
-        //23/12/20 K.Setoguchi---->>>>
+        //23/12/20 K.setoguchi@NV---------->>>>>>>>>>
         //---------------------------------------                                  
         //        public OPA_STRUCT OPA_Str;                  //開始OPAデータ情報        //23/12/20 K.Setoguchi
         //        public OPA_STRUCT OPA_End;                  //終了OPAデータ情報        //23/12/20 K.Setoguchi
@@ -391,29 +394,47 @@ namespace SurvLine
         public List<OPA_STRUCT_SUB> OPA_ListStr;    //->開始OPAデータ詳細情報    //23/12/20 K.Setoguchi  
         public List<OPA_STRUCT_SUB> OPA_ListEnd;    //->終了OPAデータ詳細情報    //23/12/20 K.Setoguchi
         //---------------------------------------                                  
-        //<<<<----23/12/20 K.Setoguchi
+        //<<<<<<<<<-----------23/12/20 K.setoguchi@NV
 
 
 
 
-        //23/12/20 K.Setoguchi---->>>>
+        //23/12/20 K.setoguchi@NV---------->>>>>>>>>>
         //'*******************************************************************************
         //  DepPattern Load                 位相パターンの標高
         //'*******************************************************************************
         public List<NSPPS3_DEP_PATTERN> m_tDepPattern;
-        //<<<<----23/12/20 K.Setoguchi
+        //<<<<<<<<<-----------23/12/20 K.setoguchi@NV
 
-        //23/12/20 K.Setoguchi---->>>>
+         //23/12/20 K.setoguchi@NV---------->>>>>>>>>>>
         //'*******************************************************************************
         //  DepDataMask Load                衛星情報マスク
         //'*******************************************************************************
         public List<MaskInfo> m_tMaskInfos;         //衛星（衛星番号
-        public List<MaskInfo_T> m_tMaskInfos_T;     //衛星（マスク開始時間/マスク終了時間
-        //<<<<----23/12/20 K.Setoguchi
+
+        //23/12/22 K.setoguchi@NV---------->>>>>>>>>>
+        //-------------------------------------------------------
+        //--- 衛星 m_tMaskInfos   マスク開始時間/マスク終了時間
+        //-------------------------------------------------------
+        //(del) public List<List<MaskInfo_T>> m_tMaskInfos_T;       //衛星（マスク開始時間/マスク終了時間    //23/12/22 K.setoguchi@NV
+        public List<List<DateTime>> m_tMaskInfos_StrTimes;          //衛星マスク開始時間２次元配列           //23/12/22 K.setoguchi@NV
+        public List<List<DateTime>> m_tMaskInfos_EndTimes;          //衛星マスク終了時間２次元配列           //23/12/22 K.setoguchi@NV
+        //-------------------------------------------------------
+        //<<<<<<<<<-----------23/12/22 K.setoguchi@NV
+        //<<<<<<<<<-----------23/12/20 K.setoguchi@NV
+
+        //23/12/22 K.setoguchi@NV---------->>>>>>>>>>
+        //****************************************************************
+        // AmbInfo_Load
+        //  'アンビギュイティ情報
+        //----------------------------------------------------------------
+        public List<AMBINF_STRUCT> m_tAmbInfos;  //アンビギュイティ情報  //AmbInfo_Load:m_tAmbInfos
+        //<<<<<<<<<-----------23/12/22 K.setoguchi@NV
+
 
 
     }
-    //23/12/20 K.Setoguchi---->>>>
+    //23/12/20 K.setoguchi@NV---------->>>>>>>>>>
     //'*******************************************************************************      
     //  DepPattern Load 構造体         位相パターンの標高
     //'*******************************************************************************      
@@ -425,10 +446,10 @@ namespace SurvLine
         public Single PatternL5;    //PatternL5 As Single 'phase center pattern for L5 (meters)
     }
 
-    //<<<<----23/12/20 K.Setoguchi
+    //<<<<<<<<<-----------23/12/20 K.setoguchi@NV
 
 
-    //23/12/20 K.Setoguchi---->>>>
+    //23/12/20 K.setoguchi@NV---------->>>>>>>>>>
     //'*******************************************************************************      
     //  DepDataMask Load 構造体        衛星情報マスク（衛星番号・マスク開始時間/マスク終了時間）
     //'*******************************************************************************      
@@ -446,6 +467,7 @@ namespace SurvLine
         public bool Enabled;           //As Boolean '有効フラグ。
                                        //---------------------------
         public long nUBound;           //(@NV)=-1:無し / =1以上は、(MaskInfo_T)マスク開始時間/マスク終了時間
+
     }
     //-----------------------------------
     public struct MaskInfo_T
@@ -453,19 +475,26 @@ namespace SurvLine
         public DateTime StrTimes;      //()As Date 'マスク開始時間(以上)。配列の要素は(-1 To ...)、要素 -1 は未使用。
         public DateTime EndTimes;      //()As Date 'マスク終了時間(以下)。配列の要素は(-1 To ...)、要素 -1 は未使用。
 
-//        public static implicit operator MaskInfo_T(int v)
-//        {
-//            throw new NotImplementedException();
-//        }
+        public static implicit operator MaskInfo_T(List<MaskInfo_T> v)
+        {
+            throw new NotImplementedException();
+        }
+
+        //23/12/22 K.setoguchi@NV---------->>>>>>>>>>
+        //(del) //        public static implicit operator MaskInfo_T(int v)
+        //(del) //        {
+        //(del) //            throw new NotImplementedException();
+        //(del) //        }
+        //<<<<<<<<<-----------23/12/22 K.setoguchi@NV
     }
-    //<<<<----23/12/20 K.Setoguchi
+    //<<<<<<<<<-----------23/12/20 K.setoguchi@NV
 
 
-    //23/12/20 K.Setoguchi---->>>>
+    //23/12/20 K.setoguchi@NV---------->>>>>>>>>>
     //'*******************************************************************************
     //  ObservationPointAttributes Load 構造体
     //'*******************************************************************************
-    //<<<<----23/12/20 K.Setoguchi
+    //<<<<<<<<<-----------23/12/20 K.setoguchi@NV
     public struct OPA_STRUCT
     {
         //'*******************************************************************************
@@ -515,7 +544,7 @@ namespace SurvLine
                                              //'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     }
 
-    //23/12/20 K.Setoguchi---->>>>
+    //23/12/20 K.setoguchi@NV---------->>>>>>>>>>
 
     public struct OPA_STRUCT_SUB
     {
@@ -551,9 +580,9 @@ namespace SurvLine
         public bool bParent;                        //    '親フラグ。
                                                     //----------------------------------------------------------------    
     }
-    //<<<<----23/12/20 K.Setoguchi
+    //<<<<<<<<<-----------23/12/20 K.setoguchi@NV
 
-    //23/12/20 K.Setoguchi---->>>>
+    //23/12/20 K.setoguchi@NV---------->>>>>>>>>>
     public struct OCA_STRUCT        //ObservationCommonAttributes
     {
         //****************************************************************
@@ -567,9 +596,9 @@ namespace SurvLine
         public int OldEditCode;             //As EDITCODE_STYLE '旧編集コード。
                                             //****************************************************************
     }
-    //<<<<----23/12/20 K.Setoguchi
+    //<<<<<<<<<-----------23/12/20 K.setoguchi@NV
 
-    //23/12/20 K.Setoguchi---->>>>
+    //23/12/20 K.setoguchi@NV---------->>>>>>>>>>
     public struct OPFix_STRUCT        //CoordinatePointFix
     {
         //****************************************************************
@@ -604,9 +633,9 @@ namespace SurvLine
         public double m_nRoundYKON;        //As Double '今期丸めY。
         public double m_nRoundZKON;        //As Double '今期丸めZ。
     }
-    //<<<<----23/12/20 K.Setoguchi
+    //<<<<<<<<<-----------23/12/20 K.setoguchi@NV
 
-    //23/12/20 K.Setoguchi---->>>>
+    //23/12/20 K.setoguchi@NV---------->>>>>>>>>>
     public struct CPXYZ_STRUCT        //CoordinatePointXYZ
     {
         //****************************************************************
@@ -621,6 +650,44 @@ namespace SurvLine
         public double m_nRoundZ;           //As Double '丸めZ。
         public int m_nCoordinateType;      //As COORDINATE_TYPE '座標値種別。
     }
-    //<<<<----23/12/20 K.Setoguchi
+    //<<<<<<<<<-----------23/12/20 K.setoguchi@NV
+
+
+
+
+    //23/12/22 K.setoguchi@NV---------->>>>>>>>>>
+    //****************************************************************
+    // AmbInfo_Load
+    //
+    //  'アンビギュイティ情報
+    //----------------------------------------------------------------
+    public struct AMBINF_STRUCT        //アンビギュイティ情報  //AmbInfo_Load:m_tAmbInfos
+    {
+        //------------------------
+        public long Count;                  //'アンビギュイティ情報数。
+        //------------------------
+        public long Lc;         //'周波数。
+        public long Prn;        //'衛星番号。
+        public long PrnRef;     //'基準衛星番号。
+        public AMBINF_T_STRUCT beg;   //'開始時間、年/月/日/時/分/秒。
+        public AMBINF_T_STRUCT End;   //'終了時間、年/月/日/時/分/秒。
+        public Single RMS;      //'RMS。
+        public long Fix;         //'フィックスフラグ。
+        public double ValueFlt;      //'フロート値。
+        public long ValueFix;         //'フィックス値。
+
+    }
+    public struct AMBINF_T_STRUCT        //AmbInfo_Load
+    {
+        public long Year;       //beg/End'時間、年。
+        public long Month;      //beg/End'時間、月。
+        public long Day;        //beg/End'時間、日。
+        public long Hour;       //beg/End'時間、時。
+        public long Min;        //beg/End'時間、分。
+        public double Sec;      //beg/End'時間、秒。
+    }
+    //-----------------------------------------
+    //<<<<<<<<<-----------23/12/22 K.setoguchi@NV
+
 
 }

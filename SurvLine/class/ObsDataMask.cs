@@ -8,6 +8,8 @@ using System.Windows.Forms;
 using System.IO;
 using System.Xml.Linq;
 using NTS;
+using System.Web;
+using static System.Windows.Forms.AxHost;
 
 namespace SurvLine
 {
@@ -36,7 +38,7 @@ namespace SurvLine
         public void Load(BinaryReader br, long nVersion, ref GENBA_STRUCT_S Genba_S)
         {
 
-            //23/12/20 K.Setoguchi---->>>>
+             //23/12/20 K.setoguchi@NV---------->>>>>>>>>>>
             Document document = new Document();
             byte[] buf = new byte[8]; int ret;
 
@@ -48,6 +50,16 @@ namespace SurvLine
             List<MaskInfo> m_tMaskInfosA = new List<MaskInfo>();
             Genba_S.m_tMaskInfos = m_tMaskInfosA;
             //----------------------------------------------------
+
+            //23/12/22 K.setoguchi@NV---------->>>>>>>>>>
+            //-------------------------------------------------------------
+            List<List<DateTime>> StrList = new List<List<DateTime>>();
+            Genba_S.m_tMaskInfos_StrTimes = StrList;
+            List<List<DateTime>> EndList = new List<List<DateTime>>();
+            Genba_S.m_tMaskInfos_EndTimes = EndList;
+            //-------------------------------------------------------------
+            //<<<<<<<<<-----------23/12/22 K.setoguchi@NV
+
 
             for (long i = 0; i < nCount; i++)
             {
@@ -101,12 +113,21 @@ namespace SurvLine
                 //-----------------------------------------------------
                 Genba_S.m_tMaskInfos.Add(m_tMaskInfos_struct);
 
+
                 //******************************************
                 //((MaskInfo_T)マスク開始時間/マスク終了時間
                 //******************************************
                 var MaskInfo_T_struct = new MaskInfo_T();
-                List<MaskInfo_T> m_tMaskInfosT = new List<MaskInfo_T>();
-                Genba_S.m_tMaskInfos_T = m_tMaskInfosT;
+
+                //23/12/22 K.setoguchi@NV---------->>>>>>>>>>
+                //(del)     List<MaskInfo_T> m_tMaskInfosT = new List<MaskInfo_T>();
+                //(del)     Genba_S.m_tMaskInfos_T = m_tMaskInfosT;
+                //<<<<<<<<<-----------23/12/22 K.setoguchi@NV
+
+                //-------------------------------------------------------------
+                List<DateTime> Strdate = new List<DateTime>();
+                List<DateTime> Enddate = new List<DateTime>();
+                //-------------------------------------------------------------
 
                 if (m_tMaskInfos_struct.nUBound != -1)         //47回目0xFFFFFFFFF
                 {
@@ -119,31 +140,57 @@ namespace SurvLine
 
                         MaskInfo_T_struct.EndTimes = DateTime.FromOADate(BitConverter.ToDouble(buf, 0));
 
+
+                        //23/12/22 K.setoguchi@NV---------->>>>>>>>>>
                         //-----------------------------------------------------
-                        // 再配置<-読み込みデータ情報
+                        //(del)     //-----------------------------------------------------
+                        //(del)     // 再配置<-読み込みデータ情報
+                        //(del)     //-----------------------------------------------------
+                        //(del)     Genba_S.m_tMaskInfos_T.Add(MaskInfo_T_struct);
                         //-----------------------------------------------------
-                        Genba_S.m_tMaskInfos_T.Add(MaskInfo_T_struct);
+                        Strdate.Add(MaskInfo_T_struct.StrTimes);                    //衛星マスク開始時間２次元配列    //23/12/22 K.setoguchi@NV
+                        Enddate.Add(MaskInfo_T_struct.EndTimes);                    //衛星マスク終了時間２次元配列    //23/12/22 K.setoguchi@NV
+                        //-----------------------------------------------------
+                        //<<<<<<<<<-----------23/12/22 K.setoguchi@NV
+
                     }
+                    //23/12/22 K.setoguchi@NV---------->>>>>>>>>>
+                    //-----------------------------------------------------
+                    // 再配置<-読み込みデータ情報
+                    //-----------------------------------------------------
+                    Genba_S.m_tMaskInfos_StrTimes.Add(Strdate);
+                    Genba_S.m_tMaskInfos_EndTimes.Add(Enddate);
+                    //-----------------------------------------------------
+                    //<<<<<<<<<-----------23/12/22 K.setoguchi@NV
 
                 }
                 else
                 {
                     MaskInfo_T_struct.StrTimes = DateTime.MinValue;
                     MaskInfo_T_struct.EndTimes = DateTime.MinValue;
+
+                    //23/12/22 K.setoguchi@NV---------->>>>>>>>>>
+                    //(del)     //-----------------------------------------------------
+                    //(del)     // 再配置<-読み込みデータ情報
+                    //(del)     //-----------------------------------------------------
+                    //(del)     Genba_S.m_tMaskInfos_T.Add(MaskInfo_T_struct);
                     //-----------------------------------------------------
-                    // 再配置<-読み込みデータ情報
+                    Strdate.Add(MaskInfo_T_struct.StrTimes);
+                    Enddate.Add(MaskInfo_T_struct.EndTimes);
                     //-----------------------------------------------------
-                    Genba_S.m_tMaskInfos_T.Add(MaskInfo_T_struct);
+                    Genba_S.m_tMaskInfos_StrTimes.Add(Strdate);
+                    Genba_S.m_tMaskInfos_EndTimes.Add(Enddate);
+                    //-----------------------------------------------------
+                    //<<<<<<<<<-----------23/12/22 K.setoguchi@NV
 
                 }
 
-
             }   // for (long i = 0; i < nCount; i++)
 
-            //<<<<----23/12/20 K.Setoguchi
+            //<<<<<<<<<-----------23/12/20 K.setoguchi@NV
 
-            //<<<<----23/12/20 K.Setoguchi  ＜＜＜　23/12/20以前の処理は削除　＞＞＞
-            //23/12/20 K.Setoguchi---->>>>  ＜＜＜　23/12/20以前の処理は削除　＞＞＞
+            //<<<<<<<<<-----------23/12/20 K.setoguchi@NV  ＜＜＜　23/12/20以前の処理は削除　＞＞＞
+             //23/12/20 K.setoguchi@NV---------->>>>>>>>>>>  ＜＜＜　23/12/20以前の処理は削除　＞＞＞
 
             //==================================================================
             //'読み込み。
