@@ -406,7 +406,7 @@ namespace SurvLine
             //[VB]  Call m_clsStrPoint.Load(nFile, nVersion, clsObservationPoints, Nothing)
             //-----------------------------------------------------------------------
 
-            //23/12/20 K.Setoguchi---->>>>
+             //23/12/20 K.setoguchi@NV---------->>>>>>>>>>>
             //-----------------------------------------------------
             //(del)     ObservationPoint observationPoint = new ObservationPoint();
             //(del)     observationPoint.Load(br, nVersion, ref Genba_S);
@@ -423,7 +423,7 @@ namespace SurvLine
             //[VB]  Call m_clsEndPoint.Load(nFile, nVersion, clsObservationPoints, Nothing)
             //------------------------------------------------------------------------
 
-            //23/12/20 K.Setoguchi---->>>>
+             //23/12/20 K.setoguchi@NV---------->>>>>>>>>>>
             //-----------------------------------------------------
             //(del)     observationPoint.Load(br, nVersion, ref Genba_S);
             //-----------------------------------------------------
@@ -432,7 +432,7 @@ namespace SurvLine
             //-----------------------------------------------------
             observationPoint.Load(br, nVersion, ref Genba_S, ref Genba_S.OPA_ListEnd);
             //-----------------------------------------------------
-            //<<<<----23/12/20 K.Setoguchi
+            //<<<<<<<<<-----------23/12/20 K.setoguchi@NV
 
 
             //----------------------------------------

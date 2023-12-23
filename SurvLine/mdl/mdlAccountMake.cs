@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SurvLine;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -36,106 +37,114 @@ namespace NTS
             SELECTED_OBJECT_TYPE_BASELINEVECTOR,    //'基線ベクトル。
             SELECTED_OBJECT_TYPE_SESSION,           //'セッション。
         }
-#if false
+
+
+//23/12/22 K.setoguchi@NV---------->>>>>>>>>>
+//(del)#if false
         //'用紙サイズ幅。
-        Public Const PAPER_WID_LETTER As Single = 8.5 * 1440 'レター、8 1/2 x 11 インチ
-        Public Const PAPER_WID_LETTERSMALL As Single = 8.5 * 1400 'レター スモール、8 1/2 x 11 インチ
-        Public Const PAPER_WID_TABLOID As Single = 11 * 1440 'タブロイド、11 x 17 インチ
-        Public Const PAPER_WID_LEDGER As Single = 11 * 1440 'レジャー、17 x 11 インチ
-        Public Const PAPER_WID_LEGAL As Single = 8.5 * 1440 'リーガル、8 1/2 x 14 インチ
-        Public Const PAPER_WID_STATEMENT As Single = 5.5 * 1440 'ステートメント、5 1/2 x 8 1/2 インチ
-        Public Const PAPER_WID_EXECUTIVE As Single = 7.5 * 1440 'エグゼクティブ、7 1/2 x 10 1/2 インチ
-        Public Const PAPER_WID_A3 As Single = 29.7 * 567 'A3, 297 x 420 mm
-        Public Const PAPER_WID_A4 As Single = 21 * 567 'A4, 210 x 297 mm
-        Public Const PAPER_WID_A4SMALL As Single = 21 * 567 'A4 Small, 210 x 297 mm
-        Public Const PAPER_WID_A5 As Single = 14.8 * 567 'A5, 148 x 210 mm
-        Public Const PAPER_WID_B4 As Single = 25 * 567 'B4, 250 x 354 mm
-        Public Const PAPER_WID_B5 As Single = 18.2 * 567 'B5, 182 x 257 mm
-        Public Const PAPER_WID_FOLIO As Single = 8.5 * 1440 'フォリオ、8 1/2 x 13 インチ
-        Public Const PAPER_WID_QUARTO As Single = 21.5 * 567 'クォート、215 x 275 mm
-        Public Const PAPER_WID_10X14 As Single = 10 * 1440 '10 x 14 インチ
-        Public Const PAPER_WID_11X17 As Single = 11 * 1440 '11 x 17 インチ
-        Public Const PAPER_WID_NOTE As Single = 8.5 * 1440 'ノート、8 1/2 x 11 インチ
-        Public Const PAPER_WID_ENV9 As Single = 31 / 8 * 1440 '封筒 #9、3 7/8 x 8 7/8 インチ
-        Public Const PAPER_WID_ENV10 As Single = 33 / 8 * 1440 '封筒 #10、4 1/8 x 9 1/2 インチ
-        Public Const PAPER_WID_ENV11 As Single = 4.5 * 1440 '封筒 #11、4 1/2 x 10 3/8 インチ
-        Public Const PAPER_WID_ENV12 As Single = 4.5 * 1440 '封筒 #12、4 1/2 x 11 インチ
-        Public Const PAPER_WID_ENV14 As Single = 5 * 1440 '封筒 #14、5 x 11 1/2 インチ
-        Public Const PAPER_WID_CSHEET As Single = 0 'C サイズ シート
-        Public Const PAPER_WID_DSHEET As Single = 0 'D サイズ シート
-        Public Const PAPER_WID_ESHEET As Single = 0 'E サイズ シート
-        Public Const PAPER_WID_ENVDL As Single = 11 * 567 '封筒 DL、110 x 220 mm
-        Public Const PAPER_WID_ENVC5 As Single = 16.2 * 567 '封筒 C5、162 x 229 mm
-        Public Const PAPER_WID_ENVC3 As Single = 32.4 * 567 '封筒 C3、324 x 458 mm
-        Public Const PAPER_WID_ENVC4 As Single = 22.9 * 567 '封筒 C4、229 x 324 mm
-        Public Const PAPER_WID_ENVC6 As Single = 11.4 * 567 '封筒 C6、114 x 162 mm
-        Public Const PAPER_WID_ENVC65 As Single = 11.4 * 567 '封筒 C65、114 x 229 mm
-        Public Const PAPER_WID_ENVB4 As Single = 25 * 567 '封筒 B4、250 x 353 mm
-        Public Const PAPER_WID_ENVB5 As Single = 17.6 * 567 '封筒 B5、176 x 250 mm
-        Public Const PAPER_WID_ENVB6 As Single = 17.6 * 567 '封筒 B6、176 x 125 mm
-        Public Const PAPER_WID_ENVITALY As Single = 11 * 567 '封筒、110 x 230 mm
-        Public Const PAPER_WID_ENVMONARCH As Single = 31 / 8 * 1440 '封筒 Monarch、3 7/8 x 7 1/2 インチ
-        Public Const PAPER_WID_ENVPERSONAL As Single = 29 / 8 * 1440 '封筒、3 5/8 x 6 1/2 インチ
-        Public Const PAPER_WID_FANFOLDUS As Single = 119 / 8 * 1440 'US スタンダード ファンフォールド、14 7/8 x 11 インチ
-        Public Const PAPER_WID_FANFOLDSTDGERMAN As Single = 8.5 * 1440 'ドイツ スタンダード ファンフォールド、8 1/2 x 12 インチ
-        Public Const PAPER_WID_FANFOLDLGLGERMAN As Single = 8.5 * 1440 'ドイツ リーガル ファンフォールド、8 1/2 x 13 インチ
-        Public Const PAPER_WID_USER As Single = 0 'ユーザー定義のサイズ
+        public const Single PAPER_WID_LETTER = 8.5f * 1440;                 //As Single'レター、8 1/2 x 11 インチ
+        public const Single PAPER_WID_LETTERSMALL = (float)8.5f * 1400;     //As Single 'レター スモール、8 1/2 x 11 インチ
+        public const Single PAPER_WID_TABLOID = 11 * 1440;                  //As Single'タブロイド、11 x 17 インチ
+        public const Single PAPER_WID_LEDGER = 11 * 1440;                   //As Single'レジャー、17 x 11 インチ
+        public const Single PAPER_WID_LEGAL = 8.5f * 1440;                  //As Single'リーガル、8 1/2 x 14 インチ
+        public const Single PAPER_WID_STATEMENT = 5.5f * 1440;              //As Single'ステートメント、5 1/2 x 8 1/2 インチ
+        public const Single PAPER_WID_EXECUTIVE = 7.5f * 1440;              //As Single 'エグゼクティブ、7 1/2 x 10 1/2 インチ
+        public const Single PAPER_WID_A3 = 29.7f * 567;                     //As Single 'A3, 297 x 420 mm
+        public const Single PAPER_WID_A4 = 21 * 567;                        //As Single 'A4, 210 x 297 mm
+        public const Single PAPER_WID_A4SMALL = 21 * 567;                   //As Single 'A4 Small, 210 x 297 mm
+        public const Single PAPER_WID_A5 = 14.8f * 567;                     //As Single 'A5, 148 x 210 mm
+        public const Single PAPER_WID_B4 = 25 * 567;                        //As Single 'B4, 250 x 354 mm
+        public const Single PAPER_WID_B5 = 18.2f * 567;                     //As Single 'B5, 182 x 257 mm
+        public const Single PAPER_WID_FOLIO = 8.5f * 1440;                  //As Single 'フォリオ、8 1/2 x 13 インチ
+        public const Single PAPER_WID_QUARTO = 21.5f * 567;                 //As Single 'クォート、215 x 275 mm
+        public const Single PAPER_WID_10X14 = 10 * 1440;                    //As Single '10 x 14 インチ
+        public const Single PAPER_WID_11X17 = 11 * 1440;                    //As Single '11 x 17 インチ
+        public const Single PAPER_WID_NOTE = 8.5f * 1440;                   //As Single 'ノート、8 1/2 x 11 インチ
+        public const Single PAPER_WID_ENV9 = 31 / 8 * 1440;                 //As Single '封筒 #9、3 7/8 x 8 7/8 インチ
+        public const Single PAPER_WID_ENV10 = 33 / 8 * 1440;                //As Single '封筒 #10、4 1/8 x 9 1/2 インチ
+        public const Single PAPER_WID_ENV11 = 4.5f * 1440;                  //As Single '封筒 #11、4 1/2 x 10 3/8 インチ
+        public const Single PAPER_WID_ENV12 = 4.5f * 1440;                  //As Single '封筒 #12、4 1/2 x 11 インチ
+        public const Single PAPER_WID_ENV14 = 5 * 1440;                     //As Single '封筒 #14、5 x 11 1/2 インチ
+        public const Single PAPER_WID_CSHEET = 0;                           //As Single 'C サイズ シート
+        public const Single PAPER_WID_DSHEET = 0;                           //As Single 'D サイズ シート
+        public const Single PAPER_WID_ESHEET = 0;                           //As Single 'E サイズ シート
+        public const Single PAPER_WID_ENVDL = 11 * 567;                     //As Single '封筒 DL、110 x 220 mm
+        public const Single PAPER_WID_ENVC5 = 16.2f * 567;                  //As Single 封筒 C5、162 x 229 mm
+        public const Single PAPER_WID_ENVC3 = 32.4f * 567;                  //As Single '封筒 C3、324 x 458 mm
+        public const Single PAPER_WID_ENVC4 = 22.9f * 567;                  //As Single '封筒 C4、229 x 324 mm
+        public const Single PAPER_WID_ENVC6 = 11.4f * 567;                  //As Single '封筒 C6、114 x 162 mm
+        public const Single PAPER_WID_ENVC65 = 11.4f * 567;                 //As Single '封筒 C65、114 x 229 mm
+        public const Single PAPER_WID_ENVB4 = 25 * 567;                     //As Single '封筒 B4、250 x 353 mm
+        public const Single PAPER_WID_ENVB5 = 17.6f * 567;                  //As Single '封筒 B5、176 x 250 mm
+        public const Single PAPER_WID_ENVB6 = 17.6f * 567;                  //As Single '封筒 B6、176 x 125 mm
+        public const Single PAPER_WID_ENVITALY = 11 * 567;                  //As Single '封筒、110 x 230 mm
+        public const Single PAPER_WID_ENVMONARCH = 31 / 8 * 1440;           //As Single '封筒 Monarch、3 7/8 x 7 1/2 インチ
+        public const Single PAPER_WID_ENVPERSONAL = 29 / 8 * 1440;          //As Single '封筒、3 5/8 x 6 1/2 インチ
+        public const Single PAPER_WID_FANFOLDUS = 119 / 8 * 1440;           //As Single 'US スタンダード ファンフォールド、14 7/8 x 11 インチ
+        public const Single PAPER_WID_FANFOLDSTDGERMAN = 8.5f * 1440;       //As Single 'ドイツ スタンダード ファンフォールド、8 1/2 x 12 インチ
+        public const Single PAPER_WID_FANFOLDLGLGERMAN = 8.5f * 1440;       //As Single 'ドイツ リーガル ファンフォールド、8 1/2 x 13 インチ
+        public const Single PAPER_WID_USER = 0;                             //As Single 'ユーザー定義のサイズ
+        //<<<<<<<<<-----------23/12/22 K.setoguchi@NV
+        //23/12/22 K.setoguchi@NV---------->>>>>>>>>>
+        //'用紙サイズ高さ。
+        public const Single PAPER_HEI_LETTER = 11 * 1440;                   //As Single 'レター、8 1/2 x 11 インチ
+        public const Single PAPER_HEI_LETTERSMALL = 11 * 1400;              //As Single 'レター スモール、8 1/2 x 11 インチ
+        public const Single PAPER_HEI_TABLOID = 17 * 1440;                  //As Single 'タブロイド、11 x 17 インチ
+        public const Single PAPER_HEI_LEDGER = 17 * 1440;                   //As Single 'レジャー、17 x 11 インチ
+        public const Single PAPER_HEI_LEGAL = 14 * 1440;                    //As Single 'リーガル、8 1/2 x 14 インチ
+        public const Single PAPER_HEI_STATEMENT = 8.5f * 1440;              //As Single 'ステートメント、5 1/2 x 8 1/2 インチ
+        public const Single PAPER_HEI_EXECUTIVE = 10.5f * 1440;             //As Single 'エグゼクティブ、7 1/2 x 10 1/2 インチ
+        public const Single PAPER_HEI_A3 = 42 * 567;                        //As Single 'A3, 297 x 420 mm
+        public const Single PAPER_HEI_ = 29.7f * 567;                       //As Single 'A4, 210 x 297 mm
+        public const Single PAPER_HEI_A4SMALL = 29.7f * 567;                //As Single 'A4 Small, 210 x 297 mm
+        public const Single PAPER_HEI_A5 = 21 * 567;                        //As Single 'A5, 148 x 210 mm
+        public const Single PAPER_HEI_B4 = 35.4f * 567;                     //As Single 'B4, 250 x 354 mm
+        public const Single PAPER_HEI_B5 = 25.7f * 567;                     //As Single 'B5, 182 x 257 mm
+        public const Single PAPER_HEI_FOLIO = 13 * 1440;                    //As Single 'フォリオ、8 1/2 x 13 インチ
+        public const Single PAPER_HEI_QUARTO = 27.5f * 567;                 //As Single 'クォート、215 x 275 mm
+        public const Single PAPER_HEI_10X14 = 14 * 1440;                    //As Single '10 x 14 インチ
+        public const Single PAPER_HEI_11X17 = 17 * 1440;                    //As Single '11 x 17 インチ
+        public const Single PAPER_HEI_NOTE = 11 * 1440;                     //As Single 'ノート、8 1/2 x 11 インチ
+        public const Single PAPER_HEI_ENV9 = 71 / 8 * 1440;                 //As Single '封筒 #9、3 7/8 x 8 7/8 インチ
+        public const Single PAPER_HEI_ENV10 = 9.5f * 1440;                  //As Single '封筒 #10、4 1/8 x 9 1/2 インチ
+        public const Single PAPER_HEI_ENV11 = 83 / 8 * 1440;                //As Single '封筒 #11、4 1/2 x 10 3/8 インチ
+        public const Single PAPER_HEI_ENV12 = 11 * 1440;                    //As Single '封筒 #12、4 1/2 x 11 インチ
+        public const Single PAPER_HEI_ENV14 = 11.5f * 1440;                 //As Single '封筒 #14、5 x 11 1/2 インチ
+        public const Single PAPER_HEI_CSHEET = 0;                           //'C サイズ シート
+        public const Single PAPER_HEI_DSHEET = 0;                           //'D サイズ シート
+        public const Single PAPER_HEI_ESHEET = 0;                           //'E サイズ シート
+        public const Single PAPER_HEI_ENVDL = 22 * 567;                     //'封筒 DL、110 x 220 mm
+        public const Single PAPER_HEI_ENVC5 = 22.9f * 567;                  //'封筒 C5、162 x 229 mm
+        public const Single PAPER_HEI_ENVC3 = 45.8f * 567;                  //'封筒 C3、324 x 458 mm
+        public const Single PAPER_HEI_ENVC4 = 32.4f * 567;                  //'封筒 C4、229 x 324 mm
+        public const Single PAPER_HEI_ENVC6 = 16.2f * 567;                  //'封筒 C6、114 x 162 mm
+        public const Single PAPER_HEI_ENVC65 = 22.9f * 567;                 //'封筒 C65、114 x 229 mm
+        public const Single PAPER_HEI_ENVB4 = 35.3f * 567;                  //'封筒 B4、250 x 353 mm
+        public const Single PAPER_HEI_ENVB5 = 25 * 567;                     //'封筒 B5、176 x 250 mm
+        public const Single PAPER_HEI_ENVB6 = 12.5f * 567;                  //'封筒 B6、176 x 125 mm
+        public const Single PAPER_HEI_ENVITALY = 23 * 567;                  //'封筒、110 x 230 mm
+        public const Single PAPER_HEI_ENVMONARCH = 7.5f * 1440;             //'封筒 Monarch、3 7/8 x 7 1/2 インチ
+        public const Single PAPER_HEI_ENVPERSONAL = 6.5f * 1440;            //'封筒、3 5/8 x 6 1/2 インチ
+        public const Single PAPER_HEI_FANFOLDUS = 11 * 1440;                //'US スタンダード ファンフォールド、14 7/8 x 11 インチ
+        public const Single PAPER_HEI_FANFOLDSTDGERMAN = 12 * 1440;         //'ドイツ スタンダード ファンフォールド、8 1/2 x 12 インチ
+        public const Single PAPER_HEI_FANFOLDLGLGERMAN = 13 * 1440;         //'ドイツ リーガル ファンフォールド、8 1/2 x 13 インチ
+        public const Single PAPER_HEI_USER = 0;                             //'ユーザー定義のサイズ
 
-        '用紙サイズ高さ。
-        Public Const PAPER_HEI_LETTER As Single = 11 * 1440 'レター、8 1/2 x 11 インチ
-        Public Const PAPER_HEI_LETTERSMALL As Single = 11 * 1400 'レター スモール、8 1/2 x 11 インチ
-        Public Const PAPER_HEI_TABLOID As Single = 17 * 1440 'タブロイド、11 x 17 インチ
-        Public Const PAPER_HEI_LEDGER As Single = 17 * 1440 'レジャー、17 x 11 インチ
-        Public Const PAPER_HEI_LEGAL As Single = 14 * 1440 'リーガル、8 1/2 x 14 インチ
-        Public Const PAPER_HEI_STATEMENT As Single = 8.5 * 1440 'ステートメント、5 1/2 x 8 1/2 インチ
-        Public Const PAPER_HEI_EXECUTIVE As Single = 10.5 * 1440 'エグゼクティブ、7 1/2 x 10 1/2 インチ
-        Public Const PAPER_HEI_A3 As Single = 42 * 567 'A3, 297 x 420 mm
-        Public Const PAPER_HEI_A4 As Single = 29.7 * 567 'A4, 210 x 297 mm
-        Public Const PAPER_HEI_A4SMALL As Single = 29.7 * 567 'A4 Small, 210 x 297 mm
-        Public Const PAPER_HEI_A5 As Single = 21 * 567 'A5, 148 x 210 mm
-        Public Const PAPER_HEI_B4 As Single = 35.4 * 567 'B4, 250 x 354 mm
-        Public Const PAPER_HEI_B5 As Single = 25.7 * 567 'B5, 182 x 257 mm
-        Public Const PAPER_HEI_FOLIO As Single = 13 * 1440 'フォリオ、8 1/2 x 13 インチ
-        Public Const PAPER_HEI_QUARTO As Single = 27.5 * 567 'クォート、215 x 275 mm
-        Public Const PAPER_HEI_10X14 As Single = 14 * 1440 '10 x 14 インチ
-        Public Const PAPER_HEI_11X17 As Single = 17 * 1440 '11 x 17 インチ
-        Public Const PAPER_HEI_NOTE As Single = 11 * 1440 'ノート、8 1/2 x 11 インチ
-        Public Const PAPER_HEI_ENV9 As Single = 71 / 8 * 1440 '封筒 #9、3 7/8 x 8 7/8 インチ
-        Public Const PAPER_HEI_ENV10 As Single = 9.5 * 1440 '封筒 #10、4 1/8 x 9 1/2 インチ
-        Public Const PAPER_HEI_ENV11 As Single = 83 / 8 * 1440 '封筒 #11、4 1/2 x 10 3/8 インチ
-        Public Const PAPER_HEI_ENV12 As Single = 11 * 1440 '封筒 #12、4 1/2 x 11 インチ
-        Public Const PAPER_HEI_ENV14 As Single = 11.5 * 1440 '封筒 #14、5 x 11 1/2 インチ
-        Public Const PAPER_HEI_CSHEET As Single = 0 'C サイズ シート
-        Public Const PAPER_HEI_DSHEET As Single = 0 'D サイズ シート
-        Public Const PAPER_HEI_ESHEET As Single = 0 'E サイズ シート
-        Public Const PAPER_HEI_ENVDL As Single = 22 * 567 '封筒 DL、110 x 220 mm
-        Public Const PAPER_HEI_ENVC5 As Single = 22.9 * 567 '封筒 C5、162 x 229 mm
-        Public Const PAPER_HEI_ENVC3 As Single = 45.8 * 567 '封筒 C3、324 x 458 mm
-        Public Const PAPER_HEI_ENVC4 As Single = 32.4 * 567 '封筒 C4、229 x 324 mm
-        Public Const PAPER_HEI_ENVC6 As Single = 16.2 * 567 '封筒 C6、114 x 162 mm
-        Public Const PAPER_HEI_ENVC65 As Single = 22.9 * 567 '封筒 C65、114 x 229 mm
-        Public Const PAPER_HEI_ENVB4 As Single = 35.3 * 567 '封筒 B4、250 x 353 mm
-        Public Const PAPER_HEI_ENVB5 As Single = 25 * 567 '封筒 B5、176 x 250 mm
-        Public Const PAPER_HEI_ENVB6 As Single = 12.5 * 567 '封筒 B6、176 x 125 mm
-        Public Const PAPER_HEI_ENVITALY As Single = 23 * 567 '封筒、110 x 230 mm
-        Public Const PAPER_HEI_ENVMONARCH As Single = 7.5 * 1440 '封筒 Monarch、3 7/8 x 7 1/2 インチ
-        Public Const PAPER_HEI_ENVPERSONAL As Single = 6.5 * 1440 '封筒、3 5/8 x 6 1/2 インチ
-        Public Const PAPER_HEI_FANFOLDUS As Single = 11 * 1440 'US スタンダード ファンフォールド、14 7/8 x 11 インチ
-        Public Const PAPER_HEI_FANFOLDSTDGERMAN As Single = 12 * 1440 'ドイツ スタンダード ファンフォールド、8 1/2 x 12 インチ
-        Public Const PAPER_HEI_FANFOLDLGLGERMAN As Single = 13 * 1440 'ドイツ リーガル ファンフォールド、8 1/2 x 13 インチ
-        Public Const PAPER_HEI_USER As Single = 0 'ユーザー定義のサイズ
+        //'時間帯。
+        public const string DISP_TIME_ZONE_UTC = "UTC";                     //As String           
+        public const string DISP_TIME_ZONE_JST = "JST";                     //As String
+        //(del)     Public DISP_TIME_ZONE(TIME_ZONE_COUNT - 1) As String
+        public List<String> DISP_TIME_ZONE;                                 //As String 終了OPAデータ詳細情報
 
-        '時間帯。
-        Public Const DISP_TIME_ZONE_UTC As String = "UTC"
-        Public Const DISP_TIME_ZONE_JST As String = "JST"
-        Public DISP_TIME_ZONE(TIME_ZONE_COUNT - 1) As String
 
-        '書式。
-        Public Const ACCOUNT_FORMAT_MIN As String = "00" '座標。分。
-        Public Const ACCOUNT_FORMAT_SEC As String = "00" '座標、秒。
-        Public Const ACCOUNT_FORMAT_DISPERSION As String = "0.00000E+000" '分散･共分散。
 
-#endif
+        //'書式。
+        public const string ACCOUNT_FORMAT_MIN = "00";                      //As String '座標。分。
+        public const string ACCOUNT_FORMAT_SEC  = "00";                     //As String '座標、秒。
+        public const string ACCOUNT_FORMAT_DISPERSION = "0.00000E+000";     //As String'分散･共分散。
+
+        //(del)     #endif
+        //<<<<<<<<<-----------23/12/22 K.setoguchi@NV
         //'少数点以下桁数。
         public const long ACCOUNT_DECIMAL_SEC = 4;          //As Long = 4 '座標、秒。
         public const long ACCOUNT_DECIMAL_SEC_L = 5;        //As Long = 5 '座標、秒。

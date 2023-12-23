@@ -103,6 +103,7 @@
     <Compile Include="mdl\mdlNSDefine.cs" />
     <Compile Include="mdl\mdlNSSDefine.cs" />
     <Compile Include="mdl\mdlUtility.cs" />
+    <Compile Include="pmemo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="user\ListPane.cs">

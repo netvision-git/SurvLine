@@ -102,11 +102,11 @@ namespace SurvLine
             //-------------------------------------------------------------------------
             GENBA_STRUCT_S Genba_S = new GENBA_STRUCT_S();
 
-            //23/12/20 K.Setoguchi---->>>>
+             //23/12/20 K.setoguchi@NV---------->>>>>>>>>>>
             GENBA_STRUCT_S Genba_S_Init = new GENBA_STRUCT_S();
             Genba_S = Genba_S_Init;         //構造体の初期化
             //(del)  List_Genba_S.Add(Genba_S);
-            //<<<<----23/12/20 K.Setoguchi
+            //<<<<<<<<<-----------23/12/20 K.setoguchi@NV
             //-------------------------------------------------------------------------
 
             Dispersion dispersion = new Dispersion();
@@ -117,12 +117,12 @@ namespace SurvLine
             //[VB]      Call m_clsDispersion.Load(nFile, nVersion)
             dispersion.Load( br, ref Genba_S);
 
-            //23/12/20 K.Setoguchi---->>>>
+             //23/12/20 K.setoguchi@NV---------->>>>>>>>>>>
             //-----------------------------------------------------
             // 再配置<-読み込みデータ情報
             //-----------------------------------------------------
             List_Genba_S.Add(Genba_S);
-            //<<<<----23/12/20 K.Setoguchi
+            //<<<<<<<<<-----------23/12/20 K.setoguchi@NV
 
             //[VB]------------------------------------------------------------
             //[VB]      Dim clsBaseLineVector As BaseLineVector
@@ -145,11 +145,11 @@ namespace SurvLine
             nCount = (long)br.ReadInt32();
             for (int i = 0; i < nCount; i++)            //87
             {
-                //23/12/20 K.Setoguchi---->>>>
+                 //23/12/20 K.setoguchi@NV---------->>>>>>>>>>>
                 //  //-------------------------------------------------------------------------
                 //  List_Genba_S.Add(Genba_S);
                 //  //-------------------------------------------------------------------------
-                //<<<<----23/12/20 K.Setoguchi
+                //<<<<<<<<<-----------23/12/20 K.setoguchi@NV
 
                 //------------------------------------------------------------------------------
                 //[VB]          Set clsBaseLineVector = New BaseLineVector
@@ -157,14 +157,14 @@ namespace SurvLine
                 //[VB]          Set clsChainList = clsChainList.InsertNext(clsBaseLineVector)
                 baseLineVector.Load(br, nVersion, ref Genba_S);
 
-                //23/12/20 K.Setoguchi---->>>>
+                 //23/12/20 K.setoguchi@NV---------->>>>>>>>>>>
                 //-----------------------------------------------------
                 // 再配置<-読み込みデータ情報
                 //-----------------------------------------------------
                 List_Genba_S.Add(Genba_S);
 
                 Genba_S = Genba_S_Init;         //構造体の初期化
-                //<<<<----23/12/20 K.Setoguchi
+                //<<<<<<<<<-----------23/12/20 K.setoguchi@NV
 
             }
 
