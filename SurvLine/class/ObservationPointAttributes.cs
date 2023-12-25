@@ -303,12 +303,22 @@ namespace SurvLine
                     //[VB]  Call clsSatelliteInfoReader.ReadSattSignal(nSattSignalGPS, nSattSignalGLONASS, nSattSignalQZSS, nSattSignalGalileo, nSattSignalBeiDou, clsProgressInterface)
                     string App_Path = @"C:\Develop\NetSurv\Src\NS-App\NS-Survey";
                     SatelliteInfoReader satelliteInfoReader = new SatelliteInfoReader();
-                    //"C:\Develop\NetSurv\Src\NS-App\NS-Survey\Temp\.\ObsPoint\017H305.log"
-                    satelliteInfoReader.OpenFile($"{App_Path}{TEMPORARY_PATH}.{ OBSPOINT_PATH}{ FileTitle}.RNX_SV_EXTENSION");
+                    //--------------------------------------------------------------------"C:\Develop\NetSurv\Src\NS-App\NS-Survey\Temp\.\ObsPoint\017H305.log"
+
+                    //23/12/24 K.setoguchi@NV---------->>>>>>>>>>
+                    //---------------------------------------------------------------------------------------------------
+                    //(del)     satelliteInfoReader.OpenFile($"{App_Path}{TEMPORARY_PATH}.{OBSPOINT_PATH}{FileTitle}.RNX_SV_EXTENSION");
+                    //      satelliteInfoReader.OpenFile($"{App_Path}{TEMPORARY_PATH}.{OBSPOINT_PATH}{Genba_S.OPA.FileTitle}.RNX_SV_EXTENSION");
+                    //---------------------------------------------------------------------------------------------------
+                    //
                     //-----------------------------
                     //<<< 衛星信号の読み込み。 >>>
-                    satelliteInfoReader.ReadSattSignal(nSattSignalGPS, nSattSignalGLONASS, nSattSignalQZSS, nSattSignalGalileo, nSattSignalBeiDou);
                     //-----------------------------
+                    //(del) satelliteInfoReader.ReadSattSignal(nSattSignalGPS, nSattSignalGLONASS, nSattSignalQZSS, nSattSignalGalileo, nSattSignalBeiDou);
+                    string SattAatePath = $"{App_Path}{TEMPORARY_PATH}{OBSPOINT_PATH}{Genba_S.OPA.FileTitle}.{MdlRINEXTYPE.RNX_SV_EXTENSION}";
+                    satelliteInfoReader.ReadSattSignal(SattAatePath, ref nSattSignalGPS, ref nSattSignalGLONASS, ref nSattSignalQZSS, ref nSattSignalGalileo, ref nSattSignalBeiDou);
+                    //---------------------------------------------------------------------------------------------------
+                    //<<<<<<<<<-----------23/12/24 K.setoguchi@NV
 
 
                     //-------------------------------------------------------------------------------

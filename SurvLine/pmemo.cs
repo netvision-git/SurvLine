@@ -8,6 +8,10 @@ namespace SurvLine
 {
     internal class pmemo
     {
+        //23/12/24 K.setoguchi@NV---------->>>>>>>>>>
+        //<<<<<<<<<-----------23/12/24 K.setoguchi@NV
+
+
         //23/12/22 K.setoguchi@NV---------->>>>>>>>>>
         //<<<<<<<<<-----------23/12/22 K.setoguchi@NV
 
