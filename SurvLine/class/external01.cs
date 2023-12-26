@@ -6,6 +6,8 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static SurvLine.MdlNSPPS2;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 namespace SurvLine
 {
@@ -429,11 +431,46 @@ namespace SurvLine
         //  'アンビギュイティ情報
         //----------------------------------------------------------------
         public List<AMBINF_STRUCT> m_tAmbInfos;  //アンビギュイティ情報  //AmbInfo_Load:m_tAmbInfos
-        //<<<<<<<<<-----------23/12/22 K.setoguchi@NV
+                                                 //<<<<<<<<<-----------23/12/22 K.setoguchi@NV
+
+
+        //23/12/26 K.setoguchi@NV---------->>>>>>>>>>
+        //****************************************************************
+        // ObsInfo_Load
+        //      '観測情報
+        //----------------------------------------------------------------
+        public List<OBS_INFO> m_tObsInfos;
+        //<<<<<<<<<-----------23/12/26 K.setoguchi@NV
+
+
+    }
+
+    //23/12/26 K.setoguchi@NV---------->>>>>>>>>>
+    //****************************************************************
+    // ObsInfo_Load
+    //      '観測情報
+    //----------------------------------------------------------------
+    public struct OBS_INFO{  //'観測情報。
+
+        public long puNumber;       //As Long '衛星番号。
+
+
+        public long Number;
+
+        //**** Info As NSPPS2_OBS_INFO '情報。***
+        //NSPPS2_OBS_INFO iNF;
+        //  '総数。
+        public long INFO_All;    // As Long
+        //  '使用数。
+        public long INFO_Used;   // As Long
 
 
 
     }
+    //<<<<<<<<<-----------23/12/26 K.setoguchi@NV
+
+
+
     //23/12/20 K.setoguchi@NV---------->>>>>>>>>>
     //'*******************************************************************************      
     //  DepPattern Load 構造体         位相パターンの標高
