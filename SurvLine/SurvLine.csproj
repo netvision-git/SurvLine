@@ -78,17 +78,17 @@
     <Compile Include="class\ObsInfo.cs" />
     <Compile Include="class\ProjectFileManager.cs" />
     <Compile Include="class\SatelliteInfoReader.cs" />
-    <Compile Include="frmJobEdit.cs">
+    <Compile Include="frmJobEdit2.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="frmJobEdit.Designer.cs">
-      <DependentUpon>frmJobEdit.cs</DependentUpon>
+    <Compile Include="frmJobEdit2.Designer.cs">
+      <DependentUpon>frmJobEdit2.cs</DependentUpon>
     </Compile>
-    <Compile Include="frmMain.cs">
+    <Compile Include="frmMain2.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="frmMain.Designer.cs">
-      <DependentUpon>frmMain.cs</DependentUpon>
+    <Compile Include="frmMain2.Designer.cs">
+      <DependentUpon>frmMain2.cs</DependentUpon>
     </Compile>
     <Compile Include="frmJobOpen.cs">
       <SubType>Form</SubType>
@@ -96,6 +96,7 @@
     <Compile Include="frmJobOpen.Designer.cs">
       <DependentUpon>frmJobOpen.cs</DependentUpon>
     </Compile>
+    <Compile Include="mdl\mdlGUI.cs" />
     <Compile Include="mdl\mdlNSPPS2.cs" />
     <Compile Include="mdl\mdlRINEXTYPE.cs" />
     <Compile Include="mdl\mdlAccountMake.cs" />
@@ -115,11 +116,11 @@
     <Compile Include="user\ListPane.Designer.cs">
       <DependentUpon>ListPane.cs</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="frmJobEdit.resx">
-      <DependentUpon>frmJobEdit.cs</DependentUpon>
+    <EmbeddedResource Include="frmJobEdit2.resx">
+      <DependentUpon>frmJobEdit2.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="frmMain.resx">
-      <DependentUpon>frmMain.cs</DependentUpon>
+    <EmbeddedResource Include="frmMain2.resx">
+      <DependentUpon>frmMain2.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmJobOpen.resx">
       <DependentUpon>frmJobOpen.cs</DependentUpon>

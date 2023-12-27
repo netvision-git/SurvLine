@@ -1,4 +1,6 @@
 ﻿using Microsoft.SqlServer.Server;
+using Microsoft.VisualBasic;
+using SurvLine.mdl;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -10,13 +12,30 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 namespace SurvLine
 {
     public partial class frmJobOpen : Form
     {
+        //23/12/26 K.setoguchi@NV---------->>>>>>>>>>
+        // '現場を選択画面
+        //
+        //Option Explicit
+        //
+        //'プロパティ
+        public long Result;         // As Long 'ダイアログの結果。
+        public string FolderName;   // As String 'フォルダ名が設定される。
+
+        //'インプリメンテーション
+        private long m_nSortIndex;  // As Long'ソートカラムインデックス。
+
+        //<<<<<<<<<-----------23/12/26 K.setoguchi@NV
+        //--------------------------------------------------------------------------------------------------
+
+
         private string sendData = "";
-        public frmMain fMain;
+        public frmMain2 fMain;
 
         public frmJobOpen()
         {
@@ -49,6 +68,11 @@ namespace SurvLine
 
 
             InitializeComponent();
+
+            //23/12/26 K.setoguchi@NV---------->>>>>>>>>>
+            Result = MdiDefine.DEFINE.vbCancel;    /// As Long 'ダイアログの結果。
+            //<<<<<<<<<-----------23/12/26 K.setoguchi@NV
+
 
 
             //**************************************
@@ -144,8 +168,17 @@ namespace SurvLine
             if (fMain != null)
             {
                 fMain.ReceiveData = "OK";
+
+                //23/12/26 K.setoguchi@NV---------->>>>>>>>>>
+                Result = MdiDefine.DEFINE.vbOK;    /// As Long 'ダイアログの結果。
+                //<<<<<<<<<-----------23/12/26 K.setoguchi@NV
+
             }
             this.Close();
+
+            //23/12/26 K.setoguchi@NV---------->>>>>>>>>>
+            Result = MdiDefine.DEFINE.vbCancel;    /// As Long 'ダイアログの結果。
+           //<<<<<<<<<-----------23/12/26 K.setoguchi@NV
 
         }
 

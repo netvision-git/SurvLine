@@ -1,6 +1,6 @@
 ﻿namespace SurvLine
 {
-    partial class frmMain
+    partial class frmMain2
     {
         /// <summary>
         /// 必要なデザイナー変数です。

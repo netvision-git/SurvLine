@@ -9,10 +9,11 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static SurvLine.mdl.MdiDefine;
 
 namespace SurvLine
 {
-    public partial class frmMain : Form
+    public partial class frmMain2 : Form
     {
 
         [DllImport("user32.dll")]
@@ -21,7 +22,7 @@ namespace SurvLine
         public string receiveData = "";
         MdlUtility Utility = new MdlUtility();
 
-        public frmMain()
+        public frmMain2()
         {
             InitializeComponent();
 
@@ -43,19 +44,84 @@ namespace SurvLine
         //*******************************************************************************
         private void mnuFileNew_Click(object sender, EventArgs e)
         {
-            frmMain fmain = new frmMain();
-
-            //frmMain fMain = new frmMain();
-            // textBox1.Text = $"mnuFileNew_Click";
-            //label1.Text = textBox1.Text;
-            //label1.Refresh();
+            frmMain2 fmain = new frmMain2();
 
 
-            frmJobEdit fJobEdit = new frmJobEdit();
+            frmJobEdit2 fJobEdit = new frmJobEdit2();
             fJobEdit.Text = "新規現場の作成";
+
+            //23/12/26 K.setoguchi@NV---------->>>>>>>>>>
+            fJobEdit.lblFolder.Text = "";
+            //<<<<<<<<<-----------23/12/26 K.setoguchi@NV
 
 
             fJobEdit.ShowDialog();
+
+            if (fJobEdit.Result != DEFINE.vbOK) { return; }
+
+
+            //    '再描画。
+            //    If RedrawWindow(Me.hWnd, 0, 0, RDW_UPDATENOW) = 0 Then Call Err.Raise(ERR_FATAL, , GetLastErrorMessage())
+            //
+            //
+            //    'プロジェクトフォルダの生成。
+            //    On Error GoTo FileErrorHandler
+            //    Dim clsProjectFileManager As New ProjectFileManager
+            //    Dim sProjectFolderName As String
+            //
+            //    sProjectFolderName = clsProjectFileManager.CreateProjectFolder
+            //    If sProjectFolderName = "" Then
+            //        Call MsgBox("これ以上現場を保存することができません。" & vbCrLf & "不要な現場を削除してください。", vbCritical)
+            //        Exit Function
+            //    End If
+            //    On Error GoTo 0
+            //
+            //
+            //    '既存の現場を閉じる。
+            //    Call CloseProject
+            //
+            //
+            //    '新規設定。
+            //    Call m_clsDocument.SetJob(frmJobEdit.JobName, frmJobEdit.DistrictName, frmJobEdit.CoordNum, frmJobEdit.GeoidoEnable, frmJobEdit.GeoidoPath, frmJobEdit.SemiDynaEnable, frmJobEdit.SemiDynaPath)
+            //
+            //
+            //    '2009/11 H.Nakamura
+            //    'セミ・ダイナミックパラメータファイルのパスはデフォルトにも反映させる。
+            //    If m_clsDocument.SemiDynaEnable Then
+            //        m_clsDocument.SemiDynaPathDef = m_clsDocument.SemiDynaPath
+            //        If WritePrivateProfileString(PROFILE_SAVE_SEC_SEMIDYNA, PROFILE_SAVE_KEY_PATH, m_clsDocument.SemiDynaPathDef, App.Path &"\" & App.Title & PROFILE_SAVE_EXT) = 0 Then Call Err.Raise(ERR_FATAL, , GetLastErrorMessage())
+            //    End If
+            //
+            //
+            //    '2009/11 H.Nakamura
+            //    'セミ・ダイナミックの初期化。
+            //    Call mdlSemiDyna.Initialize(m_clsDocument.SemiDynaEnable, m_clsDocument.SemiDynaPath)
+            //
+            //
+            //    '保存。
+            //    Call Save(clsProjectFileManager.GetSaveFilePath(sProjectFolderName))
+            //
+            //
+            //    'iniファイルに保存。
+            //    Dim sValue As String
+            //    sValue = CStr(frmJobEdit.CoordNum)
+            //    If WritePrivateProfileString(PROFILE_SAVE_SEC_ACCOUNT, PROFILE_SAVE_KEY_COORDNUM, sValue, App.Path &"\" & App.Title & PROFILE_SAVE_EXT) = 0 Then Call Err.Raise(ERR_FATAL, , GetLastErrorMessage())
+            //
+            //
+            //    CreateJob = True
+            //
+            //
+            //    Exit Function
+            //
+            //
+            //FileErrorHandler:
+            //            If Err.Number<> ERR_FILE Then Call Err.Raise(Err.Number, Err.Source, Err.Description, Err.HelpFile, Err.HelpContext)
+            //    Call MsgBox(Err.Description, vbCritical)
+            //
+            //
+            //End Function
+
+
 
 
         }
@@ -134,6 +200,14 @@ namespace SurvLine
             //---------------------------------------------------
             form.ShowDialog();
 
+
+            //23/12/26 K.setoguchi@NV---------->>>>>>>>>>
+            if (form.Result != MdiDefine.DEFINE.vbOK)
+            {
+                return false;
+            }
+            //<<<<<<<<<-----------23/12/26 K.setoguchi@NV
+
             //[VB]---------------------------------------------------
             //[VB]      If frmJobOpen.Result<> vbOK Then Exit Function
             //---------------------------------------------------
@@ -144,7 +218,7 @@ namespace SurvLine
             //[VB]      If RedrawWindow(Me.hWnd, 0, 0, RDW_UPDATENOW) = 0 Then Call Err.Raise(ERR_FATAL, , GetLastErrorMessage())
             //----------------------------------.-----------------
             //再描画
-            if (frmMain.RedrawWindow(this.Handle, IntPtr.Zero, IntPtr.Zero, (int)DEFINE.RDW_UPDATENOW) == false)
+            if (frmMain2.RedrawWindow(this.Handle, IntPtr.Zero, IntPtr.Zero, (int)DEFINE.RDW_UPDATENOW) == false)
             {
                 return false;
             }
@@ -397,7 +471,7 @@ namespace SurvLine
 
         private void mnuFileEdit_Click(object sender, EventArgs e)
         {
-            frmJobEdit form = new frmJobEdit();
+            frmJobEdit2 form = new frmJobEdit2();
             form.Text = "現場の編集";
 
 
