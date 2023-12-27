@@ -16,6 +16,7 @@ using System.Net.Security;
 using static System.Windows.Forms.AxHost;
 using SurvLine.mdl;
 using System.Drawing;
+using static SurvLine.mdl.MdiDefine;
 
 namespace SurvLine
 {
@@ -463,6 +464,215 @@ namespace SurvLine
 
         }
 
+
+
+        //23/12/26 K.setoguchi@NV---------->>>>>>>>>>
+        /// <summary>
+        /// 'メソッド
+        ///
+        /// 'プロジェクトのリストを取得する。
+        /// '
+        /// '現在保存されているプロジェクトの一覧情報を取得する。
+        /// '
+        /// '引き数：
+        ///     'sJobNames 現場名が設定される。配列の要素は(-1 To ...)、要素 -1 は未使用。
+        ///     'sDistrictNames 地区名が設定される。配列の要素は(-1 To ...)、要素 -1 は未使用。
+        ///     'sFolderNames フォルダ名が設定される。配列の要素は(-1 To ...)、要素 -1 は未使用。
+        ///     'tModTime 更新日時が設定される。配列の要素は(-1 To ...)、要素 -1 は未使用。
+        ///     'tCreateTime 作成日時が設定される。配列の要素は(-1 To ...)、要素 -1 は未使用。
+        /// </summary>
+        /// <param name="sJobNames"></param>
+        /// <param name="sDistrictNames"></param>
+        /// <param name="sFolderNames"></param>
+        /// <param name="tModTime"></param>
+        /// <param name="tCreateTime"></param>
+        /// <returns></returns>
+        public void GetProjectList(ref List<string> sJobNames, ref List<string> sDistrictNames, ref List<string> sFolderNames, ref List<DateTime> tModTime, ref List<DateTime> tCreateTime)
+        {
+
+            //*******************************
+            //
+            //  パラメータ変更　瀬戸口健二　
+            //
+            //*******************************
+
+            //    Dim clsFind As New FileFind
+            //    Dim nUBound As Long
+            //    Dim sPath As String
+            //    Dim sJobName As String
+            //    Dim sDistrictName As String
+            //    Dim sFolderName As String
+            //    nUBound = -1
+            //    sPath = frmMain.UserDataPath  '2008/10/13 NGS Yamada
+            //'    sPath = App.Path & DATA_FOLDER_NAME
+            //    If Not clsFind.FindFile(sPath & "*") Then Exit Sub
+            long nUBound;
+            string sPath;
+            string sJobName = "";
+            string sDistrictName = "";
+            string sFolderName;
+
+            string sWork;
+
+
+            var main = new FRM_MAIN();
+            //仮---->>>>
+            main.UserDataPath = @"C:\Develop\NetSurv\Src\NS-App\NS-Survey\UserData\";
+            //<<<<----仮
+
+
+            sPath = main.UserDataPath;
+
+
+            //******************************************
+            // サブフォルダ名を取得
+            //******************************************
+            var files = System.IO.Directory.GetDirectories(sPath);
+
+
+            //------------------------------------------
+            MdlUtility Utility = new MdlUtility();
+
+
+            //******************************************************************
+            //パス内の全（フォルダ＋ファイル名＆読み込み）
+            //******************************************************************
+            int i = 0;
+            int datacount = 0;
+            nUBound = 1;
+
+            //------------------
+            foreach (var file in files)
+            {
+                //------------------------------------------
+                //[VB]  If(clsFind.Attributes And FILE_ATTRIBUTE_DIRECTORY) = 0 Then GoTo ContinueHandler
+                FileAttributes attr = System.IO.File.GetAttributes(sPath);
+                if (((long)attr & DEFINE.FILE_ATTRIBUTE_DIRECTORY) == 0)
+                {
+                    goto ContinueHandler2;
+                }
+                //------------------------------------------
+
+                //------------------------------------------
+                //フォルダ名を設定   
+                //------------------------------------------
+                sFolderName = files[i];
+
+                //------------------------------------------
+                //[VB]  If IsDots(sFolderName) Then GoTo ContinueHandler
+                if (Utility.IsDots(sFolderName))
+                {
+                    goto ContinueHandler2;
+                }
+                //------------------------------------------
+                //[VB]      If Not ReadInfo(sPath &sFolderName & "\" & DATA_FILE_NAME, sJobName, sDistrictName) Then GoTo ContinueHandler
+                if (!(ReadInfo($"{sFolderName}\\{GENBA_CONST.DATA_FILE_NAME}", ref sJobName, ref sDistrictName)))
+                {
+                    goto ContinueHandler2;
+                }
+
+                //******************************************
+                //  現場名をグローバル領域に設定
+                //******************************************
+                sJobNames.Add(sJobName);
+
+
+                //******************************************
+                //  地区名をグローバル領域に設定
+                //******************************************
+                sDistrictNames.Add(sDistrictName);
+
+                //------------------------------------------
+                //ファイル名を設定   
+                //------------------------------------------
+                //[VB]      sJobNames(nUBound) = sJobName
+                string sFileName = GENBA_CONST.DATA_FILE_NAME;
+
+
+
+                //------------------------------------------
+                //  サブフォルダ名をグローバル領域に設定
+                //------------------------------------------
+                sFolderNames.Add(sFolderName);
+
+
+                //******************************************
+                //  最終更新日をグローバル領域に設定
+                //******************************************
+                tModTime.Add(System.IO.File.GetLastWriteTime($"{sFolderName}\\{sFileName}"));
+
+
+                //******************************************
+                //  画面表示＜作成日  .ToString("yyyy/MM/dd HH:mm")＞
+                //******************************************
+                tCreateTime.Add(System.IO.File.GetLastWriteTime($"{sFolderName}\\{sFileName}"));
+
+                datacount++;
+
+            ContinueHandler2:
+                i++;
+
+            }
+
+        }
+        //'メソッド
+        //
+        //'プロジェクトのリストを取得する。
+        //'
+        //'現在保存されているプロジェクトの一覧情報を取得する。
+        //'
+        //'引き数：
+        //'sJobNames 現場名が設定される。配列の要素は(-1 To ...)、要素 -1 は未使用。
+        //'sDistrictNames 地区名が設定される。配列の要素は(-1 To ...)、要素 -1 は未使用。
+        //'sFolderNames フォルダ名が設定される。配列の要素は(-1 To ...)、要素 -1 は未使用。
+        //'tModTime 更新日時が設定される。配列の要素は(-1 To ...)、要素 -1 は未使用。
+        //'tCreateTime 作成日時が設定される。配列の要素は(-1 To ...)、要素 -1 は未使用。
+        //Public Sub GetProjectList(ByRef sJobNames() As String, ByRef sDistrictNames() As String, ByRef sFolderNames() As String, ByRef tModTime() As Date, ByRef tCreateTime() As Date)
+        //
+        //    ReDim sJobNames(-1 To -1)
+        //    ReDim sDistrictNames(-1 To -1)
+        //    ReDim sFolderNames(-1 To -1)
+        //    ReDim tModTime(-1 To -1)
+        //    ReDim tCreateTime(-1 To -1)
+        //
+        //
+        //    Dim clsFind As New FileFind
+        //    Dim nUBound As Long
+        //    Dim sPath As String
+        //    Dim sJobName As String
+        //    Dim sDistrictName As String
+        //    Dim sFolderName As String
+        //    nUBound = -1
+        //    sPath = frmMain.UserDataPath  '2008/10/13 NGS Yamada
+        //'    sPath = App.Path & DATA_FOLDER_NAME
+        //    If Not clsFind.FindFile(sPath & "*") Then Exit Sub
+        //
+        //    Do
+        //        If(clsFind.Attributes And FILE_ATTRIBUTE_DIRECTORY) = 0 Then GoTo ContinueHandler
+        //        sFolderName = clsFind.Name
+        //        If IsDots(sFolderName) Then GoTo ContinueHandler
+        //        If Not ReadInfo(sPath & sFolderName & "\" & DATA_FILE_NAME, sJobName, sDistrictName) Then GoTo ContinueHandler
+        //        nUBound = nUBound + 1
+        //        ReDim Preserve sJobNames(-1 To nUBound)
+        //        ReDim Preserve sDistrictNames(-1 To nUBound)
+        //        ReDim Preserve sFolderNames(-1 To nUBound)
+        //        ReDim Preserve tModTime(-1 To nUBound)
+        //        ReDim Preserve tCreateTime(-1 To nUBound)
+        //        sJobNames(nUBound) = sJobName
+        //        sDistrictNames(nUBound) = sDistrictName
+        //        sFolderNames(nUBound) = sFolderName
+        //        Dim clsFind2 As FileFind
+        //        Set clsFind2 = New FileFind
+        //        If clsFind2.FindFile(sPath & sFolderName & "\" & DATA_FILE_NAME) Then
+        //            tModTime(nUBound) = clsFind2.LastWriteTime
+        //            tCreateTime(nUBound) = clsFind2.CreationTime
+        //        End If
+        //ContinueHandler:
+        //    Loop While clsFind.FindNext()
+        //
+        //End Sub
+        //<<<<<<<<<-----------23/12/26 K.setoguchi@NV
+
         //***************************************************************************
         /// <summary>
         /// 現場名、地区名をファイルから取得する。
@@ -577,6 +787,108 @@ namespace SurvLine
         //[VB]      GetSaveFilePath = frmMain.UserDataPath & sFolderName & "\"
         //[VB]  '    GetSaveFilePath = App.Path & DATA_FOLDER_NAME & sFolderName & "\"
         //[VB]  End Function
+
+
+
+        //23/12/26 K.setoguchi@NV---------->>>>>>>>>>
+        //***************************************************************************
+        //***************************************************************************
+        /// <summary>
+        /// '現場名の重複チェック。
+        /// '
+        /// 'sJobName で指定された現場名がすでに存在するか確認する。
+        /// '
+        /// '引き数：
+        ///     'sFolder フォルダ名。
+        ///     'sJobName 現場名。
+        /// </summary>
+        /// <param name="sFolder"></param>
+        /// <param name="sJobName"></param>
+        /// <returns>
+        /// '戻り値：
+        ///     '重複しない場合は True を返す。
+        ///     '重複する場合は False を返す。
+        /// </returns>
+        public bool CheckJobName(string sFolder, string sJobName)
+        {
+            bool CheckJobName = false;
+
+            //    Dim sJobNames() As String
+            //    Dim sDistrictNames() As String
+            //    Dim sFolderNames() As String
+            //    Dim tModTime() As Date
+            //    Dim tCreateTime() As Date
+            //    Call GetProjectList(sJobNames, sDistrictNames, sFolderNames, tModTime, tCreateTime)
+            List<string> sJobNames = new List<string>();
+            List<string> sDistrictNames = new List<string>();
+            List<string> sFolderNames = new List<string>();
+            List<DateTime> tModTime = new List<DateTime>();
+            List<DateTime> tCreateTime = new List<DateTime>();
+
+            GetProjectList(ref sJobNames, ref sDistrictNames, ref sFolderNames, ref tModTime, ref tCreateTime);
+
+
+            //    Dim i As Long
+            //    For i = 0 To UBound(sFolderNames)
+            //        If sFolderNames(i) <> sFolder Then
+            //            If sJobName = sJobNames(i) Then Exit Function
+            //        End If
+            //    Next
+            for (int i = 0; i < sJobNames.Count; i++)
+            {
+                if (sFolderNames[i] != sFolder) 
+                {
+                    if (sJobName == sJobNames[i])
+                    {
+                        return CheckJobName;
+                    }
+                }
+            }
+            CheckJobName = true;
+            return CheckJobName;
+        }
+        //-------------------------------------------------------------------
+        //'現場名の重複チェック。
+        //'
+        //'sJobName で指定された現場名がすでに存在するか確認する。
+        //'
+        //'引き数：
+        //'sFolder フォルダ名。
+        //'sJobName 現場名。
+        //'
+        //'戻り値：
+        //'重複しない場合は True を返す。
+        //'重複する場合は False を返す。
+        //Public Function CheckJobName(ByVal sFolder As String, ByVal sJobName As String) As Boolean
+        //
+        //    CheckJobName = False
+        //
+        //    Dim sJobNames() As String
+        //    Dim sDistrictNames() As String
+        //    Dim sFolderNames() As String
+        //    Dim tModTime() As Date
+        //    Dim tCreateTime() As Date
+        //    Call GetProjectList(sJobNames, sDistrictNames, sFolderNames, tModTime, tCreateTime)
+        //
+        //
+        //    Dim i As Long
+        //    For i = 0 To UBound(sFolderNames)
+        //        If sFolderNames(i) <> sFolder Then
+        //            If sJobName = sJobNames(i) Then Exit Function
+        //        End If
+        //    Next
+        //
+        //
+        //    CheckJobName = True
+        //
+        //End Function
+        //***************************************************************************
+        //***************************************************************************
+        //<<<<<<<<<-----------23/12/26 K.setoguchi@NV
+
+
+
+
 
 
     }
