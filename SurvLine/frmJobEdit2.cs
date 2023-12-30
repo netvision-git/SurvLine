@@ -29,7 +29,7 @@ namespace SurvLine
         public string Folder;           //As String 'フォルダ名。
         public long CoordNum;           //As Long   '座標系番号(1～19)。
         public bool GeoidoEnable;       //As Boolean ジオイドオプションの有効/無効。True=有効。False=無効。
-        public string GeoidoPath;       //As String 'ジオイドモデルのパス。
+        public string GeoidoPath{ get; set; }      //As String 'ジオイドモデルのパス。
 
         //'セミ・ダイナミック対応。'2009/11 H.Nakamura
         public bool SemiDynaEnable;     //As Boolean 'セミ・ダイナミックオプションの有効/無効。True=有効。False=無効。
@@ -45,13 +45,15 @@ namespace SurvLine
             InitializeComponent();
 
 
+            //23/12/29 K.setoguchi@NV---------->>>>>>>>>>
+            //      //==========================
+            //      //デバック用に瀬戸口作成
+            //      //==========================
+            //      cmbZone.SelectedIndex = 6;
+            //      txtGeoidoPath.Text = @"C:\Develop\パラメータファイル\gsigeo2011_ver1.asc";
+            //      txtSemiDynaPath.Text = @"C:\Develop\パラメータファイル\SemiDyna2009.par";
             //==========================
-            //デバック用に瀬戸口作成
-            //==========================
-            cmbZone.SelectedIndex = 6;
-            txtGeoidoPath.Text = @"C:\Develop\パラメータファイル\gsigeo2011_ver1.asc";
-            txtSemiDynaPath.Text = @"C:\Develop\パラメータファイル\SemiDyna2009.par";
-            //==========================
+            //<<<<<<<<<-----------23/12/29 K.setoguchi@NV
 
         }
 

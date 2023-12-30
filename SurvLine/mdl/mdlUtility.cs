@@ -1,13 +1,17 @@
-﻿using System;
+﻿using SurvLine.mdl;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.Eventing.Reader;
 using System.IO;
 using System.Linq;
+using System.Runtime.Remoting;
 using System.Security.Cryptography;
+using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Linq;
+using static System.Net.Mime.MediaTypeNames;
 using static System.Net.WebRequestMethods;
 using static System.Windows.Forms.AxHost;
 
@@ -486,7 +490,161 @@ namespace SurvLine
         //***************************************************************************
         //***************************************************************************
 
+        //23/12/29 K.setoguchi@NV---------->>>>>>>>>>
+        //***************************************************************************
+        //***************************************************************************
+        /// <summary>
+        /// ディレクトリを作成する。
+        ///
+        /// 引き数：
+        ///     sPath 作成するディレクトリのパス。
+        ///     bRaise Err.Raise の有無。
+        /// </summary>
+        /// <param name="sPath"></param>
+        /// <param name="bRaise"></param>
+        /// <returns>
+        /// 戻り値：
+        ///     正常終了の場合 True を返す。
+        ///     それ以外の場合 False を返す。
+        /// </returns>
+        public bool CreateDir(string sPath, bool bRaise = false)
+        {
+            bool CreateDir = false;
+            MdiVBfunctions mdiVBfunctions = new MdiVBfunctions();
+
+            try
+            {
+                //[VB]    sPath = RTrimEx(sPath, "\")
+                //[VB]    If Right$(sPath, 1) = ":" Then Exit Function
+                //[VB]    Dim clsFind As New FileFind
+                sPath = RTrimEx(sPath, "\\");
+                if (mdiVBfunctions.Right(sPath, 1) == ":")
+                {
+                    return CreateDir;
+                }
+
+
+                //[VB]    Dim clsFind As New FileFind
+                //[VB]    If Not clsFind.FindFile(sPath) Then   //"C:\Develop\NetSurv\Src\NS-App\NS-Survey\UserData"
+                //[VB]        Dim sDrive As String
+                //[VB]        Dim sDir As String
+                //[VB]        Dim sTitle As String
+                //[VB]        Dim sExt As String
+                //[VB]        Call SplitPath(sPath, sDrive, sDir, sTitle, sExt) 
+                //[VB]
+                //                                              sPath = "C:\Develop\NetSurv\Src\NS-App\NS-Survey\UserData2"
+                //                                              sDrive = "C:" 
+                //                                              sDir   = "\Develop\NetSurv\Src\NS-App\NS-Survey\" 
+                //                                              sTitle = "UserData2"
+                //                                              sExt = "" 
+                //
+                //[VB]        If Not CreateDir(sDrive & sDir, bRaise) Then Exit Function
+                //[VB]        Call MkDir(sPath)
+                //[VB]    End If
+                //
+                if (!System.IO.Directory.Exists(sPath))
+                {
+                    //存在しない場合は、フォルダを作成
+                    //      ※　VC#では、複数のフォルダを一気に作成できる
+                    System.IO.Directory.CreateDirectory(sPath);
+
+                    CreateDir = true;
+                    bRaise = true;
+                }
+                else
+                {
+                    CreateDir = true;
+                    CreateDir = true;
+                }
+
+            }
+            catch (Exception e)
+            {
+                CreateDir = false;
+                bRaise = false;
+            }
+
+            return CreateDir;
+
+        }
+
+        //'ディレクトリを作成する。
+        //'
+        //'引き数：
+        //'sPath 作成するディレクトリのパス。
+        //'bRaise Err.Raise の有無。
+        //'
+        //'戻り値：
+        //'正常終了の場合 True を返す。
+        //'それ以外の場合 False を返す。
+        //Public Function CreateDir(ByVal sPath As String, Optional ByVal bRaise As Boolean = False) As Boolean
+        //    CreateDir = False
+        //    On Error GoTo FileErrorHandler
+        //    sPath = RTrimEx(sPath, "\")
+        //    If Right$(sPath, 1) = ":" Then Exit Function
+        //    Dim clsFind As New FileFind
+        //    If Not clsFind.FindFile(sPath) Then
+        //        Dim sDrive As String
+        //        Dim sDir As String
+        //        Dim sTitle As String
+        //        Dim sExt As String
+        //        Call SplitPath(sPath, sDrive, sDir, sTitle, sExt)
+        //        If Not CreateDir(sDrive & sDir, bRaise) Then Exit Function
+        //        Call MkDir(sPath)
+        //    End If
+        //    CreateDir = True
+        //    Exit Function
+        //FileErrorHandler:
+        //    If bRaise Then Call Err.Raise(Err.Number, Err.Source, Err.Description, Err.HelpFile, Err.HelpContext)
+        //End Function
+        //***************************************************************************
+        //***************************************************************************
+        //<<<<<<<<<-----------23/12/29 K.setoguchi@NV
+
+
+
+        public void SplitPath(string sPath, string sDrive, string sDir, string sTitle, string sExt)
+        {
+
+        }
+
+        //'パス名を構成要素に分解する。
+        //'
+        //'引き数：
+        //'sPath パス。
+        //'sDrive ドライブ。"C:"
+        //'sDir フォルダパス。"\AAA\BBB\"
+        //'sTitle ファイルタイトル。"CCC"
+        //'sExt 拡張子。".DDD"
+        //Public Sub SplitPath(ByVal sPath As String, ByRef sDrive As String, ByRef sDir As String, ByRef sTitle As String, ByRef sExt As String)
+        //    'ディレクトリ位置。
+        //    Dim nPosDir As Long
+        //    nPosDir = InStrRev(sPath, ":") + 1
+        //    'ファイルタイトル位置。
+        //    Dim nPosTitle As Long
+        //    nPosTitle = InStrRev(sPath, "\") + 1
+        //    If nPosTitle <= 1 Then nPosTitle = nPosDir
+        //    '拡張子位置。
+        //    Dim nPosExt As Long
+        //    nPosExt = InStrRev(sPath, ".")
+        //    If nPosExt < nPosTitle Then nPosExt = Len(sPath) + 1
+        //    '拡張子。
+        //    If nPosExt < nPosTitle Then
+        //        sExt = ""
+        //    Else
+        //        sExt = Mid$(sPath, nPosExt)
+        //    End If
+        //    'ファイルタイトル。
+        //    sTitle = Mid$(sPath, nPosTitle, nPosExt - nPosTitle)
+        //    'ディレクトリパス。
+        //    sDir = Mid$(sPath, nPosDir, nPosTitle - nPosDir)
+        //    'ドライブ。
+        //    sDrive = Mid$(sPath, 1, nPosDir - 1)
+        //End Sub
+
+
     }
+
 
 
 }

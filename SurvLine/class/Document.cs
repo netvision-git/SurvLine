@@ -8,11 +8,112 @@ using System.Windows.Forms;
 using SurvLine.mdl;
 using System.IO;
 using static System.Net.WebRequestMethods;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
+using System.Runtime.Remoting;
 
 namespace SurvLine
 {
     public class Document
     {
+
+        //'*******************************************************************************
+        //'ドキュメント
+        //
+        //Option Explicit
+        //
+        //'イベント
+        //
+        //'結合距離違反イベント。
+        //'
+        //'結合する観測点間の距離が制限を超えている場合に発生する。
+        //'
+        //'引き数：
+        //'clsObservationPoint 違反の対象となる観測点。
+        //'nDistance 観測点間の距離(ｍ)。
+        //'nMax 距離の制限値(㎝)。
+        //'nStyle メッセージスタイル。0=メッセージ無し。1=OKボタンのみ。2=OKボタンとすべてOKボタン。
+        //'nResult メッセージボックスの結果が設定される。
+        //Event CombinedDistanceViolation(ByVal clsObservationPoint As ObservationPoint, ByVal nDistance As Double, ByVal nMax As Long, ByVal nStyle As Long, ByRef nResult As Long)
+        //
+        //'上書き通知イベント。
+        //'
+        //'同じ観測点番号、セッション名の観測点をインポートしたときに、上書きを確認するために発生する。
+        //'
+        //'引き数：
+        //'clsObservationPoint 対象となる観測点。
+        //'nStyle メッセージスタイル。0=メッセージ無し。1=OKボタンのみ。2=OKボタンとすべてOKボタン。
+        //'nResult メッセージボックスの結果が設定される。
+        //Event OverwriteNotification(ByVal clsObservationPoint As ObservationPoint, ByVal nStyle As Long, ByRef nResult As Long)
+        //
+        //'読み込みファイルバージョン拒否イベント。
+        //'
+        //'Dataファイルのバージョンが読み込みできないバージョンの時に発生する。
+        //'
+        //'引き数：
+        //'sPath Dataファイルのパス。
+        //'nVersion ファイルバージョン。
+        //Event RejectedFileVersion(ByVal sPath As String, ByVal nVersion As Long)
+        //
+        //'定数
+        //private Const TEMP_FILE_NAME As String = "Document.tmp" '保存処理用のテンポラリファイルの名前。
+        //
+        //'恒久プロパティ
+        public bool PageNumberVisible;          // As Boolean '帳票ページ番号表示フラグ。True=表示。False=非表示。
+        public long NumberOfMinSV;              // As Long '最少衛星数。0の場合は観測データから取得。1～12が固定値。
+        //Public EllipseModel As ELLIPSE_MODEL '記簿に出力する楕円体モデル。
+        public long SameTimeMin;                // As Long '最小同時観測時間(秒)。
+        public long SatelliteCountMin;          // As Long '最少共通衛星数。
+        public string GeoidoPathDef;            // As String 'ジオイドモデルのパスのデフォルト。
+        public string SemiDynaPathDef;          // As String 'セミ・ダイナミックパラメータファイルのパスのデフォルト。'2009/11 H.Nakamura
+        public long DefLeapSec;                 // As Long 'デフォルトの閏秒。
+        //  public TIME_ZONE TimeZone;      // As TIME_ZONE  '時間帯。
+        //
+        //'2008/10/13 NGS Yamada
+        //'ユーザデータを管理するフォルダのパスを追加
+        //Public UserDataPath As String
+        //
+        //Public ImportComPort As Long '受信機を接続するCOMポート。2007/6/20 NGS Yamada
+        //Public ImportComPortType As Boolean '受信機を接続するCOMポートの取得方法(True=自動取得、False=手動選択)。2007/7/2 NGS Yamada
+        //Public ImportDataSave As Boolean    '受信機からインポート時に観測データを保存する（True=保存する、False=保存しない）2007/8/10 NGS Yamada
+        //
+        //Public PlotPointLabel As Long 'プロット画面に表示するラベルの種類。0=観測点No,1=観測点名称,2=観測点No(観測点名称)。 2006/10/6 NGS Yamada
+        //Public DisableVectorVisible As Boolean '「無効」なベクトルをプロット画面に表示するか？。True=表示,False=非表示。 2006/10/10 NGS Yamada
+        //
+        //'インプリメンテーション
+        public bool m_bEmpty;                  // As Boolean '空フラグ。True=空。False=空でない。
+        public string m_sPath;                 // As String '保存ファイルのパス。
+        public bool m_bModifyed;               // As Boolean '更新フラグ。True=更新あり。False=更新なし。
+        //
+        public string m_sJobName;              // As String '現場名。
+        public string m_sDistrictName;         // As String '地区名。
+        public string m_sSupervisor;           // As String 'プログラム管理者。
+        public long m_nCoordNum;               // As Long   '座標系番号(1～19)。
+        public bool m_bGeoidoEnable;           // As Boolean 'ジオイド有効/無効。True=有効。False=無効。
+        public string m_sGeoidoPath;           // As String 'ジオイドモデルのパス。
+        public bool m_bTkyEnable;              // As Boolean '旧日本測地系有効/無効。True=有効。False=無効。
+        public string m_sTkyPath;              // As String '旧日本測地系パラメータファイルのパス。
+        public bool m_bSemiDynaEnable;         // As Boolean 'セミ・ダイナミック有効/無効。True=有効。False=無効。'2009/11 H.Nakamura
+        public string m_sSemiDynaPath;         // As String 'セミ・ダイナミックパラメータファイルのパス。'2009/11 H.Nakamura
+        //Private WithEvents m_clsNetworkModel As NetworkModel 'ネットワークモデル。
+        //Private m_clsBaseLineAnalysisParam As BaseLineAnalysisParam '基線解析パラメータ。
+        //Private m_clsAngleDiffParamRing As AngleDiffParam '環閉合差パラメータ。
+        //Private m_clsAngleDiffParamBetween As AngleDiffParam '電子基準点間の閉合差パラメータ。
+        //Private m_clsAngleDiffParamHeight As AngleDiffParam '楕円体高の閉合差パラメータ。'2023/05/19 Hitz H.Nakamura 楕円体高の閉合差を追加。
+        //Private m_clsAccountMaker As AccountMaker '帳票作成。
+        //Private m_clsAccountParamHand As AccountParam '観測手簿パラメータ。
+        //Private m_clsAccountParamWrite As AccountParam '観測記簿パラメータ。
+        //Private m_clsAccountParamCoordinate As AccountParam '座標計算簿パラメータ。
+        //Private m_clsAccountOverlapParam As AccountOverlapParam '点検計算簿(重複基線)パラメータ。
+        //Private m_clsAccountParamEccentricCorrect As AccountParam '偏心計算簿パラメータ。
+        //Private m_clsAccountParamSemiDyna As AccountParam 'セミ・ダイナミック補正表パラメータ。'2009/11 H.Nakamura
+        //Private m_clsAccountCadastralParam As AccountCadastralParam '地籍図根三角測量精度管理表パラメータ。
+        //Private m_clsAccountParamResultBase As AccountParam '座標一覧表パラメータ。2007/7/18 NGS Yamada
+        //Private m_clsOutputParam(OUTPUT_TYPE_COUNT - 1) As OutputParam '外部出力ファイル出力パラメータ。
+        //Private m_clsDXFParam(DXF_TYPE_COUNT - 1) As DXFParam 'DXFファイル出力パラメータ。
+        //Private m_clsAutoOrderVectorParam As AutoOrderVectorParam '基線ベクトルの向きの自動整列パラメータ。
+        //'*******************************************************************************
+
+
         MdlUtility mdiUtility = new MdlUtility();
 
         public bool GetFileBool(BinaryReader br)
@@ -453,5 +554,70 @@ namespace SurvLine
         //[VB]  
         //**************************************************************************************
         //**************************************************************************************
+
+
+
+        //23/12/29 K.setoguchi@NV---------->>>>>>>>>>
+        //**************************************************************************************
+        //**************************************************************************************
+        /// <summary>
+        ///現場を設定する。
+        ///
+        ///引き数：
+        /// sJobName 現場名。
+        /// sDistrictName 地区名。
+        /// nCoordNum 座標系番号(1～19)。
+        /// bGeoidoEnable ジオイド有効/無効。True=有効。False=無効。
+        /// sGeoidoPath ジオイドモデルのパス。
+        /// bSemiDynaEnable セミ・ダイナミック有効/無効。True=有効。False=無効。'2009/11 H.Nakamura
+        /// sSemiDynaPath セミ・ダイナミックパラメータファイルのパス。'2009/11 H.Nakamura
+        /// </summary>
+        /// <param name="sJobName"></param>
+        /// <param name="sDistrictName"></param>
+        /// <param name="nCoordNum"></param>
+        /// <param name="bGeoidoEnable"></param>
+        /// <param name="sGeoidoPath"></param>
+        /// <param name="bSemiDynaEnable"></param>
+        /// <param name="sSemiDynaPath"></param>
+        /// 
+        public void SetJob( string sJobName, string sDistrictName, long nCoordNum, bool bGeoidoEnable, string sGeoidoPath, bool bSemiDynaEnable, string sSemiDynaPath)
+        {
+            m_sJobName = sJobName;
+            m_sDistrictName = sDistrictName;
+            m_nCoordNum = nCoordNum;
+            m_bGeoidoEnable = bGeoidoEnable;
+            m_sGeoidoPath = sGeoidoPath;
+            m_bSemiDynaEnable = bSemiDynaEnable;    //'セミ・ダイナミック対応。'2009/11 H.Nakamura
+            m_sSemiDynaPath = sSemiDynaPath;        //'セミ・ダイナミック対応。'2009/11 H.Nakamura
+            m_bEmpty = false;
+            m_bModifyed = true;
+        }
+        //--------------------------------------------------------------------------------------
+        //'現場を設定する。
+        //'
+        //'引き数：
+        //'sJobName 現場名。
+        //'sDistrictName 地区名。
+        //'nCoordNum 座標系番号(1～19)。
+        //'bGeoidoEnable ジオイド有効/無効。True=有効。False=無効。
+        //'sGeoidoPath ジオイドモデルのパス。
+        //'bSemiDynaEnable セミ・ダイナミック有効/無効。True=有効。False=無効。'2009/11 H.Nakamura
+        //'sSemiDynaPath セミ・ダイナミックパラメータファイルのパス。'2009/11 H.Nakamura
+        //Public Function SetJob(ByVal sJobName As String, ByVal sDistrictName As String, ByVal nCoordNum As Long, ByVal bGeoidoEnable As Boolean, ByVal sGeoidoPath As String, ByVal bSemiDynaEnable As Boolean, ByVal sSemiDynaPath As String)
+        //    m_sJobName = sJobName
+        //    m_sDistrictName = sDistrictName
+        //    m_nCoordNum = nCoordNum
+        //    m_bGeoidoEnable = bGeoidoEnable
+        //    m_sGeoidoPath = sGeoidoPath
+        //    m_bSemiDynaEnable = bSemiDynaEnable 'セミ・ダイナミック対応。'2009/11 H.Nakamura
+        //    m_sSemiDynaPath = sSemiDynaPath 'セミ・ダイナミック対応。'2009/11 H.Nakamura
+        //    m_bEmpty = False
+        //    m_bModifyed = True
+        //End Function
+        //**************************************************************************************
+        //**************************************************************************************
+
+        //<<<<<<<<<-----------23/12/29 K.setoguchi@NV
+
     }
 }

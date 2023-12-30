@@ -245,19 +245,19 @@
 
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.TextBox txtJobName;
-        private System.Windows.Forms.TextBox txtDistrictName;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.ComboBox cmbZone;
-        private System.Windows.Forms.CheckBox chkGeoidoEnable;
-        private System.Windows.Forms.CheckBox chkSemiDynaEnable;
-        private System.Windows.Forms.TextBox txtGeoidoPath;
-        private System.Windows.Forms.TextBox txtSemiDynaPath;
         private System.Windows.Forms.Button cmdRefGeoido;
         private System.Windows.Forms.Button cmdRefSemiDyna;
         private System.Windows.Forms.Button OKButton;
         private System.Windows.Forms.Button CancelButton;
         internal System.Windows.Forms.Label lblFolder;
+        internal System.Windows.Forms.TextBox txtSemiDynaPath;
+        internal System.Windows.Forms.TextBox txtJobName;
+        internal System.Windows.Forms.TextBox txtDistrictName;
+        internal System.Windows.Forms.ComboBox cmbZone;
+        internal System.Windows.Forms.CheckBox chkGeoidoEnable;
+        internal System.Windows.Forms.CheckBox chkSemiDynaEnable;
+        internal System.Windows.Forms.TextBox txtGeoidoPath;
     }
 }
