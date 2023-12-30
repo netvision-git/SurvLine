@@ -96,6 +96,8 @@
     <Compile Include="frmJobOpen.Designer.cs">
       <DependentUpon>frmJobOpen.cs</DependentUpon>
     </Compile>
+    <Compile Include="class\IniFileControl.cs" />
+    <Compile Include="mdl\mdiVBfunctions.cs" />
     <Compile Include="mdl\mdlGUI.cs" />
     <Compile Include="mdl\mdlNSPPS2.cs" />
     <Compile Include="mdl\mdlRINEXTYPE.cs" />

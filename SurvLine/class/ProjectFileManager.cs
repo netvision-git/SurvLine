@@ -17,12 +17,38 @@ using static System.Windows.Forms.AxHost;
 using SurvLine.mdl;
 using System.Drawing;
 using static SurvLine.mdl.MdiDefine;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 namespace SurvLine
 {
 
     public class ProjectFileManager
     {
+
+        //23/12/29 K.setoguchi@NV---------->>>>>>>>>>
+
+        //'*******************************************************************************
+        //'プロジェクトファイル管理
+        //
+        //Option Explicit
+        //
+        //'定数
+        private const string DATA_FOLDER_FORMAT = "0000";       // As String 'データフォルダ書式。
+        private const long MAX_PROJECT_NUMBER = 999;            // As Long '最大プロジェクト番号。
+        //
+        //'現場リストカラム番号。
+        private enum COL_NUM_PROJECTLIST
+        {
+            COL_NUM_PROJECTLIST_CHECK = 0,      //'チェックボックス。
+            COL_NUM_PROJECTLIST_JOBNAME,        //'現場名。
+            COL_NUM_PROJECTLIST_DISTRICTNAME,   //'地区名。
+            COL_NUM_PROJECTLIST_FOLDER,         //'フォルダ。
+            COL_NUM_PROJECTLIST_MDATE,          //'最終更新日。
+            COL_NUM_PROJECTLIST_CDATE,          //'作成日。
+            COL_NUM_PROJECTLIST_COUNT,          //'番号数。
+        }
+
+        //<<<<<<<<<-----------23/12/29 K.setoguchi@NV
 
         //Private Const COL_NAM_PROJECTLIST_CHECK As String = "" '現場リストカラム名称、チェックボックス。
         //Private Const COL_NAM_PROJECTLIST_JOBNAME As String = "現場名" '現場リストカラム名称、現場名。
@@ -887,7 +913,107 @@ namespace SurvLine
         //<<<<<<<<<-----------23/12/26 K.setoguchi@NV
 
 
+        //23/12/29 K.setoguchi@NV---------->>>>>>>>>>
+        //***************************************************************************
+        //***************************************************************************
+        /// <summary>
+        ///'新しくプロジェクトフォルダを作成する。
+        ///'
+        ///'空いている番号のフォルダを作成する。
+        ///'
+        /// </summary>
+        /// <returns>
+        //'戻り値：
+        //'フォルダが正常に作成された場合はフォルダパスを返す。
+        //'それ以外の場合は空文字を返す。
+        /// </returns>
+        public string CreateProjectFolder()
+        {
+            string CreateProjectFolder = "";
 
+
+            //[VB]    Dim sDataFolderPath As String
+            //[VB]    sDataFolderPath = frmMain.UserDataPath  '2008/10/13 NGS Yamada
+            //[VB]'    sDataFolderPath = App.Path & DATA_FOLDER_NAME
+            //[VB]    Call CreateDir(sDataFolderPath, True)
+            string sDataFolderPath;
+            //frmMain2 frmMain2 = new frmMain2(); 
+            //sDataFolderPath = frmMain2.UserDataPath;  //'2008/10/13 NGS Yamada
+            sDataFolderPath = @"C:\Develop\NetSurv\Src\NS-App\NS-Survey\UserData\";
+
+            MdlUtility mdlUtility = new MdlUtility();
+            mdlUtility.CreateDir(sDataFolderPath, true);
+
+
+            //    Dim sPath As String
+            //    Dim clsFind As New FileFind
+            //    Dim i As Long
+            //    For i = 1 To MAX_PROJECT_NUMBER
+            //        CreateProjectFolder = Format$(i, DATA_FOLDER_FORMAT)
+            //        sPath = sDataFolderPath & CreateProjectFolder         //sPath = "C:\Develop\NetSurv\Src\NS-App\NS-Survey\UserData2\0001"
+            //        If Not clsFind.FindFile(sPath) Then Exit For
+            //    Next
+            //    If i > MAX_PROJECT_NUMBER Then
+            //        CreateProjectFolder = ""
+            //    Else
+            //        Call CreateDir(sPath, True)
+            //        Call CreateDir(sPath & OBSPOINT_PATH, True)
+            //    End If
+            string sPath;
+            for (long i = 1; i <= MAX_PROJECT_NUMBER; i++)     //1 - 9999
+            {
+                CreateProjectFolder = i.ToString("0000");
+                sPath = $"{sDataFolderPath}{CreateProjectFolder}";
+                if (!System.IO.Directory.Exists($"{sDataFolderPath}{CreateProjectFolder}"))
+                {
+                    if (i > MAX_PROJECT_NUMBER)
+                    {
+                        CreateProjectFolder = "";
+                    }
+                    else
+                    {
+                        //存在しない場合
+                        mdlUtility.CreateDir(sPath, true);
+                        mdlUtility.CreateDir($"{sPath}{MdlNSSDefine.OBSPOINT_PATH}", true);
+                    }
+                    return CreateProjectFolder;
+
+                }
+            }
+            return CreateProjectFolder;
+        }
+        //---------------------------------------------------------------------
+        //'新しくプロジェクトフォルダを作成する。
+        //
+        //'
+        //'空いている番号のフォルダを作成する。
+        //'
+        //'引き数：
+        //'戻り値：
+        //'フォルダが正常に作成された場合はフォルダパスを返す。
+        //'それ以外の場合は空文字を返す。
+        //Public Function CreateProjectFolder() As String
+        //    Dim sDataFolderPath As String
+        //    sDataFolderPath = frmMain.UserDataPath  '2008/10/13 NGS Yamada
+        //'    sDataFolderPath = App.Path & DATA_FOLDER_NAME
+        //    Call CreateDir(sDataFolderPath, True)
+        //    Dim sPath As String
+        //    Dim clsFind As New FileFind
+        //    Dim i As Long
+        //    For i = 1 To MAX_PROJECT_NUMBER
+        //        CreateProjectFolder = Format$(i, DATA_FOLDER_FORMAT)
+        //        sPath = sDataFolderPath & CreateProjectFolder
+        //        If Not clsFind.FindFile(sPath) Then Exit For
+        //    Next
+        //    If i > MAX_PROJECT_NUMBER Then
+        //        CreateProjectFolder = ""
+        //    Else
+        //        Call CreateDir(sPath, True)
+        //        Call CreateDir(sPath & OBSPOINT_PATH, True)
+        //    End If
+        //End Function
+
+        //<<<<<<<<<-----------23/12/29 K.setoguchi@NV
 
 
 
