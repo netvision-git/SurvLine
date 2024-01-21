@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics.Eventing.Reader;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Reflection.Emit;
 using System.Runtime.InteropServices;
@@ -12,6 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static SurvLine.mdl.MdiDefine;
+using static System.Net.WebRequestMethods;
 
 namespace SurvLine
 {
@@ -23,6 +25,9 @@ namespace SurvLine
 
         public string receiveData = "";
         MdlUtility Utility = new MdlUtility();
+        IniFileControl iniFileControl = new IniFileControl();
+
+        Document m_clsDocument = new Document();
 
 
         //23/12/29 K.setoguchi@NV---------->>>>>>>>>>
@@ -38,6 +43,7 @@ namespace SurvLine
         public frmMain2()
         {
             InitializeComponent();
+            Document m_clsDocument = new Document();
 
         }
 
@@ -152,6 +158,11 @@ namespace SurvLine
         {
             bool CreateJob = false;
 
+
+            m_clsDocument.Class_Initialize();
+
+
+
             //------------------------------------------------------------
             //[VB]      '既存の値。
             //[VB]      frmJobEdit.JobName = ""
@@ -160,71 +171,78 @@ namespace SurvLine
             frmJobEdit2 fJobEdit = new frmJobEdit2();
 
 
-
             fJobEdit.txtJobName.Text = "";
             fJobEdit.txtDistrictName.Text = "";
             fJobEdit.lblFolder.Text = "";
 
 
+            //------------------------------------------------------------------------------------
             //[VB]      frmJobEdit.CoordNum = GetPrivateProfileInt(PROFILE_SAVE_SEC_ACCOUNT, PROFILE_SAVE_KEY_COORDNUM, 9, App.Path & "\" & App.Title & PROFILE_SAVE_EXT)
-            //
-            //          PROFILE_SAVE_SEC_ACCOUNT =  "ACCOUNT"
-            //          PROFILE_SAVE_KEY_COORDNUM = "COORDNUM"
-            //          App.Path = "C:\Develop\NetSurv\Src\NS-App\NS-Survey"
-            //          App.Title =  "NS-Survey"
-            //          PROFILE_SAVE_EXT =   ".ini"
-            //            fJobEdit.CoordNum = GetPrivateProfileInt(PROFILE_SAVE_SEC_ACCOUNT, PROFILE_SAVE_KEY_COORDNUM, 9, App.Path & "\" & App.Title & PROFILE_SAVE_EXT)
-            fJobEdit.cmbZone.SelectedIndex = 7; //GetPrivateProfileInt                        //
+            //              PROFILE_SAVE_SEC_ACCOUNT =  "ACCOUNT"
+            //              PROFILE_SAVE_KEY_COORDNUM = "COORDNUM"
+            //              App.Path = "C:\Develop\NetSurv\Src\NS-App\NS-Survey"
+            //              App.Title =  "NS-Survey"
+            //              PROFILE_SAVE_EXT =   ".ini"
+            string App_Path = @"C:\Develop\NetSurv\Src\NS-App\NS-Survey";
+            string App_Title = "NS-Survey";
+            fJobEdit.CoordNum = iniFileControl.GetPrivateProfileInt(MdlNSDefine.PROFILE_SAVE_SEC_ACCOUNT, MdlNSDefine.PROFILE_SAVE_KEY_COORDNUM, 9, $"{App_Path}\\{App_Title}{MdlNSSDefine.PROFILE_SAVE_EXT}");
+            fJobEdit.CoordNum -= 1;
+            fJobEdit.cmbZone.SelectedIndex = (int)fJobEdit.CoordNum;
 
 
+            //------------------------------------------------------------------------------------
             //[VB]      frmJobEdit.GeoidoEnable = Not m_clsDocument.GeoidoPathDef = ""
             //[VB]      frmJobEdit.GeoidoPath = m_clsDocument.GeoidoPathDef
-            //fJobEdit.GeoidoEnable = Not m_clsDocument.GeoidoPathDef = "";     //true : "C:\Develop\パラメータファイル\gsigeo2011_ver1.asc"
             fJobEdit.chkGeoidoEnable.Checked = true;                                       //true : "C:\Develop\パラメータファイル\gsigeo2011_ver1.asc"
-            //fJobEdit.GeoidoPath = m_clsDocument.GeoidoPathDef;                        //"C:\Develop\パラメータファイル\gsigeo2011_ver1.asc"
             fJobEdit.txtGeoidoPath.Text = @"C:\Develop\パラメータファイル\gsigeo2011_ver1.asc"; //"C:\Develop\パラメータファイル\gsigeo2011_ver1.asc"
 
+            if (m_clsDocument.GeoidoPathDef != "")
+            {
+                fJobEdit.chkGeoidoEnable.Checked = true;                                       //true : "C:\Develop\パラメータファイル\gsigeo2011_ver1.asc"
+            }
+            else
+            {
+                fJobEdit.chkGeoidoEnable.Checked = false;                                       //true : "C:\Develop\パラメータファイル\gsigeo2011_ver1.asc"
 
+            }
+            fJobEdit.txtGeoidoPath.Text = m_clsDocument.GeoidoPathDef;
+
+
+            //------------------------------------------------------------------------------------
             //'セミ・ダイナミック対応。'2009/11 H.Nakamura
             //[VB]      frmJobEdit.SemiDynaEnable = False
             //[VB]      frmJobEdit.SemiDynaPath = m_clsDocument.SemiDynaPathDef
             //[VB]      frmJobEdit.SemiDynaValid = True
-
             fJobEdit.chkSemiDynaEnable.Checked = false;
-            //fJobEdit.SemiDynaPath = m_clsDocument.SemiDynaPathDef;          //"C:\Develop\パラメータファイル\SemiDyna2009.par"
-            fJobEdit.txtSemiDynaPath.Text = @"C:\Develop\パラメータファイル\SemiDyna2009.par";
+            fJobEdit.SemiDynaPath = m_clsDocument.SemiDynaPathDef;          //"C:\Develop\パラメータファイル\SemiDyna2009.par"
+            fJobEdit.txtSemiDynaPath.Text = m_clsDocument.SemiDynaPathDef;  //@"C:\Develop\パラメータファイル\SemiDyna2009.par";
             fJobEdit.SemiDynaValid = true;
 
+            //------------------------------------------------------------------------------------
             //[VB]      //'Caption を設定すると Form_Load が走るので注意すべし！
             //[VB]      frmJobEdit.Caption = "新規現場の作成"
             fJobEdit.Text = "新規現場の作成";
 
 
-
+            //--------------------------------------------
             //    Call frmJobEdit.Show(1)
-            //    If frmJobEdit.Result<> vbOK Then Exit Function
             fJobEdit.ShowDialog();
 
+            //--------------------------------------------
+            //    If frmJobEdit.Result<> vbOK Then Exit Function
             if (fJobEdit.Result != DEFINE.vbOK) { return false; }
 
 
+            //--------------------------------------------
             //    '再描画。
             //    If RedrawWindow(Me.hWnd, 0, 0, RDW_UPDATENOW) = 0 Then Call Err.Raise(ERR_FATAL, , GetLastErrorMessage())
-
-            // ＜＜＜　坂井様お願い致します。　＞＞＞           
+            //
+            //          //＜＜＜　坂井様お願い致します。　＞＞＞           
 
 
             //--------------------------------------------
             //[VB]    'プロジェクトフォルダの生成。
             //[VB]    On Error GoTo FileErrorHandler
-            //[VB]    Dim clsProjectFileManager As New ProjectFileManager
-            //[VB]    Dim sProjectFolderName As String
-            //[VB]
-            //[VB]    sProjectFolderName = clsProjectFileManager.CreateProjectFolder
-            //[VB]    If sProjectFolderName = "" Then
-            //[VB]        Call MsgBox("これ以上現場を保存することができません。" & vbCrLf & "不要な現場を削除してください。", vbCritical)
-            //[VB]        Exit Function
-            //[VB]    End If
             ProjectFileManager clsProjectFileManager = new ProjectFileManager();
             string sProjectFolderName = clsProjectFileManager.CreateProjectFolder();        //"0004"
             if (sProjectFolderName == "")
@@ -234,73 +252,68 @@ namespace SurvLine
 
             }
 
+            //  C:\Develop\NetSurv\Src\NS-App\NS-Survey\UserData\0277\ObsPoint
+
             //--------------------------------------------
             //    On Error GoTo 0
             //   
             //    '既存の現場を閉じる。
-            //    Call CloseProject
-            //
-            //
+            CloseProject();
 
-
-
+            //--------------------------------------------
             //    '新規設定。
-            //    Call m_clsDocument.SetJob(frmJobEdit.JobName, frmJobEdit.DistrictName, frmJobEdit.CoordNum, frmJobEdit.GeoidoEnable, frmJobEdit.GeoidoPath, frmJobEdit.SemiDynaEnable, frmJobEdit.SemiDynaPath)
-            //
-            //
-            Document document = new Document();
-            document.SetJob(fJobEdit.JobName, fJobEdit.DistrictName, fJobEdit.CoordNum, fJobEdit.GeoidoEnable, fJobEdit.GeoidoPath, fJobEdit.SemiDynaEnable, fJobEdit.SemiDynaPath);
+            m_clsDocument.SetJob(fJobEdit.JobName, fJobEdit.DistrictName, fJobEdit.CoordNum, fJobEdit.GeoidoEnable, fJobEdit.GeoidoPath, fJobEdit.SemiDynaEnable, fJobEdit.SemiDynaPath);
 
 
 
-
+            //--------------------------------------------
             //    '2009/11 H.Nakamura
             //    'セミ・ダイナミックパラメータファイルのパスはデフォルトにも反映させる。
-            //    If m_clsDocument.SemiDynaEnable Then
-            //        m_clsDocument.SemiDynaPathDef = m_clsDocument.SemiDynaPath
-            //        If WritePrivateProfileString(PROFILE_SAVE_SEC_SEMIDYNA, PROFILE_SAVE_KEY_PATH, m_clsDocument.SemiDynaPathDef, App.Path & "\" & App.Title & PROFILE_SAVE_EXT) = 0 Then Call Err.Raise(ERR_FATAL, , GetLastErrorMessage())
-            //    End If
-            //    
-            if (document.m_bSemiDynaEnable)
+            App_Path = @"C:\Develop\NetSurv\Src\NS-App\NS-Survey";
+            App_Title = "NS-Survey";
+            if (m_clsDocument.m_bSemiDynaEnable)
             {
-                document.SemiDynaPathDef = document.m_sSemiDynaPath;
+                m_clsDocument.SemiDynaPathDef = m_clsDocument.m_sSemiDynaPath;
 
-                string App_Path = "";
-                string App_Title = "";
-
-                IniFileControl iniFileControl = new IniFileControl();
-                if (!iniFileControl.WritePrivateProfileString(MdlNSDefine.PROFILE_SAVE_SEC_SEMIDYNA, MdlNSDefine.PROFILE_SAVE_KEY_PATH, document.SemiDynaPathDef, $"{App_Path}\\{App_Title}{MdlNSSDefine.PROFILE_SAVE_EXT}")){
+                //--------------------------------------------
+                //
+                // "C:\Develop\NetSurv\Src\NS-App\NS-Survey" "\" "NS-Survey" .ini
+                //      App_Path = C:\Hitz\NetSurv\Prog\Src
+                //      App_Title =  "NS-Survey"  
+                //
+                if (!iniFileControl.WritePrivateProfileString(MdlNSDefine.PROFILE_SAVE_SEC_SEMIDYNA, MdlNSDefine.PROFILE_SAVE_KEY_PATH, m_clsDocument.SemiDynaPathDef, $"{App_Path}\\{App_Title}{MdlNSSDefine.PROFILE_SAVE_EXT}")){
                     //Call Err.Raise(ERR_FATAL, , GetLastErrorMessage())
                 }
             }
 
 
-
-
             //--------------------------------------------
             //    '2009/11 H.Nakamura
             //    'セミ・ダイナミックの初期化。
-            //    Call mdlSemiDyna.Initialize(m_clsDocument.SemiDynaEnable, m_clsDocument.SemiDynaPath)
-            //    
-
+            MdlSemiDyna mdlSemiDyna = new MdlSemiDyna();
+            mdlSemiDyna.Initialize(m_clsDocument.m_bSemiDynaEnable, m_clsDocument.m_sSemiDynaPath);
 
 
 
             //--------------------------------------------
             //    '保存。
-            //    Call Save(clsProjectFileManager.GetSaveFilePath(sProjectFolderName))
-            //    
+            //--------  C:\Develop\NetSurv\Src\NS-App\NS-Survey\UserData\0277\data
+            Save(clsProjectFileManager.GetSaveFilePath(sProjectFolderName));
+
 
 
             //--------------------------------------------
             //    'iniファイルに保存。
-            //    Dim sValue As String
-            //    sValue = CStr(frmJobEdit.CoordNum)
-            //    If WritePrivateProfileString(PROFILE_SAVE_SEC_ACCOUNT, PROFILE_SAVE_KEY_COORDNUM, sValue, App.Path & "\" & App.Title & PROFILE_SAVE_EXT) = 0 Then Call Err.Raise(ERR_FATAL, , GetLastErrorMessage())
+            //                      App_Path = C:\Hitz\NetSurv\Prog\Src
+            //                      App_Title =  "NS-Survey"  
+            string sValue;
+            sValue = fJobEdit.CoordNum.ToString();
+            if (iniFileControl.WritePrivateProfileString(MdlNSDefine.PROFILE_SAVE_SEC_ACCOUNT, MdlNSDefine.PROFILE_SAVE_KEY_COORDNUM, sValue, $"{App_Path}\\{App_Title}{MdlNSSDefine.PROFILE_SAVE_EXT}") == false){
+                //  Call Err.Raise(ERR_FATAL, , GetLastErrorMessage())
+            }
 
 
-
-
+            //<<<<<<<<<-----------24/01/04 K.setoguchi@NV
 
 
             return CreateJob;
@@ -392,6 +405,69 @@ namespace SurvLine
         //<<<<<<<<<-----------23/12/29 K.setoguchi@NV
 
 
+        //24/01/04 K.setoguchi@NV---------->>>>>>>>>>
+        //'*******************************************************************************
+        //'*******************************************************************************
+        /// <summary>
+        ///インプリメンテーション
+        ///
+        /// プロジェクトを保存する。
+        ///
+        /// 引き数：
+        ///     sPath 保存先ファイルのパス。
+        /// </summary>
+        /// <param name="sPath"></param>
+        private void Save(string sPath)
+        {
+
+            //------------------------------
+            //[VB]    '砂時計。
+            //[VB]    Dim clsWaitCursor As New WaitCursor
+            //[VB]    Set clsWaitCursor.Object = Me
+            Cursor = Cursors.WaitCursor;
+
+            //------------------------------
+            //[VB]   On Error GoTo FileErrorHandler
+            //[VB]   Call m_clsDocument.Save(sPath)
+            //[VB]   On Error GoTo 0
+            m_clsDocument.Save(sPath);
+
+            //------------------------------
+            //[VB]   Call clsWaitCursor.Back
+            Cursor = Cursors.Default;
+
+        }
+        //--------------------------------
+        //'インプリメンテーション
+        //
+        //'プロジェクトを保存する。
+        //'
+        //'引き数：
+        //'sPath 保存先ファイルのパス。
+        //Private Sub Save(ByVal sPath As String)
+        //
+        //    '砂時計。
+        //    Dim clsWaitCursor As New WaitCursor
+        //    Set clsWaitCursor.Object = Me
+        //
+        //    On Error GoTo FileErrorHandler
+        //    Call m_clsDocument.Save(sPath)
+        //    On Error GoTo 0
+        //
+        //
+        //    Call clsWaitCursor.Back
+        //
+        //
+        //    Exit Sub
+        //
+        //
+        //FileErrorHandler:
+        //    Call MsgBox(Err.Description, vbCritical)
+        //
+        //End Sub
+        //'*******************************************************************************
+        //'*******************************************************************************
+        //<<<<<<<<<-----------24/01/04 K.setoguchi@NV
 
 
 
@@ -656,7 +732,10 @@ namespace SurvLine
 
         //**************************************************************************************
         //**************************************************************************************
-        //'プロジェクトを閉じる。
+        /// <summary>
+        /// プロジェクトを閉じる。
+        /// 
+        /// </summary>
         private void CloseProject()
         {
             //[VB]---------------------------------------------------
@@ -665,10 +744,23 @@ namespace SurvLine
             //[VB]      Set clsWaitCursor.Object = Me
             Cursor = Cursors.WaitCursor;
 
+            //[VB]      'クリア。
+            //[VB]      Call m_clsDocument.Clear
 
+            m_clsDocument.Clear();
+
+            //[VB]      '座標系番号を更新する。
+            //[VB]      Call SetListIndexManual(cmbZone, m_clsDocument.CoordNum - 1)
+            //
+            //MdlGUI mdlGUI = new MdlGUI();
+            //mdlGUI.SetListIndexManual(cmbZone, m_clsDocument.CoordNum - 1);
+
+            //[VB]      Call clsWaitCursor.Back
+            Cursor = Cursors.Default;
 
 
         }
+        //---------------------------------------------------------------------------------------
         //[VB]    'プロジェクトを閉じる。
         //[VB]  Private Sub CloseProject()
         //[VB]    
@@ -738,27 +830,512 @@ namespace SurvLine
 
         }
 
+
+        //==========================================================================================
+        /*[VB]
+        'プロジェクトを上書き保存する。
+        Private Sub mnuFileSave_Click()
+
+            On Error GoTo ErrorHandler
+    
+            'プロジェクトの上書き保存。
+            If Not SaveProject() Then Exit Sub
+    
+            Exit Sub
+    
+        ErrorHandler:
+            Call mdlMain.ErrorExit
+    
+        End Sub
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        /// <summary>
+        /// プロジェクトを上書き保存する。
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void mnuFileSave_Click(object sender, EventArgs e)
         {
-            MessageBox.Show(mnuFileSave.Text);
+            //MessageBox.Show(mnuFileSave.Text);
+
+            //'プロジェクトの上書き保存。
+            if (!SaveProject())
+            {
+                return;
+            }
+
 
         }
 
+        //==========================================================================================
+        /*[VB]
+        'プロジェクトを上書き保存する。
+        '
+        '戻り値：
+        '正常終了の場合 True を返す。
+        'キャンセルの場合 False を返す。
+        Private Function SaveProject() As Boolean
+
+            SaveProject = False
+    
+            If m_clsDocument.Path = "" Then
+                'If Not SaveAsProject() Then Exit Function
+            Else
+                Call Save(m_clsDocument.Path)
+            End If
+    
+            SaveProject = True
+    
+        End Function            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        /// <summary>
+        ///'プロジェクトを上書き保存する。
+        ///'
+        /// </summary>
+        /// <returns>
+        ///'戻り値：
+        ///'正常終了の場合 True を返す。
+        ///'キャンセルの場合 False を返す。
+        /// </returns>
+        private bool SaveProject()
+        {
+            bool SaveProject = false;
+
+            if (m_clsDocument.Path() == "") {
+                //'If Not SaveAsProject() Then Exit Function
+            }
+            else
+            {
+                Save(m_clsDocument.Path());
+            }
+
+            SaveProject = true;
+            return SaveProject;
+
+        }
+
+
+        //==========================================================================================
+        /*[VB]
+        'プロジェクトを名前を付けて保存する。
+        Private Sub mnuFileSaveAs_Click()
+
+            On Error GoTo ErrorHandler
+    
+            'プロジェクトを名前を付けて保存。
+            If Not SaveAsProject() Then Exit Sub
+    
+            'タイトル。
+            Call UpdateTitle
+    
+            '座標系番号を更新する。
+            Call SetListIndexManual(cmbZone, m_clsDocument.CoordNum - 1)
+    
+            '砂時計。
+            Dim clsWaitCursor As New WaitCursor
+            Set clsWaitCursor.Object = Me
+    
+            'プロットの再描画。
+            Call objPlotPane.UpdateLogicalDrawArea(False)
+            Call objPlotPane.Redraw
+            Call objPlotPane.Refresh
+    
+            'ステータスバーの更新。
+            Call UpdateStatusBar(STATUSBAR_NUM_COORDNUM)
+            Call UpdateStatusBar(STATUSBAR_NUM_GEOIDO)
+    
+            Exit Sub
+    
+        ErrorHandler:
+            Call mdlMain.ErrorExit
+    
+        End Sub
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        /// <summary>
+        /// 'プロジェクトを名前を付けて保存する。
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void mnuFileSaveAs_Click(object sender, EventArgs e)
         {
-            MessageBox.Show(mnuFileSaveAs.Text);
+            // MessageBox.Show(mnuFileSaveAs.Text);
+
+            //'プロジェクトを名前を付けて保存。
+            if (!SaveAsProject())
+            {
+                return;
+            }
+
+
+            //'タイトル。
+            UpdateTitle();
+
+
+            //'座標系番号を更新する。
+            //Call SetListIndexManual(cmbZone, m_clsDocument.CoordNum -1)
+
+            //'砂時計。
+            Cursor = Cursors.WaitCursor;
+
+
+            //'プロットの再描画。
+            //Call objPlotPane.UpdateLogicalDrawArea(False)
+            //Call objPlotPane.Redraw
+            //Call objPlotPane.Refresh
+
+
+            //'ステータスバーの更新。
+            //Call UpdateStatusBar(STATUSBAR_NUM_COORDNUM)
+            //Call UpdateStatusBar(STATUSBAR_NUM_GEOIDO)
 
         }
 
+        //==========================================================================================
+        /*[VB]
+        'プロジェクトを名前を付けて保存する。
+        '
+        '戻り値：
+        '正常終了の場合 True を返す。
+        'キャンセルの場合 False を返す。
+        Private Function SaveAsProject() As Boolean
+
+            SaveAsProject = False
+    
+            '既存の値。
+            frmJobEdit.JobName = m_clsDocument.JobName
+            frmJobEdit.DistrictName = m_clsDocument.DistrictName
+            frmJobEdit.Folder = ""
+            frmJobEdit.CoordNum = m_clsDocument.CoordNum
+            frmJobEdit.GeoidoEnable = m_clsDocument.GeoidoEnable
+            frmJobEdit.GeoidoPath = m_clsDocument.GeoidoPath
+    
+            'セミ・ダイナミック対応。'2009/11 H.Nakamura
+            frmJobEdit.SemiDynaEnable = m_clsDocument.SemiDynaEnable
+            frmJobEdit.SemiDynaPath = m_clsDocument.SemiDynaPath
+            frmJobEdit.SemiDynaValid = False
+    
+            'Caption を設定すると Form_Load が走るので注意すべし！
+            frmJobEdit.Caption = "名前を付けて保存"
+    
+            Call frmJobEdit.Show(1)
+            If frmJobEdit.Result <> vbOK Then Exit Function
+    
+            '再描画。
+            If RedrawWindow(Me.hWnd, 0, 0, RDW_UPDATENOW) = 0 Then Call Err.Raise(ERR_FATAL, , GetLastErrorMessage())
+    
+            'プロジェクトフォルダの生成。
+            On Error GoTo FileErrorHandler
+            Dim clsProjectFileManager As New ProjectFileManager
+            Dim sProjectFolderName As String
+            sProjectFolderName = clsProjectFileManager.CreateProjectFolder
+            If sProjectFolderName = "" Then
+                Call MsgBox("これ以上現場を保存することができません。" & vbCrLf & "不要な現場を削除してください。", vbCritical)
+                Exit Function
+            End If
+            On Error GoTo 0
+    
+            '設定。
+            Call m_clsDocument.SetJob(frmJobEdit.JobName, frmJobEdit.DistrictName, frmJobEdit.CoordNum, frmJobEdit.GeoidoEnable, frmJobEdit.GeoidoPath, frmJobEdit.SemiDynaEnable, frmJobEdit.SemiDynaPath)
+    
+            '保存。
+            Call Save(clsProjectFileManager.GetSaveFilePath(sProjectFolderName))
+    
+            SaveAsProject = True
+    
+            Exit Function
+    
+        FileErrorHandler:
+            If Err.Number <> ERR_FILE Then Call Err.Raise(Err.Number, Err.Source, Err.Description, Err.HelpFile, Err.HelpContext)
+            Call MsgBox(Err.Description, vbCritical)
+    
+        End Function
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        /// <summary>
+        /// 'プロジェクトを名前を付けて保存する。
+        /// '
+        /// '戻り値：
+        /// '正常終了の場合 True を返す。
+        /// 'キャンセルの場合 False を返す。
+        /// 
+        /// </summary>
+        /// <returns>
+        /// '戻り値：
+        /// '正常終了の場合 True を返す。
+        /// 'キャンセルの場合 False を返す。
+        /// </returns>
+        private bool SaveAsProject()
+        {
+            bool SaveAsProject = false;
+
+            frmJobEdit2 frmJobEdit2 = new frmJobEdit2();
+
+
+            //'既存の値。
+            frmJobEdit2.JobName = m_clsDocument.JobName();
+            frmJobEdit2.DistrictName = m_clsDocument.DistrictName();
+            frmJobEdit2.Folder = "";
+            frmJobEdit2.CoordNum = m_clsDocument.CoordNum();
+            frmJobEdit2.GeoidoEnable = m_clsDocument.GeoidoEnable();
+            frmJobEdit2.GeoidoPath = m_clsDocument.GeoidoPath();
+
+
+            //'セミ・ダイナミック対応。'2009 / 11 H.Nakamura
+            frmJobEdit2.SemiDynaEnable = m_clsDocument.SemiDynaEnable();
+            frmJobEdit2.SemiDynaPath = m_clsDocument.SemiDynaPath();
+            frmJobEdit2.SemiDynaValid = false;
+
+            //'Caption を設定すると Form_Load が走るので注意すべし！
+            frmJobEdit2.Text = "名前を付けて保存";
+
+            frmJobEdit2.ShowDialog();
+            if (frmJobEdit2.Result != DEFINE.vbOK) { return false; }
+
+            //'再描画。
+            //If RedrawWindow(Me.hWnd, 0, 0, RDW_UPDATENOW) = 0 Then Call Err.Raise(ERR_FATAL, , GetLastErrorMessage())
+
+
+            //'プロジェクトフォルダの生成。
+            ProjectFileManager clsProjectFileManager = new ProjectFileManager();
+            string sProjectFolderName;
+            sProjectFolderName = clsProjectFileManager.CreateProjectFolder();
+            if (sProjectFolderName == ""){
+                MessageBox.Show($"これ以上現場を保存することができません。\n 不要な現場を削除してください。", "エラー発生");
+                return SaveAsProject;
+            }
+
+            //'設定。
+            m_clsDocument.SetJob(frmJobEdit2.JobName, frmJobEdit2.DistrictName, frmJobEdit2.CoordNum, frmJobEdit2.GeoidoEnable, frmJobEdit2.GeoidoPath, frmJobEdit2.SemiDynaEnable, frmJobEdit2.SemiDynaPath);
+
+            //'保存。
+            Save(clsProjectFileManager.GetSaveFilePath(sProjectFolderName));
+
+
+            SaveAsProject = true;
+            return SaveAsProject;
+        }
+
+
+        //==========================================================================================
+        /*[VB]
         private void mnuFileEdit_Click(object sender, EventArgs e)
         {
-            frmJobEdit2 form = new frmJobEdit2();
-            form.Text = "現場の編集";
+
+            On Error GoTo ErrorHandler
 
 
-            form.ShowDialog();
+            '現場の新規作成。
+            Call EditJob
+
+
+            'タイトル。
+            Call UpdateTitle
+
+
+            '座標系番号を更新する。
+            Call SetListIndexManual(cmbZone, m_clsDocument.CoordNum -1)
+    
+            '砂時計。
+            Dim clsWaitCursor As New WaitCursor
+            Set clsWaitCursor.Object = Me
+
+
+            'プロットの再描画。
+            Call objPlotPane.UpdateLogicalDrawArea(False)
+            Call objPlotPane.Redraw
+            Call objPlotPane.Refresh
+
+
+            'メニューの更新。
+            mnuAccountSemiDynaGAN2KON.Enabled = (mdlSemiDyna.m_nSemiDyna<> 0) 'セミ・ダイナミック対応。'2009 / 11 H.Nakamura
+
+
+            'ステータスバーの更新。
+            Call UpdateStatusBar(STATUSBAR_NUM_COORDNUM)
+            Call UpdateStatusBar(STATUSBAR_NUM_GEOIDO)
+
+
+            Exit Sub
+
+
+        ErrorHandler:
+                    Call mdlMain.ErrorExit
+
+                End Sub
 
         }
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        /// <summary>
+        /// 'プロジェクトを編集する。
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// 
+        private void mnuFileEdit_Click(object sender, EventArgs e)
+        {
+
+            //現場の新規作成。
+            EditJob();
+
+
+            //'タイトル。
+            UpdateTitle();
+
+            //'座標系番号を更新する。
+            //  SetListIndexManual(cmbZone, m_clsDocument.CoordNum - 1);
+
+            //'砂時計。
+            Cursor = Cursors.WaitCursor;
+
+
+            //'プロットの再描画。
+            //Call objPlotPane.UpdateLogicalDrawArea(False)
+            //Call objPlotPane.Redraw
+            //Call objPlotPane.Refresh
+
+
+            //'メニューの更新。
+            //mnuAccountSemiDynaGAN2KON.Enabled = (mdlSemiDyna.m_nSemiDyna<> 0) 'セミ・ダイナミック対応。'2009 / 11 H.Nakamura
+
+
+            //'ステータスバーの更新。
+            //UpdateStatusBar(STATUSBAR_NUM_COORDNUM);
+            //UpdateStatusBar(STATUSBAR_NUM_GEOIDO);
+
+
+        }
+
+        //==========================================================================================
+        /*[VB]
+        '現場の編集。
+        '
+        '戻り値：
+        '正常終了の場合 True を返す。
+        'キャンセルの場合 False を返す。
+        Private Function EditJob() As Boolean
+
+            EditJob = False
+
+            '既存の値。
+            frmJobEdit.JobName = m_clsDocument.JobName
+            frmJobEdit.DistrictName = m_clsDocument.DistrictName
+            frmJobEdit.Folder = m_clsDocument.Folder
+            frmJobEdit.CoordNum = m_clsDocument.CoordNum
+            frmJobEdit.GeoidoEnable = m_clsDocument.GeoidoEnable
+            frmJobEdit.GeoidoPath = m_clsDocument.GeoidoPath
+
+
+            'セミ・ダイナミック対応。'2009/11 H.Nakamura
+            frmJobEdit.SemiDynaEnable = m_clsDocument.SemiDynaEnable
+            frmJobEdit.SemiDynaPath = m_clsDocument.SemiDynaPath
+            frmJobEdit.SemiDynaValid = True
+
+
+            Call frmJobEdit.Show(1)
+            If frmJobEdit.Result<> vbOK Then Exit Function
+
+            '再描画。
+            If RedrawWindow(Me.hWnd, 0, 0, RDW_UPDATENOW) = 0 Then Call Err.Raise(ERR_FATAL, , GetLastErrorMessage())
+
+            '設定。
+            Call m_clsDocument.SetJob(frmJobEdit.JobName, frmJobEdit.DistrictName, frmJobEdit.CoordNum, frmJobEdit.GeoidoEnable, frmJobEdit.GeoidoPath, frmJobEdit.SemiDynaEnable, frmJobEdit.SemiDynaPath)
+
+            '2009/11 H.Nakamura
+            'セミ・ダイナミックパラメータファイルのパスはデフォルトにも反映させる。
+            If m_clsDocument.SemiDynaEnable Then
+                m_clsDocument.SemiDynaPathDef = m_clsDocument.SemiDynaPath
+                If WritePrivateProfileString(PROFILE_SAVE_SEC_SEMIDYNA, PROFILE_SAVE_KEY_PATH, m_clsDocument.SemiDynaPathDef, App.Path & "\" & App.Title & PROFILE_SAVE_EXT) = 0 Then Call Err.Raise(ERR_FATAL, , GetLastErrorMessage())
+            End If
+
+            '2009/11 H.Nakamura
+            'セミ・ダイナミックの初期化。
+            Call mdlSemiDyna.Initialize(m_clsDocument.SemiDynaEnable, m_clsDocument.SemiDynaPath)
+
+            EditJob = True
+
+
+        End Function
+
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        private bool EditJob()
+        {
+
+            bool EditJob = false;
+
+
+            frmJobEdit2 frmJobEdit2 = new frmJobEdit2();
+
+            //'既存の値。
+            frmJobEdit2.JobName = m_clsDocument.JobName();
+            frmJobEdit2.DistrictName = m_clsDocument.DistrictName();
+            frmJobEdit2.Folder = m_clsDocument.Folder();
+            frmJobEdit2.CoordNum = m_clsDocument.CoordNum();
+            frmJobEdit2.GeoidoEnable = m_clsDocument.GeoidoEnable();
+            frmJobEdit2.GeoidoPath = m_clsDocument.GeoidoPath();
+
+
+            //'セミ・ダイナミック対応。'2009 / 11 H.Nakamura
+            frmJobEdit2.SemiDynaEnable = m_clsDocument.SemiDynaEnable();
+            frmJobEdit2.SemiDynaPath = m_clsDocument.SemiDynaPath();
+            frmJobEdit2.SemiDynaValid = true;
+
+
+            frmJobEdit2.ShowDialog();
+            if (frmJobEdit2.Result != DEFINE.vbOK) { return false; }
+
+
+
+            //再描画
+            if (frmMain2.RedrawWindow(this.Handle, IntPtr.Zero, IntPtr.Zero, (int)DEFINE.RDW_UPDATENOW) == false)
+            {
+                return false;
+            }
+
+            //'設定。
+            m_clsDocument.SetJob(frmJobEdit2.JobName, frmJobEdit2.DistrictName, frmJobEdit2.CoordNum, frmJobEdit2.GeoidoEnable, frmJobEdit2.GeoidoPath, frmJobEdit2.SemiDynaEnable, frmJobEdit2.SemiDynaPath);
+
+
+            //'2009/11 H.Nakamura
+            //'セミ・ダイナミックパラメータファイルのパスはデフォルトにも反映させる。
+            string App_Path = @"C:\Develop\NetSurv\Src\NS-App\NS-Survey";
+            string App_Title = "NS-Survey";
+            if (m_clsDocument.m_bSemiDynaEnable)
+            {
+                m_clsDocument.SemiDynaPathDef = m_clsDocument.m_sSemiDynaPath;
+
+                //--------------------------------------------
+                //
+                // "C:\Develop\NetSurv\Src\NS-App\NS-Survey" "\" "NS-Survey" .ini
+                //      App_Path = C:\Hitz\NetSurv\Prog\Src
+                //      App_Title =  "NS-Survey"  
+                //
+                if (!iniFileControl.WritePrivateProfileString(MdlNSDefine.PROFILE_SAVE_SEC_SEMIDYNA, MdlNSDefine.PROFILE_SAVE_KEY_PATH, m_clsDocument.SemiDynaPathDef, $"{App_Path}\\{App_Title}{MdlNSSDefine.PROFILE_SAVE_EXT}"))
+                {
+                    //Call Err.Raise(ERR_FATAL, , GetLastErrorMessage())
+                }
+            }
+
+
+            //'2009/11 H.Nakamura
+            //'セミ・ダイナミックの初期化。
+            MdlSemiDyna mdlSemiDyna = new MdlSemiDyna();
+            mdlSemiDyna.Initialize(m_clsDocument.m_bSemiDynaEnable, m_clsDocument.m_sSemiDynaPath);
+
+
+            return EditJob;
+        }
+
 
         private void mnuCheck_Click(object sender, EventArgs e)
         {
@@ -833,5 +1410,8 @@ namespace SurvLine
         {
 
         }
+
+
+
     }
 }

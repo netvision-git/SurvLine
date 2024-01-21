@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Eventing.Reader;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Runtime.Remoting;
@@ -14,10 +15,6 @@ using System.Xml.Linq;
 using static System.Net.Mime.MediaTypeNames;
 using static System.Net.WebRequestMethods;
 using static System.Windows.Forms.AxHost;
-
-
-
-
 namespace SurvLine
 {
 
@@ -247,6 +244,105 @@ namespace SurvLine
         //***************************************************************************
         //***************************************************************************
 
+        //24/01/04 K.setoguchi@NV---------->>>>>>>>>>
+        //***************************************************************************
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sPath"></param>
+        /// <param name="bRaise"></param>
+        /// <returns></returns>
+        public bool EmptyDir(string sPath, bool bRaise = false)
+        {
+
+            bool EmptyDir = false;
+
+            try
+            {
+                //文字末尾が"\"の場合は、文字から削除する
+                sPath = RTrimEx(sPath, "\\");
+                //このフォルダの有無
+                if (Directory.Exists(sPath))
+                {
+
+                    sPath = $"{sPath}\\";
+
+                    string[] picList = Directory.GetFiles(sPath, "*.*");
+                    string fName;
+
+                    foreach (string f in picList)
+                    {
+                        // Remove path from the file name.
+                        fName = f.Substring(sPath.Length + 1);
+
+                        if (IsDots(fName) == false)
+                        {
+                            if (System.IO.File.Exists(Path.Combine(sPath, fName)))
+                            {
+                                //ファイル有り
+                                System.IO.File.Delete(Path.Combine(sPath, fName));
+                            }
+                        }
+
+                    }
+                    EmptyDir = true;
+
+                }
+            }
+            catch (Exception ex)
+            {
+                if (bRaise) { MessageBox.Show(ex.Message, "エラー発生"); }
+            }
+
+            return EmptyDir;
+
+        }
+        //-------------------------------------------------------------------------
+        //'ディレクトリを空にする。
+        //'
+        //'引き数：
+        //'sPath 空にするディレクトリのパス。
+        //'bRaise Err.Raise の有無。
+        //'
+        //'戻り値：
+        //'正常終了の場合 True を返す。
+        //'それ以外の場合 False を返す。
+        //Public Function EmptyDir(ByVal sPath As String, Optional ByVal bRaise As Boolean = False) As Boolean
+        //    EmptyDir = False
+        //    On Error GoTo FileErrorHandler
+        //    Dim clsFind As New FileFind
+        //    If clsFind.FindFile(RTrimEx(sPath, "\")) Then
+        //        If Mid$(sPath, Len(sPath), 1) <> "\" Then sPath = sPath & "\"
+        //        Dim sFormat As String
+        //        sFormat = sPath & "*"
+        //        Set clsFind = New FileFind
+        //        Dim bFind As Boolean
+        //        bFind = clsFind.FindFile(sFormat)
+        //        Do While bFind
+        //            Dim sFind As String
+        //            sFind = sPath & clsFind.Name
+        //            If(clsFind.Attributes And FILE_ATTRIBUTE_DIRECTORY) = 0 Then
+        //                Call RemoveFile(sFind, bRaise)
+        //            Else
+        //                If Not IsDots(sFind) Then
+        //                    If Not EmptyDir(sFind, bRaise) Then Exit Function
+        //                    Call RmDir(sFind)
+        //                End If
+        //            End If
+        //            bFind = clsFind.FindNext()
+        //        Loop
+        //    End If
+        //    EmptyDir = True
+        //    Exit Function
+        //FileErrorHandler:
+        //    If bRaise Then Call Err.Raise(Err.Number, Err.Source, Err.Description, Err.HelpFile, Err.HelpContext)
+        //End Function
+        //***************************************************************************
+        //<<<<<<<<<-----------24/01/04 K.setoguchi@NV
+
+
+
+
         //***************************************************************************
         //***************************************************************************
         /// <summary>
@@ -364,6 +460,59 @@ namespace SurvLine
             }
             return sGetData;
         }
+
+
+
+        //24/01/04 K.setoguchi@NV---------->>>>>>>>>>
+        //***************************************************************************
+        /// <summary>
+        //'文字列変数をバリアントに変換してファイルに書き込む。
+        //'
+        //'引き数：
+        ///     br バイナリファイル
+        ///     sBuff ファイルに書き込む文字列。
+        /// </summary>
+        /// <param name="br"></param>
+        /// <param name="sBuff"></param>
+        public void FileWrite_PutString(BinaryWriter bw, string sBuff)
+        {
+            ushort size;
+            ushort vertype = 8;
+            bw.Write(vertype);
+
+            if (sBuff == null)
+            {
+                size = 0;
+                bw.Write(size);
+            }
+            else
+            {
+                byte[] shiftJisBytes = Encoding.GetEncoding("Shift-JIS").GetBytes(sBuff);
+                size = (ushort)shiftJisBytes.Length;
+                bw.Write(size);
+                //-------------------------------------------------------------------------
+                bw.Write(shiftJisBytes);
+                //bw.Write(sBuff);
+                //-------------------------------------------------------------------------
+            }
+        }
+        //------------------------------------------------------------------------------
+        //'文字列変数をバリアントに変換してファイルに書き込む。
+        //'
+        //'引き数：
+        //'nFile ファイル番号。
+        //'sBuff ファイルに書き込む文字列。
+        //Public Sub PutString(ByVal nFile As Integer, ByVal sBuff As String)
+        //    Dim V As Variant
+        //    V = sBuff
+        //    Put #nFile, , V
+        ///End Sub
+        //***************************************************************************
+        //<<<<<<<<<-----------24/01/04 K.setoguchi@NV
+
+
+
+
         //***************************************************************************
         /// <summary>
         /// 指定されたパスが"."、もしくは".."であるか検査する。
@@ -603,7 +752,7 @@ namespace SurvLine
 
 
 
-        public void SplitPath(string sPath, string sDrive, string sDir, string sTitle, string sExt)
+        public void SplitPath(string sPath, ref string sDrive, ref string sDir, ref string sTitle, ref string sExt)
         {
 
         }
@@ -641,6 +790,162 @@ namespace SurvLine
         //    'ドライブ。
         //    sDrive = Mid$(sPath, 1, nPosDir - 1)
         //End Sub
+
+
+        //24/01/04 K.setoguchi@NV---------->>>>>>>>>>
+        //***************************************************************************
+        //***************************************************************************
+        /// <summary>
+        /// ファイルを削除する。
+        ///
+        /// 引き数：
+        ///     sPath 削除するファイルのパス。
+        ///     bRaise Err.Raise の有無。
+        /// 
+        /// </summary>
+        /// <param name="sPath"></param>
+        /// <param name="bRaise"></param>
+        /// <returns>
+        /// </returns>
+        public bool RemoveFile(string sPath, bool bRaise = false)
+        {
+            bool RemoveFile = false;
+
+            try
+            {
+                if (System.IO.File.Exists(sPath))
+                {
+                    System.IO.File.Delete(sPath);
+                    RemoveFile = true;
+                }
+
+            }
+            catch (Exception e)
+            {
+                if (bRaise)
+                {
+                    //flase の為、メッセージは、不要
+                }
+
+            }
+
+            return RemoveFile;
+        }
+        //------------------------------------------------------------------------------------------------------
+        //'ファイルを削除する。
+        //'
+        //'引き数：
+        //'sPath 削除するファイルのパス。
+        //'bRaise Err.Raise の有無。
+        //'
+        //'戻り値：
+        //'正常終了の場合 True を返す。
+        //'それ以外の場合 False を返す。
+        //Public Function RemoveFile(ByVal sPath As String, Optional ByVal bRaise As Boolean = False) As Boolean
+        //    RemoveFile = False
+        //    On Error GoTo FileErrorHandler
+        //    Dim fs
+        //    Set fs = CreateObject("Scripting.FileSystemObject")
+        //    Call fs.DeleteFile(sPath, True)
+        //    RemoveFile = True
+        //    Exit Function
+        //FileErrorHandler:
+        //    If bRaise Then Call Err.Raise(Err.Number, Err.Source, Err.Description, Err.HelpFile, Err.HelpContext)
+        //End Function
+        //***************************************************************************
+        //***************************************************************************
+        //<<<<<<<<<-----------24/01/04 K.setoguchi@NV
+
+
+        //24/01/04 K.setoguchi@NV---------->>>>>>>>>>
+        //***************************************************************************
+        //***************************************************************************
+        /// <summary>
+        /// ファイルを置き換える。
+        ///
+        /// sSrcFile のパスを sDstFile に変更する。
+        /// sDstFile が存在する場合は削除する。
+        ///     (sSrcFile -- (Move)--> sDstFile )
+        ///     
+        /// 引き数：
+        ///     sSrcFile 対象ファイルのパス。
+        ///     sDstFile 変更先ファイルのパス。
+        /// 
+        /// </summary>
+        /// <param name="sSrcFile"></param>
+        /// <param name="sDstFile"></param>
+        public void ReplaceFile(string sSrcFile, string sDstFile)
+        {
+            bool dmy = RemoveFile(sDstFile, false);
+
+            System.IO.File.Move(sSrcFile, sDstFile);
+
+        }
+        //---------------------------------------------------------------
+        //'ファイルを置き換える。
+        //'
+        //'sSrcFile のパスを sDstFile に変更する。
+        //'sDstFile が存在する場合は削除する。
+        //'
+        //'引き数：
+        //'sSrcFile 対象ファイルのパス。
+        //'sDstFile 変更先ファイルのパス。
+        //Public Sub ReplaceFile(ByVal sSrcFile As String, ByVal sDstFile As String)
+        //    On Error Resume Next
+        //    Call RemoveFile(sDstFile)
+        //    On Error GoTo 0
+        //    Name sSrcFile As sDstFile
+        //End Sub
+        //***************************************************************************
+        //***************************************************************************
+        //<<<<<<<<<-----------24/01/04 K.setoguchi@NV
+
+        //***************************************************************************
+        /// <summary>
+        /// bool型データ読み出し VB対応
+        /// </summary>
+        /// <param name="br"></param>
+        /// <returns></returns>
+        public bool GetFileBool(BinaryReader br)
+        {
+            bool bBool = false;
+
+            ushort uWork;
+            uWork = br.ReadUInt16();
+            if (uWork == 0xffff)
+            {
+                bBool = true;
+            }
+            else
+            {
+                bBool = false;
+            }
+            return bBool;
+        }
+
+        //24/01/04 K.setoguchi@NV---------->>>>>>>>>>
+        //***************************************************************************
+        /// <summary>
+        /// bool型データ書き込み VB対応
+        /// bw : バイナリファイル
+        /// data：書き込む　boolデータ
+        /// </summary>
+        /// <param name="bw"></param>
+        /// <param name="data"></param>
+        public void PutFileBool(BinaryWriter bw, bool data)
+        {
+            ushort uWork = 0;
+
+            if (data)
+            {
+                uWork = 0xffff;
+            }
+            bw.Write(uWork);
+
+            return; ;
+        }
+        //<<<<<<<<<-----------24/01/04 K.setoguchi@NV
+        //***************************************************************************
 
 
     }

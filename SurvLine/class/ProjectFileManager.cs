@@ -862,7 +862,7 @@ namespace SurvLine
             //    Next
             for (int i = 0; i < sJobNames.Count; i++)
             {
-                if (sFolderNames[i] != sFolder) 
+                if (sFolderNames[i] != sFolder)
                 {
                     if (sJobName == sJobNames[i])
                     {

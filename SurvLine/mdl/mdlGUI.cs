@@ -33,6 +33,47 @@ namespace SurvLine
         public const string GUI_MSG_INTEGER = "には整数を入力してください。";
 
 
+        //'*******************************************************************************
+        //'*******************************************************************************
+        /// <summary>
+        /// リストインデックスのマニュアル設定。
+        ///
+        /// 引き数：
+        ///     objList 対象オブジェクト。
+        ///     nListIndex ListIndexの値。
+        /// 
+        /// </summary>
+        /// <param name="objList"></param>
+        /// <param name="nListIndex"></param>
+        public void SetListIndexManual(Object objList, long nListIndex)
+        {
+
+            //    'クリックイベントで Tag プロパティを参照し、GUI_MANUAL_LISTINDEX であるか評価する。
+            string sTag;
+        //    sTag = objList.Tag
+        //    objList.ListIndex = nListIndex
+        //    objList.Tag = sTag
+
+        }
+        //---------------------------------------------------------------------------------------
+        //'リストインデックスのマニュアル設定。
+        //'
+        //'引き数：
+        //'objList 対象オブジェクト。
+        //'nListIndex ListIndexの値。
+        //Public Sub SetListIndexManual(ByVal objList As Object, ByVal nListIndex As Long)
+        //
+        //    'クリックイベントで Tag プロパティを参照し、GUI_MANUAL_LISTINDEX であるか評価する。
+        //    Dim sTag As String
+        //    sTag = objList.Tag
+        //    objList.Tag = GUI_MANUAL_LISTINDEX
+        //    objList.ListIndex = nListIndex
+        //    objList.Tag = sTag
+        //
+        //
+        //End Sub
+
+
         //***************************************************************************
         //***************************************************************************
         /// <summary>
@@ -284,6 +325,8 @@ namespace SurvLine
         //
         //
         // End Function
+        //***************************************************************************
+        //***************************************************************************
 
 
         //***************************************************************************
@@ -305,6 +348,43 @@ namespace SurvLine
 
 
             bool CheckFileName = false;
+
+            if (sValue == null)
+            {
+                return CheckFileName;
+            }
+
+            long nChar;
+            for (int i = 0; i < sValue.Length; i++)
+            {
+                string sWork = sValue.Substring(i, 1);
+                // nChar = long.Parse(sWork);
+                byte[] data;
+                data = System.Text.Encoding.GetEncoding("ascii").GetBytes(sWork);
+
+                nChar = (long)data[0];
+                if (0x00 <= nChar && nChar < 0x20) { return CheckFileName; }    //'制御コード。
+
+            }
+
+            if (sValue.Contains("\"") == true) { return CheckFileName; }    //case 0x22:      //”
+            if (sValue.Contains("*") == true) { return CheckFileName; }     //case 0x2A:      //'＊
+            if (sValue.Contains(",") == true) { return CheckFileName; }     //case 0x2C:      //'，
+            if (sValue.Contains("/") == true) { return CheckFileName; }     //case 0x2F:      //'／
+            if (sValue.Contains(":") == true) { return CheckFileName; }     //case 0x3A:      //'：
+            if (sValue.Contains("<") == true) { return CheckFileName; }     //case 0x3C:      //'＜
+            if (sValue.Contains(">") == true) { return CheckFileName; }     //case 0x3E:      //'＞
+            if (sValue.Contains("?") == true) { return CheckFileName; }     //case 0x3F:      //'？
+            if (sValue.Contains("\\") == true) { return CheckFileName; }     //case 0x5C:      //'￥
+            if (sValue.Contains("|") == true) { return CheckFileName; }     //case 0x7C:      //'｜
+            if (sValue.Contains("\b") == true) { return CheckFileName; }     //case 0x7F:      //'DEL
+
+
+            CheckFileName = true;
+            return CheckFileName;
+
+#if false   ////////////////////////////////////////////////////////////////////////////////////
+
             long nChar;
             //    Dim i As Long
             //    For i = 1 To Len(sValue)
@@ -352,6 +432,8 @@ namespace SurvLine
             }
             CheckFileName = true;
             return CheckFileName;
+#endif  //#if false   ////////////////////////////////////////////////////////////////////////////////////
+
         }
         //-----------------------------------------------------------------------
         //'文字列にファイル名として無効な文字が含まれているか検査する。
@@ -402,10 +484,26 @@ namespace SurvLine
         //
         //
         //End Function
+        //***************************************************************************
+        //***************************************************************************
 
 
 
-
+        //***************************************************************************
+        //***************************************************************************
+        /// <summary>
+        /// ファイル名入力値が無効であるか検査する。
+        ///
+        /// 引き数：
+        ///     txtTextBox 検査対象コントロール。
+        ///     sLabel 対象コントロールの名称。
+        ///     bFocus 検査に引っかかった場合フォーカスを移すか？
+        /// 
+        /// </summary>
+        /// <param name="txtTextBox"></param>
+        /// <param name="sLabel"></param>
+        /// <param name="bFocus"></param>
+        /// <returns></returns>
         public bool CheckFileNameInputInvalid(string txtTextBox, string sLabel, bool bFocus)
         {
             //    CheckFileNameInputInvalid = False

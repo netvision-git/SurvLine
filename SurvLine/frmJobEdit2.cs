@@ -317,11 +317,16 @@ namespace SurvLine
             JobName = txtJobName.Text;     //現場名
             DistrictName = txtDistrictName.Text;   //地区名
             Folder = lblFolder.Text;     //フォルダ
-            CoordNum = (long)cmbZone.SelectedIndex;         //平面直角座標系:
+            CoordNum = (long)cmbZone.SelectedIndex + 1;         //平面直角座標系:      //24/01/04 K.setoguchi@NV
             GeoidoEnable = chkGeoidoEnable.Checked;      //ジオイド補正する
             GeoidoPath = txtGeoidoPath.Text;            //ジオイド補正パス
             SemiDynaEnable = chkSemiDynaEnable.Checked; //セミ・ダイナミック補正する    
             SemiDynaPath = txtSemiDynaPath.Text;        //セミ・ダイナミック補正パス
+
+        }
+
+        private void txtJobName_TextChanged(object sender, EventArgs e)
+        {
 
         }
         //-------------------------------------------------------------

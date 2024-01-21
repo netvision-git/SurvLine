@@ -55,6 +55,7 @@ namespace SurvLine
             FREQUENCY_IFMW,     //'iono-free & Melbourne-Wuebbena
             FREQUENCY_COUNT,    //'数。
             //'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+            FREQUENCY_INI = -1, //初期値   //24/01/04 K.setoguchi@NV
         }
 
         //'解析モード。

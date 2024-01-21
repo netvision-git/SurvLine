@@ -10,7 +10,9 @@ namespace SurvLine.mdl
     {
 
         //'定数
-//        public const DateTime MIN_TIME = "1899/12/30 00:00:00";     //'アプリ最小時刻。
+        //public const DateTime MIN_TIME = (DateTime)"1899/12/30 00:00:00";     //'アプリ最小時刻。
+        public const string MIN_TIME = "1899/12/30 00:00:00";     //'アプリ最小時刻。
+
         public const long DEF_LEAP_SEC = 16;                        //'デフォルトのうるう秒。
 
         public const long DOCUMENT_FILE_VERSION = 9700;              //'ドキュメントファイルバージョン。
