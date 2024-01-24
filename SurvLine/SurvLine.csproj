@@ -61,8 +61,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="class\AngleDiffResult.cs" />
+    <Compile Include="class\AngleDiff.cs" />
+    <Compile Include="class\AutoOrderVectorParam.cs" />
+    <Compile Include="class\AccountCadastralParam.cs" />
+    <Compile Include="class\AccountOverlapParam.cs" />
+    <Compile Include="class\AccountParam.cs" />
+    <Compile Include="class\AccountMaker.cs" />
+    <Compile Include="class\AngleDiffParam.cs" />
+    <Compile Include="class\BaseLineAnalysisParam.cs" />
+    <Compile Include="class\ChainList.cs" />
     <Compile Include="class\AmbInfo.cs" />
     <Compile Include="class\BaseLineVector.cs" />
+    <Compile Include="class\Collection.cs" />
     <Compile Include="class\CoordinatePointFix.cs" />
     <Compile Include="class\CoordinatePointXYZ.cs" />
     <Compile Include="class\DepPattern.cs" />
@@ -78,11 +89,19 @@
     <Compile Include="class\ObsInfo.cs" />
     <Compile Include="class\ProjectFileManager.cs" />
     <Compile Include="class\SatelliteInfoReader.cs" />
+    <Compile Include="class\DXFParam.cs" />
+    <Compile Include="class\CoordinatePoint.cs" />
     <Compile Include="frmJobEdit2.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="frmJobEdit2.Designer.cs">
       <DependentUpon>frmJobEdit2.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmJobSelect2.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmJobSelect2.Designer.cs">
+      <DependentUpon>frmJobSelect2.cs</DependentUpon>
     </Compile>
     <Compile Include="frmMain2.cs">
       <SubType>Form</SubType>
@@ -97,6 +116,8 @@
       <DependentUpon>frmJobOpen.cs</DependentUpon>
     </Compile>
     <Compile Include="class\IniFileControl.cs" />
+    <Compile Include="class\KnownPoint.cs" />
+    <Compile Include="mdl\mdlSemiDyna.cs" />
     <Compile Include="mdl\mdiVBfunctions.cs" />
     <Compile Include="mdl\mdlGUI.cs" />
     <Compile Include="mdl\mdlNSPPS2.cs" />
@@ -108,6 +129,8 @@
     <Compile Include="mdl\mdlNSDefine.cs" />
     <Compile Include="mdl\mdlNSSDefine.cs" />
     <Compile Include="mdl\mdlUtility.cs" />
+    <Compile Include="class\OutputParam.cs" />
+    <Compile Include="class\ObservationShared.cs" />
     <Compile Include="pmemo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -120,6 +143,9 @@
     </Compile>
     <EmbeddedResource Include="frmJobEdit2.resx">
       <DependentUpon>frmJobEdit2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmJobSelect2.resx">
+      <DependentUpon>frmJobSelect2.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmMain2.resx">
       <DependentUpon>frmMain2.cs</DependentUpon>

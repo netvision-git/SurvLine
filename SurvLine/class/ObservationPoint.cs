@@ -8,11 +8,40 @@ using System.Runtime.Remoting;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 namespace SurvLine
 {
     public class ObservationPoint
     {
+
+        //'*******************************************************************************
+        //'観測点
+        //
+        //Option Explicit
+        //
+        //'プロパティ
+        public long WorkKey;            // As Long '汎用作業キー。
+        public object WorkObject;       // As Object '汎用作業オブジェクト。
+        public long ObjectTypel;        // As Long 'オブジェクト種別。
+        public object Owner;            // As Object '所有者。接合観測点の場合、基線ベクトルが保持される。代表観測点の場合、チェーンリストが保持される。
+
+        //'インプリメンテーション
+        private ObservationPointAttributes m_clsAttributes = new ObservationPointAttributes();      // '観測点属性。
+        private ObservationShared m_clsObservationShared;               // As ObservationShared '観測共有情報。
+
+        private ObservationPoint m_clsParentPoint;      // As ObservationPoint '親観測点。
+        private ObservationPoint m_clsChildPoint;       // As ObservationPoint '子観測点。
+        private ObservationPoint m_clsPrevPoint;        // As ObservationPoint '兄観測点。
+        private ObservationPoint m_clsNextPoint;        // As ObservationPoint '弟観測点。
+        private ObservationPoint m_clsCorrectPoint;     // As ObservationPoint '補正点。自オブジェクトが本点の場合は偏心点(HeadPoint)が設定される。自オブジェクトが偏心点の場合は本点(実観測点)が設定される。※相互参照なので Attributes や CommonAttributes のメンバにしてはいけない。
+        private bool m_bEnable;                         // As Boolean '有効フラグ。True=有効。False=無効。
+
+
+
+        //'*******************************************************************************
+        //'*******************************************************************************
+
 
         Document document = new Document();
 

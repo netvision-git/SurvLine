@@ -45,15 +45,63 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.Remoting;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Xml.Linq;
 using static System.Net.WebRequestMethods;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 namespace SurvLine
 {
     public class NetworkModel
     {
+
+        //Option Explicit
+        //
+        //'イベント
+        //
+        //'結合距離違反イベント。
+        //'
+        //'結合する観測点間の距離が制限を超えている場合に発生する。
+        //'
+        //'引き数：
+        //'clsObservationPoint 違反の対象となる観測点。
+        //'nDistance 観測点間の距離(ｍ)。
+        //'nMax 距離の制限値(㎝)。
+        //'nStyle メッセージスタイル。0=メッセージ無し。1=OKボタンのみ。2=OKボタンとすべてOKボタン。
+        //'nResult メッセージボックスの結果が設定される。
+        // Event CombinedDistanceViolation(ByVal clsObservationPoint As ObservationPoint, ByVal nDistance As Double, ByVal nMax As Long, ByVal nStyle As Long, ByRef nResult As Long)
+        //
+        //'上書き通知イベント。
+        //'
+        //'同じ観測点番号、セッション名の観測点をインポートしたときに、上書きを確認するために発生する。
+        //'
+        //'引き数：
+        //'clsObservationPoint 対象となる観測点。
+        //'nStyle メッセージスタイル。0=メッセージ無し。1=OKボタンのみ。2=OKボタンとすべてOKボタン。
+        //'nResult メッセージボックスの結果が設定される。
+        //Event OverwriteNotification(ByVal clsObservationPoint As ObservationPoint, ByVal nStyle As Long, ByRef nResult As Long) '上書き通知。
+
+
+        //'インプリメンテーション
+        //-----------------------------------------------------------------
+        //      Private m_clsBaseLineVectorHead As New ChainList          '基線ベクトルリストのヘッダー。要素は BaseLineVector オブジェクト。
+        private ChainList m_clsBaseLineVectorHead = new ChainList();    //'基線ベクトルリストのヘッダー。要素は BaseLineVector オブジェクト。
+        //-----------------------------------------------------------------
+        //      Private m_clsRepresentPointHead As New ChainList          '代表観測点リストのヘッダー。要素は ObservationPoint オブジェクト(代表観測点)。
+        private ChainList m_clsRepresentPointHead = new ChainList();    //'代表観測点リストのヘッダー。要素は ObservationPoint オブジェクト(代表観測点)。
+        //-----------------------------------------------------------------
+        //      Private m_clsIsolatePointHead As New ChainList            '孤立観測点リストのヘッダー。要素は ObservationPoint オブジェクト(実観測点)。
+        private ChainList m_clsIsolatePointHead = new ChainList();      //'孤立観測点リストのヘッダー。要素は ObservationPoint オブジェクト(実観測点)。
+        //-----------------------------------------------------------------
+        //      Private m_clsObservationShared As New ObservationShared   '観測共有情報。
+        private ObservationShared m_clsObservationShared = new ObservationShared();       //'観測共有情報。
+        //-----------------------------------------------------------------
+        //      Private m_clsDispersion As New Dispersion '分散・共分散(固定重量)。
+        private Dispersion m_clsDispersion = new Dispersion();
+
 
 
         //'*******************************************************************************
@@ -328,9 +376,172 @@ namespace SurvLine
         //[VB]      
         //[VB]      
         //[VB] End Sub
+        //***************************************************************************
+        //***************************************************************************
+
+        //24/01/04 K.setoguchi@NV---------->>>>>>>>>>
+        //***************************************************************************
+        /// <summary>
+        /// '汎用作業キーを初期化する。
+        /// '
+        /// 'nWorkKey で指定される値で WorkKey を初期化する。
+        /// '観測点、基線ベクトルの WorkKey を初期化する。
+        /// '
+        /// '引き数：
+        /// 'nWorkKey 初期化する値。
+        /// 
+        /// </summary>
+        /// <param name="nWorkKey"></param>
+        public void ClearWorkKey(long nWorkKey)
+        {
+            ChainList clsChainList;
+
+            clsChainList = m_clsBaseLineVectorHead.NextList;
+            for (; ; )
+            {
+                if(clsChainList == null)
+                {
+                    break;
+                }
+                //瀬戸口　clsChainList.Element.ClearWorkKey(nWorkKey);
+
+                clsChainList = clsChainList.NextList;
+            }
 
 
+            clsChainList = m_clsIsolatePointHead.NextList;
+            for (; ; )
+            {
+                if (clsChainList == null)
+                {
+                    break;
+                }
+                //瀬戸口　clsChainList.Element.ClearWorkKey(nWorkKey);    
 
+                clsChainList = clsChainList.NextList;
+            }
+
+        }
+        //----------------------------------------------
+        //'汎用作業キーを初期化する。
+        //'
+        //'nWorkKey で指定される値で WorkKey を初期化する。
+        //'観測点、基線ベクトルの WorkKey を初期化する。
+        //'
+        //'引き数：
+        //'nWorkKey 初期化する値。
+        //Public Sub ClearWorkKey(ByVal nWorkKey As Long)
+        //    Dim clsChainList As ChainList
+        //    Set clsChainList = m_clsBaseLineVectorHead.NextList
+        //    Do While Not clsChainList Is Nothing
+        //        clsChainList.Element.WorkKey = nWorkKey
+        //        Call clsChainList.Element.ClearWorkKey(nWorkKey)
+        //        Set clsChainList = clsChainList.NextList
+        //    Loop
+        //    Set clsChainList = m_clsIsolatePointHead.NextList
+        //    Do While Not clsChainList Is Nothing
+        //        Call clsChainList.Element.ClearWorkKey(nWorkKey)
+        //        Set clsChainList = clsChainList.NextList
+        //    Loop
+        //End Sub
+
+        //24/01/04 K.setoguchi@NV---------->>>>>>>>>>
+        //***************************************************************************
+        public void Save(BinaryWriter bw)
+        {
+            //---------------------------------------------------
+            //    Call m_clsDispersion.Save(nFile)
+            Dispersion m_clsDispersion = new Dispersion();
+            m_clsDispersion.Save(bw);
+
+
+            //---------------------------------------------------
+            //    '汎用作業キーを結合キーとして使用する。
+            //    Call ClearWorkKey(-1)
+            ClearWorkKey(-1);
+
+            //---------------------------------------------------
+            //    '結合キー。各ObservationPointの結合部分に番号付けをする。
+            //    Dim nJointKey As Long
+            //    nJointKey = 0
+            long nJointKey = 0;
+
+
+            //---------------------------------------------------
+            //    '基線ベクトル保存。
+            //    Put #nFile, , m_clsBaseLineVectorHead.FollowingCount
+            //    Dim clsChainList As ChainList
+            //    Set clsChainList = m_clsBaseLineVectorHead.NextList
+            //    Do While Not clsChainList Is Nothing
+            //        Call clsChainList.Element.Save(nFile, nJointKey)
+            //        Set clsChainList = clsChainList.NextList
+            //    Loop
+
+#if false
+            bw.Write(m_clsBaseLineVectorHead.FollowingCount);
+#else
+            long FollowingCount = 0;
+            bw.Write(FollowingCount);
+#endif
+
+            //---------------------------------------------------
+            //'孤立観測点保存。
+            //Put #nFile, , m_clsIsolatePointHead.FollowingCount
+            //Set clsChainList = m_clsIsolatePointHead.NextList
+            //Do While Not clsChainList Is Nothing
+            //    Call clsChainList.Element.Save(nFile, nJointKey)
+            //    Set clsChainList = clsChainList.NextList
+            //Loop
+
+#if false
+            bw.Write(m_clsIsolatePointHead.FollowingCount);
+#else
+            FollowingCount = 0;
+            bw.Write(FollowingCount);
+#endif
+
+        }
+        //--------------------------------------------------------------------
+        //'メソッド
+        //
+        //'保存。
+        //'
+        //'ObservationPoint の WorkKey を使用する。
+        //'
+        //'引き数：
+        //'nFile ファイル番号。
+        //Public Sub Save(ByVal nFile As Integer)
+        //
+        //    Call m_clsDispersion.Save(nFile)
+        //    
+        //    '汎用作業キーを結合キーとして使用する。
+        //    Call ClearWorkKey(-1)
+        //    
+        //    '結合キー。各ObservationPointの結合部分に番号付けをする。
+        //    Dim nJointKey As Long
+        //    nJointKey = 0
+        //    
+        //    '基線ベクトル保存。
+        //    Put #nFile, , m_clsBaseLineVectorHead.FollowingCount
+        //    Dim clsChainList As ChainList
+        //    Set clsChainList = m_clsBaseLineVectorHead.NextList
+        //    Do While Not clsChainList Is Nothing
+        //        Call clsChainList.Element.Save(nFile, nJointKey)
+        //        Set clsChainList = clsChainList.NextList
+        //    Loop
+        //    
+        //    '孤立観測点保存。
+        //    Put #nFile, , m_clsIsolatePointHead.FollowingCount
+        //    Set clsChainList = m_clsIsolatePointHead.NextList
+        //    Do While Not clsChainList Is Nothing
+        //        Call clsChainList.Element.Save(nFile, nJointKey)
+        //        Set clsChainList = clsChainList.NextList
+        //    Loop
+        //
+        //
+        //End Sub
+        //***************************************************************************
+        //<<<<<<<<<-----------24/01/04 K.setoguchi@NV
 
     }
 }

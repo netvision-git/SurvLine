@@ -72,6 +72,7 @@
             this.txtJobName.Name = "txtJobName";
             this.txtJobName.Size = new System.Drawing.Size(231, 19);
             this.txtJobName.TabIndex = 2;
+            this.txtJobName.TextChanged += new System.EventHandler(this.txtJobName_TextChanged);
             // 
             // txtDistrictName
             // 
