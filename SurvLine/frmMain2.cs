@@ -13,6 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static SurvLine.mdl.MdiDefine;
+using static System.Net.Mime.MediaTypeNames;
 using static System.Net.WebRequestMethods;
 
 namespace SurvLine
@@ -1184,7 +1185,7 @@ namespace SurvLine
         {
 
             //現場の新規作成。
-            EditJob();
+            EditJob(sender);
 
 
             //'タイトル。
@@ -1268,12 +1269,13 @@ namespace SurvLine
             [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
-        private bool EditJob()
+        private bool EditJob(object sender)
         {
 
             bool EditJob = false;
 
 
+            //frmJobEdit2 frmJobEdit2 = (frmJobEdit2)sender;
             frmJobEdit2 frmJobEdit2 = new frmJobEdit2();
 
             //'既存の値。
@@ -1410,6 +1412,220 @@ namespace SurvLine
         {
 
         }
+
+
+
+
+
+        //24/01/24 K.setoguchi@NV---------->>>>>>>>>>
+        //***************************************************************************
+
+        //==========================================================================================
+        /*[VB]
+        'プロジェクトを削除する。
+        Private Sub mnuFileRemove_Click()
+
+            On Error GoTo ErrorHandler
+    
+            '既存のプロジェクトを閉じる。
+            If Not ConfirmCloseProject() Then Exit Sub
+    
+            '現場の削除。
+            If Not RemoveJob Then Exit Sub
+    
+            'タイトル。
+            Call UpdateTitle
+    
+            '砂時計。
+            Dim clsWaitCursor As New WaitCursor
+            Set clsWaitCursor.Object = Me
+    
+            'リストの作成。
+            Call objListPane.RemakeList(False)
+    
+            'プロットの再描画。
+            Call objPlotPane.UpdateLogicalDrawArea(True)
+            Call objPlotPane.Redraw
+            Call objPlotPane.Refresh
+    
+            'ステータスバーの更新。
+            Call UpdateStatusBarAll
+    
+            'ドキュメントのOpen/Closeによるメニューの更新。
+            Call UpdateDocumentMenu
+    
+            Call clsWaitCursor.Back
+    
+            Exit Sub
+    
+        ErrorHandler:
+            Call mdlMain.ErrorExit
+
+        End Sub
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        /// <summary>
+        /// 現場を削除
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void mnuFileRemove_Click(object sender, EventArgs e)
+        {
+            //坂井様へ  //On Error GoTo ErrorHandler  
+
+
+            //坂井様へ //'既存のプロジェクトを閉じる。
+            //坂井様へ //If Not ConfirmCloseProject() Then Exit Sub
+
+
+            //'現場の削除。
+            if(!RemoveJob())
+            {
+                return;
+            }
+
+
+            //'タイトル。
+            UpdateTitle();
+
+
+            //'砂時計。
+            Cursor = Cursors.WaitCursor;
+
+
+            //坂井様へ'リストの作成。
+            //坂井様へCall objListPane.RemakeList(False)
+
+
+            //坂井様へ'プロットの再描画。
+            //坂井様へCall objPlotPane.UpdateLogicalDrawArea(True)
+            //坂井様へCall objPlotPane.Redraw
+            //坂井様へCall objPlotPane.Refresh
+
+
+            //坂井様へ'ステータスバーの更新。
+            //坂井様へCall UpdateStatusBarAll
+
+
+            //坂井様へ'ドキュメントのOpen/Closeによるメニューの更新。
+            //坂井様へCall UpdateDocumentMenu
+
+
+            Cursor = Cursors.Default;
+
+
+        }
+        //<<<<<<<<<-----------24/01/24 K.setoguchi@NV
+        //***************************************************************************
+
+
+        //24/01/24 K.setoguchi@NV---------->>>>>>>>>>
+        //***************************************************************************
+        //==========================================================================================
+        /*[VB]
+        '現場の削除。
+        '
+        '戻り値：
+        '正常終了の場合 True を返す。
+        'キャンセルの場合 False を返す。
+        Private Function RemoveJob() As Boolean
+
+            RemoveJob = False
+    
+            On Error GoTo FileErrorHandler
+    
+            '再描画。
+            If RedrawWindow(Me.hWnd, 0, 0, RDW_UPDATENOW) = 0 Then Call Err.Raise(ERR_FATAL, , GetLastErrorMessage())
+    
+            frmJobSelect.Caption = "現場を削除"
+            frmJobSelect.Description = "削除する現場を選択してください｡"
+            frmJobSelect.TextOK = "削除"
+            frmJobSelect.MsgOK = "選択された現場を削除します。"
+            frmJobSelect.MsgUnselected = "削除する現場をチェックしてください。"
+            Call frmJobSelect.Show(1)
+            If frmJobSelect.Result <> vbOK Then Exit Function
+    
+            '再描画。
+            If RedrawWindow(Me.hWnd, 0, 0, RDW_UPDATENOW) = 0 Then Call Err.Raise(ERR_FATAL, , GetLastErrorMessage())
+    
+            '閉じてから削除する。
+            Call CloseProject
+    
+            Dim sFolderNames() As String
+            sFolderNames = frmJobSelect.FolderNames
+            Dim clsProjectFileManager As New ProjectFileManager
+    
+            Dim i As Long
+            For i = 0 To UBound(sFolderNames)
+                Call clsProjectFileManager.DeleteProjectFolder(sFolderNames(i))
+            Next
+    
+            RemoveJob = True
+    
+            Exit Function
+    
+        FileErrorHandler:
+            If Err.Number <> ERR_FILE Then Call Err.Raise(Err.Number, Err.Source, Err.Description, Err.HelpFile, Err.HelpContext)
+            Call MsgBox(Err.Description, vbCritical)
+    
+        End Function
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        private bool RemoveJob()
+        {
+            bool RemoveJob = false;
+
+            //坂井様へOn Error GoTo FileErrorHandler
+
+
+            //坂井様へ'再描画。
+            //坂井様へIf RedrawWindow(Me.hWnd, 0, 0, RDW_UPDATENOW) = 0 Then Call Err.Raise(ERR_FATAL, , GetLastErrorMessage())
+
+
+            frmJobSelect2 frmJobSelect = new frmJobSelect2();
+            frmJobSelect.Text = "現場を削除";
+            frmJobSelect.Description("削除する現場を選択してください｡");
+            frmJobSelect.TextOK("削除");
+            frmJobSelect.MsgOK = "選択された現場を削除します。";
+            frmJobSelect.MsgUnselected = "削除する現場をチェックしてください。";
+
+            frmJobSelect.ShowDialog();
+
+            if (frmJobSelect.Result != DEFINE.vbOK) { return false; }
+
+            //再描画
+            if (frmMain2.RedrawWindow(this.Handle, IntPtr.Zero, IntPtr.Zero, (int)DEFINE.RDW_UPDATENOW) == false)
+            {
+                return false;
+            }
+
+
+            //'閉じてから削除する。
+            CloseProject();
+
+
+            // sFolderNames() As String
+            List<string> sFolderNames = new List<string>();
+
+            sFolderNames.Add(frmJobSelect.FolderNames());
+
+            ProjectFileManager clsProjectFileManager = new ProjectFileManager();
+
+
+            for (int i = 0; i < sFolderNames.Count; i++)
+            {
+                clsProjectFileManager.DeleteProjectFolder(sFolderNames[i]);
+            }
+
+
+            RemoveJob = true;
+            return RemoveJob;
+        }
+
+        //<<<<<<<<<-----------24/01/24 K.setoguchi@NV
+        //***************************************************************************
 
 
 

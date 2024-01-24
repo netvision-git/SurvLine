@@ -132,6 +132,44 @@
             this.mnuHelpSupport = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuHelpAbout = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripContainer1 = new System.Windows.Forms.ToolStripContainer();
+            this.SurvLine_statusStrip = new System.Windows.Forms.StatusStrip();
+            this.sts0_toolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this.sts1_toolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this.sts2_toolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this.sts3_toolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this.sts4_toolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this.sts5_toolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this.ListTabControl = new System.Windows.Forms.TabControl();
+            this.kansokuten_tabPage = new System.Windows.Forms.TabPage();
+            this.kansokuten_dataGridView = new System.Windows.Forms.DataGridView();
+            this.Column1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column3 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column4 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column5 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column6 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column7 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.zahyou_tabPage = new System.Windows.Forms.TabPage();
+            this.zahyou_dataGridView = new System.Windows.Forms.DataGridView();
+            this.dataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn3 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn4 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn5 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn6 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn7 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.bekutoru_tabPage = new System.Windows.Forms.TabPage();
+            this.bekutoru_dataGridView = new System.Windows.Forms.DataGridView();
+            this.dataGridViewTextBoxColumn8 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn9 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn10 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn11 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn12 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn13 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dataGridViewTextBoxColumn14 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.SessionCheckedListBox = new System.Windows.Forms.CheckedListBox();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.mnuFile_btn = new System.Windows.Forms.ToolStrip();
             this.mnuFileNew_btn = new System.Windows.Forms.ToolStripButton();
             this.mnuFileOpen_btn = new System.Windows.Forms.ToolStripButton();
@@ -295,57 +333,12 @@
             this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
             this.mnuViewReduce_ViewEnlarge_cmb = new System.Windows.Forms.ToolStripComboBox();
             this.toolStripSeparator21 = new System.Windows.Forms.ToolStripSeparator();
-            this.panel2 = new System.Windows.Forms.Panel();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.SessionCheckedListBox = new System.Windows.Forms.CheckedListBox();
-            this.ListTabControl = new System.Windows.Forms.TabControl();
-            this.kansokuten_tabPage = new System.Windows.Forms.TabPage();
-            this.kansokuten_dataGridView = new System.Windows.Forms.DataGridView();
-            this.Column1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column3 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column4 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column5 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column6 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column7 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.zahyou_tabPage = new System.Windows.Forms.TabPage();
-            this.zahyou_dataGridView = new System.Windows.Forms.DataGridView();
-            this.dataGridViewTextBoxColumn1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn3 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn4 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn5 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn6 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn7 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.bekutoru_tabPage = new System.Windows.Forms.TabPage();
-            this.bekutoru_dataGridView = new System.Windows.Forms.DataGridView();
-            this.dataGridViewTextBoxColumn8 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn9 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn10 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn11 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn12 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn13 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.dataGridViewTextBoxColumn14 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.sts0_toolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
-            this.sts1_toolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
-            this.sts2_toolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
-            this.sts3_toolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
-            this.sts4_toolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
-            this.sts5_toolStripStatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
-            this.SurvLine_statusStrip = new System.Windows.Forms.StatusStrip();
             this.menuStrip1.SuspendLayout();
             this.toolStripContainer1.BottomToolStripPanel.SuspendLayout();
             this.toolStripContainer1.ContentPanel.SuspendLayout();
             this.toolStripContainer1.TopToolStripPanel.SuspendLayout();
             this.toolStripContainer1.SuspendLayout();
-            this.mnuFile_btn.SuspendLayout();
-            this.mnuEdit_btn.SuspendLayout();
-            this.mnuEdit2_btn.SuspendLayout();
-            this.mnuCalc_InspCalc_btn.SuspendLayout();
-            this.mnuTyouhyou_FileOutput_btn.SuspendLayout();
-            this.mnuView_btn.SuspendLayout();
-            this.panel2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            this.SurvLine_statusStrip.SuspendLayout();
             this.ListTabControl.SuspendLayout();
             this.kansokuten_tabPage.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.kansokuten_dataGridView)).BeginInit();
@@ -353,7 +346,14 @@
             ((System.ComponentModel.ISupportInitialize)(this.zahyou_dataGridView)).BeginInit();
             this.bekutoru_tabPage.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.bekutoru_dataGridView)).BeginInit();
-            this.SurvLine_statusStrip.SuspendLayout();
+            this.panel2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
+            this.mnuFile_btn.SuspendLayout();
+            this.mnuEdit_btn.SuspendLayout();
+            this.mnuEdit2_btn.SuspendLayout();
+            this.mnuCalc_InspCalc_btn.SuspendLayout();
+            this.mnuTyouhyou_FileOutput_btn.SuspendLayout();
+            this.mnuView_btn.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -473,6 +473,7 @@
             this.mnuFileRemove.Name = "mnuFileRemove";
             this.mnuFileRemove.Size = new System.Drawing.Size(224, 22);
             this.mnuFileRemove.Text = "現場を削除(&D)...";
+            this.mnuFileRemove.Click += new System.EventHandler(this.mnuFileRemove_Click);
             // 
             // toolStripMenuItem3
             // 
@@ -720,66 +721,66 @@
             this.mnuViewPlot.Checked = true;
             this.mnuViewPlot.CheckState = System.Windows.Forms.CheckState.Checked;
             this.mnuViewPlot.Name = "mnuViewPlot";
-            this.mnuViewPlot.Size = new System.Drawing.Size(172, 22);
+            this.mnuViewPlot.Size = new System.Drawing.Size(173, 22);
             this.mnuViewPlot.Text = "配置図(&P)";
             // 
             // toolStripMenuItem10
             // 
             this.toolStripMenuItem10.Name = "toolStripMenuItem10";
-            this.toolStripMenuItem10.Size = new System.Drawing.Size(169, 6);
+            this.toolStripMenuItem10.Size = new System.Drawing.Size(170, 6);
             // 
             // mnuViewNoScale
             // 
             this.mnuViewNoScale.Name = "mnuViewNoScale";
-            this.mnuViewNoScale.Size = new System.Drawing.Size(172, 22);
+            this.mnuViewNoScale.Size = new System.Drawing.Size(173, 22);
             this.mnuViewNoScale.Text = "オブジェクトを選択(&S)";
             // 
             // mnuViewEnlarge
             // 
             this.mnuViewEnlarge.Name = "mnuViewEnlarge";
-            this.mnuViewEnlarge.Size = new System.Drawing.Size(172, 22);
+            this.mnuViewEnlarge.Size = new System.Drawing.Size(173, 22);
             this.mnuViewEnlarge.Text = "拡大(&E)";
             // 
             // mnuViewReduce
             // 
             this.mnuViewReduce.Name = "mnuViewReduce";
-            this.mnuViewReduce.Size = new System.Drawing.Size(172, 22);
+            this.mnuViewReduce.Size = new System.Drawing.Size(173, 22);
             this.mnuViewReduce.Text = "縮小(&R)";
             // 
             // mnuViewFit
             // 
             this.mnuViewFit.Name = "mnuViewFit";
-            this.mnuViewFit.Size = new System.Drawing.Size(172, 22);
+            this.mnuViewFit.Size = new System.Drawing.Size(173, 22);
             this.mnuViewFit.Text = "全体表示(&F)";
             // 
             // mnuViewSlide
             // 
             this.mnuViewSlide.Name = "mnuViewSlide";
-            this.mnuViewSlide.Size = new System.Drawing.Size(172, 22);
+            this.mnuViewSlide.Size = new System.Drawing.Size(173, 22);
             this.mnuViewSlide.Text = "スクロール(&L)";
             // 
             // toolStripMenuItem11
             // 
             this.toolStripMenuItem11.Name = "toolStripMenuItem11";
-            this.toolStripMenuItem11.Size = new System.Drawing.Size(169, 6);
+            this.toolStripMenuItem11.Size = new System.Drawing.Size(170, 6);
             // 
             // mnuViewData
             // 
             this.mnuViewData.Name = "mnuViewData";
-            this.mnuViewData.Size = new System.Drawing.Size(172, 22);
+            this.mnuViewData.Size = new System.Drawing.Size(173, 22);
             this.mnuViewData.Text = "データ表示(&G)";
             // 
             // toolStripMenuItem12
             // 
             this.toolStripMenuItem12.Name = "toolStripMenuItem12";
-            this.toolStripMenuItem12.Size = new System.Drawing.Size(169, 6);
+            this.toolStripMenuItem12.Size = new System.Drawing.Size(170, 6);
             // 
             // mnuViewToolbar
             // 
             this.mnuViewToolbar.Checked = true;
             this.mnuViewToolbar.CheckState = System.Windows.Forms.CheckState.Checked;
             this.mnuViewToolbar.Name = "mnuViewToolbar";
-            this.mnuViewToolbar.Size = new System.Drawing.Size(172, 22);
+            this.mnuViewToolbar.Size = new System.Drawing.Size(173, 22);
             this.mnuViewToolbar.Text = "ツールバー(&T)";
             // 
             // mnuViewStatusBar
@@ -787,7 +788,7 @@
             this.mnuViewStatusBar.Checked = true;
             this.mnuViewStatusBar.CheckState = System.Windows.Forms.CheckState.Checked;
             this.mnuViewStatusBar.Name = "mnuViewStatusBar";
-            this.mnuViewStatusBar.Size = new System.Drawing.Size(172, 22);
+            this.mnuViewStatusBar.Size = new System.Drawing.Size(173, 22);
             this.mnuViewStatusBar.Text = "ステータスバー(&B)";
             // 
             // mnuAnalysis
@@ -1070,7 +1071,7 @@
             // mnuToolsOptions
             // 
             this.mnuToolsOptions.Name = "mnuToolsOptions";
-            this.mnuToolsOptions.Size = new System.Drawing.Size(143, 22);
+            this.mnuToolsOptions.Size = new System.Drawing.Size(144, 22);
             this.mnuToolsOptions.Text = "オプション(&O)...";
             // 
             // mnuHelp
@@ -1116,7 +1117,7 @@
             this.toolStripContainer1.ContentPanel.Controls.Add(this.ListTabControl);
             this.toolStripContainer1.ContentPanel.Controls.Add(this.SessionCheckedListBox);
             this.toolStripContainer1.ContentPanel.Controls.Add(this.panel2);
-            this.toolStripContainer1.ContentPanel.Size = new System.Drawing.Size(1008, 593);
+            this.toolStripContainer1.ContentPanel.Size = new System.Drawing.Size(1008, 618);
             this.toolStripContainer1.Location = new System.Drawing.Point(0, 24);
             this.toolStripContainer1.Name = "toolStripContainer1";
             this.toolStripContainer1.Size = new System.Drawing.Size(1008, 704);
@@ -1132,6 +1133,346 @@
             this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.mnuTyouhyou_FileOutput_btn);
             this.toolStripContainer1.TopToolStripPanel.Controls.Add(this.mnuView_btn);
             this.toolStripContainer1.TopToolStripPanel.MaximumSize = new System.Drawing.Size(0, 200);
+            // 
+            // SurvLine_statusStrip
+            // 
+            this.SurvLine_statusStrip.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.SurvLine_statusStrip.Dock = System.Windows.Forms.DockStyle.None;
+            this.SurvLine_statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.sts0_toolStripStatusLabel,
+            this.sts1_toolStripStatusLabel,
+            this.sts2_toolStripStatusLabel,
+            this.sts3_toolStripStatusLabel,
+            this.sts4_toolStripStatusLabel,
+            this.sts5_toolStripStatusLabel});
+            this.SurvLine_statusStrip.Location = new System.Drawing.Point(0, 0);
+            this.SurvLine_statusStrip.Name = "SurvLine_statusStrip";
+            this.SurvLine_statusStrip.ShowItemToolTips = true;
+            this.SurvLine_statusStrip.Size = new System.Drawing.Size(1008, 24);
+            this.SurvLine_statusStrip.TabIndex = 6;
+            // 
+            // sts0_toolStripStatusLabel
+            // 
+            this.sts0_toolStripStatusLabel.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top) 
+            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right) 
+            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom)));
+            this.sts0_toolStripStatusLabel.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.sts0_toolStripStatusLabel.Name = "sts0_toolStripStatusLabel";
+            this.sts0_toolStripStatusLabel.Size = new System.Drawing.Size(429, 19);
+            this.sts0_toolStripStatusLabel.Spring = true;
+            // 
+            // sts1_toolStripStatusLabel
+            // 
+            this.sts1_toolStripStatusLabel.AutoToolTip = true;
+            this.sts1_toolStripStatusLabel.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top) 
+            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right) 
+            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom)));
+            this.sts1_toolStripStatusLabel.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.sts1_toolStripStatusLabel.Name = "sts1_toolStripStatusLabel";
+            this.sts1_toolStripStatusLabel.Size = new System.Drawing.Size(143, 19);
+            this.sts1_toolStripStatusLabel.Text = "平面直角座標系　第９系";
+            this.sts1_toolStripStatusLabel.ToolTipText = "平面直角座標系";
+            // 
+            // sts2_toolStripStatusLabel
+            // 
+            this.sts2_toolStripStatusLabel.AutoToolTip = true;
+            this.sts2_toolStripStatusLabel.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top) 
+            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right) 
+            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom)));
+            this.sts2_toolStripStatusLabel.BorderStyle = System.Windows.Forms.Border3DStyle.Etched;
+            this.sts2_toolStripStatusLabel.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.sts2_toolStripStatusLabel.Name = "sts2_toolStripStatusLabel";
+            this.sts2_toolStripStatusLabel.Size = new System.Drawing.Size(136, 19);
+            this.sts2_toolStripStatusLabel.Text = "ジオイドモデル 2011 Ver2.2";
+            this.sts2_toolStripStatusLabel.ToolTipText = "ジオイドモデル";
+            // 
+            // sts3_toolStripStatusLabel
+            // 
+            this.sts3_toolStripStatusLabel.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top) 
+            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right) 
+            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom)));
+            this.sts3_toolStripStatusLabel.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.sts3_toolStripStatusLabel.Name = "sts3_toolStripStatusLabel";
+            this.sts3_toolStripStatusLabel.Size = new System.Drawing.Size(47, 19);
+            this.sts3_toolStripStatusLabel.Text = "観測法";
+            this.sts3_toolStripStatusLabel.ToolTipText = "観測法";
+            // 
+            // sts4_toolStripStatusLabel
+            // 
+            this.sts4_toolStripStatusLabel.AutoToolTip = true;
+            this.sts4_toolStripStatusLabel.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top) 
+            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right) 
+            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom)));
+            this.sts4_toolStripStatusLabel.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.sts4_toolStripStatusLabel.Name = "sts4_toolStripStatusLabel";
+            this.sts4_toolStripStatusLabel.Size = new System.Drawing.Size(83, 19);
+            this.sts4_toolStripStatusLabel.Text = "整合計算　済";
+            this.sts4_toolStripStatusLabel.ToolTipText = "整合計算の未／済";
+            // 
+            // sts5_toolStripStatusLabel
+            // 
+            this.sts5_toolStripStatusLabel.AutoToolTip = true;
+            this.sts5_toolStripStatusLabel.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top) 
+            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right) 
+            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom)));
+            this.sts5_toolStripStatusLabel.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.sts5_toolStripStatusLabel.Name = "sts5_toolStripStatusLabel";
+            this.sts5_toolStripStatusLabel.Size = new System.Drawing.Size(155, 19);
+            this.sts5_toolStripStatusLabel.Text = "仮定網　済　　実用網　未";
+            this.sts5_toolStripStatusLabel.ToolTipText = "網平均計算の未／済";
+            // 
+            // ListTabControl
+            // 
+            this.ListTabControl.Alignment = System.Windows.Forms.TabAlignment.Bottom;
+            this.ListTabControl.Controls.Add(this.kansokuten_tabPage);
+            this.ListTabControl.Controls.Add(this.zahyou_tabPage);
+            this.ListTabControl.Controls.Add(this.bekutoru_tabPage);
+            this.ListTabControl.Dock = System.Windows.Forms.DockStyle.Right;
+            this.ListTabControl.Location = new System.Drawing.Point(557, 0);
+            this.ListTabControl.Name = "ListTabControl";
+            this.ListTabControl.SelectedIndex = 0;
+            this.ListTabControl.Size = new System.Drawing.Size(451, 618);
+            this.ListTabControl.TabIndex = 9;
+            // 
+            // kansokuten_tabPage
+            // 
+            this.kansokuten_tabPage.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.kansokuten_tabPage.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.kansokuten_tabPage.Controls.Add(this.kansokuten_dataGridView);
+            this.kansokuten_tabPage.Location = new System.Drawing.Point(4, 4);
+            this.kansokuten_tabPage.Name = "kansokuten_tabPage";
+            this.kansokuten_tabPage.Padding = new System.Windows.Forms.Padding(3);
+            this.kansokuten_tabPage.Size = new System.Drawing.Size(443, 592);
+            this.kansokuten_tabPage.TabIndex = 0;
+            this.kansokuten_tabPage.Text = "観測点";
+            // 
+            // kansokuten_dataGridView
+            // 
+            this.kansokuten_dataGridView.AllowUserToDeleteRows = false;
+            this.kansokuten_dataGridView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.kansokuten_dataGridView.BackgroundColor = System.Drawing.SystemColors.ButtonFace;
+            this.kansokuten_dataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.kansokuten_dataGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.Column1,
+            this.Column2,
+            this.Column3,
+            this.Column4,
+            this.Column5,
+            this.Column6,
+            this.Column7});
+            this.kansokuten_dataGridView.Location = new System.Drawing.Point(-2, -2);
+            this.kansokuten_dataGridView.Name = "kansokuten_dataGridView";
+            this.kansokuten_dataGridView.RowTemplate.Height = 21;
+            this.kansokuten_dataGridView.Size = new System.Drawing.Size(427, 565);
+            this.kansokuten_dataGridView.TabIndex = 0;
+            // 
+            // Column1
+            // 
+            this.Column1.HeaderText = "Column1";
+            this.Column1.Name = "Column1";
+            // 
+            // Column2
+            // 
+            this.Column2.HeaderText = "Column2";
+            this.Column2.Name = "Column2";
+            // 
+            // Column3
+            // 
+            this.Column3.HeaderText = "Column3";
+            this.Column3.Name = "Column3";
+            // 
+            // Column4
+            // 
+            this.Column4.HeaderText = "Column4";
+            this.Column4.Name = "Column4";
+            // 
+            // Column5
+            // 
+            this.Column5.HeaderText = "Column5";
+            this.Column5.Name = "Column5";
+            // 
+            // Column6
+            // 
+            this.Column6.HeaderText = "Column6";
+            this.Column6.Name = "Column6";
+            // 
+            // Column7
+            // 
+            this.Column7.HeaderText = "Column7";
+            this.Column7.Name = "Column7";
+            // 
+            // zahyou_tabPage
+            // 
+            this.zahyou_tabPage.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.zahyou_tabPage.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.zahyou_tabPage.Controls.Add(this.zahyou_dataGridView);
+            this.zahyou_tabPage.Location = new System.Drawing.Point(4, 4);
+            this.zahyou_tabPage.Name = "zahyou_tabPage";
+            this.zahyou_tabPage.Padding = new System.Windows.Forms.Padding(3);
+            this.zahyou_tabPage.Size = new System.Drawing.Size(443, 592);
+            this.zahyou_tabPage.TabIndex = 1;
+            this.zahyou_tabPage.Text = "座標";
+            // 
+            // zahyou_dataGridView
+            // 
+            this.zahyou_dataGridView.AllowUserToDeleteRows = false;
+            this.zahyou_dataGridView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.zahyou_dataGridView.BackgroundColor = System.Drawing.SystemColors.ButtonFace;
+            this.zahyou_dataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.zahyou_dataGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.dataGridViewTextBoxColumn1,
+            this.dataGridViewTextBoxColumn2,
+            this.dataGridViewTextBoxColumn3,
+            this.dataGridViewTextBoxColumn4,
+            this.dataGridViewTextBoxColumn5,
+            this.dataGridViewTextBoxColumn6,
+            this.dataGridViewTextBoxColumn7});
+            this.zahyou_dataGridView.Location = new System.Drawing.Point(-2, -2);
+            this.zahyou_dataGridView.Name = "zahyou_dataGridView";
+            this.zahyou_dataGridView.RowTemplate.Height = 21;
+            this.zahyou_dataGridView.Size = new System.Drawing.Size(427, 564);
+            this.zahyou_dataGridView.TabIndex = 1;
+            // 
+            // dataGridViewTextBoxColumn1
+            // 
+            this.dataGridViewTextBoxColumn1.HeaderText = "Column1";
+            this.dataGridViewTextBoxColumn1.Name = "dataGridViewTextBoxColumn1";
+            // 
+            // dataGridViewTextBoxColumn2
+            // 
+            this.dataGridViewTextBoxColumn2.HeaderText = "Column2";
+            this.dataGridViewTextBoxColumn2.Name = "dataGridViewTextBoxColumn2";
+            // 
+            // dataGridViewTextBoxColumn3
+            // 
+            this.dataGridViewTextBoxColumn3.HeaderText = "Column3";
+            this.dataGridViewTextBoxColumn3.Name = "dataGridViewTextBoxColumn3";
+            // 
+            // dataGridViewTextBoxColumn4
+            // 
+            this.dataGridViewTextBoxColumn4.HeaderText = "Column4";
+            this.dataGridViewTextBoxColumn4.Name = "dataGridViewTextBoxColumn4";
+            // 
+            // dataGridViewTextBoxColumn5
+            // 
+            this.dataGridViewTextBoxColumn5.HeaderText = "Column5";
+            this.dataGridViewTextBoxColumn5.Name = "dataGridViewTextBoxColumn5";
+            // 
+            // dataGridViewTextBoxColumn6
+            // 
+            this.dataGridViewTextBoxColumn6.HeaderText = "Column6";
+            this.dataGridViewTextBoxColumn6.Name = "dataGridViewTextBoxColumn6";
+            // 
+            // dataGridViewTextBoxColumn7
+            // 
+            this.dataGridViewTextBoxColumn7.HeaderText = "Column7";
+            this.dataGridViewTextBoxColumn7.Name = "dataGridViewTextBoxColumn7";
+            // 
+            // bekutoru_tabPage
+            // 
+            this.bekutoru_tabPage.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.bekutoru_tabPage.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.bekutoru_tabPage.Controls.Add(this.bekutoru_dataGridView);
+            this.bekutoru_tabPage.Location = new System.Drawing.Point(4, 4);
+            this.bekutoru_tabPage.Name = "bekutoru_tabPage";
+            this.bekutoru_tabPage.Padding = new System.Windows.Forms.Padding(3);
+            this.bekutoru_tabPage.Size = new System.Drawing.Size(443, 592);
+            this.bekutoru_tabPage.TabIndex = 2;
+            this.bekutoru_tabPage.Text = "ベクトル";
+            // 
+            // bekutoru_dataGridView
+            // 
+            this.bekutoru_dataGridView.AllowUserToDeleteRows = false;
+            this.bekutoru_dataGridView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.bekutoru_dataGridView.BackgroundColor = System.Drawing.SystemColors.ButtonFace;
+            this.bekutoru_dataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.bekutoru_dataGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.dataGridViewTextBoxColumn8,
+            this.dataGridViewTextBoxColumn9,
+            this.dataGridViewTextBoxColumn10,
+            this.dataGridViewTextBoxColumn11,
+            this.dataGridViewTextBoxColumn12,
+            this.dataGridViewTextBoxColumn13,
+            this.dataGridViewTextBoxColumn14});
+            this.bekutoru_dataGridView.Location = new System.Drawing.Point(-2, -2);
+            this.bekutoru_dataGridView.Name = "bekutoru_dataGridView";
+            this.bekutoru_dataGridView.RowTemplate.Height = 21;
+            this.bekutoru_dataGridView.Size = new System.Drawing.Size(427, 540);
+            this.bekutoru_dataGridView.TabIndex = 1;
+            // 
+            // dataGridViewTextBoxColumn8
+            // 
+            this.dataGridViewTextBoxColumn8.HeaderText = "Column1";
+            this.dataGridViewTextBoxColumn8.Name = "dataGridViewTextBoxColumn8";
+            // 
+            // dataGridViewTextBoxColumn9
+            // 
+            this.dataGridViewTextBoxColumn9.HeaderText = "Column2";
+            this.dataGridViewTextBoxColumn9.Name = "dataGridViewTextBoxColumn9";
+            // 
+            // dataGridViewTextBoxColumn10
+            // 
+            this.dataGridViewTextBoxColumn10.HeaderText = "Column3";
+            this.dataGridViewTextBoxColumn10.Name = "dataGridViewTextBoxColumn10";
+            // 
+            // dataGridViewTextBoxColumn11
+            // 
+            this.dataGridViewTextBoxColumn11.HeaderText = "Column4";
+            this.dataGridViewTextBoxColumn11.Name = "dataGridViewTextBoxColumn11";
+            // 
+            // dataGridViewTextBoxColumn12
+            // 
+            this.dataGridViewTextBoxColumn12.HeaderText = "Column5";
+            this.dataGridViewTextBoxColumn12.Name = "dataGridViewTextBoxColumn12";
+            // 
+            // dataGridViewTextBoxColumn13
+            // 
+            this.dataGridViewTextBoxColumn13.HeaderText = "Column6";
+            this.dataGridViewTextBoxColumn13.Name = "dataGridViewTextBoxColumn13";
+            // 
+            // dataGridViewTextBoxColumn14
+            // 
+            this.dataGridViewTextBoxColumn14.HeaderText = "Column7";
+            this.dataGridViewTextBoxColumn14.Name = "dataGridViewTextBoxColumn14";
+            // 
+            // SessionCheckedListBox
+            // 
+            this.SessionCheckedListBox.CheckOnClick = true;
+            this.SessionCheckedListBox.Dock = System.Windows.Forms.DockStyle.Left;
+            this.SessionCheckedListBox.FormattingEnabled = true;
+            this.SessionCheckedListBox.Items.AddRange(new object[] {
+            "aaaa",
+            "bbbb",
+            "cccc"});
+            this.SessionCheckedListBox.Location = new System.Drawing.Point(0, 0);
+            this.SessionCheckedListBox.Name = "SessionCheckedListBox";
+            this.SessionCheckedListBox.Size = new System.Drawing.Size(99, 618);
+            this.SessionCheckedListBox.TabIndex = 8;
+            // 
+            // panel2
+            // 
+            this.panel2.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.panel2.Controls.Add(this.pictureBox1);
+            this.panel2.Location = new System.Drawing.Point(105, 0);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(450, 617);
+            this.panel2.TabIndex = 0;
+            // 
+            // pictureBox1
+            // 
+            this.pictureBox1.BackColor = System.Drawing.SystemColors.WindowText;
+            this.pictureBox1.Location = new System.Drawing.Point(0, 0);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(459, 617);
+            this.pictureBox1.TabIndex = 0;
+            this.pictureBox1.TabStop = false;
             // 
             // mnuFile_btn
             // 
@@ -2472,7 +2813,7 @@
             this.toolStripSeparator21});
             this.mnuView_btn.Location = new System.Drawing.Point(481, 31);
             this.mnuView_btn.Name = "mnuView_btn";
-            this.mnuView_btn.Size = new System.Drawing.Size(162, 31);
+            this.mnuView_btn.Size = new System.Drawing.Size(129, 31);
             this.mnuView_btn.TabIndex = 22;
             // 
             // mnuViewData_btn
@@ -2517,347 +2858,7 @@
             this.toolStripSeparator21.Name = "toolStripSeparator21";
             this.toolStripSeparator21.Size = new System.Drawing.Size(6, 31);
             // 
-            // panel2
-            // 
-            this.panel2.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.panel2.Controls.Add(this.pictureBox1);
-            this.panel2.Location = new System.Drawing.Point(105, 0);
-            this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(450, 617);
-            this.panel2.TabIndex = 0;
-            // 
-            // pictureBox1
-            // 
-            this.pictureBox1.BackColor = System.Drawing.SystemColors.WindowText;
-            this.pictureBox1.Location = new System.Drawing.Point(0, 0);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(459, 617);
-            this.pictureBox1.TabIndex = 0;
-            this.pictureBox1.TabStop = false;
-            // 
-            // SessionCheckedListBox
-            // 
-            this.SessionCheckedListBox.CheckOnClick = true;
-            this.SessionCheckedListBox.Dock = System.Windows.Forms.DockStyle.Left;
-            this.SessionCheckedListBox.FormattingEnabled = true;
-            this.SessionCheckedListBox.Items.AddRange(new object[] {
-            "aaaa",
-            "bbbb",
-            "cccc"});
-            this.SessionCheckedListBox.Location = new System.Drawing.Point(0, 0);
-            this.SessionCheckedListBox.Name = "SessionCheckedListBox";
-            this.SessionCheckedListBox.Size = new System.Drawing.Size(99, 593);
-            this.SessionCheckedListBox.TabIndex = 8;
-            // 
-            // ListTabControl
-            // 
-            this.ListTabControl.Alignment = System.Windows.Forms.TabAlignment.Bottom;
-            this.ListTabControl.Controls.Add(this.kansokuten_tabPage);
-            this.ListTabControl.Controls.Add(this.zahyou_tabPage);
-            this.ListTabControl.Controls.Add(this.bekutoru_tabPage);
-            this.ListTabControl.Dock = System.Windows.Forms.DockStyle.Right;
-            this.ListTabControl.Location = new System.Drawing.Point(557, 0);
-            this.ListTabControl.Name = "ListTabControl";
-            this.ListTabControl.SelectedIndex = 0;
-            this.ListTabControl.Size = new System.Drawing.Size(451, 593);
-            this.ListTabControl.TabIndex = 9;
-            // 
-            // kansokuten_tabPage
-            // 
-            this.kansokuten_tabPage.BackColor = System.Drawing.SystemColors.ButtonFace;
-            this.kansokuten_tabPage.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.kansokuten_tabPage.Controls.Add(this.kansokuten_dataGridView);
-            this.kansokuten_tabPage.Location = new System.Drawing.Point(4, 4);
-            this.kansokuten_tabPage.Name = "kansokuten_tabPage";
-            this.kansokuten_tabPage.Padding = new System.Windows.Forms.Padding(3);
-            this.kansokuten_tabPage.Size = new System.Drawing.Size(443, 618);
-            this.kansokuten_tabPage.TabIndex = 0;
-            this.kansokuten_tabPage.Text = "観測点";
-            // 
-            // kansokuten_dataGridView
-            // 
-            this.kansokuten_dataGridView.AllowUserToDeleteRows = false;
-            this.kansokuten_dataGridView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.kansokuten_dataGridView.BackgroundColor = System.Drawing.SystemColors.ButtonFace;
-            this.kansokuten_dataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.kansokuten_dataGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.Column1,
-            this.Column2,
-            this.Column3,
-            this.Column4,
-            this.Column5,
-            this.Column6,
-            this.Column7});
-            this.kansokuten_dataGridView.Location = new System.Drawing.Point(-2, -2);
-            this.kansokuten_dataGridView.Name = "kansokuten_dataGridView";
-            this.kansokuten_dataGridView.RowTemplate.Height = 21;
-            this.kansokuten_dataGridView.Size = new System.Drawing.Size(427, 591);
-            this.kansokuten_dataGridView.TabIndex = 0;
-            // 
-            // Column1
-            // 
-            this.Column1.HeaderText = "Column1";
-            this.Column1.Name = "Column1";
-            // 
-            // Column2
-            // 
-            this.Column2.HeaderText = "Column2";
-            this.Column2.Name = "Column2";
-            // 
-            // Column3
-            // 
-            this.Column3.HeaderText = "Column3";
-            this.Column3.Name = "Column3";
-            // 
-            // Column4
-            // 
-            this.Column4.HeaderText = "Column4";
-            this.Column4.Name = "Column4";
-            // 
-            // Column5
-            // 
-            this.Column5.HeaderText = "Column5";
-            this.Column5.Name = "Column5";
-            // 
-            // Column6
-            // 
-            this.Column6.HeaderText = "Column6";
-            this.Column6.Name = "Column6";
-            // 
-            // Column7
-            // 
-            this.Column7.HeaderText = "Column7";
-            this.Column7.Name = "Column7";
-            // 
-            // zahyou_tabPage
-            // 
-            this.zahyou_tabPage.BackColor = System.Drawing.SystemColors.ButtonFace;
-            this.zahyou_tabPage.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.zahyou_tabPage.Controls.Add(this.zahyou_dataGridView);
-            this.zahyou_tabPage.Location = new System.Drawing.Point(4, 4);
-            this.zahyou_tabPage.Name = "zahyou_tabPage";
-            this.zahyou_tabPage.Padding = new System.Windows.Forms.Padding(3);
-            this.zahyou_tabPage.Size = new System.Drawing.Size(443, 567);
-            this.zahyou_tabPage.TabIndex = 1;
-            this.zahyou_tabPage.Text = "座標";
-            // 
-            // zahyou_dataGridView
-            // 
-            this.zahyou_dataGridView.AllowUserToDeleteRows = false;
-            this.zahyou_dataGridView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.zahyou_dataGridView.BackgroundColor = System.Drawing.SystemColors.ButtonFace;
-            this.zahyou_dataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.zahyou_dataGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.dataGridViewTextBoxColumn1,
-            this.dataGridViewTextBoxColumn2,
-            this.dataGridViewTextBoxColumn3,
-            this.dataGridViewTextBoxColumn4,
-            this.dataGridViewTextBoxColumn5,
-            this.dataGridViewTextBoxColumn6,
-            this.dataGridViewTextBoxColumn7});
-            this.zahyou_dataGridView.Location = new System.Drawing.Point(-2, -2);
-            this.zahyou_dataGridView.Name = "zahyou_dataGridView";
-            this.zahyou_dataGridView.RowTemplate.Height = 21;
-            this.zahyou_dataGridView.Size = new System.Drawing.Size(427, 564);
-            this.zahyou_dataGridView.TabIndex = 1;
-            // 
-            // dataGridViewTextBoxColumn1
-            // 
-            this.dataGridViewTextBoxColumn1.HeaderText = "Column1";
-            this.dataGridViewTextBoxColumn1.Name = "dataGridViewTextBoxColumn1";
-            // 
-            // dataGridViewTextBoxColumn2
-            // 
-            this.dataGridViewTextBoxColumn2.HeaderText = "Column2";
-            this.dataGridViewTextBoxColumn2.Name = "dataGridViewTextBoxColumn2";
-            // 
-            // dataGridViewTextBoxColumn3
-            // 
-            this.dataGridViewTextBoxColumn3.HeaderText = "Column3";
-            this.dataGridViewTextBoxColumn3.Name = "dataGridViewTextBoxColumn3";
-            // 
-            // dataGridViewTextBoxColumn4
-            // 
-            this.dataGridViewTextBoxColumn4.HeaderText = "Column4";
-            this.dataGridViewTextBoxColumn4.Name = "dataGridViewTextBoxColumn4";
-            // 
-            // dataGridViewTextBoxColumn5
-            // 
-            this.dataGridViewTextBoxColumn5.HeaderText = "Column5";
-            this.dataGridViewTextBoxColumn5.Name = "dataGridViewTextBoxColumn5";
-            // 
-            // dataGridViewTextBoxColumn6
-            // 
-            this.dataGridViewTextBoxColumn6.HeaderText = "Column6";
-            this.dataGridViewTextBoxColumn6.Name = "dataGridViewTextBoxColumn6";
-            // 
-            // dataGridViewTextBoxColumn7
-            // 
-            this.dataGridViewTextBoxColumn7.HeaderText = "Column7";
-            this.dataGridViewTextBoxColumn7.Name = "dataGridViewTextBoxColumn7";
-            // 
-            // bekutoru_tabPage
-            // 
-            this.bekutoru_tabPage.BackColor = System.Drawing.SystemColors.ButtonFace;
-            this.bekutoru_tabPage.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.bekutoru_tabPage.Controls.Add(this.bekutoru_dataGridView);
-            this.bekutoru_tabPage.Location = new System.Drawing.Point(4, 4);
-            this.bekutoru_tabPage.Name = "bekutoru_tabPage";
-            this.bekutoru_tabPage.Padding = new System.Windows.Forms.Padding(3);
-            this.bekutoru_tabPage.Size = new System.Drawing.Size(443, 618);
-            this.bekutoru_tabPage.TabIndex = 2;
-            this.bekutoru_tabPage.Text = "ベクトル";
-            // 
-            // bekutoru_dataGridView
-            // 
-            this.bekutoru_dataGridView.AllowUserToDeleteRows = false;
-            this.bekutoru_dataGridView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.bekutoru_dataGridView.BackgroundColor = System.Drawing.SystemColors.ButtonFace;
-            this.bekutoru_dataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.bekutoru_dataGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.dataGridViewTextBoxColumn8,
-            this.dataGridViewTextBoxColumn9,
-            this.dataGridViewTextBoxColumn10,
-            this.dataGridViewTextBoxColumn11,
-            this.dataGridViewTextBoxColumn12,
-            this.dataGridViewTextBoxColumn13,
-            this.dataGridViewTextBoxColumn14});
-            this.bekutoru_dataGridView.Location = new System.Drawing.Point(-2, -2);
-            this.bekutoru_dataGridView.Name = "bekutoru_dataGridView";
-            this.bekutoru_dataGridView.RowTemplate.Height = 21;
-            this.bekutoru_dataGridView.Size = new System.Drawing.Size(427, 591);
-            this.bekutoru_dataGridView.TabIndex = 1;
-            // 
-            // dataGridViewTextBoxColumn8
-            // 
-            this.dataGridViewTextBoxColumn8.HeaderText = "Column1";
-            this.dataGridViewTextBoxColumn8.Name = "dataGridViewTextBoxColumn8";
-            // 
-            // dataGridViewTextBoxColumn9
-            // 
-            this.dataGridViewTextBoxColumn9.HeaderText = "Column2";
-            this.dataGridViewTextBoxColumn9.Name = "dataGridViewTextBoxColumn9";
-            // 
-            // dataGridViewTextBoxColumn10
-            // 
-            this.dataGridViewTextBoxColumn10.HeaderText = "Column3";
-            this.dataGridViewTextBoxColumn10.Name = "dataGridViewTextBoxColumn10";
-            // 
-            // dataGridViewTextBoxColumn11
-            // 
-            this.dataGridViewTextBoxColumn11.HeaderText = "Column4";
-            this.dataGridViewTextBoxColumn11.Name = "dataGridViewTextBoxColumn11";
-            // 
-            // dataGridViewTextBoxColumn12
-            // 
-            this.dataGridViewTextBoxColumn12.HeaderText = "Column5";
-            this.dataGridViewTextBoxColumn12.Name = "dataGridViewTextBoxColumn12";
-            // 
-            // dataGridViewTextBoxColumn13
-            // 
-            this.dataGridViewTextBoxColumn13.HeaderText = "Column6";
-            this.dataGridViewTextBoxColumn13.Name = "dataGridViewTextBoxColumn13";
-            // 
-            // dataGridViewTextBoxColumn14
-            // 
-            this.dataGridViewTextBoxColumn14.HeaderText = "Column7";
-            this.dataGridViewTextBoxColumn14.Name = "dataGridViewTextBoxColumn14";
-            // 
-            // sts0_toolStripStatusLabel
-            // 
-            this.sts0_toolStripStatusLabel.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top) 
-            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right) 
-            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom)));
-            this.sts0_toolStripStatusLabel.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.sts0_toolStripStatusLabel.Name = "sts0_toolStripStatusLabel";
-            this.sts0_toolStripStatusLabel.Size = new System.Drawing.Size(398, 19);
-            this.sts0_toolStripStatusLabel.Spring = true;
-            // 
-            // sts1_toolStripStatusLabel
-            // 
-            this.sts1_toolStripStatusLabel.AutoToolTip = true;
-            this.sts1_toolStripStatusLabel.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top) 
-            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right) 
-            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom)));
-            this.sts1_toolStripStatusLabel.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.sts1_toolStripStatusLabel.Name = "sts1_toolStripStatusLabel";
-            this.sts1_toolStripStatusLabel.Size = new System.Drawing.Size(143, 19);
-            this.sts1_toolStripStatusLabel.Text = "平面直角座標系　第９系";
-            this.sts1_toolStripStatusLabel.ToolTipText = "平面直角座標系";
-            // 
-            // sts2_toolStripStatusLabel
-            // 
-            this.sts2_toolStripStatusLabel.AutoToolTip = true;
-            this.sts2_toolStripStatusLabel.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top) 
-            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right) 
-            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom)));
-            this.sts2_toolStripStatusLabel.BorderStyle = System.Windows.Forms.Border3DStyle.Etched;
-            this.sts2_toolStripStatusLabel.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.sts2_toolStripStatusLabel.Name = "sts2_toolStripStatusLabel";
-            this.sts2_toolStripStatusLabel.Size = new System.Drawing.Size(136, 19);
-            this.sts2_toolStripStatusLabel.Text = "ジオイドモデル 2011 Ver2.2";
-            this.sts2_toolStripStatusLabel.ToolTipText = "ジオイドモデル";
-            // 
-            // sts3_toolStripStatusLabel
-            // 
-            this.sts3_toolStripStatusLabel.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top) 
-            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right) 
-            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom)));
-            this.sts3_toolStripStatusLabel.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.sts3_toolStripStatusLabel.Name = "sts3_toolStripStatusLabel";
-            this.sts3_toolStripStatusLabel.Size = new System.Drawing.Size(47, 19);
-            this.sts3_toolStripStatusLabel.Text = "観測法";
-            this.sts3_toolStripStatusLabel.ToolTipText = "観測法";
-            // 
-            // sts4_toolStripStatusLabel
-            // 
-            this.sts4_toolStripStatusLabel.AutoToolTip = true;
-            this.sts4_toolStripStatusLabel.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top) 
-            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right) 
-            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom)));
-            this.sts4_toolStripStatusLabel.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.sts4_toolStripStatusLabel.Name = "sts4_toolStripStatusLabel";
-            this.sts4_toolStripStatusLabel.Size = new System.Drawing.Size(83, 19);
-            this.sts4_toolStripStatusLabel.Text = "整合計算　済";
-            this.sts4_toolStripStatusLabel.ToolTipText = "整合計算の未／済";
-            // 
-            // sts5_toolStripStatusLabel
-            // 
-            this.sts5_toolStripStatusLabel.AutoToolTip = true;
-            this.sts5_toolStripStatusLabel.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top) 
-            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right) 
-            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom)));
-            this.sts5_toolStripStatusLabel.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.sts5_toolStripStatusLabel.Name = "sts5_toolStripStatusLabel";
-            this.sts5_toolStripStatusLabel.Size = new System.Drawing.Size(155, 19);
-            this.sts5_toolStripStatusLabel.Text = "仮定網　済　　実用網　未";
-            this.sts5_toolStripStatusLabel.ToolTipText = "網平均計算の未／済";
-            // 
-            // SurvLine_statusStrip
-            // 
-            this.SurvLine_statusStrip.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.SurvLine_statusStrip.Dock = System.Windows.Forms.DockStyle.None;
-            this.SurvLine_statusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.sts0_toolStripStatusLabel,
-            this.sts1_toolStripStatusLabel,
-            this.sts2_toolStripStatusLabel,
-            this.sts3_toolStripStatusLabel,
-            this.sts4_toolStripStatusLabel,
-            this.sts5_toolStripStatusLabel});
-            this.SurvLine_statusStrip.Location = new System.Drawing.Point(0, 0);
-            this.SurvLine_statusStrip.Name = "SurvLine_statusStrip";
-            this.SurvLine_statusStrip.ShowItemToolTips = true;
-            this.SurvLine_statusStrip.Size = new System.Drawing.Size(1008, 24);
-            this.SurvLine_statusStrip.TabIndex = 6;
-            // 
-            // frmMain
+            // frmMain2
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -2867,7 +2868,7 @@
             this.Controls.Add(this.menuStrip1);
             this.MainMenuStrip = this.menuStrip1;
             this.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
-            this.Name = "frmMain";
+            this.Name = "frmMain2";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "SurvLine";
             this.Load += new System.EventHandler(this.frmMain_Load);
@@ -2880,6 +2881,17 @@
             this.toolStripContainer1.TopToolStripPanel.PerformLayout();
             this.toolStripContainer1.ResumeLayout(false);
             this.toolStripContainer1.PerformLayout();
+            this.SurvLine_statusStrip.ResumeLayout(false);
+            this.SurvLine_statusStrip.PerformLayout();
+            this.ListTabControl.ResumeLayout(false);
+            this.kansokuten_tabPage.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.kansokuten_dataGridView)).EndInit();
+            this.zahyou_tabPage.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.zahyou_dataGridView)).EndInit();
+            this.bekutoru_tabPage.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.bekutoru_dataGridView)).EndInit();
+            this.panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.mnuFile_btn.ResumeLayout(false);
             this.mnuFile_btn.PerformLayout();
             this.mnuEdit_btn.ResumeLayout(false);
@@ -2892,17 +2904,6 @@
             this.mnuTyouhyou_FileOutput_btn.PerformLayout();
             this.mnuView_btn.ResumeLayout(false);
             this.mnuView_btn.PerformLayout();
-            this.panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
-            this.ListTabControl.ResumeLayout(false);
-            this.kansokuten_tabPage.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.kansokuten_dataGridView)).EndInit();
-            this.zahyou_tabPage.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.zahyou_dataGridView)).EndInit();
-            this.bekutoru_tabPage.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.bekutoru_dataGridView)).EndInit();
-            this.SurvLine_statusStrip.ResumeLayout(false);
-            this.SurvLine_statusStrip.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 

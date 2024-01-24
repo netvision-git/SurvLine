@@ -97,6 +97,12 @@
     <Compile Include="frmJobEdit2.Designer.cs">
       <DependentUpon>frmJobEdit2.cs</DependentUpon>
     </Compile>
+    <Compile Include="frmJobSelect2.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmJobSelect2.Designer.cs">
+      <DependentUpon>frmJobSelect2.cs</DependentUpon>
+    </Compile>
     <Compile Include="frmMain2.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -137,6 +143,9 @@
     </Compile>
     <EmbeddedResource Include="frmJobEdit2.resx">
       <DependentUpon>frmJobEdit2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmJobSelect2.resx">
+      <DependentUpon>frmJobSelect2.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmMain2.resx">
       <DependentUpon>frmMain2.cs</DependentUpon>

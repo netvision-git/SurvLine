@@ -26,6 +26,9 @@ namespace SurvLine
     {
 
         //23/12/29 K.setoguchi@NV---------->>>>>>>>>>
+        MdlUtility mdlUtility = new MdlUtility();
+
+
 
         //'*******************************************************************************
         //'プロジェクトファイル管理
@@ -1015,6 +1018,29 @@ namespace SurvLine
 
         //<<<<<<<<<-----------23/12/29 K.setoguchi@NV
 
+
+        //==========================================================================================
+        /*[VB]
+        'プロジェクトフォルダを削除する。
+        '
+        'sFolderName で指定されるフォルダを削除する。
+        '
+        '引き数：
+        'sFolderName フォルダ名。
+        Public Sub DeleteProjectFolder(ByVal sFolderName As String)
+            Call DeleteDir(frmMain.UserDataPath & sFolderName, True)
+        '    Call DeleteDir(App.Path & DATA_FOLDER_NAME & sFolderName, True)
+        End Sub
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        public void DeleteProjectFolder(string sFolderName)
+        {
+            string UserDataPath = @"C:\Develop\NetSurv\Src\NS-App\NS-Survey\UserData\";
+
+            mdlUtility.DeleteDir($"{UserDataPath}{sFolderName}{MdlNSSDefine.OBSPOINT_PATH}", true);
+            mdlUtility.DeleteDir($"{UserDataPath}{sFolderName}", true);
+        }
 
 
     }
