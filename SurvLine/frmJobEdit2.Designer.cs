@@ -146,6 +146,7 @@
             this.chkGeoidoEnable.TabIndex = 8;
             this.chkGeoidoEnable.Text = "ジオイド補正する";
             this.chkGeoidoEnable.UseVisualStyleBackColor = true;
+            this.chkGeoidoEnable.CheckedChanged += new System.EventHandler(this.chkGeoidoEnable_CheckedChanged);
             // 
             // chkSemiDynaEnable
             // 
@@ -156,6 +157,7 @@
             this.chkSemiDynaEnable.TabIndex = 10;
             this.chkSemiDynaEnable.Text = "セミ・ダイナミック補正する";
             this.chkSemiDynaEnable.UseVisualStyleBackColor = true;
+            this.chkSemiDynaEnable.CheckedChanged += new System.EventHandler(this.chkSemiDynaEnable_CheckedChanged);
             // 
             // txtGeoidoPath
             // 

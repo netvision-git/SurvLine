@@ -311,6 +311,7 @@ namespace SurvLine
             sValue = fJobEdit.CoordNum.ToString();
             if (iniFileControl.WritePrivateProfileString(MdlNSDefine.PROFILE_SAVE_SEC_ACCOUNT, MdlNSDefine.PROFILE_SAVE_KEY_COORDNUM, sValue, $"{App_Path}\\{App_Title}{MdlNSSDefine.PROFILE_SAVE_EXT}") == false){
                 //  Call Err.Raise(ERR_FATAL, , GetLastErrorMessage())
+                MessageBox.Show("iniファイルに保存", "エラーが発生");
             }
 
 
@@ -549,10 +550,10 @@ namespace SurvLine
 
 
             //23/12/26 K.setoguchi@NV---------->>>>>>>>>>
-            if (form.Result != MdiDefine.DEFINE.vbOK)
-            {
-                return false;
-            }
+            //再検討            if (form.Result != MdiDefine.DEFINE.vbOK)
+            //再検討            {
+            //再検討            return false;
+            //再検討        }
             //<<<<<<<<<-----------23/12/26 K.setoguchi@NV
 
             //[VB]---------------------------------------------------
@@ -599,9 +600,9 @@ namespace SurvLine
             // 「XXXX.data」ファイル読み込み
             //-----------------------------------
             //[VB]      Call Load(sPath)
-            Load_frmMain(sPath, fListPane);                  //Cursor = Cursors.Default;
+            //こちらは、未使用  Load_frmMain(sPath, fListPane);
+            Load_frmMain(sPath);
             //------------------------------
-
 
 
             return true;
@@ -633,6 +634,63 @@ namespace SurvLine
         //*********************************************************************************
         //**************************************************************************************
 
+
+        //24/01/25 K.setoguchi@NV---------->>>>>>>>>>
+        //***************************************************************************
+
+        //==========================================================================================
+        /*[VB]
+        '砂時計。
+          
+            On Error GoTo FileErrorHandler
+            Call m_clsDocument.Load(sPath)
+            On Error GoTo 0
+          
+          
+            Call clsWaitCursor.Back
+          
+          
+          
+        FileErrorHandler:
+            Call MsgBox(Err.Description, vbCritical)
+            Call m_clsDocument.Clear
+          
+            End Sub
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //          （注意事項）Load_frmMain関数は、２つ存在する
+        /// <summary>
+        ///  プロジェクトを読み込む
+        ///  引き数：
+        ///  sPath 読み込み元ファイルのパス。
+        /// </summary>
+        /// <param name="sPath"></param>
+        private void Load_frmMain(string sPath)
+        {
+            //'砂時計。
+            Cursor = Cursors.WaitCursor;
+
+            try
+            {
+                m_clsDocument.Load(sPath);
+
+            }
+            catch (Exception)
+            {
+                //FileErrorHandler:
+                //[VB]          Call MsgBox(Err.Description, vbCritical)
+                m_clsDocument.Clear();
+
+            }
+
+            Cursor = Cursors.Default;
+
+        }
+        //<<<<<<<<<-----------24/01/25 K.setoguchi@NV
+        //***************************************************************************
+
+
         //**************************************************************************************
         //**************************************************************************************
         /// <summary>
@@ -649,23 +707,22 @@ namespace SurvLine
             //[VB]          Set clsWaitCursor.Object = Me
             Cursor = Cursors.WaitCursor;
 
-            Document document = new Document();
-
+            //Document m_clsDocument = new Document();  //24/01/25 K.setoguchi@NV
 
             //23/12/29 K.setoguchi@NV---------->>>>>>>>>>
-
-            //[VB]  Set m_clsDocument = GetDocument()
+            //m_clsDocument = GetDocument();
             //[VB]  m_clsChangeSelRow.Value = True
             //[VB]  UserDataPath = m_clsDocument.UserDataPath;  //'2008/10/14 NGS Yamada
             UserDataPath = @"C:\Develop\NetSurv\Src\NS-App\NS-Survey\UserData\";
             //<<<<<<<<<-----------23/12/29 K.setoguchi@NV
 
-
-
-
             //[VB]          On Error GoTo FileErrorHandler
-            //[VB]          Call m_clsDocument.Load(sPath)
+            m_clsDocument.Load(sPath);                  //24/01/25 K.setoguchi@NV
             //[VB]          On Error GoTo 0
+#if false   
+//******************************************************************:
+//坂井様へ　下記の処理は　ＮＧ　です、表示処理をお願いします
+//******************************************************************:
             try
             {
                 //サンプル>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
@@ -679,13 +736,9 @@ namespace SurvLine
 
                 List<GENBA_STRUCT_S> List_Genba_S = new List<GENBA_STRUCT_S>();
 
-                document.Load(sPath, ref List_Genba_S);
+                m_clsDocument.Load(sPath, ref List_Genba_S);        //24/01/25 K.setoguchi@NV---------->>>>>>>>>>
 
-#if false   
-//******************************************************************:
-//坂井様へ　下記の処理は　ＮＧ　です、表示処理をお願いします
-//******************************************************************:
-#endif
+
                 //-----------------------------------
                 // リスト表示（観測点・ベクトル表示）
                 //-----------------------------------
@@ -696,8 +749,10 @@ namespace SurvLine
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message, "エラーが発生");
+                m_clsDocument.Clear();
                 return;
             }
+#endif
         }
         //[VB]---------------------------------------------------
         //[VB]  'プロジェクトを読み込む。
@@ -824,12 +879,104 @@ namespace SurvLine
 
 
 
+        //24/01/25 K.setoguchi@NV---------->>>>>>>>>>
+        //***************************************************************************
+        //==========================================================================================
+        /*[VB]
+        'プロジェクトを閉じる。
+        Private Sub mnuFileClose_Click()
 
+            On Error GoTo ErrorHandler
+    
+            '既存のプロジェクトを閉じるか確認する。
+            If Not ConfirmCloseProject() Then Exit Sub
+    
+            'プロジェクトを閉じる。
+            Call CloseProject
+    
+            'タイトル。
+            Call UpdateTitle
+    
+            '砂時計。
+            Dim clsWaitCursor As New WaitCursor
+            Set clsWaitCursor.Object = Me
+    
+            'リストの作成。
+            Call objListPane.RemakeList(False)
+    
+            'プロットの再描画。
+            Call objPlotPane.UpdateLogicalDrawArea(True)
+            Call objPlotPane.Redraw
+            Call objPlotPane.Refresh
+    
+            'ステータスバーの更新。
+            Call UpdateStatusBarAll
+    
+            'ドキュメントのOpen/Closeによるメニューの更新。
+            Call UpdateDocumentMenu
+
+
+            Call clsWaitCursor.Back
+
+            Exit Sub
+
+        ErrorHandler:
+            Call mdlMain.ErrorExit
+
+        End Sub
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        /// <summary>
+        /// プロジェクトを閉じる。
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void mnuFileClose_Click(object sender, EventArgs e)
         {
-            MessageBox.Show(mnuFileClose.Text);
+
+            //On Error GoTo ErrorHandler
+
+
+            //坂井様へ  '既存のプロジェクトを閉じるか確認する。
+            //坂井様へ  If Not ConfirmCloseProject() Then Exit Sub
+
+
+            //'プロジェクトを閉じる。
+            CloseProject();
+
+
+            //'タイトル。
+            UpdateTitle();
+
+
+            //'砂時計。
+            Cursor = Cursors.WaitCursor;
+
+            //坂井様へ  'リストの作成。
+            //坂井様へ  Call objListPane.RemakeList(False)
+
+            //坂井様へ  'プロットの再描画。
+            //坂井様へ  Call objPlotPane.UpdateLogicalDrawArea(True)
+            //坂井様へ  Call objPlotPane.Redraw
+            //坂井様へ  Call objPlotPane.Refresh
+
+
+            //坂井様へ  'ステータスバーの更新。
+            //坂井様へ  Call UpdateStatusBarAll
+
+
+            //'ドキュメントのOpen/Closeによるメニューの更新。
+            //坂井様へ  UpdateDocumentMenu();
+
+
+            Cursor = Cursors.Default;
+
 
         }
+        //<<<<<<<<<-----------24/01/25 K.setoguchi@NV
+        //***************************************************************************
 
 
         //==========================================================================================
@@ -859,13 +1006,18 @@ namespace SurvLine
         /// <param name="e"></param>
         private void mnuFileSave_Click(object sender, EventArgs e)
         {
-            //MessageBox.Show(mnuFileSave.Text);
+            //On Error GoTo ErrorHandler
 
             //'プロジェクトの上書き保存。
             if (!SaveProject())
             {
                 return;
             }
+
+            return;
+
+            //ErrorHandler:
+            //    Call mdlMain.ErrorExit
 
 
         }
@@ -905,8 +1057,11 @@ namespace SurvLine
         {
             bool SaveProject = false;
 
-            if (m_clsDocument.Path() == "") {
-                //'If Not SaveAsProject() Then Exit Function
+            if (m_clsDocument.Path() == ""){
+                if (!SaveAsProject())
+                {
+                    return SaveProject;
+                }
             }
             else
             {
