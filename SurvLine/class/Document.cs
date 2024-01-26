@@ -1215,8 +1215,8 @@ namespace SurvLine
                     {
                         bSemiDynaEnable = false;
                         Genba_S.bSemiDynaEnable = bSemiDynaEnable;
-                        //-------------->>>>>>>>>>>>>>>>>>  SemiDynaPath = SemiDynaPathDef;
-                        //-------------->>>>>>>>>>>>>>>>>>   Genba_S.sSemiDynaPath = sSemiDynaPath;
+                        sSemiDynaPath = SemiDynaPathDef;
+                        Genba_S.sSemiDynaPath = sSemiDynaPath;
                     }
                     else
                     {
@@ -1283,12 +1283,287 @@ namespace SurvLine
                     //[VB]  If nVersion >= 7900 Then Call clsAccountParamResultBase.Load(clsFile.Number, nVersion)
 
 
+                    //[VB]  Dim i As Long
+                    //[VB]  Dim clsOutputParam(OUTPUT_TYPE_COUNT - 1) As OutputParam
+                    //[VB]  If nVersion< 3300 Then
+                    //[VB]      For i = 0 To OUTPUT_TYPE_COUNT - 1
+                    //[VB]          Set clsOutputParam(i) = New OutputParam
+                    //[VB]      Next
+                    //[VB]      Call clsOutputParam(OUTPUT_TYPE_NVF).Load(clsFile.Number, nVersion)
+                    //[VB]      Call clsOutputParam(OUTPUT_TYPE_JOB).Load(clsFile.Number, nVersion)
+                    //[VB]      If nVersion >= 1500 Then Call clsOutputParam(OUTPUT_TYPE_RINEX).Load(clsFile.Number, nVersion)
+                    //[VB]      ElseIf nVersion< 7100 Then
+                    //[VB]      For i = 0 To OUTPUT_TYPE_CSV - 1
+                    //[VB]          Set clsOutputParam(i) = New OutputParam
+                    //[VB]          Call clsOutputParam(i).Load(clsFile.Number, nVersion)
+                    //[VB]      Next
+                    //[VB]      Set clsOutputParam(OUTPUT_TYPE_CSV) = New OutputParam
+                    //[VB]  Else
+                    //[VB]      For i = 0 To OUTPUT_TYPE_COUNT - 1
+                    //[VB]      Set clsOutputParam(i) = New OutputParam
+                    //[VB]      Call clsOutputParam(i).Load(clsFile.Number, nVersion)
+                    //[VB]      Next
+                    //[VB]  End If
+                    //[VB]  Dim clsDXFParam(DXF_TYPE_COUNT - 1) As DXFParam
+                    //[VB]  For i = 0 To DXF_TYPE_COUNT - 1
+                    //[VB]      Set clsDXFParam(i) = New DXFParam
+                    //[VB]      Call clsDXFParam(i).Load(clsFile.Number, nVersion)
+                    //[VB]  Next
+                    //[VB]  
+                    //[VB]  If nVersion >= 3200 Then
+                    //[VB]  'チェックサム。
+                    //[VB]  Dim nLoc As Long
+                    //[VB]  nLoc = Loc(clsFile.Number)
+                    //[VB]  Dim nSize As Long
+                    //[VB]  Get #clsFile.Number, , nSize
+                    //[VB]  If nLoc<> nSize Then Call Err.Raise(ERR_FILE, , "プロジェクトファイルの読み込みに失敗しました。")
+                    //[VB]  End If
+                    //[VB]  
+                    //[VB]  
+                    //[VB]  Call clsFile.CloseFile
+
+
+                    //24/01/25 K.setoguchi@NV
+                    //'実変数へ代入。      
+                    m_sJobName = sJobName;
+                    m_sDistrictName = sDistrictName;
+                    m_sSupervisor = sSupervisor;
+                    m_nCoordNum = nCoordNum;
+                    m_bGeoidoEnable = bGeoidoEnable;
+                    m_sGeoidoPath = sGeoidoPath;
+                    m_bTkyEnable = bTkyEnable;
+                    m_sTkyPath = sTkyPath;
+                    m_bSemiDynaEnable = bSemiDynaEnable;    // 'セミ・ダイナミック対応。'2009/11 H.Nakamura
+                    m_sSemiDynaPath = sSemiDynaPath;        // 'セミ・ダイナミック対応。'2009/11 H.Nakamura
+                    //Set m_clsNetworkModel = clsNetworkModel;
+                    //Set m_clsBaseLineAnalysisParam = clsBaseLineAnalysisParam
+                    //Set m_clsAngleDiffParamRing = clsAngleDiffParamRing
+                    //Set m_clsAngleDiffParamBetween = clsAngleDiffParamBetween
+                    //Set m_clsAngleDiffParamHeight = clsAngleDiffParamHeight '2023/05/19 Hitz H.Nakamura 楕円体高の閉合差を追加。
+                    //Set m_clsAccountParamHand = clsAccountParamHand
+                    //Set m_clsAccountParamWrite = clsAccountParamWrite
+                    //Set m_clsAccountParamCoordinate = clsAccountParamCoordinate
+                    //Set m_clsAccountOverlapParam = clsAccountOverlapParam
+                    //Set m_clsAccountParamEccentricCorrect = clsAccountParamEccentricCorrect
+                    //Set m_clsAccountParamSemiDyna = clsAccountParamSemiDyna 'セミ・ダイナミック対応。'2009/11 H.Nakamura
+                    //Set m_clsAccountCadastralParam = clsAccountCadastralParam
+                    //Set m_clsAutoOrderVectorParam = clsAutoOrderVectorParam
+                    //Set m_clsAccountParamResultBase = clsAccountParamResultBase '2007/7/18 NGS Yamada
 
 
                 }
 
                 fs.Close();
             }
+        }
+        public void Load(string sPath)
+        {
+            //'観測点ファイルのコピー。
+            string  sSrcObsPointPath;
+            string sDstObsPointPath;
+            sSrcObsPointPath = $"{sPath}{MdlNSSDefine.OBSPOINT_PATH}";     //"C:\Develop\NetSurv\Src\NS-App\NS-Survey\UserData\0006\.\ObsPoint\"
+            string App_Path = @"C:\Develop\NetSurv\Src\NS-App\NS-Survey";
+            sDstObsPointPath = $"{App_Path}{MdlNSDefine.TEMPORARY_PATH}{MdlNSSDefine.OBSPOINT_PATH}";  //"C:\Develop\NetSurv\Src\NS-App\NS-Survey\Temp\.\ObsPoint\"
+            bool dmy1 = mdiUtility.DeleteDir(sDstObsPointPath, true);
+            bool dmy2 = mdiUtility.CopyDir(sSrcObsPointPath, sDstObsPointPath, true);
+
+            //-------------------------------------------------------------
+            //[VB]  'テンポラリ変数に読み込む。
+            //[VB]  Dim clsFile As New FileNumber
+            //[VB]  Open sPath & DATA_FILE_NAME For Binary Access Read Lock Write As #clsFile.Number
+            //[VB]      
+            long nVersion;
+            //-------------------------------------------------------
+            string sJobName;
+            string sDistrictName;
+            string sSupervisor;
+            long nCoordNum;
+            bool bGeoidoEnable;
+            string sGeoidoPath;
+            bool bTkyEnable;
+            string sTkyPath;
+            bool bSemiDynaEnable;   //'セミ・ダイナミック対応。'2009/11 H.Nakamura
+            string sSemiDynaPath;   //'セミ・ダイナミック対応。'2009/11 H.Nakamura
+
+            using (var fs = System.IO.File.OpenRead($"{sPath}{GENBA_CONST.DATA_FILE_NAME}"))    //sPath:"C:\\Develop\\NetSurv\\Src\\NS-App\\NS-Survey\\UserData\\0006\\"
+            {
+                using (BinaryReader br = new BinaryReader(fs))
+                {
+                    //---------------------------------------------------
+                    //[VB]      'ファイルバージョン。
+                    nVersion = br.ReadInt32();
+                    if ((nVersion < 1100) || (MdlNSDefine.DOCUMENT_FILE_VERSION < nVersion))
+                    {
+                        return;
+                    }
+
+                    //******************************************
+                    //  現場名をグローバル領域に設定
+                    //******************************************
+                    sJobName = mdiUtility.FileRead_GetString(br);
+                    //-------------------------------------------------------
+                    //[VB]  sDistrictName = GetString(clsFile.Number)
+                    //******************************************
+                    //  地区名をグローバル領域に設定
+                    //******************************************
+                    sDistrictName = mdiUtility.FileRead_GetString(br);
+                    //'↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+                    //'地区名より前の領域は ProjectFileManager 関係に影響するので注意。
+                    //-------------------------------------------------------
+
+                    //-------------------------------------------------------
+                    sSupervisor = nVersion < 2300 ? "" : mdiUtility.FileRead_GetString(br);
+
+                    //-------------------------------------------------------
+                    nCoordNum = br.ReadInt32();
+                    nCoordNum = nCoordNum;      //7
+
+                    //-------------------------------------------------------
+                    //[VB]  Get #clsFile.Number, , bGeoidoEnable
+                    bGeoidoEnable = GetFileBool(br);
+                    bGeoidoEnable = bGeoidoEnable;  //true
+
+                    //-------------------------------------------------------
+                    //[VB]  sGeoidoPath = GetString(clsFile.Number)
+                    sGeoidoPath = mdiUtility.FileRead_GetString(br);   //"C:\Develop\パラメータファイル\gsigeome.ver3" 
+
+                    //-------------------------------------------------------
+                    //[VB]  Get #clsFile.Number, , bTkyEnable
+                    bTkyEnable = GetFileBool(br);
+                    // bTkyEnable = br.ReadBoolean();
+                    bTkyEnable = bTkyEnable;    //false
+
+                    //-------------------------------------------------------
+                    //[VB]  sTkyPath = GetString(clsFile.Number)
+                    sTkyPath = mdiUtility.FileRead_GetString(br);
+                    sTkyPath = sTkyPath;    ///""                   
+
+                    //-------------------------------------------------------
+                    //[VB]      'セミ・ダイナミック対応。'2009/11 H.Nakamura
+                    if (nVersion < 8100)
+                    {
+                        bSemiDynaEnable = false;
+                        bSemiDynaEnable = bSemiDynaEnable;
+                        sSemiDynaPath = SemiDynaPathDef;
+                        sSemiDynaPath = sSemiDynaPath;
+                    }
+                    else
+                    {
+                        bSemiDynaEnable = GetFileBool(br); ;
+                        bSemiDynaEnable = bSemiDynaEnable;
+                        //----------------------------------------
+                        sSemiDynaPath = mdiUtility.FileRead_GetString(br);
+                        sSemiDynaPath = sSemiDynaPath;   //"C:\Develop\パラメータファイル\SemiDyna2009.par"
+                    }
+                }
+            }
+            //[VB]  Dim clsNetworkModel As New NetworkModel
+            //[VB]  Call clsNetworkModel.Load(clsFile.Number, nVersion)
+            //[VB]  Dim clsBaseLineAnalysisParam As New BaseLineAnalysisParam
+            //[VB]  Call clsBaseLineAnalysisParam.Load(clsFile.Number, nVersion)
+            //[VB]  Dim clsAngleDiffParamRing As New AngleDiffParam
+            //[VB]  Call clsAngleDiffParamRing.Load(clsFile.Number, nVersion)
+            //[VB]  Dim clsAngleDiffParamBetween As New AngleDiffParam
+            //[VB]  Call clsAngleDiffParamBetween.Load(clsFile.Number, nVersion)
+            //[VB]  Dim clsAngleDiffParamHeight As New AngleDiffParam '2023/05/19 Hitz H.Nakamura 楕円体高の閉合差を追加。
+            //[VB]  If nVersion >= 9700 Then Call clsAngleDiffParamHeight.Load(clsFile.Number, nVersion)
+            //[VB]  Dim clsAccountParamHand As New AccountParam
+            //[VB]  Call clsAccountParamHand.Load(clsFile.Number, nVersion)
+            //[VB]  Dim clsAccountParamWrite As New AccountParam
+            //[VB]  Call clsAccountParamWrite.Load(clsFile.Number, nVersion)
+            //[VB]  Dim clsAccountParamCoordinate As New AccountParam
+            //[VB]  Call clsAccountParamCoordinate.Load(clsFile.Number, nVersion)
+            //[VB]  Dim clsAccountOverlapParam As New AccountOverlapParam
+            //[VB]  Call clsAccountOverlapParam.Load(clsFile.Number, nVersion)
+            //[VB]  Dim clsAccountParamEccentricCorrect As New AccountParam
+            //[VB]  If nVersion >= 2200 Then Call clsAccountParamEccentricCorrect.Load(clsFile.Number, nVersion)
+            //[VB]      'セミ・ダイナミック対応。'2009/11 H.Nakamura
+            //[VB]   Dim clsAccountParamSemiDyna As New AccountParam
+            //[VB]  If nVersion >= 8101 Then Call clsAccountParamSemiDyna.Load(clsFile.Number, nVersion)
+            //[VB]  Dim clsAccountCadastralParam As New AccountCadastralParam
+            //[VB]  If nVersion >= 2400 Then Call clsAccountCadastralParam.Load(clsFile.Number, nVersion)
+            //[VB]  Dim clsAutoOrderVectorParam As New AutoOrderVectorParam
+            //[VB]  If nVersion >= 2500 Then Call clsAutoOrderVectorParam.Load(clsFile.Number, nVersion)
+            //[VB]  Dim clsAccountParamResultBase As New AccountParam   '2007/7/18 NGS Yamada
+            //[VB]  If nVersion >= 7900 Then Call clsAccountParamResultBase.Load(clsFile.Number, nVersion)
+            //[VB]  
+            //[VB]  Dim i As Long
+            //[VB]  Dim clsOutputParam(OUTPUT_TYPE_COUNT - 1) As OutputParam
+            //[VB]  If nVersion< 3300 Then
+            //[VB]      For i = 0 To OUTPUT_TYPE_COUNT - 1
+            //[VB]          Set clsOutputParam(i) = New OutputParam
+            //[VB]      Next
+            //[VB]      Call clsOutputParam(OUTPUT_TYPE_NVF).Load(clsFile.Number, nVersion)
+            //[VB]      Call clsOutputParam(OUTPUT_TYPE_JOB).Load(clsFile.Number, nVersion)
+            //[VB]      If nVersion >= 1500 Then Call clsOutputParam(OUTPUT_TYPE_RINEX).Load(clsFile.Number, nVersion)
+            //[VB]      ElseIf nVersion< 7100 Then
+            //[VB]      For i = 0 To OUTPUT_TYPE_CSV - 1
+            //[VB]          Set clsOutputParam(i) = New OutputParam
+            //[VB]          Call clsOutputParam(i).Load(clsFile.Number, nVersion)
+            //[VB]      Next
+            //[VB]      Set clsOutputParam(OUTPUT_TYPE_CSV) = New OutputParam
+            //[VB]  Else
+            //[VB]      For i = 0 To OUTPUT_TYPE_COUNT - 1
+            //[VB]      Set clsOutputParam(i) = New OutputParam
+            //[VB]      Call clsOutputParam(i).Load(clsFile.Number, nVersion)
+            //[VB]      Next
+            //[VB]  End If
+            //[VB]  Dim clsDXFParam(DXF_TYPE_COUNT - 1) As DXFParam
+            //[VB]  For i = 0 To DXF_TYPE_COUNT - 1
+            //[VB]      Set clsDXFParam(i) = New DXFParam
+            //[VB]      Call clsDXFParam(i).Load(clsFile.Number, nVersion)
+            //[VB]  Next
+            //[VB]  
+            //[VB]  If nVersion >= 3200 Then
+            //[VB]  'チェックサム。
+            //[VB]  Dim nLoc As Long
+            //[VB]  nLoc = Loc(clsFile.Number)
+            //[VB]  Dim nSize As Long
+            //[VB]  Get #clsFile.Number, , nSize
+            //[VB]  If nLoc<> nSize Then Call Err.Raise(ERR_FILE, , "プロジェクトファイルの読み込みに失敗しました。")
+            //[VB]  End If
+            //[VB]  
+            //[VB]  
+            //[VB]  Call clsFile.CloseFile
+
+            //'実変数へ代入。
+            m_sJobName = sJobName;
+            m_sDistrictName = sDistrictName;
+            m_sSupervisor = sSupervisor;
+            m_nCoordNum = nCoordNum;
+            m_bGeoidoEnable = bGeoidoEnable;
+            m_sGeoidoPath = sGeoidoPath;
+            m_bTkyEnable = bTkyEnable;
+            m_sTkyPath = sTkyPath;
+            m_bSemiDynaEnable = bSemiDynaEnable;        //'セミ・ダイナミック対応。'2009/11 H.Nakamura
+            m_sSemiDynaPath = sSemiDynaPath;            //'セミ・ダイナミック対応。'2009/11 H.Nakamura
+            //[VB]  Set m_clsNetworkModel = clsNetworkModel
+            //[VB]  Set m_clsBaseLineAnalysisParam = clsBaseLineAnalysisParam
+            //[VB]  Set m_clsAngleDiffParamRing = clsAngleDiffParamRing
+            //[VB]  Set m_clsAngleDiffParamBetween = clsAngleDiffParamBetween
+            //[VB]  Set m_clsAngleDiffParamHeight = clsAngleDiffParamHeight '2023/05/19 Hitz H.Nakamura 楕円体高の閉合差を追加。
+            //[VB]  Set m_clsAccountParamHand = clsAccountParamHand
+            //[VB]  Set m_clsAccountParamWrite = clsAccountParamWrite
+            //[VB]  Set m_clsAccountParamCoordinate = clsAccountParamCoordinate
+            //[VB]  Set m_clsAccountOverlapParam = clsAccountOverlapParam
+            //[VB]  Set m_clsAccountParamEccentricCorrect = clsAccountParamEccentricCorrect
+            //[VB]  Set m_clsAccountParamSemiDyna = clsAccountParamSemiDyna 'セミ・ダイナミック対応。'2009/11 H.Nakamura
+            //[VB]  Set m_clsAccountCadastralParam = clsAccountCadastralParam
+            //[VB]  Set m_clsAutoOrderVectorParam = clsAutoOrderVectorParam
+            //[VB]  Set m_clsAccountParamResultBase = clsAccountParamResultBase '2007/7/18 NGS Yamada
+            //[VB]  
+            //[VB]  
+            //[VB]  For i = 0 To OUTPUT_TYPE_COUNT - 1
+            //[VB]      Set m_clsOutputParam(i) = clsOutputParam(i)
+            //[VB]  Next
+            //[VB]  For i = 0 To DXF_TYPE_COUNT - 1
+            //[VB]      Set m_clsDXFParam(i) = clsDXFParam(i)
+            //[VB]  Next
+            //[VB]  
+            m_sPath = sPath;    //'パスの更新。
+            m_bEmpty = false;
+            m_bModifyed = false;
+
         }
         //--------------------------------------------------------------------------------------
         //[VB]  '読み込み。

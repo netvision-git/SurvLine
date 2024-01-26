@@ -40,7 +40,6 @@
 //'BaseLineVector オブジェクトは m_clsBaseLineVectorHead のリストに保持される。
 //'代表観測点は m_clsRepresentPointHead のリストに保持される。
 //'孤立観測点はさらに m_clsIsolatePointHead のリストでも保持される。
-using NTS;
 using System;
 using System.Collections.Generic;
 using System.IO;

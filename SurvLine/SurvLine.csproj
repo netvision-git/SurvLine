@@ -117,6 +117,9 @@
     </Compile>
     <Compile Include="class\IniFileControl.cs" />
     <Compile Include="class\KnownPoint.cs" />
+    <Compile Include="mdl\mdlNSGUI.cs" />
+    <Compile Include="mdl\mdlAccountMakeNSS.cs" />
+    <Compile Include="mdl\mdlMain.cs" />
     <Compile Include="mdl\mdlSemiDyna.cs" />
     <Compile Include="mdl\mdiVBfunctions.cs" />
     <Compile Include="mdl\mdlGUI.cs" />
