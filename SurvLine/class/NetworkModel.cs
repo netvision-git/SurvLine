@@ -40,6 +40,8 @@
 //'BaseLineVector オブジェクトは m_clsBaseLineVectorHead のリストに保持される。
 //'代表観測点は m_clsRepresentPointHead のリストに保持される。
 //'孤立観測点はさらに m_clsIsolatePointHead のリストでも保持される。
+using SurvLine;
+//using static SurvLine;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -50,7 +52,14 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Linq;
 using static System.Net.WebRequestMethods;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Rebar;
+using static SurvLine.mdl.MdlNSDefine;
+using static SurvLine.mdl.MdlNSSDefine;
+using System.Collections.ObjectModel;
+using System.Collections;
+using System.Runtime.InteropServices;
+using SurvLine.mdl;
+using static SurvLine.mdl.DEFINE;
 
 namespace SurvLine
 {
@@ -103,32 +112,579 @@ namespace SurvLine
 
 
 
-        //'*******************************************************************************
-        //'*******************************************************************************
+        //==========================================================================================
+        /*[VB]
+        '*******************************************************************************
+        'プロパティ
+
+        '基線ベクトル数。
+        Property Get BaseLineVectorCount() As Long
+            BaseLineVectorCount = m_clsBaseLineVectorHead.FollowingCount
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        /*
+        'プロパティ
+        
+        '基線ベクトル数。
+        */
+        public long BaseLineVectorCount()
+        {
+            return m_clsBaseLineVectorHead.FollowingCount();
+        }
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '代表観測点数。
+        Property Get RepresentPointCount() As Long
+            RepresentPointCount = m_clsRepresentPointHead.FollowingCount
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //'代表観測点数。
+        public long RepresentPointCount()
+        {
+            return m_clsRepresentPointHead.FollowingCount();
+        }
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '長男代表観測点数。
+        Property Get HeadRepresentPointCount() As Long
+            HeadRepresentPointCount = 0
+            Dim clsChainList As ChainList
+            Set clsChainList = m_clsRepresentPointHead.NextList
+            Do While Not clsChainList Is Nothing
+                If clsChainList.Element.PrevPoint Is Nothing Then HeadRepresentPointCount = HeadRepresentPointCount + 1
+                Set clsChainList = clsChainList.NextList
+            Loop
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //'長男代表観測点数。
+        public long HeadRepresentPointCount()
+        {
+            long w_HeadRepresentPointCount = 0;
+            ChainList clsChainList;
+            clsChainList = m_clsRepresentPointHead.NextList();
+            while (clsChainList != null)
+            {
+#if false
+                /*
+                 *************************** 修正要 sakai
+                 */
+                if (clsChainList.Element.PrevPoint == null)
+                {
+                    w_HeadRepresentPointCount = w_HeadRepresentPointCount + 1;
+                }
+#endif
+                clsChainList = clsChainList.NextList();
+            }
+            return w_HeadRepresentPointCount;
+        }
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '有効な固定点の数。
+        Property Get EnableFixedCount() As Long
+            Dim clsChainList As ChainList
+            Set clsChainList = m_clsRepresentPointHead.NextList
+            EnableFixedCount = 0
+            Do While Not clsChainList Is Nothing
+                If clsChainList.Element.Fixed And clsChainList.Element.Enable Then EnableFixedCount = EnableFixedCount + 1
+                Set clsChainList = clsChainList.NextList
+            Loop
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //'有効な固定点の数。
+        public long EnableFixedCount()
+        {
+            ChainList clsChainList;
+            clsChainList = m_clsRepresentPointHead.NextList();
+            long w_EnableFixedCount = 0;
+            while (clsChainList != null)
+            {
+#if false
+                /*
+                 *************************** 修正要 sakai
+                 */
+                if (clsChainList.Element.Fixed && clsChainList.Element.Enable)
+                {
+                    w_EnableFixedCount = w_EnableFixedCount + 1;
+                }
+#endif
+                clsChainList = clsChainList.NextList();
+            }
+            return w_EnableFixedCount;
+        }
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '有効な代表観測点の数。
+        Property Get EnablePointCount() As Long
+            Dim clsChainList As ChainList
+            Set clsChainList = m_clsRepresentPointHead.NextList
+            EnablePointCount = 0
+            Do While Not clsChainList Is Nothing
+                If clsChainList.Element.Enable Then EnablePointCount = EnablePointCount + 1
+                Set clsChainList = clsChainList.NextList
+            Loop
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //'有効な代表観測点の数。
+        public long EnablePointCount()
+        {
+            ChainList clsChainList;
+            clsChainList = m_clsRepresentPointHead.NextList();
+            long w_EnablePointCount = 0;
+            while (clsChainList != null)
+            {
+#if false
+                /*
+                 *************************** 修正要 sakai
+                 */
+                if (clsChainList.Element.Enable)
+                {
+                    w_EnablePointCount = w_EnablePointCount + 1;
+                }
+#endif
+                clsChainList = clsChainList.NextList();
+            }
+            return w_EnablePointCount;
+        }
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '有効な基線ベクトルの数。
+        Property Get EnableVectorCount() As Long
+            Dim clsChainList As ChainList
+            Set clsChainList = m_clsBaseLineVectorHead.NextList
+            EnableVectorCount = 0
+            Do While Not clsChainList Is Nothing
+                If clsChainList.Element.Enable Then EnableVectorCount = EnableVectorCount + 1
+                Set clsChainList = clsChainList.NextList
+            Loop
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //'有効な基線ベクトルの数。
+        public long EnableVectorCount()
+        {
+            ChainList clsChainList;
+            clsChainList = m_clsBaseLineVectorHead.NextList();
+            long w_EnableVectorCount = 0;
+            while (clsChainList != null)
+            {
+#if false
+                /*
+                 *************************** 修正要 sakai
+                 */
+                if (clsChainList.Element.Enable)
+                {
+                    w_EnableVectorCount = w_EnableVectorCount + 1;
+                }
+#endif
+                clsChainList = clsChainList.NextList();
+            }
+            return w_EnableVectorCount;
+        }
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '基線ベクトルリストの先頭。
+        Property Get BaseLineVectorHead() As ChainList
+            Set BaseLineVectorHead = m_clsBaseLineVectorHead.NextList
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //'基線ベクトルリストの先頭。
+        //  public ChainList BaseLineVectorHead()
+        public object BaseLineVectorHead()
+        {
+            return m_clsBaseLineVectorHead.NextList();
+        }
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '代表観測点リストの先頭。
+        Property Get RepresentPointHead() As ChainList
+            Set RepresentPointHead = m_clsRepresentPointHead.NextList
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //'代表観測点リストの先頭。
+        //  public ChainList RepresentPointHead()
+        public object RepresentPointHead()
+        {
+            return m_clsRepresentPointHead.NextList();
+        }
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '孤立観測点リストの先頭。
+        Property Get IsolatePointHead() As ChainList
+            Set IsolatePointHead = m_clsIsolatePointHead.NextList
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //'孤立観測点リストの先頭。
+        //public ChainList IsolatePointHead()
+        public object IsolatePointHead()
+        {
+            return m_clsIsolatePointHead.NextList();
+        }
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '観測共有情報。
+        Property Get ObservationShared() As ObservationShared
+            Set ObservationShared = m_clsObservationShared
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //'観測共有情報。
+        //public ObservationShared ObservationShared()
+        public object ObservationShared()
+        {
+            return m_clsObservationShared;
+        }
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '分散・共分散(固定重量)。
+        Property Let Dispersion(ByVal clsDispersion As Dispersion)
+            Let m_clsDispersion = clsDispersion
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //'分散・共分散(固定重量)。
+        public Dispersion Dispersion(Dispersion clsDispersion)
+        {
+            m_clsDispersion = clsDispersion;
+            return m_clsDispersion;
+        }
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '分散・共分散(固定重量)。
+        Property Get Dispersion() As Dispersion
+            Set Dispersion = m_clsDispersion
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //'分散・共分散(固定重量)。
+        public Dispersion Dispersion()
+        {
+            return m_clsDispersion;
+        }
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        'うるう秒。
+        Property Get LeapSeconds() As Long
+            If m_clsRepresentPointHead.NextList Is Nothing Then
+                LeapSeconds = GetPrivateProfileInt(PROFILE_SAVE_SEC_BASELINE, PROFILE_SAVE_KEY_DEFLEAPSEC, DEF_LEAP_SEC, App.Path & "\" & App.Title & PROFILE_SAVE_EXT)
+            Else
+                LeapSeconds = m_clsRepresentPointHead.NextList.Element.LeapSeconds
+            End If
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //'うるう秒。
+        public long LeapSeconds()
+        {
+            if (m_clsRepresentPointHead.NextList() == null)
+            {
+                string AppPath = Path.GetDirectoryName(Application.ExecutablePath);
+#if true
+                /*
+                 ****************** 修正要 sakai
+                */
+                string AppTitle = "SurvLine";
+#endif
+                return GetPrivateProfileInt(PROFILE_SAVE_SEC_BASELINE, PROFILE_SAVE_KEY_DEFLEAPSEC, (int)DEF_LEAP_SEC, AppPath + "\\" + AppTitle + PROFILE_SAVE_EXT);
+            }
+            else
+            {
+#if false
+                /*
+                 *************************** 修正要 sakai
+                 */
+                return m_clsRepresentPointHead.NextList().Element.LeapSeconds;
+#else
+                return 0;
+#endif
+            }
+        }
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '*******************************************************************************
+        'イベント
+
+        '初期化。
+        Private Sub Class_Initialize()
+
+            On Error GoTo ErrorHandler
+    
+            Exit Sub
+    
+        ErrorHandler:
+            Call mdlMain.ErrorExit
+    
+        End Sub
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        /*
+        '*******************************************************************************
+        'イベント
+        
+        '初期化。
+        */
         private void Class_Initialize()
         {
 
+            try
+            {
+                return;
+            }
+
+            catch
+            {
+                MdlMain mdlMain = new MdlMain();
+                mdlMain.ErrorExit();
+                return;
+            }
+
         }
-        //-------------------------------------------------------------------------------
-        //'*******************************************************************************
-        //[VB]  'イベント
-        //[VB]
-        //[VB]'初期化。
-        //[VB]Private Sub Class_Initialize()
-        //[VB]
-        //[VB]    On Error GoTo ErrorHandler
-        //[VB]
-        //[VB]
-        //[VB]    Exit Sub
-        //[VB]
-        //[VB]
-        //[VB]ErrorHandler:
-        //[VB]    Call mdlMain.ErrorExit
-        //[VB]
-        //[VB]
-        //[VB]End Sub
-        //'*******************************************************************************
-        //'*******************************************************************************
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '終了。
+        Private Sub Class_Terminate()
+
+            On Error GoTo ErrorHandler
+    
+            Dim clsChainList As ChainList
+            Set clsChainList = m_clsBaseLineVectorHead.NextList
+            Do While Not clsChainList Is Nothing
+                Call clsChainList.Element.Terminate
+                Set clsChainList = clsChainList.NextList
+            Loop
+            Call m_clsBaseLineVectorHead.RemoveAll
+            Set m_clsBaseLineVectorHead = Nothing
+            Set clsChainList = m_clsRepresentPointHead.NextList
+            Do While Not clsChainList Is Nothing
+                Call clsChainList.Element.Terminate
+                Set clsChainList = clsChainList.NextList
+            Loop
+            Call m_clsRepresentPointHead.RemoveAll
+            Set m_clsRepresentPointHead = Nothing
+    
+            Call m_clsIsolatePointHead.RemoveAll
+            Set m_clsIsolatePointHead = Nothing
+    
+            Set m_clsObservationShared = Nothing
+            Set m_clsDispersion = Nothing
+    
+            Exit Sub
+    
+        ErrorHandler:
+            Call mdlMain.ErrorExit
+    
+        End Sub
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //'終了。
+        private void Class_Terminate()
+        {
+            try
+            {
+                ChainList clsChainList = m_clsBaseLineVectorHead.NextList();
+                while (clsChainList != null)
+                {
+#if false
+                    /*
+                     *************************** 修正要 sakai
+                     */
+                    clsChainList.Element.Terminate();
+#endif
+                    clsChainList = clsChainList.NextList();
+                }
+                m_clsBaseLineVectorHead.RemoveAll();
+#if false
+                /*
+                 *************************** 修正要 sakai
+                 */
+                m_clsBaseLineVectorHead = null;
+#endif
+                clsChainList = m_clsRepresentPointHead.NextList();
+                while (clsChainList != null)
+                {
+#if false
+                    /*
+                     *************************** 修正要 sakai
+                     */
+                    clsChainList.Element.Terminate();
+#endif
+                    clsChainList = clsChainList.NextList();
+                }
+                m_clsRepresentPointHead.RemoveAll();
+                m_clsRepresentPointHead = null;
+
+
+                m_clsIsolatePointHead.RemoveAll();
+                m_clsIsolatePointHead = null;
+
+
+                m_clsObservationShared = null;
+                m_clsDispersion = null;
+
+                return;
+            }
+
+
+            catch
+            {
+                MdlMain mdlMain = new MdlMain();
+                mdlMain.ErrorExit();
+                return;
+            }
+        }
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '*******************************************************************************
+        'メソッド
+
+        '保存。
+        '
+        'ObservationPoint の WorkKey を使用する。
+        '
+        '引き数：
+        'nFile ファイル番号。
+        Public Sub Save(ByVal nFile As Integer)
+
+            Call m_clsDispersion.Save(nFile)
+    
+            '汎用作業キーを結合キーとして使用する。
+            Call ClearWorkKey(-1)
+    
+            '結合キー。各ObservationPointの結合部分に番号付けをする。
+            Dim nJointKey As Long
+            nJointKey = 0
+    
+            '基線ベクトル保存。
+            Put #nFile, , m_clsBaseLineVectorHead.FollowingCount
+            Dim clsChainList As ChainList
+            Set clsChainList = m_clsBaseLineVectorHead.NextList
+            Do While Not clsChainList Is Nothing
+                Call clsChainList.Element.Save(nFile, nJointKey)
+                Set clsChainList = clsChainList.NextList
+            Loop
+    
+            '孤立観測点保存。
+            Put #nFile, , m_clsIsolatePointHead.FollowingCount
+            Set clsChainList = m_clsIsolatePointHead.NextList
+            Do While Not clsChainList Is Nothing
+                Call clsChainList.Element.Save(nFile, nJointKey)
+                Set clsChainList = clsChainList.NextList
+            Loop
+    
+        End Sub
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        /*
+        '*******************************************************************************
+        'メソッド
+        
+        '保存。
+        '
+        'ObservationPoint の WorkKey を使用する。
+        '
+        '引き数：
+        'nFile ファイル番号。
+        */
+        public void Save(int nFile)
+        {
+#if false
+            /*
+             *************************** 修正要 sakai
+             */
+            m_clsDispersion.Save(nFile);
+
+
+            //'汎用作業キーを結合キーとして使用する。
+            ClearWorkKey(-1);
+
+            //'結合キー。各ObservationPointの結合部分に番号付けをする。
+            long nJointKey;
+            nJointKey = 0;
+
+
+            //'基線ベクトル保存。
+            put #nFile, , m_clsBaseLineVectorHead.FollowingCount;
+            ChainList clsChainList;
+            clsChainList = m_clsBaseLineVectorHead.NextList();
+            while (clsChainList != null)
+            {
+                clsChainList.Element.Save(nFile, nJointKey);
+                clsChainList = clsChainList.NextList();
+            }
+
+
+            //'孤立観測点保存。
+            put #nFile, , m_clsIsolatePointHead.FollowingCount;
+            clsChainList = m_clsIsolatePointHead.NextList();
+            while (clsChainList != null)
+            {
+                clsChainList.Element.Save(nFile, nJointKey);
+                clsChainList = clsChainList.NextList();
+            }
+#endif
+
+            return;
+        }
+        //==========================================================================================
+
+
+
+
+
+
+
 
         //**************************************************************************************
         //**************************************************************************************
@@ -395,7 +951,7 @@ namespace SurvLine
         {
             ChainList clsChainList;
 
-            clsChainList = m_clsBaseLineVectorHead.NextList;
+            clsChainList = m_clsBaseLineVectorHead.NextList();
             for (; ; )
             {
                 if(clsChainList == null)
@@ -404,11 +960,11 @@ namespace SurvLine
                 }
                 //瀬戸口　clsChainList.Element.ClearWorkKey(nWorkKey);
 
-                clsChainList = clsChainList.NextList;
+                clsChainList = clsChainList.NextList();
             }
 
 
-            clsChainList = m_clsIsolatePointHead.NextList;
+            clsChainList = m_clsIsolatePointHead.NextList();
             for (; ; )
             {
                 if (clsChainList == null)
@@ -417,7 +973,7 @@ namespace SurvLine
                 }
                 //瀬戸口　clsChainList.Element.ClearWorkKey(nWorkKey);    
 
-                clsChainList = clsChainList.NextList;
+                clsChainList = clsChainList.NextList();
             }
 
         }

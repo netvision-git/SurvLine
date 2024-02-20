@@ -1,6 +1,7 @@
 ﻿using SurvLine.mdl;
 using System;
 using System.Collections.Generic;
+using System.Drawing.Drawing2D;
 using System.IO;
 using System.Linq;
 using System.Security.AccessControl;
@@ -12,33 +13,101 @@ using static SurvLine.GENBA_STRUCT_S;
 using static SurvLine.mdl.MdlNSDefine;
 using static SurvLine.mdl.MdlNSSDefine;
 using static System.Collections.Specialized.BitVector32;
+using static System.Net.WebRequestMethods;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
+
 
 namespace SurvLine
 {
     public class ObservationPointAttributes
     {
 
-        //'*******************************************************************************
-        //  ObservationPointAttributes
-        //'*******************************************************************************
-        //'観測点属性
-        //ption Explicit
-        //
+        /*[VB]
+        '*******************************************************************************
+        '観測点属性
+
+        Option Explicit
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        'プロパティ
+        Public Mode As OBJ_MODE '観測点モード。
+        Public Session As String 'セッション名。
+        Public ProvisionalSession As Boolean '仮のセッション。
+        Public FileTitle As String 'ファイルタイトル。
+        Public RinexExt As String 'RINEXファイル拡張子(先頭２文字)。
+        Public SrcPath As String 'ソースファイルのパス。
+        Public StrTimeGPS As Date '観測開始日時(GPS)。
+        Public EndTimeGPS As Date '観測終了日時(GPS)。
+        Public LeapSeconds As Long 'うるう秒。
+        Public Interval As Double '間隔(秒)。
+        Public RecType As String '受信機名称。
+        Public RecNumber As String '受信機シリアル。
+        Public AntType As String 'アンテナ種別。
+        Public AntNumber As String 'アンテナシリアル番号。
+        Public AntMeasurement As String 'アンテナ測位方法。
+        Public AntHeight As Double 'アンテナ高(ｍ)。
+        Public ElevationMask As Double '仰角マスク(度)。
+        Public NumberOfMinSV As Long '最少衛星数。
+        Public SatelliteInfo As Object '衛星数情報。
+        Public ImportType As IMPORT_TYPE 'インポートファイルの種別。
+        Public GlonassFlag As Boolean 'GLONASSフラグ。
+        '2017/06/06 NS6000対応。'''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        Public QZSSFlag As Boolean 'QZSSフラグ。
+        Public GalileoFlag As Boolean 'Galileoフラグ。
+        Public BeiDouFlag As Boolean 'BeiDouフラグ。
+        Public MixedNav As Boolean '混合タイプの暦ファイルか？
+        Public RinexVersion As Long 'RINEXファイルのバージョン。バージョン番号を1000倍した整数。
+        '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        Public IsList As Boolean 'リスト更新必要フラグ。
+        Public ElevationMaskHand As Long '手簿に出力する最低高度角(度)。負の値の場合OFFとする。
+        Public NumberOfMinSVHand As Long '手簿に出力する最少衛星数。0の場合はオプション設定から取得。1～12が最少衛星数。
+        '2022/02/07 SattSignal の追加。''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        Public SattSignalGPS 'GPS衛星信号。ビットフラグ。0x01＝L1、0x02＝L2、0x04＝L5。
+        Public SattSignalGLONASS 'GLONASS衛星信号。ビットフラグ。0x01＝G1、0x02＝G2、0x04＝G3。
+        Public SattSignalQZSS 'QZSS衛星信号。ビットフラグ。0x01＝L1、0x02＝L2、0x04＝L5。
+        Public SattSignalGalileo 'Galileo衛星信号。ビットフラグ。0x01＝E1、0x02＝E5。
+        Public SattSignalBeiDou 'BeiDou衛星信号。ビットフラグ。0x01＝B1、0x02＝B2、0x04＝B3。
+        '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
         //'プロパティ
-        public int Mode;                //As OBJ_MODE '観測点モード。
-        public string Session;          //As String 'セッション名。
-        public bool ProvisionalSession; //As Boolean '仮のセッション。
-        public string FileTitle;        //As String 'ファイルタイトル。
-        public string RinexExt;         //As String 'RINEXファイル拡張子(先頭２文字)。
-        public string SrcPath;          //As String 'ソースファイルのパス。
-        public DateTime StrTimeGPS;     //As Date '観測開始日時(GPS)。
-        public DateTime EndTimeGPS;     //As Date '観測終了日時(GPS)。
-        public long LeapSeconds;        //As Long 'うるう秒。
-        //    public SatelliteInfo As Object '衛星数情報。
-        public bool GlonassFlag;        //As Boolean 'GLONASSフラグ。
+        public OBJ_MODE Mode;               //'観測点モード。
+        public string Session;              //'セッション名。
+        public bool ProvisionalSession;     //'仮のセッション。
+        public string FileTitle;            //'ファイルタイトル。
+        public string RinexExt;             //'RINEXファイル拡張子(先頭２文字)。
+        public string SrcPath;              //'ソースファイルのパス。
+        public DateTime StrTimeGPS;         //'観測開始日時(GPS)。
+        public DateTime EndTimeGPS;         //'観測終了日時(GPS)。
+        public long LeapSeconds;            //'うるう秒。
+        public double Interval;             //'間隔(秒)。
+        public string RecType;              //'受信機名称。
+        public string RecNumber;            //'受信機シリアル。
+        public string AntType;              //'アンテナ種別。
+        public string AntNumber;            //'アンテナシリアル番号。
+        public string AntMeasurement;       //'アンテナ測位方法。
+        public double AntHeight;            //'アンテナ高(ｍ)。
+        public double ElevationMask;        //'仰角マスク(度)。
+        public long NumberOfMinSV;          //'最少衛星数。
+        public object SatelliteInfo;        //'衛星数情報。
+        public IMPORT_TYPE ImportType;      //'インポートファイルの種別。
+        public bool GlonassFlag;            //'GLONASSフラグ。
+        //'2017/06/06 NS6000対応。'''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        public bool QZSSFlag;               //'QZSSフラグ。
+        public bool GalileoFlag;            //'Galileoフラグ。
+        public bool BeiDouFlag;             //'BeiDouフラグ。
+        public bool MixedNav;               //'混合タイプの暦ファイルか？
+        public long RinexVersion;           //'RINEXファイルのバージョン。バージョン番号を1000倍した整数。
         //'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-        public bool IsList;             //As Boolean 'リスト更新必要フラグ。
+        public bool IsList;                 //'リスト更新必要フラグ。
+        public long ElevationMaskHand;      //'手簿に出力する最低高度角(度)。負の値の場合OFFとする。
+        public long NumberOfMinSVHand;      //'手簿に出力する最少衛星数。0の場合はオプション設定から取得。1～12が最少衛星数。
         //'2022/02/07 SattSignal の追加。''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
         public int SattSignalGPS;           //'GPS衛星信号。ビットフラグ。0x01＝L1、0x02＝L2、0x04＝L5。
         public int SattSignalGLONASS;       //'GLONASS衛星信号。ビットフラグ。0x01＝G1、0x02＝G2、0x04＝G3。
@@ -46,6 +115,225 @@ namespace SurvLine
         public int SattSignalGalileo;       //'Galileo衛星信号。ビットフラグ。0x01＝E1、0x02＝E5。
         public int SattSignalBeiDou;        //'BeiDou衛星信号。ビットフラグ。0x01＝B1、0x02＝B2、0x04＝B3。
         //'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        'インプリメンテーション
+        Private m_clsCommon As New ObservationCommonAttributes '観測点共通属性。
+        Private m_clsCoordinateObservation As New CoordinatePointXYZ '観測座標。
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //'インプリメンテーション
+        private ObservationCommonAttributes m_clsCommon = new ObservationCommonAttributes();    //'観測点共通属性。
+        private CoordinatePointXYZ m_clsCoordinateObservation = new CoordinatePointXYZ();       //'観測座標。
+
+        private MdlMain mdlMain;
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '*******************************************************************************
+        'プロパティ
+
+        '観測点共通属性。
+        Property Set Common(ByVal clsCommon As ObservationCommonAttributes)
+            Set m_clsCommon = clsCommon
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        /*
+        '*******************************************************************************
+        'プロパティ
+
+        '観測点共通属性。
+        */
+        public void Common(ObservationCommonAttributes clsCommon)
+        {
+            m_clsCommon = clsCommon;
+        }
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '観測点共通属性。
+        Property Get Common() As ObservationCommonAttributes
+            Set Common = m_clsCommon
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //'観測点共通属性。
+        public ObservationCommonAttributes Common()
+        {
+            return m_clsCommon;
+        }
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '観測座標。
+        Property Let CoordinateObservation(ByVal clsCoordinateObservation As CoordinatePoint)
+            Let m_clsCoordinateObservation = clsCoordinateObservation
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //'観測座標。
+        //public void CoordinateObservation(CoordinatePoint clsCoordinateObservation)
+        public void CoordinateObservation(object clsCoordinateObservation)
+        {
+#if false
+            /*
+             *************************** 修正要 sakai
+             */
+            m_clsCoordinateObservation = (CoordinatePointXYZ)clsCoordinateObservation;
+#endif
+            return;
+        }
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '観測座標。
+        Property Get CoordinateObservation() As CoordinatePoint
+            Set CoordinateObservation = m_clsCoordinateObservation
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //'観測座標。
+        //瀬戸口   public CoordinatePoint CoordinateObservation()
+        public object CoordinateObservation()
+        {
+#if false
+            /*
+             *************************** 修正要 sakai
+             */
+            return (CoordinatePoint)m_clsCoordinateObservation;
+#endif
+            return null;
+        }
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '*******************************************************************************
+        'イベント
+
+        '初期化。
+        Private Sub Class_Initialize()
+
+            On Error GoTo ErrorHandler
+
+
+            ElevationMaskHand = -1
+    
+            Exit Sub
+
+
+        ErrorHandler:
+            Call mdlMain.ErrorExit
+
+
+        End Sub
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        /*
+        '*******************************************************************************
+        'イベント
+
+        '初期化。
+        */
+        private void Class_Initialize()
+        {
+            try
+            {
+                ElevationMaskHand = -1;
+                return;
+            }
+
+            catch (Exception)
+            {
+                mdlMain.ErrorExit();
+                return;
+            }
+        }
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '*******************************************************************************
+        'メソッド
+
+        '保存。
+        '
+        '引き数：
+        'nFile ファイル番号。
+        Public Sub Save(ByVal nFile As Integer)
+            Put #nFile, , Mode
+            Call PutString(nFile, Session)
+            Put #nFile, , ProvisionalSession
+            Call PutString(nFile, FileTitle)
+            Call PutString(nFile, RinexExt)
+            Call PutString(nFile, SrcPath)
+            Put #nFile, , StrTimeGPS
+            Put #nFile, , EndTimeGPS
+            Put #nFile, , LeapSeconds
+            Put #nFile, , Interval
+            Call PutString(nFile, RecType)
+            Call PutString(nFile, RecNumber)
+            Call PutString(nFile, AntType)
+            Call PutString(nFile, AntNumber)
+            Call PutString(nFile, AntMeasurement)
+            Put #nFile, , AntHeight
+            Put #nFile, , ElevationMask
+            Put #nFile, , NumberOfMinSV
+            Put #nFile, , ImportType
+            Put #nFile, , GlonassFlag
+            '2017/06/06 NS6000対応。'''''''''''''''''''''''''''''''''''''''''''''''''''''''
+            Put #nFile, , QZSSFlag
+            Put #nFile, , GalileoFlag
+            Put #nFile, , BeiDouFlag
+            Put #nFile, , MixedNav
+            Put #nFile, , RinexVersion
+            '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+            Call m_clsCommon.Save(nFile)
+            Call m_clsCoordinateObservation.Save(nFile)
+            Put #nFile, , ElevationMaskHand
+            Put #nFile, , NumberOfMinSVHand
+            '2022/02/07 SattSignal の追加。''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+            Put #nFile, , SattSignalGPS
+            Put #nFile, , SattSignalGLONASS
+            Put #nFile, , SattSignalQZSS
+            Put #nFile, , SattSignalGalileo
+            Put #nFile, , SattSignalBeiDou
+            '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        End Sub
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        /*
+        '*******************************************************************************
+        'メソッド
+
+        '保存。
+        '
+        '引き数：
+        'nFile ファイル番号。
+        */
+        public void Save(int nFil)
+        {
+            return;
+        }
+        //==========================================================================================
+
+
+
+
 
 
 

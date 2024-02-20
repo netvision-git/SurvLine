@@ -6,16 +6,24 @@ using System.Data;
 using System.Drawing;
 using System.Globalization;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Xml.Linq;
 using static System.Net.Mime.MediaTypeNames;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Button;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 namespace SurvLine
 {
     public partial class frmJobSelect2 : Form
     {
+
+
+        MdiVBfunctions mdiVBfunctions = new MdiVBfunctions();
+
 
         //'*******************************************************************************
         //'現場の複数選択画面
@@ -42,7 +50,7 @@ namespace SurvLine
         const string COL_NAM_PROJECTLIST_MDATE = "最終更新日";     //'現場リストカラム名称、最終更新日。
         const string COL_NAM_PROJECTLIST_CDATE = "作成日";         //'現場リストカラム名称、作成日。
 
-        const int COL_WID_PROJECTLIST_CHECK = 384;                  //'現場リストカラム幅(Twips)、チェックボックス。
+        const int COL_WID_PROJECTLIST_CHECK = 384 /19;              //'現場リストカラム幅(Twips)、チェックボックス。
         const int COL_WID_PROJECTLIST_JOBNAME = 1620 / 9;           //'現場リストカラム幅(Twips)、現場名。
         const int COL_WID_PROJECTLIST_DISTRICTNAME = 1620 / 9;      //'現場リストカラム幅(Twips)、地区名。。
         const int COL_WID_PROJECTLIST_FOLDER = 900 / 9;             //'現場リストカラム幅(Twips)、フォルダ。
@@ -96,7 +104,8 @@ namespace SurvLine
         //'選択された現場のフォルダ名。配列の要素は(-1 To ...)、要素 -1 は未使用。
         public string FolderNames()
         {
-
+            return m_sFolderNames[0];
+#if false
             ListViewItem itemx = lvProject.SelectedItems[0];
             if (itemx == null)
             {
@@ -105,6 +114,7 @@ namespace SurvLine
             }
             return itemx.SubItems[2].Text;
             //return m_sFolderNames[(int)lvProject.];
+#endif
         }
 
         //'*******************************************************************************
@@ -125,18 +135,18 @@ namespace SurvLine
         Private Sub Form_Load()
 
             On Error GoTo ErrorHandler
-    
+
             '変数初期化。
             Result = vbCancel
             m_nSortIndex = -1
-    
+
             '現場リストの作成。
             Dim clsProjectFileManager As New ProjectFileManager
             Call clsProjectFileManager.MakeProjectListView(lvProject, True)
-    
+
             'ソート。
             lvProject.SortKey = 3
-    
+
             '選択行の初期化。
             If lvProject.ListItems.Count > 0 Then Set lvProject.SelectedItem = lvProject.ListItems(1)
 
@@ -151,33 +161,41 @@ namespace SurvLine
             [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        private void Form_Load(object sender, EventArgs e)
+        {
+            try
+            {
+                //'変数初期化。   
+                Result = DEFINE.vbCancel;       //DialogResult.Cancel
+                m_nSortIndex = -1;
+
+                //'現場リストの作成。
+                ProjectFileManager clsProjectFileManager = new ProjectFileManager();
+                clsProjectFileManager.MakeProjectListView(lvProject, true);
+
+            }
+            catch (Exception ex)
+            {
+                //Call mdlMain.ErrorExit
+                _ = MessageBox.Show(ex.Message, "エラー発生");
+            }
+        }
+
+        //------------------------------------------------------------------------------------------
+#if false
         private void Form_Load(object sender, EventArgs e)
         {
 
             //23/12/26 K.setoguchi@NV---------->>>>>>>>>>
-            Result = MdiDefine.DEFINE.vbCancel;    /// As Long 'ダイアログの結果。
+            Result = DEFINE.vbCancel;    /// As Long 'ダイアログの結果。
             //<<<<<<<<<-----------23/12/26 K.setoguchi@NV
 
             List<string> m_sFolderNamesA = new List<string>();
             m_sFolderNames = m_sFolderNamesA;
 
 
-#if false   //------------------------------
+            //'現場リストの作成。
 
-    坂井様へ　以降のご対応をお願い致します。
-
-#endif      //-----------------------------
-
-
-
-            //**************************************
-            //* 現場を削除の選択　リストを表示
-            //**************************************
 
 
             int nWidth;             //    Dim nWidth As Long
@@ -185,6 +203,12 @@ namespace SurvLine
 
             lvProject.View = View.Details;
             lvProject.Columns.Clear();
+
+            //'現場リストカラム名称、チェックボックス。
+            nWidth = COL_WID_PROJECTLIST_CHECK;
+            nTotalWidth = nWidth;
+            lvProject.Columns.Add(COL_NAM_PROJECTLIST_CHECK, nWidth);
+
 
             //'現場リストカラム名称、現場名。
             nWidth = COL_WID_PROJECTLIST_JOBNAME;
@@ -214,6 +238,10 @@ namespace SurvLine
             lvProject.Width = (int)nTotalWidth;
 
 
+            //--- Chaeck Boxの表示を有効 ---
+            lvProject.View = View.Details;
+            lvProject.CheckBoxes = true;
+
 
             ProjectFileManager ProjectFile = new ProjectFileManager();
 
@@ -227,10 +255,21 @@ namespace SurvLine
             int datacount = 0;
             ProjectFile.MakeProjectListView(Genba, listcount, ref datacount);
 
+
+
+
+
+
+
             //現場の情報を表示
             for (int i = 0; i < datacount; i++)
             {
-                var item = new ListViewItem(Genba[i].sJobNames);
+                string sp = "";
+                //var item = new ListViewItem(Genba[i].sJobNames);
+                var item = new ListViewItem(sp);
+
+                item.SubItems.Add(Genba[i].sJobNames);
+
                 item.SubItems.Add(Genba[i].sDistrictNames);
                 item.SubItems.Add(Genba[i].sFolderNames);
 
@@ -243,7 +282,7 @@ namespace SurvLine
             }
 
         }
-
+#endif
 
         //==========================================================================================
         /*[VB]
@@ -310,17 +349,23 @@ namespace SurvLine
         //[C#]
         /// <summary>
         /// '全選択。
-        /// 
+        ///     全チャックボックスのチャックをチャック有りにする
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void cmdSelect_Click(object sender, EventArgs e)
         {
-#if false   //------------------------------
 
-    坂井様へ　以降のご対応をお願い致します。
+            ListViewItem ListItem = new ListViewItem();
 
-#endif      //-----------------------------
+            int i = 0;
+            foreach ( var lvItem in lvProject.Items)
+            {
+                //  lvProject.CheckBoxes = false;
+
+                lvProject.Items[i].Checked = true;
+                i++;
+            }
 
         }
 
@@ -348,13 +393,24 @@ namespace SurvLine
         //------------------------------------------------------------------------------------------
         //[C#]
         //全選択
+        /// <summary>
+        /// 全選択
+        ///     全チャックボックスのチャックをチャック無しにする
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void cmdUnselect_Click(object sender, EventArgs e)
         {
-#if false   //------------------------------
+            ListViewItem ListItem = new ListViewItem();
 
-    坂井様へ　以降のご対応をお願い致します。
+            int i = 0;
+            foreach (var lvItem in lvProject.Items)
+            {
+                //  lvProject.CheckBoxes = false;
 
-#endif      //-----------------------------
+                lvProject.Items[i].Checked = false;
+                i++;
+            }
 
         }
 
@@ -385,7 +441,7 @@ namespace SurvLine
         /// <param name="e"></param>
         private void CancelButton_Click(object sender, EventArgs e)
         {
-            Result = MdiDefine.DEFINE.vbCancel;    /// As Long 'ダイアログの結果。
+            Result = DEFINE.vbCancel;    /// As Long 'ダイアログの結果。
 
             this.Close();
 
@@ -429,24 +485,51 @@ namespace SurvLine
         /// <param name="e"></param>
         private void OKButton_Click(object sender, EventArgs e)
         {
+            //On Error GoTo ErrorHandler
             try
             {
+
+                //'入力値の検査。
+                if (!CheckData())
+                {
+                    return;
+                }
+                //'確認。
+                if (MsgOK != "")
+                {
+                    //If MsgBox(MsgOK, vbOKCancel +vbExclamation) <> vbOK Then Exit Sub
+                    if (MessageBox.Show(MsgOK, "エラー発生") != DialogResult.OK)
+                    {
+                        return;
+                    }
+                }
+
+                //'値を反映させる。
+                ReflectData();
+
+                //'終了。
+                Result = DEFINE.vbOK;
+
+                this.Close();   //Call Unload(Me)
+
+#if false
                 ListViewItem itemx = lvProject.SelectedItems[0];
                 if (itemx == null)
                 {
                     MessageBox.Show(itemx.Text + " | " + itemx.SubItems[1].Text + " | " + itemx.SubItems[2].Text);
 
                 }
+#endif
             }
-            catch (ArgumentOutOfRangeException)
+            catch (Exception ex)
             {
                 MessageBox.Show("「現場を削除 画面」の操作を確認して下さい ");
                 return;
             }
 
-            Result = MdiDefine.DEFINE.vbOK;    /// As Long 'ダイアログの結果。
+            Result = DEFINE.vbOK;    /// As Long 'ダイアログの結果。
 
-            this.Close();
+            this.Close();   //Call Unload(Me)
 
 
         }
@@ -499,8 +582,31 @@ namespace SurvLine
         /// </returns>
         private bool CheckData()
         {
+            bool CheckData = false;
 
-            return true;
+            int nCount = 0;
+
+            int i = 0;
+            foreach (ListViewItem lvItem in lvProject.Items)
+            {
+                if (lvProject.Items[i].Checked)
+                {
+                    nCount++;
+                }
+                i++;
+            }
+
+            if (nCount <= 0)
+            {
+
+                //Call MsgBox(MsgUnselected, vbCritical)
+                _ = MessageBox.Show(MsgUnselected, "エラー発生");
+                return CheckData;
+
+            }
+
+            CheckData = true;
+            return CheckData;
         }
 
 
@@ -526,8 +632,23 @@ namespace SurvLine
         /// </summary>
         private void ReflectData()
         {
+            m_sFolderNames = new List<string>();
+
+            ListViewItem lvItem = new ListViewItem();
+
+            int i = 0;
+            foreach (ListViewItem lvItem2 in lvProject.Items)
+            {
+                if (lvItem2.Checked)
+                {
+                    m_sFolderNames.Add(mdiVBfunctions.Mid(lvItem2.ImageKey, MdlNSDefine.KEYPREFIX.Length));
+                }
+                i++;
+            }
 
         }
+
+        //=====================================================================
 
     }
 }

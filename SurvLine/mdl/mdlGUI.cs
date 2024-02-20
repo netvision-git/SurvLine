@@ -1,20 +1,24 @@
 ﻿//23/12/26 K.setoguchi@NV---------->>>>>>>>>>
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Emit;
+using System.Runtime.Remoting;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static System.Net.Mime.MediaTypeNames;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 namespace SurvLine
 {
     public class MdlGUI
     {
+        MdiVBfunctions mdiVBfunctions = new MdiVBfunctions();   
 
         //'*******************************************************************************
         //'GUI関連
@@ -554,6 +558,151 @@ namespace SurvLine
         //
         //
         //End Function
+
+
+        //==========================================================================================
+        /*[VB]
+            'ファイルを開くダイアログで取得された複数ファイル文字列を、文字列配列に変換する。
+            '
+            '引き数：
+            'sList ファイルを開くダイアログで取得された文字列。
+            'sPath ファイル毎に分割した文字列。配列の要素は(0 To ...)。
+            Public Sub ConvertOpenDialogMultiList(ByVal sList As String, ByRef sPath() As String)
+                '区切り文字。
+                Dim sDelimiter As String
+                sDelimiter = Chr(0)
+                '複数選択で無い場合、区切り文字がない。
+                Dim nPos As Long
+                nPos = InStr(1, sList, sDelimiter)
+                If nPos <= 0 Then
+                    ReDim sPath(0)
+                    sPath(0) = sList
+                    Exit Sub
+                End If
+                'フォルダのパスを取得。
+                Dim sDir As String
+                Dim nStr As Long
+                sDir = Left$(sList, nPos - 1)
+                nStr = nPos + 1
+                'ファイル名の取得。
+                Dim nUBound As Long
+                Dim nLen As Long
+                nUBound = 0
+                nLen = Len(sList)
+                Do While nStr <= nLen
+                    ReDim Preserve sPath(nUBound)
+                    nPos = InStr(nStr, sList, sDelimiter)
+                    If nPos > 0 Then
+                        sPath(nUBound) = sDir & "\" & Mid$(sList, nStr, nPos - nStr)
+                        nStr = nPos + 1
+                    Else
+                        sPath(nUBound) = sDir & "\" & Mid$(sList, nStr)
+                        nStr = nLen + 1
+                    End If
+                    nUBound = nUBound + 1
+                Loop
+            End Sub
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        public void ConvertOpenDialogMultiList(OpenFileDialog dlgCommonDialog, ref List<string> sPath)
+        {
+            for (int i = 0; i < dlgCommonDialog.FileNames.Count(); i++)
+            {
+                if (dlgCommonDialog.FileNames[i] != null)
+                {
+                    sPath.Add(dlgCommonDialog.FileNames[i]);
+                }
+
+            }
+
+#if false   //以下は、VBと同様の処理の場合
+
+            //'複数選択で無い場合、区切り文字がない。
+            long nPos;
+            nPos = mdiVBfunctions.InStr(1, dlgCommonDialog.FileNames[0], sDelimiter);
+            if (nPos <= 0)
+            {
+                sPath.Add(sList);
+                return;
+            }
+            //'フォルダのパスを取得。
+            string sDir;
+            long nStr;
+            sDir = mdiVBfunctions.Left(sList, (int)(nPos - 1));
+            nStr = nPos + 1;
+            //'ファイル名の取得。
+            long nUBound;
+            long nLen;
+            nUBound = 0;
+            nLen = sList.Length;
+            while (nStr <= nLen)
+            {
+                nPos = mdiVBfunctions.InStr((int)nStr, sList, sDelimiter);
+                if (nPos > 0)
+                {
+                    sPath.Add($"{sDir}\\{mdiVBfunctions.Mid(sList, (int)nStr, (int)(nPos - nStr))}");
+                    nStr = nPos + 1;
+                }
+                else
+                {
+                    sPath.Add($"{sDir}\\{mdiVBfunctions.Mid(sList, (int)nStr)}");
+                    nStr = nLen + 1;
+
+                }
+            }
+#endif   //以下は、VBと同様の処理の場合
+
+        }
+
+
+
+        //==========================================================================================
+        /*[VB]
+            'ツールバーメニューをポップアップする。
+            '
+            '引き数：
+            'objForm ツールバーの親フォーム。
+            'objToolBar ツールバー。
+            'sKey ボタンの指定。
+            'objMenu ポップアップするメニュー。
+            Public Sub PopupToolBarMenu(ByVal objForm As Form, ByVal objToolBar As Toolbar, ByVal sKey As String, ByVal objMenu As Menu)
+                Dim tRect As RECT
+                Call GetWindowRect(objToolBar.hWnd, tRect)
+                Dim tPoint As POINT
+                tPoint.X = tRect.Left
+                tPoint.Y = tRect.Top
+                Call ScreenToClient(objForm.hWnd, tPoint)
+                Dim btn As Button
+                Set btn = objToolBar.Buttons(sKey)
+                tPoint.X = tPoint.X * Screen.TwipsPerPixelX + btn.Left
+                tPoint.Y = tPoint.Y * Screen.TwipsPerPixelY + btn.Top + btn.Height
+                Call objForm.PopupMenu(objMenu, , tPoint.X, tPoint.Y)
+            End Sub
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+
+        //==========================================================================================
+        /*[VB]
+            'タブの切り替え。
+            '
+            '各タブに対応したコンテナオブジェクトの表示/非表示を、選択タブによって変更する。
+            '
+            '引き数：
+            'tsTab タブコントロール。
+            'objContainers コンテナオブジェクト配列。
+            Public Sub ChangeTab(ByVal tsTab As TabStrip, ByVal objContainers As Object)
+                Dim objTab As Object
+                For Each objTab In tsTab.Tabs
+                    objContainers(objTab.Index - 1).Visible = objTab.Selected
+                Next
+            End Sub
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+
+
     }
 
 }

@@ -11,10 +11,9 @@ using System.IO;
 using SurvLine.mdl;
 using static SurvLine.mdl.MdlNSDefine;
 using static SurvLine.mdl.MdlNSSDefine;
-//using static SurvLine.mdl.MdlBaseLineAnalyser;
 
 
-namespace SurvLine.mdl
+namespace SurvLine
 {
     public class MdlMain
     {
@@ -41,7 +40,8 @@ namespace SurvLine.mdl
 
         private Random rnd;
 
-        private MdlMain mdlMain;
+        //private MdlMain mdlMain;
+
         //==========================================================================================
 
         //==========================================================================================
@@ -185,7 +185,7 @@ namespace SurvLine.mdl
 
             catch (Exception ex)
             {
-                mdlMain.ErrorExit();
+                ErrorExit();
                 return;
             }
 
@@ -248,16 +248,23 @@ namespace SurvLine.mdl
         '
         '戻り値：FileDialog オブジェクト。
         */
+#if false
         public FileDialog GetFileDialog()
         {
-#if false
             /*
              *************************** 修正要 sakai
              */
              * if (m_clsFileDialog == null) { FileDialog m_clsFileDialog = new FileDialog; }
-#endif
             return m_clsFileDialog;
         }
+#else   //瀬戸口　作成
+        public object GetFileDialog()
+        {
+            if (m_clsFileDialog == null) { m_clsFileDialog = new FileDialog(); }
+            return (object)m_clsFileDialog;
+        }
+
+#endif
         //==========================================================================================
 
         //==========================================================================================

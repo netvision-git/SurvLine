@@ -330,12 +330,12 @@ namespace SurvLine
         private void Form_Load(object sender, EventArgs e)
         {
             //'変数初期化。
-            Result = MdiDefine.DEFINE.vbCancel;              //ボタン(OK:1 / キャンセル:0)
+            Result = DEFINE.vbCancel;              //ボタン(OK:1 / キャンセル:0)
 
             //'最大文字数。
             txtJobName.MaxLength = (int)MdlNSGUI.GUI_TEXT_MAX_LENGTH;
             txtDistrictName.MaxLength = (int)MdlNSGUI.GUI_TEXT_MAX_LENGTH;
-            txtGeoidoPath.MaxLength = (int)MdiDefine.DEFINE.MAX_PATH;
+            txtGeoidoPath.MaxLength = (int)DEFINE.MAX_PATH;
 
             //'値の設定。
             txtJobName.Text = JobName;
@@ -429,6 +429,15 @@ namespace SurvLine
             [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        private void txtGeoidoPath_GotFocus(object sender, EventArgs e)
+        {
+            return;
+        }
+        private void txtGeoidoPath_TextChanged(object sender, EventArgs e)
+        {
+            txtGeoidoPath_GotFocus(sender, e);
+        }
+
 
         //==========================================================================================
         /*[VB]
@@ -449,6 +458,25 @@ namespace SurvLine
             [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        private void txtSemiDynaPath_GotFocus(object sender, EventArgs e)
+        {
+            //On Error GoTo ErrorHandler
+
+            //SelectText(txtSemiDynaPath);
+
+            return;
+
+        //ErrorHandler:
+            //Call mdlMain.ErrorExit;
+
+        }
+        private void txtSemiDynaPath_TextChanged(object sender, EventArgs e)
+        {
+            txtSemiDynaPath_GotFocus(sender, e);
+        }
+
+
+
 
         //==========================================================================================
         /*[VB]
@@ -496,11 +524,19 @@ namespace SurvLine
             //    Call mdlMain.ErrorExit
 
         }
+
+        //==========================================================================================
+        /// <summary>
+        /// chkGeoidoEnable変化
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void chkGeoidoEnable_CheckedChanged(object sender, EventArgs e)
         {
             chkGeoidoEnable_Click(sender, e);
 
         }
+        //==========================================================================================
 
 
         //==========================================================================================
@@ -549,10 +585,18 @@ namespace SurvLine
             //    Call mdlMain.ErrorExit
 
         }
+
+        //==========================================================================================
+        /// <summary>
+        ///  chkSemiDynaEnable変換
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void chkSemiDynaEnable_CheckedChanged(object sender, EventArgs e)
         {
             chkSemiDynaEnable_Click(sender, e);
         }
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
@@ -572,8 +616,12 @@ namespace SurvLine
             [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
-
-
+        /// <summary>
+        ///  ファイルを開くダイアログでジオイドモデルのパスを設定する。
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void cmdRefGeoido_Click(object sender, EventArgs e)
         {
 
@@ -635,7 +683,7 @@ namespace SurvLine
         private void CancelButton_Click(object sender, EventArgs e)
         {
 
-            Result = MdiDefine.DEFINE.vbCancel;              //ボタン(OK:1 / キャンセル:0)
+            Result = DEFINE.vbCancel;              //ボタン(OK:1 / キャンセル:0)
 
             this.Close();
 
@@ -686,7 +734,7 @@ namespace SurvLine
 
             //    '終了。
             //    Result = vbOK
-            Result = MdiDefine.DEFINE.vbOK;              //ボタン(OK:1 / キャンセル:0)
+            Result = DEFINE.vbOK;              //ボタン(OK:1 / キャンセル:0)
 
 
             //    Call Unload(Me)

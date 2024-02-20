@@ -70,7 +70,7 @@ namespace SurvLine
             InitializeComponent();
 
             //23/12/26 K.setoguchi@NV---------->>>>>>>>>>
-            Result = MdiDefine.DEFINE.vbCancel;    /// As Long 'ダイアログの結果。
+            Result = DEFINE.vbCancel;    /// As Long 'ダイアログの結果。
             //<<<<<<<<<-----------23/12/26 K.setoguchi@NV
 
 
@@ -170,14 +170,14 @@ namespace SurvLine
                 fMain.ReceiveData = "OK";
 
                 //23/12/26 K.setoguchi@NV---------->>>>>>>>>>
-                Result = MdiDefine.DEFINE.vbOK;    /// As Long 'ダイアログの結果。
+                Result = DEFINE.vbOK;    /// As Long 'ダイアログの結果。
                 //<<<<<<<<<-----------23/12/26 K.setoguchi@NV
 
             }
             this.Close();
 
             //23/12/26 K.setoguchi@NV---------->>>>>>>>>>
-            Result = MdiDefine.DEFINE.vbCancel;    /// As Long 'ダイアログの結果。
+            Result = DEFINE.vbCancel;    /// As Long 'ダイアログの結果。
            //<<<<<<<<<-----------23/12/26 K.setoguchi@NV
 
         }

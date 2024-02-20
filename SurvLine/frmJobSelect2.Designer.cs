@@ -96,7 +96,7 @@
             this.lblDescription.TabIndex = 7;
             this.lblDescription.Text = "現場を選択してください。";
             // 
-            // frmJobSelect
+            // frmJobSelect2
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -107,7 +107,8 @@
             this.Controls.Add(this.CancelButton);
             this.Controls.Add(this.OKButton);
             this.Controls.Add(this.lvProject);
-            this.Name = "frmJobSelect";
+            this.Name = "frmJobSelect2";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "現場を選択";
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -121,6 +122,6 @@
         internal System.Windows.Forms.Button OKButton;
         internal System.Windows.Forms.Button cmdUnselect;
         internal System.Windows.Forms.Button cmdSelect;
-        private System.Windows.Forms.Label lblDescription;
+        internal System.Windows.Forms.Label lblDescription;
     }
 }

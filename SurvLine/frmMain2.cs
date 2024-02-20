@@ -9,12 +9,17 @@ using System.IO;
 using System.Linq;
 using System.Reflection.Emit;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
+using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static SurvLine.MdlAccountMakeNSS;
 using static SurvLine.mdl.MdiDefine;
+using static SurvLine.mdl.MdlNSDefine;
 using static System.Net.Mime.MediaTypeNames;
 using static System.Net.WebRequestMethods;
+using static System.Windows.Forms.AxHost;
 
 namespace SurvLine
 {
@@ -29,7 +34,9 @@ namespace SurvLine
         IniFileControl iniFileControl = new IniFileControl();
 
         Document m_clsDocument = new Document();
+        MdlMain mdlMain = new MdlMain();
 
+        MdlGUI mdlGUI = new MdlGUI();
 
         //23/12/29 K.setoguchi@NV---------->>>>>>>>>>
         //'2008/10/14 NGS Yamada
@@ -90,7 +97,7 @@ namespace SurvLine
 
             //[VB]  '現場の新規作成。
             //[VB]  If Not CreateJob Then Exit Sub
-            if (!CreateJob()){ return; }
+            if (!CreateJob()) { return; }
             //------------------------------------------------------------
 
 
@@ -282,7 +289,8 @@ namespace SurvLine
                 //      App_Path = C:\Hitz\NetSurv\Prog\Src
                 //      App_Title =  "NS-Survey"  
                 //
-                if (!iniFileControl.WritePrivateProfileString(MdlNSDefine.PROFILE_SAVE_SEC_SEMIDYNA, MdlNSDefine.PROFILE_SAVE_KEY_PATH, m_clsDocument.SemiDynaPathDef, $"{App_Path}\\{App_Title}{MdlNSSDefine.PROFILE_SAVE_EXT}")){
+                if (!iniFileControl.WritePrivateProfileString(MdlNSDefine.PROFILE_SAVE_SEC_SEMIDYNA, MdlNSDefine.PROFILE_SAVE_KEY_PATH, m_clsDocument.SemiDynaPathDef, $"{App_Path}\\{App_Title}{MdlNSSDefine.PROFILE_SAVE_EXT}"))
+                {
                     //Call Err.Raise(ERR_FATAL, , GetLastErrorMessage())
                 }
             }
@@ -309,7 +317,8 @@ namespace SurvLine
             //                      App_Title =  "NS-Survey"  
             string sValue;
             sValue = fJobEdit.CoordNum.ToString();
-            if (iniFileControl.WritePrivateProfileString(MdlNSDefine.PROFILE_SAVE_SEC_ACCOUNT, MdlNSDefine.PROFILE_SAVE_KEY_COORDNUM, sValue, $"{App_Path}\\{App_Title}{MdlNSSDefine.PROFILE_SAVE_EXT}") == false){
+            if (iniFileControl.WritePrivateProfileString(MdlNSDefine.PROFILE_SAVE_SEC_ACCOUNT, MdlNSDefine.PROFILE_SAVE_KEY_COORDNUM, sValue, $"{App_Path}\\{App_Title}{MdlNSSDefine.PROFILE_SAVE_EXT}") == false)
+            {
                 //  Call Err.Raise(ERR_FATAL, , GetLastErrorMessage())
                 MessageBox.Show("iniファイルに保存", "エラーが発生");
             }
@@ -1057,7 +1066,8 @@ namespace SurvLine
         {
             bool SaveProject = false;
 
-            if (m_clsDocument.Path() == ""){
+            if (m_clsDocument.Path() == "")
+            {
                 if (!SaveAsProject())
                 {
                     return SaveProject;
@@ -1262,7 +1272,8 @@ namespace SurvLine
             ProjectFileManager clsProjectFileManager = new ProjectFileManager();
             string sProjectFolderName;
             sProjectFolderName = clsProjectFileManager.CreateProjectFolder();
-            if (sProjectFolderName == ""){
+            if (sProjectFolderName == "")
+            {
                 MessageBox.Show($"これ以上現場を保存することができません。\n 不要な現場を削除してください。", "エラー発生");
                 return SaveAsProject;
             }
@@ -1635,7 +1646,7 @@ namespace SurvLine
 
 
             //'現場の削除。
-            if(!RemoveJob())
+            if (!RemoveJob())
             {
                 return;
             }
@@ -1783,6 +1794,1125 @@ namespace SurvLine
         //***************************************************************************
 
 
+
+
+        //24/01/28 K.setoguchi@NV---------->>>>>>>>>>
+        //***************************************************************************
+
+
+        //==========================================================================================
+        /*[VB]
+            'DATファイルをインポートする。
+            Private Sub mnuFileImportDAT_Click()
+
+                On Error GoTo ErrorHandler
+    
+                'インポート。
+                Call FileImportClick(IMPORT_TYPE_DAT)
+    
+                Exit Sub
+    
+            ErrorHandler:
+                Call mdlMain.ErrorExit
+    
+            End Sub
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        /// <summary>
+        /// 【インポート】NetSurvデータファイル：   'DATファイルをインポートする。
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void mnuFileImportDAT_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                //'インポート。
+                FileImportClick(IMPORT_TYPE.IMPORT_TYPE_DAT);
+
+            }
+            catch (Exception ex)
+            {
+                //Call mdlMain.ErrorExit
+
+            }
+
+        }
+
+
+
+        //==========================================================================================
+        /*[VB]
+        'RINEXファイルをインポートする。
+        Private Sub mnuFileImportRINEX_Click()
+
+            On Error GoTo ErrorHandler
+    
+            'インポート。
+            Call FileImportClick(IMPORT_TYPE_RINEX)
+    
+            Exit Sub
+    
+        ErrorHandler:
+            Call mdlMain.ErrorExit
+    
+        End Sub
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        /// <summary>
+        ///  【インポート】RINEXファイル：RINEXファイルをインポートする。
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void mnuFileImportRINEX_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                //'インポート。
+                FileImportClick(IMPORT_TYPE.IMPORT_TYPE_RINEX);
+
+            }
+            catch (Exception ex)
+            {
+                //Call mdlMain.ErrorExit
+
+            }
+
+        }
+        //<<<<<<<<<-----------24/01/28 K.setoguchi@NV
+        //***************************************************************************
+
+
+
+        //==========================================================================================
+        /*[VB]
+            '受信機からDATファイルをインポートする。 2007/4/10 NGS Yamada
+            Private Sub mnuFileImportDirect_Click()
+
+                On Error GoTo ErrorHandler
+    
+                'インポート。
+                Call FileImportClick(IMPORT_TYPE_DIRECT)
+    
+                Exit Sub
+    
+            ErrorHandler:
+                Call mdlMain.ErrorExit
+
+            End Sub
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        /// <summary>
+        ////  【インポート】受信機からインポート：受信機からDATファイルをインポートする。 2007/4/10 NGS Yamada
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void mnuFileImportDirect_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                //'インポート。
+                FileImportClick(IMPORT_TYPE.IMPORT_TYPE_DIRECT);
+
+            }
+            catch (Exception ex)
+            {
+                //Call mdlMain.ErrorExit
+
+            }
+        }
+
+
+
+        //24/01/28 K.setoguchi@NV---------->>>>>>>>>>
+        //***************************************************************************
+        //==========================================================================================
+        /*[VB]
+        'インポートコマンド。
+        Private Sub FileImportClick(ByVal nImportType As IMPORT_TYPE)
+
+            'インポート。
+            If Not Import(nImportType) Then Exit Sub
+    
+            '砂時計。
+            Dim clsWaitCursor As New WaitCursor
+            Set clsWaitCursor.Object = Me
+    
+            'リストの作成。
+            Call objListPane.RemakeList(True)
+    
+            'プロットの再描画。
+            Call objPlotPane.UpdateLogicalDrawArea(True)
+            Call objPlotPane.Redraw
+            Call objPlotPane.Refresh
+    
+            Call clsWaitCursor.Back
+    
+        End Sub
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        /// <summary>
+        /// インポートコマンド。
+        /// 
+        /// </summary>
+        /// <param name="nImportType"></param>
+        private void FileImportClick(IMPORT_TYPE nImportType)
+        {
+            if (!Import(nImportType))
+            {
+                return;
+            }
+
+            //'砂時計。
+            Cursor = Cursors.WaitCursor;
+
+            //坂井様へ'リストの作成。
+            //坂井様へCall objListPane.RemakeList(True)
+
+
+            //坂井様へ'プロットの再描画。
+            //坂井様へCall objPlotPane.UpdateLogicalDrawArea(True)
+            //坂井様へCall objPlotPane.Redraw
+            //坂井様へCall objPlotPane.Refresh
+
+
+
+            Cursor = Cursors.Default;
+
+        }
+        //<<<<<<<<<-----------24/01/28 K.setoguchi@NV
+        //***************************************************************************
+
+        //24/01/28 K.setoguchi@NV---------->>>>>>>>>>
+        //***************************************************************************
+
+        //==========================================================================================
+        /*[VB]
+        '外部ファイルをインポートする。
+        '
+        '引き数：
+        'nImportType インポートファイル種別。
+        '
+        '戻り値：
+        '正常終了の場合 True を返す。
+        'キャンセルの場合 False を返す。
+        Private Function Import(ByVal nImportType As IMPORT_TYPE) As Boolean
+
+            Import = False
+    
+            Dim sPath() As String
+    
+            If nImportType <> IMPORT_TYPE_DIRECT Then
+                dlgCommonDialog.DialogTitle = "インポート"
+                dlgCommonDialog.CancelError = True
+                dlgCommonDialog.flags = cdlOFNFileMustExist Or cdlOFNHideReadOnly Or cdlOFNLongNames Or cdlOFNNoChangeDir Or cdlOFNPathMustExist Or cdlOFNAllowMultiselect Or cdlOFNExplorer
+                dlgCommonDialog.MaxFileSize = 1024
+                dlgCommonDialog.FileName = ""
+                Select Case nImportType
+                Case IMPORT_TYPE_UNKNOWN
+                    dlgCommonDialog.DefaultExt = IMPORT_FILE_EXT
+                    dlgCommonDialog.Filter = IMPORT_FILE_FILTER
+                Case IMPORT_TYPE_JOB
+                    dlgCommonDialog.DefaultExt = JOB_FILE_EXT
+                    dlgCommonDialog.Filter = JOB_FILE_FILTER
+                Case IMPORT_TYPE_NVF
+                    dlgCommonDialog.DefaultExt = NVF_FILE_EXT
+                    dlgCommonDialog.Filter = NVF_FILE_FILTER
+                Case IMPORT_TYPE_DAT
+                    dlgCommonDialog.DefaultExt = DAT_FILE_EXT
+                    dlgCommonDialog.Filter = DAT_FILE_FILTER
+                Case IMPORT_TYPE_RINEX
+                    dlgCommonDialog.DefaultExt = RINEX_FILE_EXT
+                    dlgCommonDialog.Filter = RINEX_FILE_FILTER
+                End Select
+                dlgCommonDialog.FilterIndex = 1
+        
+                If Not GetFileDialog().ShowOpen(dlgCommonDialog) Then Exit Function
+        
+                '再描画。
+                If RedrawWindow(Me.hWnd, 0, 0, RDW_UPDATENOW) = 0 Then Call Err.Raise(ERR_FATAL, , GetLastErrorMessage())
+        
+                Call ConvertOpenDialogMultiList(dlgCommonDialog.FileName, sPath)
+            Else
+                With frmImportDirect
+        '            .ComPortType = m_clsDocument.ImportComPortType
+                    .ComPortCount = 0
+            
+                    If m_clsDocument.ImportComPortType = True Then  '2007/7/2 NGS Yamada
+        '                Dim autoComPort As String
+        '                If SearchComPort(autoComPort) = True Then
+        '                    .ComPort = autoComPort
+                        If SearchComPort(frmImportDirect) = True Then
+                        Else
+                            Call MsgBox("NetSurvとの接続に失敗しました。", vbCritical)
+                            Exit Function
+                        End If
+                    Else
+                        '.ComPort = "COM" & m_clsDocument.ImportComPort + 1
+                        Call .AddComPort(m_clsDocument.ImportComPort + 1)
+                    End If
+                    .DataSave = m_clsDocument.ImportDataSave
+        '            .ComPort = "COM" & m_clsDocument.ImportComPort + 1
+                    .Path = App.Path & TEMPORARY_PATH & IMPORT_PATH
+                    .Show vbModal
+            
+                    If .Result <> vbOK Then Exit Function
+            
+                    sPath = .SaveFilePaths
+                End With
+            End If
+            'インポート。
+            Dim clsProcessImport As New ProcessImport
+            Call clsProcessImport.Import(nImportType, sPath, False)
+    
+            '再描画。
+            If RedrawWindow(Me.hWnd, 0, 0, RDW_UPDATENOW) = 0 Then Call Err.Raise(ERR_FATAL, , GetLastErrorMessage())
+    
+            Import = True
+    
+        End Function
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+
+        private bool Import(IMPORT_TYPE nImportType)
+        {
+            bool Import = false;
+
+            List<string> sPath = new List<string>();
+
+
+            OpenFileDialog dlgCommonDialog = new OpenFileDialog();
+
+
+            if (nImportType != IMPORT_TYPE.IMPORT_TYPE_DIRECT)
+            {
+                dlgCommonDialog.Title = "インポート";
+                //dlgCommonDialog.CancelError = True
+                //dlgCommonDialog.flags = cdlOFNFileMustExist Or cdlOFNHideReadOnly Or cdlOFNLongNames Or cdlOFNNoChangeDir Or cdlOFNPathMustExist Or cdlOFNAllowMultiselect Or cdlOFNExplorer
+                //dlgCommonDialog.MaxFileSize = 1024;
+
+                dlgCommonDialog.Filter = "テキストファイル (*.txt)|*.txt|"
+                                 + "すべてのファイル (*.*)|*.*";
+                dlgCommonDialog.FilterIndex = 2;
+                dlgCommonDialog.Multiselect = true;
+
+                dlgCommonDialog.FileName = "";
+                switch (nImportType)
+                {
+                    case IMPORT_TYPE.IMPORT_TYPE_UNKNOWN:
+                        dlgCommonDialog.DefaultExt = MdlNSSDefine.IMPORT_FILE_EXT;
+                        dlgCommonDialog.Filter = MdlNSSDefine.IMPORT_FILE_FILTER;
+                        break;
+                    case IMPORT_TYPE.IMPORT_TYPE_JOB:
+                        dlgCommonDialog.DefaultExt = JOB_FILE_EXT;
+                        dlgCommonDialog.Filter = JOB_FILE_FILTER;
+                        break;
+                    case IMPORT_TYPE.IMPORT_TYPE_NVF:
+                        dlgCommonDialog.DefaultExt = NVF_FILE_EXT;
+                        dlgCommonDialog.Filter = NVF_FILE_FILTER;
+                        break;
+                    case IMPORT_TYPE.IMPORT_TYPE_DAT:
+                        dlgCommonDialog.DefaultExt = DAT_FILE_EXT;
+                        dlgCommonDialog.Filter = DAT_FILE_FILTER;
+                        break;
+                    case IMPORT_TYPE.IMPORT_TYPE_RINEX:
+                        dlgCommonDialog.DefaultExt = RINEX_FILE_EXT;
+                        dlgCommonDialog.Filter = RINEX_FILE_FILTER;
+                        break;
+                    default:
+                        return Import;
+                }
+                dlgCommonDialog.FilterIndex = 1;
+
+                FileDialog fd = (FileDialog)mdlMain.GetFileDialog();
+
+                if (!fd.ShowOpen(dlgCommonDialog))
+                {
+                    return Import;
+                }
+
+                //'再描画。
+                //If RedrawWindow(Me.hWnd, 0, 0, RDW_UPDATENOW) = 0 Then Call Err.Raise(ERR_FATAL, , GetLastErrorMessage())
+
+
+                mdlGUI.ConvertOpenDialogMultiList(dlgCommonDialog, ref sPath);
+
+
+            }
+            else
+            {
+                //        With frmImportDirect
+                //'            .ComPortType = m_clsDocument.ImportComPortType
+                //            .ComPortCount = 0;
+
+            }
+
+            //'インポート。
+            ProcessImport clsProcessImport = new ProcessImport();
+            clsProcessImport.Import(nImportType, ref sPath, false);
+
+
+            //            '再描画。
+            //            If RedrawWindow(Me.hWnd, 0, 0, RDW_UPDATENOW) = 0 Then Call Err.Raise(ERR_FATAL, , GetLastErrorMessage())
+
+
+            Import = true;
+            return Import;
+
+        }
+
+
+
+        //==========================================================================================
+        /*[VB]
+            'プロジェクトをインポートする。
+            Private Sub mnuFileImportProject_Click()
+
+                On Error GoTo ErrorHandler
+    
+                '既存のプロジェクトを閉じる。
+                If Not ConfirmCloseProject() Then Exit Sub
+    
+                '現場のインポート。
+                If Not ImportProject Then Exit Sub
+    
+                'タイトル。
+                Call UpdateTitle
+    
+                '砂時計。
+                Dim clsWaitCursor As New WaitCursor
+                Set clsWaitCursor.Object = Me
+    
+                'リストの作成。
+                Call objListPane.RemakeList(False)
+    
+                'プロットの再描画。
+                Call objPlotPane.UpdateLogicalDrawArea(True)
+                Call objPlotPane.Redraw
+                Call objPlotPane.Refresh
+    
+                'ステータスバーの更新。
+                Call UpdateStatusBarAll
+    
+                'ドキュメントのOpen/Closeによるメニューの更新。
+                Call UpdateDocumentMenu
+    
+                Call clsWaitCursor.Back
+    
+                Exit Sub
+    
+            ErrorHandler:
+                Call mdlMain.ErrorExit
+
+            End Sub
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        /// <summary>
+        /// プロジェクトをインポートする。
+        ///     メニュー：現場のインポート。
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void mnuFileImportProject_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                //  On Error GoTo ErrorHandler
+
+                //坂井様へ  '既存のプロジェクトを閉じる。
+                //坂井様へ  If Not ConfirmCloseProject() Then Exit Sub
+
+
+                //'現場のインポート。
+                if (!ImportProject())
+                {
+                    return;
+                }
+
+                //'タイトル。
+                UpdateTitle();
+
+
+                //'砂時計。
+                Cursor = Cursors.WaitCursor;
+
+
+                //坂井様へ    'リストの作成。
+                //坂井様へCall objListPane.RemakeList(False)
+
+
+                //坂井様へ'プロットの再描画。
+                //坂井様へCall objPlotPane.UpdateLogicalDrawArea(True)
+                //坂井様へCall objPlotPane.Redraw
+                //坂井様へCall objPlotPane.Refresh
+
+
+                //坂井様へ'ステータスバーの更新。
+                //坂井様へCall UpdateStatusBarAll
+
+
+                //坂井様へ  'ドキュメントのOpen/Closeによるメニューの更新。
+                //坂井様へ  Call UpdateDocumentMenu
+
+
+                Cursor = Cursors.Default;
+
+                return;
+            }
+            catch (Exception ex)
+            {
+                //ErrorHandler:
+                //  Call mdlMain.ErrorExit
+
+            }
+
+        }
+        //==========================================================================================
+        /*[VB]
+            '現場のインポート。
+            '
+            '戻り値：
+            '正常終了の場合 True を返す。
+            'キャンセルの場合 False を返す。
+            Private Function ImportProject() As Boolean
+
+                ImportProject = False
+    
+                On Error GoTo CancelHandler
+    
+                dlgCommonDialog.DialogTitle = "開く"
+                dlgCommonDialog.CancelError = True
+                dlgCommonDialog.DefaultExt = NSSEXP_FILE_EXT
+                dlgCommonDialog.Filter = NSSEXP_FILE_FILTER
+                dlgCommonDialog.FilterIndex = 1
+                dlgCommonDialog.flags = cdlOFNFileMustExist Or cdlOFNHideReadOnly Or cdlOFNLongNames Or cdlOFNNoChangeDir Or cdlOFNPathMustExist Or cdlOFNAllowMultiselect Or cdlOFNExplorer
+                dlgCommonDialog.MaxFileSize = 1024
+                dlgCommonDialog.FileName = ""
+    
+                If Not GetFileDialog().ShowOpen(dlgCommonDialog) Then Exit Function
+    
+                '再描画。
+                If RedrawWindow(Me.hWnd, 0, 0, RDW_UPDATENOW) = 0 Then Call Err.Raise(ERR_FATAL, , GetLastErrorMessage())
+    
+                '閉じてからインポートする。
+                Call CloseProject
+    
+                Dim sPath() As String
+                Call ConvertOpenDialogMultiList(dlgCommonDialog.FileName, sPath)
+    
+                'インポート。
+                Dim clsProcessProject As New ProcessProject
+    
+                If Not clsProcessProject.ImportProjectFolders(sPath) Then Exit Function
+    
+                ImportProject = True
+    
+                Exit Function
+    
+            CancelHandler:
+                If Err.Number <> cdlCancel Then Call MsgBox(Err.Description, vbCritical)
+    
+            End Function
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        private bool ImportProject()
+        {
+            bool ImportProject = false;
+#if false
+            dlgCommonDialog.Title = "インポート";
+            //dlgCommonDialog.CancelError = True
+            //dlgCommonDialog.flags = cdlOFNFileMustExist Or cdlOFNHideReadOnly Or cdlOFNLongNames Or cdlOFNNoChangeDir Or cdlOFNPathMustExist Or cdlOFNAllowMultiselect Or cdlOFNExplorer
+            //dlgCommonDialog.MaxFileSize = 1024;
+
+            dlgCommonDialog.Filter = "テキストファイル (*.txt)|*.txt|"
+                             + "すべてのファイル (*.*)|*.*";
+            dlgCommonDialog.FilterIndex = 2;
+            dlgCommonDialog.Multiselect = true;
+
+            dlgCommonDialog.FileName = "";
+#else   //-------------------------------------------------------------------
+            OpenFileDialog dlgCommonDialog = new OpenFileDialog();
+
+            dlgCommonDialog.Title = "開く";
+            //    dlgCommonDialog.CancelError = True
+            //     dlgCommonDialog.DefaultExt = NSSEXP_FILE_EXT
+            dlgCommonDialog.Filter = MdlNSDefine.NSSEXP_FILE_FILTER;
+            dlgCommonDialog.FilterIndex = 1;
+            //     dlgCommonDialog.flags = cdlOFNFileMustExist Or cdlOFNHideReadOnly Or cdlOFNLongNames Or cdlOFNNoChangeDir Or cdlOFNPathMustExist Or cdlOFNAllowMultiselect Or cdlOFNExplorer
+            //     dlgCommonDialog.MaxFileSize = 1024
+            dlgCommonDialog.FileName = "";
+#endif
+
+            FileDialog fd = (FileDialog)mdlMain.GetFileDialog();
+
+            if (!fd.ShowOpen(dlgCommonDialog))
+            {
+                return ImportProject;
+            }
+
+            //'再描画。
+            //If RedrawWindow(Me.hWnd, 0, 0, RDW_UPDATENOW) = 0 Then Call Err.Raise(ERR_FATAL, , GetLastErrorMessage())
+
+
+            //'閉じてからインポートする。
+            CloseProject();
+
+            List<string> sPath = new List<string>();
+            mdlGUI.ConvertOpenDialogMultiList(dlgCommonDialog, ref sPath);
+
+
+
+            //'インポート。
+            ProcessProject clsProcessProject = new ProcessProject();
+            if (!clsProcessProject.ImportProjectFolders(ref sPath))
+            {
+                return ImportProject;
+            }
+
+
+            ImportProject = true;
+            return ImportProject;
+
+        }
+
+
+
+
+        //==========================================================================================
+        /*[VB]
+            'プロジェクトをエクスポートする。
+            Private Sub mnuFileExportProject_Click()
+
+                On Error GoTo ErrorHandler
+    
+                '既存のプロジェクトを閉じる。
+                If Not ConfirmCloseProject() Then Exit Sub
+    
+                '現場のエクスポート。
+                If Not ExportProject Then Exit Sub
+    
+                'タイトル。
+                Call UpdateTitle
+    
+                '砂時計。
+                Dim clsWaitCursor As New WaitCursor
+                Set clsWaitCursor.Object = Me
+    
+                'リストの作成。
+                Call objListPane.RemakeList(False)
+    
+                'プロットの再描画。
+                Call objPlotPane.UpdateLogicalDrawArea(True)
+                Call objPlotPane.Redraw
+                Call objPlotPane.Refresh
+    
+                'ステータスバーの更新。
+                Call UpdateStatusBarAll
+    
+                'ドキュメントのOpen/Closeによるメニューの更新。
+                Call UpdateDocumentMenu
+
+
+                Call clsWaitCursor.Back
+
+                Exit Sub
+
+            ErrorHandler:
+                Call mdlMain.ErrorExit
+
+            End Sub
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        /// <summary>
+        ///  プロジェクトをエクスポートする。                
+        ///     メニュー：現場のエクスポート。
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void mnuFileExportProject_Click(object sender, EventArgs e)
+        {
+
+            try
+            {
+                //On Error GoTo ErrorHandler
+
+
+                //坂井様へ  '既存のプロジェクトを閉じる。
+                //坂井様へ  If Not ConfirmCloseProject() Then Exit Sub
+
+
+                //'現場のエクスポート。
+                if (!ExportProject()) { return; }
+
+
+                //タイトル。
+                UpdateTitle();
+
+
+                //'砂時計。
+                Cursor = Cursors.WaitCursor;
+
+
+                //坂井様へ  'リストの作成。
+                //坂井様へ  Call objListPane.RemakeList(False)
+
+
+                //坂井様へ  'プロットの再描画。
+                //坂井様へ  Call objPlotPane.UpdateLogicalDrawArea(True)
+                //坂井様へ  Call objPlotPane.Redraw
+                //坂井様へ  Call objPlotPane.Refresh
+
+
+                //坂井様へ  'ステータスバーの更新。
+                //坂井様へ  Call UpdateStatusBarAll
+
+
+                //坂井様へ  'ドキュメントのOpen/Closeによるメニューの更新。
+                //坂井様へ  Call UpdateDocumentMenu
+
+                Cursor = Cursors.Default;
+
+                return;
+            }
+            catch (Exception ex)
+            {
+                //ErrorHandler:
+                //  Call mdlMain.ErrorExit
+            }
+
+        }
+
+
+        //==========================================================================================
+        /*[VB]
+            '現場のエクスポート。
+            '
+            '戻り値：
+            '正常終了の場合 True を返す。
+            'キャンセルの場合 False を返す。
+            Private Function ExportProject() As Boolean
+
+                ExportProject = False
+    
+                On Error GoTo CancelHandler
+    
+                '再描画。
+                If RedrawWindow(Me.hWnd, 0, 0, RDW_UPDATENOW) = 0 Then Call Err.Raise(ERR_FATAL, , GetLastErrorMessage())
+    
+                frmJobSelect.Caption = "現場をエクスポート"
+                frmJobSelect.Description = "エクスポートする現場を選択してください｡"
+                frmJobSelect.TextOK = "OK"
+                frmJobSelect.MsgOK = ""
+                frmJobSelect.MsgUnselected = "エクスポートする現場をチェックしてください。"
+                Call frmJobSelect.Show(1)
+                If frmJobSelect.Result <> vbOK Then Exit Function
+    
+                '再描画。
+                If RedrawWindow(Me.hWnd, 0, 0, RDW_UPDATENOW) = 0 Then Call Err.Raise(ERR_FATAL, , GetLastErrorMessage())
+    
+                If 0 < UBound(frmJobSelect.FolderNames) Then
+                    '出力先フォルダを選択。
+                    Dim clsFolderDialog As New FolderDialog
+                    clsFolderDialog.Caption = "現場をエクスポート"
+                    clsFolderDialog.Title = "出力先のフォルダを選択してください。"
+                    clsFolderDialog.Path = ""
+                    clsFolderDialog.CancelError = True
+                    Call clsFolderDialog.ShowOpen(Me.hWnd)
+        
+                    Dim sPath As String
+                    Dim bSingle As Boolean
+                    sPath = clsFolderDialog.Path
+                    bSingle = False
+                Else
+                    Dim sFolderNames() As String
+                    sFolderNames = frmJobSelect.FolderNames
+                    Dim clsProjectFileManager As New ProjectFileManager
+        
+                    Dim sJobName As String
+                    Dim sDistrictName As String
+                    If Not clsProjectFileManager.GetJobInfo(sFolderNames(0), sJobName, sDistrictName) Then Exit Function
+        
+                    '出力先ファイルを選択。
+                    dlgCommonDialog.DialogTitle = "名前を付けて保存"
+                    dlgCommonDialog.CancelError = True
+                    dlgCommonDialog.DefaultExt = NSSEXP_FILE_EXT
+                    dlgCommonDialog.Filter = NSSEXP_FILE_FILTER
+                    dlgCommonDialog.FilterIndex = 1
+                    dlgCommonDialog.flags = cdlOFNHideReadOnly Or cdlOFNLongNames Or cdlOFNNoChangeDir Or cdlOFNNoReadOnlyReturn Or cdlOFNOverwritePrompt Or cdlOFNPathMustExist
+                    dlgCommonDialog.FileName = sJobName & "." & NSSEXP_FILE_EXT
+                    If Not GetFileDialog().ShowSave(dlgCommonDialog) Then Exit Function
+        
+                    sPath = dlgCommonDialog.FileName
+                    bSingle = True
+                End If
+    
+                '再描画。
+                If RedrawWindow(Me.hWnd, 0, 0, RDW_UPDATENOW) = 0 Then Call Err.Raise(ERR_FATAL, , GetLastErrorMessage())
+    
+                '閉じてからエクスポートする。
+                Call CloseProject
+    
+                'エクスポート。
+                Dim clsProcessProject As New ProcessProject
+                If Not clsProcessProject.ExportProjectFolders(frmJobSelect.FolderNames, sPath, bSingle) Then Exit Function
+    
+                ExportProject = True
+    
+                Exit Function
+    
+            CancelHandler:
+                If Err.Number <> cdlCancel Then Call MsgBox(Err.Description, vbCritical)
+    
+            End Function
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        /// <summary>
+        /// 現場のエクスポート。
+        /// 
+        /// </summary>
+        /// <returns>
+        /// 戻り値：
+        ///     正常終了の場合 True を返す。
+        ///     キャンセルの場合 False を返す。
+        /// </returns>
+        private bool ExportProject()
+        {
+            bool ExportProject = false;
+
+            try
+            {
+                //On Error GoTo CancelHandler
+
+
+                //坂井様へ  '再描画。
+                //坂井様へ  If RedrawWindow(Me.hWnd, 0, 0, RDW_UPDATENOW) = 0 Then Call Err.Raise(ERR_FATAL, , GetLastErrorMessage())
+
+
+                frmJobSelect2 frmJobSelect = new frmJobSelect2();
+
+                frmJobSelect.Text = "現場をエクスポート";
+                frmJobSelect.lblDescription.Text = "エクスポートする現場を選択してください｡";
+                frmJobSelect.TextOK("OK");
+                frmJobSelect.MsgOK = "";
+                frmJobSelect.MsgUnselected = "エクスポートする現場をチェックしてください。";
+
+                frmJobSelect.ShowDialog();
+
+                if (frmJobSelect.Result != DEFINE.vbOK) { return false; }
+
+                ExportProject = true;
+
+                //坂井様へ  '再描画。
+                //坂井様へ  If RedrawWindow(Me.hWnd, 0, 0, RDW_UPDATENOW) = 0 Then Call Err.Raise(ERR_FATAL, , GetLastErrorMessage())
+
+                string sPath;
+                bool bSingle;
+                List<string> sFolderNames = new List<string>();
+
+                if (frmJobSelect.FolderNames() != null)
+                {
+                    //'出力先フォルダを選択。
+
+                    FolderDialog clsFolderDialog = new FolderDialog();
+
+                    clsFolderDialog.Caption = "現場をエクスポート";
+                    clsFolderDialog.Title = "出力先のフォルダを選択してください。";
+                    clsFolderDialog.Path = "";
+                    clsFolderDialog.CancelError = true;
+
+                    clsFolderDialog.ShowOpen(frmJobSelect.Handle);
+
+                    sPath = clsFolderDialog.Path;
+                    bSingle = false;
+
+                }
+                else
+                {
+
+                    sFolderNames.Add(frmJobSelect.FolderNames());
+
+                    ProjectFileManager clsProjectFileManager = new ProjectFileManager();
+
+                    string sJobName = "";
+                    string sDistrictName = "";
+
+                    if (!clsProjectFileManager.GetJobInfo(sFolderNames[0], ref sJobName, ref sDistrictName))
+                    {
+                        return ExportProject;
+                    }
+
+
+                    OpenFileDialog dlgCommonDialog = new OpenFileDialog();
+
+                    //'出力先ファイルを選択。
+                    dlgCommonDialog.Title = "名前を付けて保存";
+                    //dlgCommonDialog.CancelError = True
+                    //dlgCommonDialog.DefaultExt = NSSEXP_FILE_EXT
+                    dlgCommonDialog.Filter = MdlNSDefine.NSSEXP_FILE_FILTER;
+                    dlgCommonDialog.FilterIndex = 1;
+                    //dlgCommonDialog.flags = cdlOFNHideReadOnly Or cdlOFNLongNames Or cdlOFNNoChangeDir Or cdlOFNNoReadOnlyReturn Or cdlOFNOverwritePrompt Or cdlOFNPathMustExist
+                    dlgCommonDialog.FileName = $"{sJobName}.{MdlNSDefine.NSSEXP_FILE_EXT}";
+
+                    FileDialog fd = (FileDialog)mdlMain.GetFileDialog();
+
+                    if (!fd.ShowSave(dlgCommonDialog))
+                    {
+                        return ExportProject;
+                    }
+
+                    sPath = dlgCommonDialog.FileName;
+                    bSingle = true;
+
+                }
+
+                //坂井様へ  '再描画。
+                //坂井様へ  If RedrawWindow(Me.hWnd, 0, 0, RDW_UPDATENOW) = 0 Then Call Err.Raise(ERR_FATAL, , GetLastErrorMessage())
+
+
+                //'閉じてからエクスポートする。
+                CloseProject();
+
+
+                //'エクスポート。
+                //Dim clsProcessProject As New ProcessProject
+                // If Not clsProcessProject.ExportProjectFolders(frmJobSelect.FolderNames, sPath, bSingle) Then Exit Function
+
+                ProcessProject clsProcessProject = new ProcessProject();
+
+                if (!clsProcessProject.ExportProjectFolders(ref sFolderNames, sPath, bSingle))
+                {
+                    return ExportProject;
+                }
+
+                ExportProject = true;
+
+
+            }
+            catch (Exception ex)
+            {
+                //CancelHandler:
+                //  If Err.Number<> cdlCancel Then Call MsgBox(Err.Description, vbCritical)
+
+            }
+
+
+            return ExportProject;
+
+        }
+
+        //==========================================================================================
+        /*[VB]
+             'RINEXファイルをエクスポートする。
+            Private Sub mnuFileExportRinex_Click()
+
+                On Error GoTo ErrorHandler
+
+
+                Dim clsOutputParam As New OutputParam
+                Let clsOutputParam = m_clsDocument.OutputParam(OUTPUT_TYPE_RINEX)
+    
+                '帳票パラメータを入力する。
+                frmAccountInfo.AccountType = ACCOUNT_TYPE_RINEX
+                Let frmAccountInfo.AccountParam = clsOutputParam.AccountParam
+                Call frmAccountInfo.Show(1)
+                If frmAccountInfo.Result<> vbOK Then Exit Sub
+
+
+                Let clsOutputParam.AccountParam = frmAccountInfo.AccountParam
+
+
+                Call ExportRinex(clsOutputParam, True)
+
+                Exit Sub
+
+            ErrorHandler:
+                Call mdlMain.ErrorExit
+
+            End Sub
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        /// <summary>
+        /// 【エクスポート】RINEXファイル：RINEXファイルをエクスポートする
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void mnuFileExportRinex_Click(object sender, EventArgs e)
+        {
+
+            try
+            {
+
+                //On Error GoTo ErrorHandler
+
+                OutputParam clsOutputParam = new OutputParam();
+
+                clsOutputParam = (OutputParam)m_clsDocument.OutputParam((long)MdlNSSDefine.OUTPUT_TYPE.OUTPUT_TYPE_RINEX);
+
+
+
+                frmAccountInfo2 frmAccountInfo = new frmAccountInfo2();
+
+                //'帳票パラメータを入力する。
+                frmAccountInfo.AccountType = (long)ACCOUNT_TYPE.ACCOUNT_TYPE_RINEX;
+
+
+
+                frmAccountInfo.AccountParam(clsOutputParam.AccountParam());
+                frmAccountInfo.ShowDialog();
+                if (frmAccountInfo.Result != DEFINE.vbOK)
+                {
+                    return;
+                }
+
+
+                clsOutputParam.AccountParam((AccountParam)frmAccountInfo.AccountParam());
+
+
+                ExportRinex(clsOutputParam, true);
+
+            }
+            catch (Exception ex)
+            {
+                //ErrorHandler:
+                //  Call mdlMain.ErrorExit
+
+            }
+
+        }
+
+        //==========================================================================================
+        /*[VB]
+            'RINEXファイルのエクスポート。
+            '
+            'bAutoFileName に True が指定された場合、出力先のフォルダだけを指定して出力ファイル名は自動で決定する。
+            'bAutoFileName に False が指定された場合、出力ファイルのパスは一つ一つ指定する。
+            '
+            '引き数：
+            'clsOutputParam 外部出力ファイル出力パラメータ。
+            'bAutoFileName 自動ファイル名フラグ。
+            Private Sub ExportRinex(ByVal clsOutputParam As OutputParam, ByVal bAutoFileName As Boolean)
+
+                On Error GoTo CancelHandler
+    
+                '観測点リスト。
+                Dim clsObservationPoints() As ObservationPoint
+                clsObservationPoints = GetAccountObservationPoints(m_clsDocument.NetworkModel.RepresentPointHead, clsOutputParam.AccountParam)
+                '出力するものがなければ戻る。
+                If UBound(clsObservationPoints) < 0 Then
+                    Call MsgBox(MESSAGE_CONTENT_EMPTY, vbExclamation)
+                    Exit Sub
+                End If
+
+
+                If bAutoFileName Then
+                    Dim clsFolderDialog As New FolderDialog
+                    clsFolderDialog.Caption = "エクスポート"
+                    clsFolderDialog.Title = "出力先のフォルダを選択してください。"
+                    clsFolderDialog.Path = clsOutputParam.Path
+                    clsFolderDialog.CancelError = True
+                    Call clsFolderDialog.ShowOpen(Me.hWnd)
+
+                    clsOutputParam.Path = clsFolderDialog.Path
+        
+                    '出力。
+                    Dim clsProcessExport As New ProcessExport
+                    Call clsProcessExport.ExportRinexMulti(clsOutputParam)
+                Else
+                    dlgCommonDialog.CancelError = True
+                    dlgCommonDialog.DefaultExt = ""
+                    dlgCommonDialog.Filter = RINEX_FILE_FILTER
+                    dlgCommonDialog.FilterIndex = 1
+                    dlgCommonDialog.flags = cdlOFNHideReadOnly Or cdlOFNLongNames Or cdlOFNNoChangeDir Or cdlOFNNoReadOnlyReturn Or cdlOFNPathMustExist 'ここでは上書き確認はしない。
+
+
+                    Dim i As Long
+                    For i = 0 To UBound(clsObservationPoints)
+                        Dim sSrcRinexExt As String
+                        sSrcRinexExt = StrConv("." & clsObservationPoints(i).RinexExt, vbUpperCase)
+
+
+                        dlgCommonDialog.DialogTitle = clsObservationPoints(i).Number & "-" & clsObservationPoints(i).Session & " のエクスポート"
+                        'RINEXファイルのファイル名称を「観測点No＋セッション名」に変更 2006/12/22 NGS Yamada
+            '            dlgCommonDialog.FileName = IIf(clsOutputParam.Path <> "", clsOutputParam.Path & "\", "") & clsObservationPoints(i).SrcTitle & sSrcRinexExt & RNX_OBS_EXTENSION
+                        dlgCommonDialog.FileName = IIf(clsOutputParam.Path<> "", clsOutputParam.Path & "\", "") & clsObservationPoints(i).RinexTitle & sSrcRinexExt & RNX_OBS_EXTENSION
+
+
+                        If Not GetFileDialog().ShowSave(dlgCommonDialog) Then Exit Sub
+
+
+                        Dim sDrive As String
+                        Dim sDir As String
+                        Dim sTitle As String
+                        Dim sExt As String
+                        Call SplitPath(dlgCommonDialog.FileName, sDrive, sDir, sTitle, sExt)
+                        clsOutputParam.Path = RTrimEx(sDrive & sDir, "\")
+                        Dim sDstRinexExt As String
+                        sDstRinexExt = RTrimEx(StrConv(sExt, vbUpperCase), StrConv(RNX_OBS_EXTENSION, vbUpperCase))
+
+
+                        If sSrcRinexExt<> sDstRinexExt Then
+                            sTitle = sTitle & sExt
+                            sDstRinexExt = sSrcRinexExt
+                        End If
+
+
+                        '出力。
+                        Set clsProcessExport = New ProcessExport
+                        If Not clsProcessExport.ExportRinexSingle(clsOutputParam, sTitle & sDstRinexExt, clsObservationPoints(i)) Then Exit Sub
+                    Next
+                End If
+
+
+                Exit Sub
+
+
+            CancelHandler:
+                If Err.Number<> cdlCancel Then Call Err.Raise(Err.Number, Err.Source, Err.Description, Err.HelpFile, Err.HelpContext)
+
+
+            End Sub
+
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        private void ExportRinex(OutputParam clsOutputParam, bool bAutoFileName)
+        {
+
+            //On Error GoTo CancelHandler
+
+
+            //'観測点リスト。
+            List<ObservationPoint> clsObservationPoints = new List<ObservationPoint>();
+
+//            clsObservationPoints = GetAccountObservationPoints(m_clsDocument.NetworkModel.RepresentPointHead, clsOutputParam.AccountParam)
+            //'出力するものがなければ戻る。
+            if(clsObservationPoints.Count < 0)
+            {
+                //Call MsgBox(MESSAGE_CONTENT_EMPTY, vbExclamation)
+            }
+
+
+
+        }
+
+
+
+        //<<<<<<<<<-----------24/01/28 K.setoguchi@NV
+        //***************************************************************************
 
     }
 }

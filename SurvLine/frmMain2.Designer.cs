@@ -461,12 +461,14 @@
             this.mnuFileImportProject.Name = "mnuFileImportProject";
             this.mnuFileImportProject.Size = new System.Drawing.Size(224, 22);
             this.mnuFileImportProject.Text = "現場をインポート(&M)...";
+            this.mnuFileImportProject.Click += new System.EventHandler(this.mnuFileImportProject_Click);
             // 
             // mnuFileExportProject
             // 
             this.mnuFileExportProject.Name = "mnuFileExportProject";
             this.mnuFileExportProject.Size = new System.Drawing.Size(224, 22);
             this.mnuFileExportProject.Text = "現場をエクスポート(&P)...";
+            this.mnuFileExportProject.Click += new System.EventHandler(this.mnuFileExportProject_Click);
             // 
             // mnuFileRemove
             // 
@@ -509,18 +511,21 @@
             this.mnuFileImportDAT.Name = "mnuFileImportDAT";
             this.mnuFileImportDAT.Size = new System.Drawing.Size(239, 22);
             this.mnuFileImportDAT.Text = "NetSurvデータファイル(&D)...";
+            this.mnuFileImportDAT.Click += new System.EventHandler(this.mnuFileImportDAT_Click);
             // 
             // mnuFileImportRINEX
             // 
             this.mnuFileImportRINEX.Name = "mnuFileImportRINEX";
             this.mnuFileImportRINEX.Size = new System.Drawing.Size(239, 22);
             this.mnuFileImportRINEX.Text = "RINEXファイル(&R)...";
+            this.mnuFileImportRINEX.Click += new System.EventHandler(this.mnuFileImportRINEX_Click);
             // 
             // mnuFileImportDirect
             // 
             this.mnuFileImportDirect.Name = "mnuFileImportDirect";
             this.mnuFileImportDirect.Size = new System.Drawing.Size(239, 22);
             this.mnuFileImportDirect.Text = "受信機からインポート";
+            this.mnuFileImportDirect.Click += new System.EventHandler(this.mnuFileImportDirect_Click);
             // 
             // mnuFileExport
             // 
@@ -533,8 +538,9 @@
             // mnuFileExportRinex
             // 
             this.mnuFileExportRinex.Name = "mnuFileExportRinex";
-            this.mnuFileExportRinex.Size = new System.Drawing.Size(164, 22);
+            this.mnuFileExportRinex.Size = new System.Drawing.Size(180, 22);
             this.mnuFileExportRinex.Text = "RINEXファイル(&R)...";
+            this.mnuFileExportRinex.Click += new System.EventHandler(this.mnuFileExportRinex_Click);
             // 
             // toolStripMenuItem4
             // 

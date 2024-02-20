@@ -166,6 +166,7 @@
             this.txtGeoidoPath.Name = "txtGeoidoPath";
             this.txtGeoidoPath.Size = new System.Drawing.Size(274, 19);
             this.txtGeoidoPath.TabIndex = 11;
+            this.txtGeoidoPath.TextChanged += new System.EventHandler(this.txtGeoidoPath_TextChanged);
             // 
             // txtSemiDynaPath
             // 
