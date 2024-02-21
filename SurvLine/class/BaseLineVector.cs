@@ -8,8 +8,10 @@ using System.Text;
 using System.Threading.Tasks;
 using static SurvLine.mdl.MdlNSDefine;
 using static SurvLine.mdl.MdlNSSDefine;
+using static SurvLine.MdlBaseLineAnalyser;
 using static System.Collections.Specialized.BitVector32;
 using static System.Net.WebRequestMethods;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 namespace SurvLine
 {
@@ -20,25 +22,1870 @@ namespace SurvLine
         Document document = new Document();
         MdlNSSDefine mdlNSSDefine = new MdlNSSDefine();
 
-        //***************************************************************************
-        //***************************************************************************
-        //'反転フラグ。True=反転。False=反転無し。
+
+        //'*******************************************************************************
+        //'基線ベクトル
+        //
+        //Option Explicit
+
+
+        //==========================================================================================
+        /*[VB]
+            'プロパティ
+            Public ObjectType As Long 'オブジェクト種別。
+            Public Session As String 'セッション名。
+            Public StrTimeGPS As Date '観測開始日時(GPS)。
+            Public EndTimeGPS As Date '観測終了日時(GPS)。
+            Public WorkKey As Long '汎用作業キー。
+            Public WorkObject As Object '汎用作業オブジェクト。
+            Public Exclusion As Boolean '解析除外フラグ。True=除外。False=解析。
+            Public Analysis As ANALYSIS_STATUS '解析状態。
+            Public Orbit As ORBIT_TYPE '軌道暦。
+            Public Frequency As FREQUENCY_TYPE '周波数。
+            Public SolveMode As SOLVEMODE_TYPE '基線解析モード。
+            Public AnalysisStrTimeGPS As Date '解析開始日時(GPS)。
+            Public AnalysisEndTimeGPS As Date '解析終了日時(GPS)。
+            Public ElevationMask As Double '仰角マスク(度)。
+            Public Interval As Double '解析間隔(秒)。
+            Public Temperature As Double '気温(℃)。
+            Public Pressure As Double '気圧(hPa)。
+            Public Humidity As Double '湿度(％)。
+            Public Troposhere As TROPOSHERE_TYPE '対流圏モデル。
+            Public AnalysisFixed As Boolean '解析始点固定点フラグ。True=解析始点が固定点。False=解析始点は固定点で無い。
+            Public AmbPercentage As Long 'FIX率(％)。
+            Public Bias As Double 'バイアス決定比(ｍ)。
+            Public EpochUsed As Long '使用エポック数。
+            Public EpochRejected As Long '棄却エポック数。
+            Public RMS As Double 'RMS値(ｍ)。
+            Public RDOP As Double 'RDOP値。
+            Public IsDispersion As Boolean '分散・共分散の有効/無効。True=有効。False=無効。
+            Public RcvNumbersGps As Long '受信GPS衛星番号。ビットフラグ。1=受信。0=非受信。ビット0がGPS1番、ビット1がGPS2番。。。。
+            Public RcvNumbersGlonass As Long '受信GLONASS衛星番号。ビットフラグ。1=受信。0=非受信。ビット0がR1番、ビット1がR2番。。。。
+            '2017/06/06 NS6000対応。'''''''''''''''''''''''''''''''''''''''''''''''''''''''
+            Public RcvNumbersQZSS As Long '受信QZSS衛星番号。ビットフラグ。1=受信。0=非受信。ビット0がJ1番、ビット1がRJ番。。。。
+            'Public RcvNumbersGalileo As Long '受信Galileo衛星番号。ビットフラグ。1=受信。0=非受信。ビット0がE1番、ビット1がE2番。。。。    '2018/08/21 Hitz H.Nakamura 衛星数が増えたので64ビットに増やす。
+            Public RcvNumbersGalileo1 As Long '受信Galileo衛星番号。ビットフラグ。1=受信。0=非受信。ビット0がE1番、ビット1がE2番。。。。
+            Public RcvNumbersGalileo2 As Long '受信Galileo衛星番号。ビットフラグ。1=受信。0=非受信。ビット0がE33番、ビット1がE34番。。。。
+            Public RcvNumbersBeiDou1 As Long '受信BeiDou1衛星番号。ビットフラグ。1=受信。0=非受信。ビット0がC1番、ビット1がC2番。。。。
+            Public RcvNumbersBeiDou2 As Long '受信BeiDou2衛星番号。ビットフラグ。1=受信。0=非受信。ビット0がC33番、ビット1がC34番。。。。
+            '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+            Public MaxResidL1_Legacy As Double '最大残差L1。
+            Public MaxResidL2_Legacy As Double '最大残差L2。
+            Public MinRatio As Double '最小バイアス決定比。
+            Public MinPs As Double '最小 probability of success。
+            Public ExcludeGPS As Long '不使用GPS。ビットフラグ。1=使用。0=無使用。ビット0がGPS1番、ビット1がGPS2番。。。。
+            Public ExcludeGlonass As Long '不使用GLONASS。ビットフラグ。1=使用。0=無使用。ビット0がR1番、ビット1がR2番。。。。
+            Public GlonassFlag As Boolean 'GLONASSフラグ。
+            '2017/06/06 NS6000対応。'''''''''''''''''''''''''''''''''''''''''''''''''''''''
+            Public ExcludeQZSS As Long '不使用QZSS。ビットフラグ。1=使用。0=無使用。ビット0がJ1番、ビット1がJ2番。。。。
+            'Public ExcludeGalileo As Long '不使用Galileo。ビットフラグ。1=使用。0=無使用。ビット0がE1番、ビット1がE2番。。。。 '2018/08/21 Hitz H.Nakamura 衛星数が増えたので64ビットに増やす。
+            Public ExcludeGalileo1 As Long '不使用Galileo。ビットフラグ。1=使用。0=無使用。ビット0がE1番、ビット1がE2番。。。。
+            Public ExcludeGalileo2 As Long '不使用Galileo。ビットフラグ。1=使用。0=無使用。ビット0がE33番、ビット1がE34番。。。。
+            Public ExcludeBeiDou1 As Long '不使用BeiDou。ビットフラグ。1=使用。0=無使用。ビット0がC1番、ビット1がC2番。。。。
+            Public ExcludeBeiDou2 As Long '不使用BeiDOu。ビットフラグ。1=使用。0=無使用。ビット0がC33番、ビット1がC34番。。。。
+            Public QZSSFlag As Boolean 'QZSSフラグ。
+            Public GalileoFlag As Boolean 'Galileoフラグ。
+            Public BeiDouFlag As Boolean 'BeiDouフラグ。
+            '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+            Public IsList As Boolean 'リスト更新必要フラグ。
+            Public StrPcvVer As Variant '始点PCVバージョン。補正無しの場合は空文字。不明の場合は Null。
+            Public EndPcvVer As Variant '終点PCVバージョン。補正無しの場合は空文字。不明の場合は Null。
+            Public AnalysisOrder As Long '解析順番。より数値が小さい方を後に解析されたこととする。第３２ビットは符号ビットとして、第３１～２９は一時的な順位の重み付けに使う。第２８ビットは解析㊥、非解析の区別に使う。第２７～１ビットで順番をあらわす。つまり、最低順位は &H0FFFFFFF となる。
+
+            'インプリメンテーション
+            Private m_clsStrPoint As New ObservationPoint '始点(接合観測点)。
+            Private m_clsEndPoint As New ObservationPoint '終点(接合観測点)。
+            Private m_clsAnalysisStrPoint As ObservationPoint '解析始点(接合観測点)。
+            Private m_clsAnalysisEndPoint As ObservationPoint '解析終点(接合観測点)。
+            Private m_clsCoordinateAnalysis As CoordinatePoint '解析座標。
+            Private m_clsVectorAnalysis As New CoordinatePointXYZ '解析ベクトル。
+            Private m_clsDispersion As New Dispersion '分散・共分散。
+            Private m_clsStrDepPattern As New DepPattern '始点アンテナ位相補正パターン。
+            Private m_clsEndDepPattern As New DepPattern '終点アンテナ位相補正パターン。
+            Private m_clsObsInfo As New ObsInfo '観測情報。
+            Private m_clsAmbInfo As New AmbInfo 'アンビギュイティ情報。
+            Private m_clsStrOffsetL1 As New CoordinatePointXYZ '始点アンテナ位相補正L1。
+            Private m_clsStrOffsetL2 As New CoordinatePointXYZ '始点アンテナ位相補正L2。
+            Private m_clsStrOffsetL5 As New CoordinatePointXYZ '始点アンテナ位相補正L5。
+            Private m_clsEndOffsetL1 As New CoordinatePointXYZ '終点アンテナ位相補正L1。
+            Private m_clsEndOffsetL2 As New CoordinatePointXYZ '終点アンテナ位相補正L2。
+            Private m_clsEndOffsetL5 As New CoordinatePointXYZ '終点アンテナ位相補正L5。
+            Private m_clsObsDataMask As New ObsDataMask '観測データマスク。
+            Private m_nLineType As OBJ_MODE '基線ベクトル種類。
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //'プロパティ
+        public long ObjectType;                //'オブジェクト種別。
+        public string Session;                 //'セッション名。
+        public DateTime StrTimeGPS;            //'観測開始日時(GPS)。
+        public DateTime EndTimeGPS;            //'観測終了日時(GPS)。
+        public long WorkKey;                   //'汎用作業キー。
+        public object WorkObject;              //'汎用作業オブジェクト。
+        public bool Exclusion;                 //'解析除外フラグ。True=除外。False=解析。
+        public ANALYSIS_STATUS Analysis;       //'解析状態。
+        public ORBIT_TYPE Orbit;               //'軌道暦。
+        public FREQUENCY_TYPE Frequency;       //'周波数。
+        public SOLVEMODE_TYPE SolveMode;       //'基線解析モード。
+        public DateTime AnalysisStrTimeGPS;    //'解析開始日時(GPS)。
+        public DateTime AnalysisEndTimeGPS;    //'解析終了日時(GPS)。
+        public double ElevationMask;           //'仰角マスク(度)。
+        public double Interval;                //'解析間隔(秒)。
+        public double Temperature;             //'気温(℃)。
+        public double Pressure;                //'気圧(hPa)。
+        public double Humidity;                //'湿度(％)。
+        private TROPOSHERE_TYPE Troposhere;     //'対流圏モデル。
+        public bool AnalysisFixed;             //'解析始点固定点フラグ。True=解析始点が固定点。False=解析始点は固定点で無い。
+        public long AmbPercentage;             //'FIX率(％)。
+        public double Bias;                    //'バイアス決定比(ｍ)。
+        public long EpochUsed;                 //'使用エポック数。
+        public long EpochRejected;             //'棄却エポック数。
+        public double RMS;                     //'RMS値(ｍ)。
+        public double RDOP;                    //'RDOP値。
+        public bool IsDispersion;              //'分散・共分散の有効/無効。True=有効。False=無効。
+        public long RcvNumbersGps;             //'受信GPS衛星番号。ビットフラグ。1=受信。0=非受信。ビット0がGPS1番、ビット1がGPS2番。。。。
+        public long RcvNumbersGlonass;         //'受信GLONASS衛星番号。ビットフラグ。1=受信。0=非受信。ビット0がR1番、ビット1がR2番。。。。
+        //'2017/06/06 NS6000対応。'''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        public long RcvNumbersQZSS;            //'受信QZSS衛星番号。ビットフラグ。1=受信。0=非受信。ビット0がJ1番、ビット1がRJ番。。。。
+        //'Public RcvNumbersGalileo As Long '受信Galileo衛星番号。ビットフラグ。1=受信。0=非受信。ビット0がE1番、ビット1がE2番。。。。    '2018/08/21 Hitz H.Nakamura 衛星数が増えたので64ビットに増やす。
+        public long RcvNumbersGalileo1;        //'受信Galileo衛星番号。ビットフラグ。1=受信。0=非受信。ビット0がE1番、ビット1がE2番。。。。
+        public long RcvNumbersGalileo2;        //'受信Galileo衛星番号。ビットフラグ。1=受信。0=非受信。ビット0がE33番、ビット1がE34番。。。。
+        public long RcvNumbersBeiDou1;         //'受信BeiDou1衛星番号。ビットフラグ。1=受信。0=非受信。ビット0がC1番、ビット1がC2番。。。。
+        public long RcvNumbersBeiDou2;         //'受信BeiDou2衛星番号。ビットフラグ。1=受信。0=非受信。ビット0がC33番、ビット1がC34番。。。。
+        //'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        public double MaxResidL1_Legacy;       //'最大残差L1。
+        public double MaxResidL2_Legacy;       //'最大残差L2。
+        public double MinRatio;                //'最小バイアス決定比。
+        public double MinPs;                   //'最小 probability of success。
+        public long ExcludeGPS;                //'不使用GPS。ビットフラグ。1=使用。0=無使用。ビット0がGPS1番、ビット1がGPS2番。。。。
+        public long ExcludeGlonass;            //'不使用GLONASS。ビットフラグ。1=使用。0=無使用。ビット0がR1番、ビット1がR2番。。。。
+        public bool GlonassFlag;               //'GLONASSフラグ。
+        //'2017/06/06 NS6000対応。'''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        public long ExcludeQZSS;               //'不使用QZSS。ビットフラグ。1=使用。0=無使用。ビット0がJ1番、ビット1がJ2番。。。。
+        //'Public ExcludeGalileo As Long '不使用Galileo。ビットフラグ。1=使用。0=無使用。ビット0がE1番、ビット1がE2番。。。。 '2018/08/21 Hitz H.Nakamura 衛星数が増えたので64ビットに増やす。
+        public long ExcludeGalileo1;           //'不使用Galileo。ビットフラグ。1=使用。0=無使用。ビット0がE1番、ビット1がE2番。。。。
+        public long ExcludeGalileo2;           //'不使用Galileo。ビットフラグ。1=使用。0=無使用。ビット0がE33番、ビット1がE34番。。。。
+        public long ExcludeBeiDou1;            //'不使用BeiDou。ビットフラグ。1=使用。0=無使用。ビット0がC1番、ビット1がC2番。。。。
+        public long ExcludeBeiDou2;            //'不使用BeiDOu。ビットフラグ。1=使用。0=無使用。ビット0がC33番、ビット1がC34番。。。。
+        public bool QZSSFlag;                  //'QZSSフラグ。
+        public bool GalileoFlag;               //'Galileoフラグ。
+        public bool BeiDouFlag;                //'BeiDouフラグ。
+        //'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        public bool IsList;                    //'リスト更新必要フラグ。
+#if false
+        /*
+         *************************** 修正要 sakai
+         */
+        public Variant StrPcvVer;              //'始点PCVバージョン。補正無しの場合は空文字。不明の場合は Null。
+        public Variant EndPcvVer;              //'終点PCVバージョン。補正無しの場合は空文字。不明の場合は Null。
+#endif
+        private long AnalysisOrder;             //'解析順番。より数値が小さい方を後に解析されたこととする。第３２ビットは符号ビットとして、第３１～２９は一時的な順位の重み付けに使う。第２８ビットは解析㊥、非解析の区別に使う。第２７～１ビットで順番をあらわす。つまり、最低順位は &H0FFFFFFF となる。
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        'インプリメンテーション
+        Private m_clsStrPoint As New ObservationPoint '始点(接合観測点)。
+        Private m_clsEndPoint As New ObservationPoint '終点(接合観測点)。
+        Private m_clsAnalysisStrPoint As ObservationPoint '解析始点(接合観測点)。
+        Private m_clsAnalysisEndPoint As ObservationPoint '解析終点(接合観測点)。
+        Private m_clsCoordinateAnalysis As CoordinatePoint '解析座標。
+        Private m_clsVectorAnalysis As New CoordinatePointXYZ '解析ベクトル。
+        Private m_clsDispersion As New Dispersion '分散・共分散。
+        Private m_clsStrDepPattern As New DepPattern '始点アンテナ位相補正パターン。
+        Private m_clsEndDepPattern As New DepPattern '終点アンテナ位相補正パターン。
+        Private m_clsObsInfo As New ObsInfo '観測情報。
+        Private m_clsAmbInfo As New AmbInfo 'アンビギュイティ情報。
+        Private m_clsStrOffsetL1 As New CoordinatePointXYZ '始点アンテナ位相補正L1。
+        Private m_clsStrOffsetL2 As New CoordinatePointXYZ '始点アンテナ位相補正L2。
+        Private m_clsStrOffsetL5 As New CoordinatePointXYZ '始点アンテナ位相補正L5。
+        Private m_clsEndOffsetL1 As New CoordinatePointXYZ '終点アンテナ位相補正L1。
+        Private m_clsEndOffsetL2 As New CoordinatePointXYZ '終点アンテナ位相補正L2。
+        Private m_clsEndOffsetL5 As New CoordinatePointXYZ '終点アンテナ位相補正L5。
+        Private m_clsObsDataMask As New ObsDataMask '観測データマスク。
+        Private m_nLineType As OBJ_MODE '基線ベクトル種類。
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //'インプリメンテーション
+        private ObservationPoint m_clsStrPoint = new ObservationPoint();            //'始点(接合観測点)。
+        private ObservationPoint m_clsEndPoint = new ObservationPoint();            //'終点(接合観測点)。
+        private ObservationPoint m_clsAnalysisStrPoint;                             //'解析始点(接合観測点)。
+        private ObservationPoint m_clsAnalysisEndPoint;                             //'解析終点(接合観測点)。
+        private CoordinatePoint m_clsCoordinateAnalysis;                            //'解析座標。
+        private CoordinatePointXYZ m_clsVectorAnalysis = new CoordinatePointXYZ();  //'解析ベクトル。
+        private Dispersion m_clsDispersion = new Dispersion();                      //'分散・共分散。
+        private DepPattern m_clsStrDepPattern = new DepPattern();                   //'始点アンテナ位相補正パターン。
+        private DepPattern m_clsEndDepPattern = new DepPattern();                   //'終点アンテナ位相補正パターン。
+        private ObsInfo m_clsObsInfo = new ObsInfo();                               //'観測情報。
+        private AmbInfo m_clsAmbInfo = new AmbInfo();                               //'アンビギュイティ情報。
+        private CoordinatePointXYZ m_clsStrOffsetL1 = new CoordinatePointXYZ();     //'始点アンテナ位相補正L1。
+        private CoordinatePointXYZ m_clsStrOffsetL2 = new CoordinatePointXYZ();     //'始点アンテナ位相補正L2。
+        private CoordinatePointXYZ m_clsStrOffsetL5 = new CoordinatePointXYZ();     //'始点アンテナ位相補正L5。
+        private CoordinatePointXYZ m_clsEndOffsetL1 = new CoordinatePointXYZ();     //'終点アンテナ位相補正L1。
+        private CoordinatePointXYZ m_clsEndOffsetL2 = new CoordinatePointXYZ();     //'終点アンテナ位相補正L2。
+        private CoordinatePointXYZ m_clsEndOffsetL5 = new CoordinatePointXYZ();     //'終点アンテナ位相補正L5。
+        private ObsDataMask m_clsObsDataMask = new ObsDataMask();                   //'観測データマスク。
+        private OBJ_MODE m_nLineType;                                               //'基線ベクトル種類。
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '*******************************************************************************
+        'プロパティ
+
+        'うるう秒。
+        Property Get LeapSeconds() As Long
+            LeapSeconds = m_clsStrPoint.LeapSeconds
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '観測開始日時(UTC)。
+        Property Get StrTimeUTC() As Date
+            StrTimeUTC = GetTimeFromGPS(StrTimeGPS, m_clsStrPoint.LeapSeconds, TIME_ZONE_UTC)
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '観測終了日時(UTC)。
+        Property Get EndTimeUTC() As Date
+            EndTimeUTC = GetTimeFromGPS(EndTimeGPS, m_clsStrPoint.LeapSeconds, TIME_ZONE_UTC)
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '観測開始日時(JST)。
+        Property Get StrTimeJST() As Date
+            StrTimeJST = GetTimeFromGPS(StrTimeGPS, m_clsStrPoint.LeapSeconds, TIME_ZONE_JST)
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '観測終了日時(JST)。
+        Property Get EndTimeJST() As Date
+            EndTimeJST = GetTimeFromGPS(EndTimeGPS, m_clsStrPoint.LeapSeconds, TIME_ZONE_JST)
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '解析開始日時(UTC)。
+        Property Get AnalysisStrTimeUTC() As Date
+            AnalysisStrTimeUTC = GetTimeFromGPS(AnalysisStrTimeGPS, m_clsStrPoint.LeapSeconds, TIME_ZONE_UTC)
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '解析終了日時(UTC)。
+        Property Get AnalysisEndTimeUTC() As Date
+            AnalysisEndTimeUTC = GetTimeFromGPS(AnalysisEndTimeGPS, m_clsStrPoint.LeapSeconds, TIME_ZONE_UTC)
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '解析開始日時(JST)。
+        Property Get AnalysisStrTimeJST() As Date
+            AnalysisStrTimeJST = GetTimeFromGPS(AnalysisStrTimeGPS, m_clsStrPoint.LeapSeconds, TIME_ZONE_JST)
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '解析終了日時(JST)。
+        Property Get AnalysisEndTimeJST() As Date
+            AnalysisEndTimeJST = GetTimeFromGPS(AnalysisEndTimeGPS, m_clsStrPoint.LeapSeconds, TIME_ZONE_JST)
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '出力開始日時(JST)。
+        Property Get OutputStrTimeJST() As Date
+            OutputStrTimeJST = GetTimeFromGPS(AnalysisStrTimeGPS, m_clsStrPoint.LeapSeconds, TIME_ZONE_JST)
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '出力終了日時(JST)。
+        Property Get OutputEndTimeJST() As Date
+            OutputEndTimeJST = GetTimeFromGPS(AnalysisEndTimeGPS, m_clsStrPoint.LeapSeconds, TIME_ZONE_JST)
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '始点(接合観測点)。
+        Property Get StrPoint() As ObservationPoint
+            Set StrPoint = m_clsStrPoint
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //'始点(接合観測点)。
+        public ObservationPoint StrPoint()
+        {
+            return m_clsStrPoint;
+        }
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '終点(接合観測点)。
+        Property Get EndPoint() As ObservationPoint
+            Set EndPoint = m_clsEndPoint
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //'終点(接合観測点)。
+        public ObservationPoint EndPoint()
+        {
+            return m_clsEndPoint;
+        }
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '解析始点(接合観測点)。
+        Property Get AnalysisStrPoint() As ObservationPoint
+            Set AnalysisStrPoint = m_clsAnalysisStrPoint
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '解析終点(接合観測点)。
+        Property Get AnalysisEndPoint() As ObservationPoint
+            Set AnalysisEndPoint = m_clsAnalysisEndPoint
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '出力始点(接合観測点)。
+        Property Get OutputStrPoint() As ObservationPoint
+            Set OutputStrPoint = m_clsAnalysisStrPoint
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '出力終点(接合観測点)。
+        Property Get OutputEndPoint() As ObservationPoint
+            Set OutputEndPoint = m_clsAnalysisEndPoint
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '反転フラグ。True=反転。False=反転無し。
+        Property Let Revers(ByVal bRevers As Boolean)
+            If bRevers Then
+                Set m_clsAnalysisStrPoint = m_clsEndPoint
+                Set m_clsAnalysisEndPoint = m_clsStrPoint
+            Else
+                Set m_clsAnalysisStrPoint = m_clsStrPoint
+                Set m_clsAnalysisEndPoint = m_clsEndPoint
+            End If
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
         public void Revers(bool bRevers)
         {
         }
-        //--------------------------------------------------------------
-        //[VB]  '反転フラグ。True=反転。False=反転無し。
-        //[VB]  Property Let Revers(ByVal bRevers As Boolean)
-        //[VB]      If bRevers Then
-        //[VB]          Set m_clsAnalysisStrPoint = m_clsEndPoint
-        //[VB]          Set m_clsAnalysisEndPoint = m_clsStrPoint
-        //[VB]      Else
-        //[VB]          Set m_clsAnalysisStrPoint = m_clsStrPoint
-        //[VB]          Set m_clsAnalysisEndPoint = m_clsEndPoint
-        //[VB]      End If
-        //[VB]  End Property
-        //***************************************************************************
-        //***************************************************************************
+
+
+        //==========================================================================================
+        /*[VB]
+        '反転フラグ。True=反転。False=反転無し。
+        Property Get Revers() As Boolean
+            Revers = Not m_clsStrPoint Is m_clsAnalysisStrPoint
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '解析座標。
+        Property Set CoordinateAnalysis(ByVal clsCoordinateAnalysis As CoordinatePoint)
+            Set m_clsCoordinateAnalysis = clsCoordinateAnalysis
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '解析座標。
+        Property Get CoordinateAnalysis() As CoordinatePoint
+            Set CoordinateAnalysis = m_clsCoordinateAnalysis
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '偏心補正後座標。
+        Property Get CoordinateCorrect() As CoordinatePoint
+            Dim clsCoordinateCorrect As CoordinatePoint
+            Dim clsStrPoint As ObservationPoint
+            If Analysis <= ANALYSIS_STATUS_FIX Then
+                Set clsCoordinateCorrect = CoordinateAnalysis
+                Set clsStrPoint = AnalysisStrPoint
+            Else
+                Set clsStrPoint = StrPoint
+                If clsStrPoint.Fixed Then
+                    Set clsCoordinateCorrect = clsStrPoint.CoordinateFixed
+                Else
+                    Set clsCoordinateCorrect = clsStrPoint.CoordinateObservation
+                End If
+            End If
+            If clsStrPoint.EnableEccentric Then
+                Dim clsCoordinatePoint As New CoordinatePointXYZ
+                clsCoordinatePoint.X = clsCoordinateCorrect.RoundX + clsStrPoint.VectorEccentric.RoundX
+                clsCoordinatePoint.Y = clsCoordinateCorrect.RoundY + clsStrPoint.VectorEccentric.RoundY
+                clsCoordinatePoint.Z = clsCoordinateCorrect.RoundZ + clsStrPoint.VectorEccentric.RoundZ
+                Set clsCoordinateCorrect = clsCoordinatePoint
+            End If
+            Set CoordinateCorrect = clsCoordinateCorrect
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '出力始点座標。
+        Property Get CoordinateOutputStr() As CoordinatePoint
+            Set CoordinateOutputStr = CoordinateCorrect
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '出力終点座標。
+        Property Get CoordinateOutputEnd() As CoordinatePoint
+            Dim clsCoordinatePoint As New CoordinatePointXYZ
+            Let clsCoordinatePoint = CoordinateCorrect
+            Dim clsVector As CoordinatePoint
+            Set clsVector = VectorCorrect
+            clsCoordinatePoint.X = clsCoordinatePoint.RoundX + clsVector.RoundX
+            clsCoordinatePoint.Y = clsCoordinatePoint.RoundY + clsVector.RoundY
+            clsCoordinatePoint.Z = clsCoordinatePoint.RoundZ + clsVector.RoundZ
+            Set CoordinateOutputEnd = clsCoordinatePoint
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '偏心補正前始点座標。
+        Property Get CoordinateUncorrectStr() As CoordinatePoint
+            Dim clsCoordinatePoint As CoordinatePoint
+            If Analysis <= ANALYSIS_STATUS_FIX Then
+                Set clsCoordinatePoint = CoordinateAnalysis
+            Else
+                If StrPoint.Fixed Then
+                    Set clsCoordinatePoint = StrPoint.CoordinateFixed
+                Else
+                    Set clsCoordinatePoint = StrPoint.CoordinateObservation
+                End If
+            End If
+            Set CoordinateUncorrectStr = clsCoordinatePoint
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '偏心補正前終点座標。
+        Property Get CoordinateUncorrectEnd() As CoordinatePoint
+            Dim clsCoordinatePoint As New CoordinatePointXYZ
+            Let clsCoordinatePoint = CoordinateUncorrectStr
+            Dim clsVector As CoordinatePoint
+            If Analysis <= ANALYSIS_STATUS_FIX Then
+                Set clsVector = VectorAnalysis
+            Else
+                Set clsVector = VectorObservation
+            End If
+            clsCoordinatePoint.X = clsCoordinatePoint.RoundX + clsVector.RoundX
+            clsCoordinatePoint.Y = clsCoordinatePoint.RoundY + clsVector.RoundY
+            clsCoordinatePoint.Z = clsCoordinatePoint.RoundZ + clsVector.RoundZ
+            Set CoordinateUncorrectEnd = clsCoordinatePoint
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '観測ベクトル。
+        Property Get VectorObservation() As CoordinatePoint
+            Dim clsVector As New CoordinatePointXYZ
+            clsVector.X = m_clsEndPoint.CoordinateObservation.X - m_clsStrPoint.CoordinateObservation.X
+            clsVector.Y = m_clsEndPoint.CoordinateObservation.Y - m_clsStrPoint.CoordinateObservation.Y
+            clsVector.Z = m_clsEndPoint.CoordinateObservation.Z - m_clsStrPoint.CoordinateObservation.Z
+            Set VectorObservation = clsVector
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '解析ベクトル。
+        Public Sub SetVectorAnalysis(ByRef VectorXYZ() As Double)
+            m_clsVectorAnalysis.X = VectorXYZ(0)
+            m_clsVectorAnalysis.Y = VectorXYZ(1)
+            m_clsVectorAnalysis.Z = VectorXYZ(2)
+        End Sub
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '解析ベクトル。
+        Property Get VectorAnalysis() As CoordinatePoint
+            Set VectorAnalysis = m_clsVectorAnalysis
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '解析ベクトル(NEU)。配列の要素は(2, 0)。
+        Property Get VectorAnalysisNEU() As Double()
+            Dim dXYZ(2, 0) As Double
+            dXYZ(0, 0) = m_clsVectorAnalysis.RoundX
+            dXYZ(1, 0) = m_clsVectorAnalysis.RoundY
+            dXYZ(2, 0) = m_clsVectorAnalysis.RoundZ
+            VectorAnalysisNEU = RotateΔXYZ(m_clsCoordinateAnalysis, dXYZ)
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '偏心補正後ベクトル。
+        Property Get VectorCorrect() As CoordinatePoint
+            Dim clsVector As New CoordinatePointXYZ
+            Dim clsStrPoint As ObservationPoint
+            Dim clsEndPoint As ObservationPoint
+            If Analysis <= ANALYSIS_STATUS_FIX Then
+                Let clsVector = VectorAnalysis
+                Set clsStrPoint = AnalysisStrPoint
+                Set clsEndPoint = AnalysisEndPoint
+            Else
+                Let clsVector = VectorObservation
+                Set clsStrPoint = StrPoint
+                Set clsEndPoint = EndPoint
+            End If
+            If clsStrPoint.EnableEccentric Then
+                clsVector.X = clsVector.RoundX - clsStrPoint.VectorEccentric.RoundX
+                clsVector.Y = clsVector.RoundY - clsStrPoint.VectorEccentric.RoundY
+                clsVector.Z = clsVector.RoundZ - clsStrPoint.VectorEccentric.RoundZ
+            End If
+            If clsEndPoint.EnableEccentric Then
+                clsVector.X = clsVector.RoundX + clsEndPoint.VectorEccentric.RoundX
+                clsVector.Y = clsVector.RoundY + clsEndPoint.VectorEccentric.RoundY
+                clsVector.Z = clsVector.RoundZ + clsEndPoint.VectorEccentric.RoundZ
+            End If
+            Set VectorCorrect = clsVector
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '出力ベクトル。
+        Property Get VectorOutput() As CoordinatePoint
+            Set VectorOutput = VectorCorrect
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '偏心補正前ベクトル。
+        Property Get VectorUncorrect() As CoordinatePoint
+            Dim clsVector As CoordinatePoint
+            If Analysis <= ANALYSIS_STATUS_FIX Then
+                Set clsVector = VectorAnalysis
+            Else
+                Set clsVector = VectorObservation
+            End If
+            Set VectorUncorrect = clsVector
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '閉合ベクトル。
+        Property Get VectorAngleDiff() As CoordinatePoint
+            Set VectorAngleDiff = VectorAnalysis
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '分散・共分散。
+        Property Let Dispersion(ByVal clsDispersion As Dispersion)
+            Let m_clsDispersion = clsDispersion
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '分散・共分散。
+        Property Get Dispersion() As Dispersion
+            Set Dispersion = m_clsDispersion
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '有効フラグ。
+        Property Let Enable(ByVal bEnable As Boolean)
+            m_clsStrPoint.Enable = bEnable
+            m_clsEndPoint.Enable = bEnable
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //'有効フラグ。
+        public void Enable(bool bEnable)
+        {
+            m_clsStrPoint.Enable(bEnable);
+            m_clsEndPoint.Enable(bEnable);
+        }
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '有効フラグ。
+        Property Get Enable() As Boolean
+            Enable = m_clsStrPoint.Enable And m_clsEndPoint.Enable And Valid
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //'有効フラグ。
+        public bool Enable()
+        {
+            return m_clsStrPoint.Enable() & m_clsEndPoint.Enable() & Valid();
+        }
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '無効化した場合、観測点が無効になるか？
+        Property Get IfDisable() As Boolean
+            IfDisable = m_clsStrPoint.IfDisable Or m_clsEndPoint.IfDisable
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '有効フラグ。
+        Property Get Valid() As Boolean
+            Valid = True
+        '    '始点と終点が同一のものは無効。
+        '    Valid = Not m_clsStrPoint.TopParentPoint Is m_clsEndPoint.TopParentPoint
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //'有効フラグ。
+        public bool Valid()
+        {
+            return true;
+        }
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '基線ベクトルキー。
+        Property Get Key() As String
+            Key = GetBaseLineVectorKey(StrPoint.Number, EndPoint.Number, Session)
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '閉合候補フラグ。
+        Property Get Candidate() As Boolean
+            Candidate = False
+            '無効な基線ベクトルは無効。
+            If Not Enable Then Exit Function
+            '未解析の基線ベクトルは無効。
+            If Analysis = ANALYSIS_STATUS_NOT Then Exit Function
+            If Analysis = ANALYSIS_STATUS_FAILED Then Exit Function
+            Candidate = True
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '始点アンテナ位相補正パターン。
+        Property Get StrDepPattern() As DepPattern
+            Set StrDepPattern = m_clsStrDepPattern
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '終点アンテナ位相補正パターン。
+        Property Get EndDepPattern() As DepPattern
+            Set EndDepPattern = m_clsEndDepPattern
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '総エポック数。
+        Property Get EpochAll() As Long
+            EpochAll = EpochUsed + EpochRejected
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '総評価衛星数。
+        Property Get ObsAll() As Long
+            Dim nObsAll As Long
+            nObsAll = 0
+            Dim i As Long
+            For i = 0 To m_clsObsInfo.Count - 1
+                nObsAll = nObsAll + m_clsObsInfo.All(i)
+            Next
+            ObsAll = nObsAll
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '総使用衛星数。
+        Property Get ObsUsed() As Long
+            Dim nObsUsed As Long
+            nObsUsed = 0
+            Dim i As Long
+            For i = 0 To m_clsObsInfo.Count - 1
+                nObsUsed = nObsUsed + m_clsObsInfo.Used(i)
+            Next
+            ObsUsed = nObsUsed
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '総棄却衛星数。
+        Property Get ObsRejected() As Long
+            Dim nObsObsRejected As Long
+            nObsObsRejected = 0
+            Dim i As Long
+            For i = 0 To m_clsObsInfo.Count - 1
+                nObsObsRejected = nObsObsRejected + m_clsObsInfo.All(i) - m_clsObsInfo.Used(i)
+            Next
+            ObsRejected = nObsObsRejected
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '観測情報。
+        Property Get ObsInfo() As ObsInfo
+            Set ObsInfo = m_clsObsInfo
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        'アンビギュイティ情報。
+        Property Get AmbInfo() As AmbInfo
+            Set AmbInfo = m_clsAmbInfo
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '始点アンテナ位相補正L1。
+        Property Let StrOffsetL1(ByVal clsStrOffsetL1 As CoordinatePoint)
+            Let m_clsStrOffsetL1 = clsStrOffsetL1
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '始点アンテナ位相補正L1。
+        Property Get StrOffsetL1() As CoordinatePoint
+            Set StrOffsetL1 = m_clsStrOffsetL1
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '始点アンテナ位相補正L2。
+        Property Let StrOffsetL2(ByVal clsStrOffsetL2 As CoordinatePoint)
+            Let m_clsStrOffsetL2 = clsStrOffsetL2
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '始点アンテナ位相補正L2。
+        Property Get StrOffsetL2() As CoordinatePoint
+            Set StrOffsetL2 = m_clsStrOffsetL2
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '始点アンテナ位相補正L5。
+        Property Let StrOffsetL5(ByVal clsStrOffsetL5 As CoordinatePoint)
+            Let m_clsStrOffsetL5 = clsStrOffsetL5
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '始点アンテナ位相補正L5。
+        Property Get StrOffsetL5() As CoordinatePoint
+            Set StrOffsetL5 = m_clsStrOffsetL5
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '終点アンテナ位相補正L1。
+        Property Let EndOffsetL1(ByVal clsEndOffsetL1 As CoordinatePoint)
+            Let m_clsEndOffsetL1 = clsEndOffsetL1
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '終点アンテナ位相補正L1。
+        Property Get EndOffsetL1() As CoordinatePoint
+            Set EndOffsetL1 = m_clsEndOffsetL1
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '終点アンテナ位相補正L2。
+        Property Let EndOffsetL2(ByVal clsEndOffsetL2 As CoordinatePoint)
+            Let m_clsEndOffsetL2 = clsEndOffsetL2
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '終点アンテナ位相補正L2。
+        Property Get EndOffsetL2() As CoordinatePoint
+            Set EndOffsetL2 = m_clsEndOffsetL2
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '終点アンテナ位相補正L5。
+        Property Let EndOffsetL5(ByVal clsEndOffsetL5 As CoordinatePoint)
+            Let m_clsEndOffsetL5 = clsEndOffsetL5
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '終点アンテナ位相補正L5。
+        Property Get EndOffsetL5() As CoordinatePoint
+            Set EndOffsetL5 = m_clsEndOffsetL5
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '採用基線ベクトル。
+        Property Get AdoptVector() As BaseLineVector
+            Dim clsBaseLineVector As BaseLineVector
+            Dim sKey As String
+            sKey = GetDuplicationKey(Me)
+            Dim clsObservationPoint As ObservationPoint
+            Set clsObservationPoint = StrPoint.HeadPoint
+            Do While Not clsObservationPoint Is Nothing
+                Set clsBaseLineVector = GetAdoptVector(clsObservationPoint, sKey)
+                If Not clsBaseLineVector Is Nothing Then Exit Do
+                Set clsObservationPoint = clsObservationPoint.NextPoint
+            Loop
+            Set AdoptVector = clsBaseLineVector
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '2023/06/26 Hitz H.Nakamura **************************************************
+        'GNSS水準測量対応。
+        '前半後半較差の追加。
+        '前半基線ベクトル。
+        Property Get HalfFstVector() As BaseLineVector
+            Dim clsBaseLineVector As BaseLineVector
+            Dim sKey As String
+            sKey = GetDuplicationKey(Me)
+            Dim clsObservationPoint As ObservationPoint
+            Set clsObservationPoint = StrPoint.HeadPoint
+            Do While Not clsObservationPoint Is Nothing
+                Set clsBaseLineVector = GetHalfFstVector(clsObservationPoint, sKey)
+                If Not clsBaseLineVector Is Nothing Then Exit Do
+                Set clsObservationPoint = clsObservationPoint.NextPoint
+            Loop
+            Set HalfFstVector = clsBaseLineVector
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '後半基線ベクトル。
+        Property Get HalfLstVector() As BaseLineVector
+            Dim clsBaseLineVector As BaseLineVector
+            Dim sKey As String
+            sKey = GetDuplicationKey(Me)
+            Dim clsObservationPoint As ObservationPoint
+            Set clsObservationPoint = StrPoint.HeadPoint
+            Do While Not clsObservationPoint Is Nothing
+                Set clsBaseLineVector = GetHalfLstVector(clsObservationPoint, sKey)
+                If Not clsBaseLineVector Is Nothing Then Exit Do
+                Set clsObservationPoint = clsObservationPoint.NextPoint
+            Loop
+            Set HalfLstVector = clsBaseLineVector
+        End Property
+        '*****************************************************************************
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        'リスト表示フラグ。
+        Property Get VisibleList() As Boolean
+            VisibleList = True
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        'プロット表示フラグ。
+        Property Get VisiblePlot() As Boolean
+            VisiblePlot = True
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '観測データマスク。
+        Property Let ObsDataMask(ByVal clsObsDataMask As ObsDataMask)
+            Let m_clsObsDataMask = clsObsDataMask
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '観測データマスク。
+        Property Get ObsDataMask() As ObsDataMask
+            Set ObsDataMask = m_clsObsDataMask
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '基線ベクトル種類。
+        Property Get LineType() As OBJ_MODE
+            LineType = m_nLineType
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '採用フラグ。True=採用。False=採用以外。
+        Property Get Adopt() As Boolean
+            Adopt = (m_nLineType = OBJ_MODE_ADOPT)
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '点検フラグ。True=点検。False=点検以外。
+        Property Get Check() As Boolean
+            Check = (m_nLineType = OBJ_MODE_CHECK)
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '重複フラグ。True=重複。False=重複以外。
+        Property Get Duplicate() As Boolean
+            Duplicate = (m_nLineType = OBJ_MODE_DUPLICATE)
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '2023/06/26 Hitz H.Nakamura **************************************************
+        'GNSS水準測量対応。
+        '前半後半較差の追加。
+        '前半フラグ。True=前半。False=前半以外。
+        Property Get HalfFst() As Boolean
+            HalfFst = (m_nLineType = OBJ_MODE_HALF_FST)
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '後半フラグ。True=後半。False=後半以外。
+        Property Get HalfLst() As Boolean
+            HalfLst = (m_nLineType = OBJ_MODE_HALF_LST)
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '前後半フラグ。True=前後半。False=前後半以外。
+        Property Get Half() As Boolean
+            Half = (m_nLineType = OBJ_MODE_HALF_FST) Or(m_nLineType = OBJ_MODE_HALF_LST)
+        End Property
+        '*****************************************************************************
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '偏心補正有効フラグ。
+        Property Get EnableCorrect() As Boolean
+            EnableCorrect = StrPoint.EnableEccentric Or EndPoint.EnableEccentric
+        End Property
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '*******************************************************************************
+        'イベント
+
+        '初期化。
+        Private Sub Class_Initialize()
+
+            On Error GoTo ErrorHandler
+
+
+            ObjectType = OBJ_TYPE_BASELINEVECTOR
+            Set m_clsStrPoint.Owner = Me
+            Set m_clsEndPoint.Owner = Me
+            Set m_clsCoordinateAnalysis = New CoordinatePointXYZ
+            StrTimeGPS = MIN_TIME - 1
+            EndTimeGPS = MIN_TIME - 1
+            Analysis = ANALYSIS_STATUS_NOT
+            IsDispersion = False
+            Set m_clsAnalysisStrPoint = m_clsStrPoint
+            Set m_clsAnalysisEndPoint = m_clsEndPoint
+            m_nLineType = OBJ_MODE_ADOPT
+
+            Exit Sub
+
+        ErrorHandler:
+            Call mdlMain.ErrorExit
+
+
+        End Sub
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '*******************************************************************************
+        'メソッド
+
+        '終了。
+        Public Sub Terminate()
+            Set m_clsStrPoint.Owner = Nothing
+            Set m_clsEndPoint.Owner = Nothing
+            Set m_clsStrPoint = Nothing
+            Set m_clsEndPoint = Nothing
+            Set m_clsAnalysisStrPoint = Nothing
+            Set m_clsAnalysisEndPoint = Nothing
+            Set m_clsCoordinateAnalysis = Nothing
+            Set m_clsVectorAnalysis = Nothing
+            Set m_clsDispersion = Nothing
+            Set m_clsObsDataMask = Nothing
+        End Sub
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '汎用作業キーを初期化する。
+        '
+        'nWorkKey で指定される値で WorkKey を初期化する。
+        '
+        '引き数：
+        'nWorkKey 初期化する値。
+        Public Sub ClearWorkKey(ByVal nWorkKey As Long)
+            Call m_clsStrPoint.ClearWorkKey(nWorkKey)
+            Call m_clsEndPoint.ClearWorkKey(nWorkKey)
+        End Sub
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        'リスト更新必要フラグを初期化する。
+        '
+        'IsList をOFFにする。
+        Public Sub ClearIsList()
+            m_clsStrPoint.IsList = False
+            m_clsEndPoint.IsList = False
+        End Sub
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+
+        //==========================================================================================
+        /*[VB]
+        '保存。
+        '
+        '引き数：
+        'nFile ファイル番号。
+        'nJointKey 結合キー。
+        Public Sub Save(ByVal nFile As Integer, ByRef nJointKey As Long)
+            Call PutString(nFile, Session)
+            Put #nFile, , StrTimeGPS
+            Put #nFile, , EndTimeGPS
+            Put #nFile, , Exclusion
+            Put #nFile, , Analysis
+            Put #nFile, , Orbit
+            Put #nFile, , Frequency
+            Put #nFile, , SolveMode
+            Put #nFile, , AnalysisStrTimeGPS
+            Put #nFile, , AnalysisEndTimeGPS
+            Put #nFile, , ElevationMask
+            Put #nFile, , Interval
+            Put #nFile, , Temperature
+            Put #nFile, , Pressure
+            Put #nFile, , Humidity
+            Put #nFile, , Troposhere
+            Put #nFile, , AnalysisFixed
+            Put #nFile, , AmbPercentage
+            Put #nFile, , Bias
+            Put #nFile, , EpochUsed
+            Put #nFile, , EpochRejected
+            Put #nFile, , RMS
+            Put #nFile, , RDOP
+            Put #nFile, , IsDispersion
+            Put #nFile, , RcvNumbersGps
+            Put #nFile, , RcvNumbersGlonass
+            '2017/06/06 NS6000対応。'''''''''''''''''''''''''''''''''''''''''''''''''''''''
+            Put #nFile, , RcvNumbersQZSS
+        '   Put #nFile, , RcvNumbersGalileo '2018/08/21 Hitz H.Nakamura 衛星数が増えたので64ビットに増やす。
+            Put #nFile, , RcvNumbersGalileo1
+            Put #nFile, , RcvNumbersGalileo2
+            Put #nFile, , RcvNumbersBeiDou1
+            Put #nFile, , RcvNumbersBeiDou2
+            '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+            Put #nFile, , MaxResidL1_Legacy
+            Put #nFile, , MaxResidL2_Legacy
+            Put #nFile, , MinRatio
+            Put #nFile, , MinPs
+            Put #nFile, , ExcludeGPS
+            Put #nFile, , ExcludeGlonass
+            Put #nFile, , GlonassFlag
+            '2017/06/06 NS6000対応。'''''''''''''''''''''''''''''''''''''''''''''''''''''''
+            Put #nFile, , ExcludeQZSS
+        '   Put #nFile, , ExcludeGalileo    '2018/08/21 Hitz H.Nakamura 衛星数が増えたので64ビットに増やす。
+            Put #nFile, , ExcludeGalileo1
+            Put #nFile, , ExcludeGalileo2
+            Put #nFile, , ExcludeBeiDou1
+            Put #nFile, , ExcludeBeiDou2
+            Put #nFile, , QZSSFlag
+            Put #nFile, , GalileoFlag
+            Put #nFile, , BeiDouFlag
+            '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+            Put #nFile, , m_nLineType
+            Put #nFile, , StrPcvVer
+            Put #nFile, , EndPcvVer
+            Put #nFile, , AnalysisOrder
+            Call m_clsStrPoint.Save(nFile, nJointKey)
+            Call m_clsEndPoint.Save(nFile, nJointKey)
+            Put #nFile, , Revers
+            Put #nFile, , m_clsCoordinateAnalysis.CoordinateType
+            Call m_clsCoordinateAnalysis.Save(nFile)
+            Call m_clsVectorAnalysis.Save(nFile)
+            Call m_clsDispersion.Save(nFile)
+            Call m_clsStrDepPattern.Save(nFile)
+            Call m_clsEndDepPattern.Save(nFile)
+            Call m_clsObsInfo.Save(nFile)
+            Call m_clsAmbInfo.Save(nFile)
+            Call m_clsStrOffsetL1.Save(nFile)
+            Call m_clsStrOffsetL2.Save(nFile)
+            Call m_clsEndOffsetL1.Save(nFile)
+            Call m_clsEndOffsetL2.Save(nFile)
+            Call m_clsStrOffsetL5.Save(nFile)
+            Call m_clsEndOffsetL5.Save(nFile)
+            Call m_clsObsDataMask.Save(nFile)
+        End Sub
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+
+
+        //==========================================================================================
+        /*[VB]
+        '始点を設定する。
+        '
+        '引き数：
+        'clsStrPoint 始点(接合観測点)。
+        '
+        '戻り値：いままで始点であった ObservationPoint オブジェクト(接合観測点)。
+        Public Function SetStrPoint(ByVal clsStrPoint As ObservationPoint) As ObservationPoint
+            If Revers Then
+                Set m_clsAnalysisEndPoint = clsStrPoint
+            Else
+                Set m_clsAnalysisStrPoint = clsStrPoint
+            End If
+            Set SetStrPoint = m_clsStrPoint
+            Set m_clsStrPoint = clsStrPoint
+            Set m_clsStrPoint.Owner = Me
+        End Function
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '終点を設定する。
+        '
+        '引き数：
+        'clsStrPoint 終点(接合観測点)。
+        '
+        '戻り値：いままで終点であった ObservationPoint オブジェクト(接合観測点)。
+        Public Function SetEndPoint(ByVal clsEndPoint As ObservationPoint) As ObservationPoint
+            If Revers Then
+                Set m_clsAnalysisStrPoint = clsEndPoint
+            Else
+                Set m_clsAnalysisEndPoint = clsEndPoint
+            End If
+            Set SetEndPoint = m_clsEndPoint
+            Set m_clsEndPoint = clsEndPoint
+            Set m_clsEndPoint.Owner = Me
+        End Function
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+
+
+
+
+
+        //==========================================================================================
+        /*[VB]
+        '基線ベクトル種類を設定する。
+        '
+        '引き数：
+        'nLineType 基線ベクトル種類。
+        Public Sub SetLineType(ByVal nLineType As OBJ_MODE)
+            m_nLineType = nLineType
+        End Sub
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '2022/02/07 SattSignal の追加。''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        '使用した周波数を取得する(GPS)。
+        '
+        '戻り値：
+        '使用した周波数。
+        Public Function GetFrequencyUsedGps() As Long
+            Dim nSattSignal As Long
+            Select Case Frequency
+            Case FREQUENCY_L1 'L1
+                nSattSignal = &H1
+            Case FREQUENCY_L2 'L2｡
+                nSattSignal = &H2
+            Case FREQUENCY_L1L2 'L1とL2の両方｡
+                nSattSignal = &H1 + &H2
+            Case FREQUENCY_L5 'L1とL2を組み合わせたワイドレーン (Lw)。
+                nSattSignal = &H1 + &H2
+            Case FREQUENCY_L3 'L1とL2を組み合わせた電離層補正 (lc)。
+                nSattSignal = &H1 + &H2
+            Case FREQUENCY_L5L3 'ワイドレーンと電離層補正の両方｡
+                nSattSignal = &H1 + &H2
+            Case FREQUENCY_1F '1周波。
+                nSattSignal = &H1
+            Case FREQUENCY_2F '2周波(L1+L2)。
+                nSattSignal = &H1 + &H2
+            Case FREQUENCY_L1L5 '2周波(L1+L5)。
+                nSattSignal = &H1 + &H4
+            Case FREQUENCY_3F '3周波。
+                nSattSignal = &H1 + &H2 + &H4
+            Case FREQUENCY_IFMW 'iono-free & Melbourne-Wuebbena
+                nSattSignal = &H1 + &H2
+            Case Default
+                nSattSignal = 0
+            End Select
+            GetFrequencyUsedGps = nSattSignal And m_clsStrPoint.SattSignalGPS And m_clsEndPoint.SattSignalGPS
+        End Function
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '使用した周波数を取得する(GLONASS)。
+        '
+        '戻り値：
+        '使用した周波数。
+        Public Function GetFrequencyUsedGlonass() As Long
+            Dim nSattSignal As Long
+            Select Case Frequency
+            Case FREQUENCY_L1 'L1
+                nSattSignal = &H1
+            Case FREQUENCY_L2 'L2｡
+                nSattSignal = &H2
+            Case FREQUENCY_L1L2 'L1とL2の両方｡
+                nSattSignal = &H1 + &H2
+            Case FREQUENCY_L5 'L1とL2を組み合わせたワイドレーン (Lw)。
+                nSattSignal = &H1 + &H2
+            Case FREQUENCY_L3 'L1とL2を組み合わせた電離層補正 (lc)。
+                nSattSignal = &H1 + &H2
+            Case FREQUENCY_L5L3 'ワイドレーンと電離層補正の両方｡
+                nSattSignal = &H1 + &H2
+            Case FREQUENCY_1F '1周波。
+                nSattSignal = &H1
+            Case FREQUENCY_2F '2周波(L1+L2)。
+                nSattSignal = &H1 + &H2
+            Case FREQUENCY_L1L5 '2周波(L1+L5)。
+                nSattSignal = &H1 + &H4
+            Case FREQUENCY_3F '3周波。
+                nSattSignal = &H1 + &H2 + &H4
+            Case FREQUENCY_IFMW 'iono-free & Melbourne-Wuebbena
+                nSattSignal = &H1 + &H2
+            Case Default
+                nSattSignal = 0
+            End Select
+            GetFrequencyUsedGlonass = nSattSignal And m_clsStrPoint.SattSignalGLONASS And m_clsEndPoint.SattSignalGLONASS
+        End Function
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '使用した周波数を取得する(QZSS)。
+        '
+        '戻り値：
+        '使用した周波数。
+        Public Function GetFrequencyUsedQzss() As Long
+            Dim nSattSignal As Long
+            Select Case Frequency
+            Case FREQUENCY_L1 'L1
+                nSattSignal = &H1
+            Case FREQUENCY_L2 'L2｡
+                nSattSignal = &H2
+            Case FREQUENCY_L1L2 'L1とL2の両方｡
+                nSattSignal = &H1 + &H2
+            Case FREQUENCY_L5 'L1とL2を組み合わせたワイドレーン (Lw)。
+                nSattSignal = &H1 + &H2
+            Case FREQUENCY_L3 'L1とL2を組み合わせた電離層補正 (lc)。
+                nSattSignal = &H1 + &H2
+            Case FREQUENCY_L5L3 'ワイドレーンと電離層補正の両方｡
+                nSattSignal = &H1 + &H2
+            Case FREQUENCY_1F '1周波。
+                nSattSignal = &H1
+            Case FREQUENCY_2F '2周波(L1+L2)。
+                nSattSignal = &H1 + &H2
+            Case FREQUENCY_L1L5 '2周波(L1+L5)。
+                nSattSignal = &H1 + &H4
+            Case FREQUENCY_3F '3周波。
+                nSattSignal = &H1 + &H2 + &H4
+            Case FREQUENCY_IFMW 'iono-free & Melbourne-Wuebbena
+                nSattSignal = &H1 + &H2
+            Case Default
+                nSattSignal = 0
+            End Select
+            GetFrequencyUsedQzss = nSattSignal And m_clsStrPoint.SattSignalQZSS And m_clsEndPoint.SattSignalQZSS
+        End Function
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '使用した周波数を取得する(Galileo)。
+        '
+        '戻り値：
+        '使用した周波数。
+        Public Function GetFrequencyUsedGalileo() As Long
+            Dim nSattSignal As Long
+            Select Case Frequency
+            Case FREQUENCY_L1 'L1
+                nSattSignal = &H1
+            Case FREQUENCY_L2 'L2｡
+                nSattSignal = 0
+            Case FREQUENCY_L1L2 'L1とL2の両方｡
+                nSattSignal = &H1
+            Case FREQUENCY_L5 'L1とL2を組み合わせたワイドレーン (Lw)。
+                nSattSignal = &H1
+            Case FREQUENCY_L3 'L1とL2を組み合わせた電離層補正 (lc)。
+                nSattSignal = &H1
+            Case FREQUENCY_L5L3 'ワイドレーンと電離層補正の両方｡
+                nSattSignal = &H1
+            Case FREQUENCY_1F '1周波。
+                nSattSignal = &H1
+            Case FREQUENCY_2F '2周波(L1+L2)。
+                nSattSignal = &H1
+            Case FREQUENCY_L1L5 '2周波(L1+L5)。
+                nSattSignal = &H1 + &H2
+            Case FREQUENCY_3F '3周波。
+                nSattSignal = &H1 + &H2
+            Case FREQUENCY_IFMW 'iono-free & Melbourne-Wuebbena
+                nSattSignal = &H1
+            Case Default
+                nSattSignal = 0
+            End Select
+            GetFrequencyUsedGalileo = nSattSignal And m_clsStrPoint.SattSignalGalileo And m_clsEndPoint.SattSignalGalileo
+        End Function
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '使用した周波数を取得する(BeiDou)。
+        '
+        '戻り値：
+        '使用した周波数。
+        Public Function GetFrequencyUsedBeiDou() As Long
+            Dim nSattSignal As Long
+            Select Case Frequency
+            Case FREQUENCY_L1 'L1
+                nSattSignal = &H1
+            Case FREQUENCY_L2 'L2｡
+                nSattSignal = &H2
+            Case FREQUENCY_L1L2 'L1とL2の両方｡
+                nSattSignal = &H1 + &H2
+            Case FREQUENCY_L5 'L1とL2を組み合わせたワイドレーン (Lw)。
+                nSattSignal = &H1 + &H2
+            Case FREQUENCY_L3 'L1とL2を組み合わせた電離層補正 (lc)。
+                nSattSignal = &H1 + &H2
+            Case FREQUENCY_L5L3 'ワイドレーンと電離層補正の両方｡
+                nSattSignal = &H1 + &H2
+            Case FREQUENCY_1F '1周波。
+                nSattSignal = &H1
+            Case FREQUENCY_2F '2周波(L1+L2)。
+                nSattSignal = &H1 + &H2
+            Case FREQUENCY_L1L5 '2周波(L1+L5)。
+                nSattSignal = &H1 + &H4
+            Case FREQUENCY_3F '3周波。
+                nSattSignal = &H1 + &H2 + &H4
+            Case FREQUENCY_IFMW 'iono-free & Melbourne-Wuebbena
+                nSattSignal = &H1 + &H2
+            Case Default
+                nSattSignal = 0
+            End Select
+            GetFrequencyUsedBeiDou = nSattSignal And m_clsStrPoint.SattSignalBeiDou And m_clsEndPoint.SattSignalBeiDou
+        End Function
+        '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '2023/05/19 Hitz H.Nakamura **************************************************
+        '楕円体高の閉合差を追加。
+        '楕円体比高の有無。
+        Public Function HasHeightDiff() As Boolean
+            HasHeightDiff = True
+        End Function
+
+        '楕円体比高。
+        Public Function GetHeightDiff() As Double
+
+            Dim clsCoordinateAnalysis As CoordinatePoint
+            Dim clsVectorAnalysis As CoordinatePoint
+            Dim clsCoordinateEnd As CoordinatePoint
+            Dim nLat As Double
+            Dim nLon As Double
+            Dim nStrHeight As Double
+            Dim nEndHeight As Double
+            Dim vAlt As Variant
+
+
+            Set clsCoordinateAnalysis = CoordinateAnalysis
+            Set clsVectorAnalysis = VectorAnalysis
+            Set clsCoordinateEnd = AddCoordinateRound(clsCoordinateAnalysis, clsVectorAnalysis)
+
+
+            Call clsCoordinateAnalysis.GetDEG(nLat, nLon, nStrHeight, vAlt, "")
+            Call clsCoordinateEnd.GetDEG(nLat, nLon, nEndHeight, vAlt, "")
+
+
+            GetHeightDiff = JpnRound(nEndHeight, ACCOUNT_DECIMAL_HEIGHT) - JpnRound(nStrHeight, ACCOUNT_DECIMAL_HEIGHT)
+
+
+        End Function
+        '*****************************************************************************
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '*******************************************************************************
+        'インプリメンテーション
+
+        '採用基線ベクトルを取得する。
+        '
+        '自分と重複する基線ベクトルオブジェクトの中で解析済で有効な採用基線ベクトルを取得する。
+        '
+        '引き数：
+        'clsObservationPoint 観測点。
+        'sKey 重複キー。
+        '
+        '戻り値：採用基線ベクトルを返す。
+        Private Function GetAdoptVector(ByVal clsObservationPoint As ObservationPoint, ByVal sKey As String) As BaseLineVector
+            Dim clsBaseLineVector As BaseLineVector
+            Dim clsChildPoint As ObservationPoint
+            Set clsChildPoint = clsObservationPoint.ChildPoint
+            If clsChildPoint Is Nothing Then
+                '接合観測点の場合、基線ベクトルを評価する。
+                If(clsObservationPoint.ObjectType And OBS_TYPE_CONNECT) <> 0 Then
+                    Set clsBaseLineVector = clsObservationPoint.Owner
+                    If clsBaseLineVector.Adopt And clsBaseLineVector.Enable And clsBaseLineVector.Analysis<ANALYSIS_STATUS_FAILED Then
+                        If sKey = GetDuplicationKey(clsBaseLineVector) Then
+                            Set GetAdoptVector = clsBaseLineVector
+                        End If
+                    End If
+                End If
+            Else
+                '子観測点すべてを巡回する。
+                Do While Not clsChildPoint Is Nothing
+                    Set clsBaseLineVector = GetAdoptVector(clsChildPoint, sKey)
+                    If Not clsBaseLineVector Is Nothing Then Exit Do
+                    Set clsChildPoint = clsChildPoint.NextPoint
+                Loop
+                Set GetAdoptVector = clsBaseLineVector
+            End If
+        End Function
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '2023/06/26 Hitz H.Nakamura **************************************************
+        'GNSS水準測量対応。
+        '前半後半較差の追加。
+        '前半基線ベクトルを取得する。
+        '
+        '自分と重複する基線ベクトルオブジェクトの中で解析済で有効な前半基線ベクトルを取得する。
+        '
+        '引き数：
+        'clsObservationPoint 観測点。
+        'sKey 重複キー。
+        '
+        '戻り値：前半基線ベクトルを返す。
+        Private Function GetHalfFstVector(ByVal clsObservationPoint As ObservationPoint, ByVal sKey As String) As BaseLineVector
+            Dim clsBaseLineVector As BaseLineVector
+            Dim clsChildPoint As ObservationPoint
+            Set clsChildPoint = clsObservationPoint.ChildPoint
+            If clsChildPoint Is Nothing Then
+                '接合観測点の場合、基線ベクトルを評価する。
+                If(clsObservationPoint.ObjectType And OBS_TYPE_CONNECT) <> 0 Then
+                    Set clsBaseLineVector = clsObservationPoint.Owner
+                    If clsBaseLineVector.HalfFst And clsBaseLineVector.Enable And clsBaseLineVector.Analysis<ANALYSIS_STATUS_FAILED Then
+                        If sKey = GetDuplicationKey(clsBaseLineVector) Then
+                            Set GetHalfFstVector = clsBaseLineVector
+                        End If
+                    End If
+                End If
+            Else
+                '子観測点すべてを巡回する。
+                Do While Not clsChildPoint Is Nothing
+                    Set clsBaseLineVector = GetHalfFstVector(clsChildPoint, sKey)
+                    If Not clsBaseLineVector Is Nothing Then Exit Do
+                    Set clsChildPoint = clsChildPoint.NextPoint
+                Loop
+                Set GetHalfFstVector = clsBaseLineVector
+            End If
+        End Function
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '後半基線ベクトルを取得する。
+        '
+        '自分と重複する基線ベクトルオブジェクトの中で解析済で有効な前半基線ベクトルを取得する。
+        '
+        '引き数：
+        'clsObservationPoint 観測点。
+        'sKey 重複キー。
+        '
+        '戻り値：後半基線ベクトルを返す。
+        Private Function GetHalfLstVector(ByVal clsObservationPoint As ObservationPoint, ByVal sKey As String) As BaseLineVector
+            Dim clsBaseLineVector As BaseLineVector
+            Dim clsChildPoint As ObservationPoint
+            Set clsChildPoint = clsObservationPoint.ChildPoint
+            If clsChildPoint Is Nothing Then
+                '接合観測点の場合、基線ベクトルを評価する。
+                If(clsObservationPoint.ObjectType And OBS_TYPE_CONNECT) <> 0 Then
+                    Set clsBaseLineVector = clsObservationPoint.Owner
+                    If clsBaseLineVector.HalfLst And clsBaseLineVector.Enable And clsBaseLineVector.Analysis<ANALYSIS_STATUS_FAILED Then
+                        If sKey = GetDuplicationKey(clsBaseLineVector) Then
+                            Set GetHalfLstVector = clsBaseLineVector
+                        End If
+                    End If
+                End If
+            Else
+                '子観測点すべてを巡回する。
+                Do While Not clsChildPoint Is Nothing
+                    Set clsBaseLineVector = GetHalfLstVector(clsChildPoint, sKey)
+                    If Not clsBaseLineVector Is Nothing Then Exit Do
+                    Set clsChildPoint = clsChildPoint.NextPoint
+                Loop
+                Set GetHalfLstVector = clsBaseLineVector
+            End If
+        End Function
+        '*****************************************************************************
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+
 
 
         //***************************************************************************

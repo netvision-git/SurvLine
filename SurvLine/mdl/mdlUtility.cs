@@ -20,6 +20,43 @@ namespace SurvLine
 
     public class MdlUtility
     {
+
+        MdiVBfunctions mdiVBfunctions = new MdiVBfunctions();
+
+        
+
+        //==========================================================================================
+        /*[VB]
+            'コレクションから指定されたキーのアイテムを取得する。
+            '
+            'アイテムは Variant。
+            '
+            '引き数：
+            'objCollection コレクション。
+            'vItem 取得されたアイテム。
+            'sKey キー。
+            ' t
+            '戻り値：
+            'コレクションにアイテムが存在する場合は True を返す。
+            'コレクションにアイテムが無い場合は False を返す。
+            Public Function LookupCollectionVariant(ByVal objCollection As Collection, ByRef vItem As Variant, ByVal sKey As String) As Boolean
+                On Error GoTo CollectionHandler
+                vItem = objCollection.Item(sKey)
+                LookupCollectionVariant = True
+            CollectionHandler:
+            End Function
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        public bool LookupCollectionVariant(object objCollection, ref string vItem, string sKey)
+        {
+            return true;
+        }
+
+
+
+
+
         //***************************************************************************
         //***************************************************************************
         /// <summary>
@@ -533,7 +570,7 @@ namespace SurvLine
             long nLen;
             nLen = sPath.Length;
 
-            if( sPath.Substring((int)(nLen - 1), 0) != ".")
+            if(sPath.Substring((int)(nLen - 1), 0) != ".")
             {
                 return false;
             }
@@ -752,44 +789,79 @@ namespace SurvLine
 
 
 
+        //==========================================================================================
+        /*[VB]
+            //'パス名を構成要素に分解する。
+            //'
+            //'引き数：
+            //'sPath パス。
+            //'sDrive ドライブ。"C:"
+            //'sDir フォルダパス。"\AAA\BBB\"
+            //'sTitle ファイルタイトル。"CCC"
+            //'sExt 拡張子。".DDD"
+            //Public Sub SplitPath(ByVal sPath As String, ByRef sDrive As String, ByRef sDir As String, ByRef sTitle As String, ByRef sExt As String)
+            //    'ディレクトリ位置。
+            //    Dim nPosDir As Long
+            //    nPosDir = InStrRev(sPath, ":") + 1
+            //    'ファイルタイトル位置。
+            //    Dim nPosTitle As Long
+            //    nPosTitle = InStrRev(sPath, "\") + 1
+            //    If nPosTitle <= 1 Then nPosTitle = nPosDir
+            //    '拡張子位置。
+            //    Dim nPosExt As Long
+            //    nPosExt = InStrRev(sPath, ".")
+            //    If nPosExt < nPosTitle Then nPosExt = Len(sPath) + 1
+            //    '拡張子。
+            //    If nPosExt < nPosTitle Then
+            //        sExt = ""
+            //    Else
+            //        sExt = Mid$(sPath, nPosExt)
+            //    End If
+            //    'ファイルタイトル。
+            //    sTitle = Mid$(sPath, nPosTitle, nPosExt - nPosTitle)
+            //    'ディレクトリパス。
+            //    sDir = Mid$(sPath, nPosDir, nPosTitle - nPosDir)
+            //    'ドライブ。
+            //    sDrive = Mid$(sPath, 1, nPosDir - 1)
+            //End Sub
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
         public void SplitPath(string sPath, ref string sDrive, ref string sDir, ref string sTitle, ref string sExt)
         {
+            //'ディレクトリ位置。
+            long nPosDir;
+
+            nPosDir = mdiVBfunctions.InStrRev(sPath, ":", 0) + 1;
+
+            //'ファイルタイトル位置。
+            long nPosTitle;
+            nPosTitle = mdiVBfunctions.InStrRev(sPath, "\\", 0) + 1;
+            if (nPosTitle <= 1)
+            {
+                nPosTitle = nPosDir;
+            }
+
+            //'拡張子位置。
+            long nPosExt;
+            nPosExt = mdiVBfunctions.InStrRev(sPath, ".", 0);
+            if (nPosExt < nPosTitle)
+            {
+                nPosExt = sPath.Length + 1;
+            }
+
+            //'拡張子。
+            sExt = nPosExt < nPosTitle ? "" : mdiVBfunctions.Mid(sPath, (int)nPosExt + 1, 4);
+
+            //'ファイルタイトル。
+            sTitle = mdiVBfunctions.Mid(sPath, (int)nPosTitle, (int)(nPosExt - nPosTitle));
+            //ディレクトリパス。
+            sDir = mdiVBfunctions.Mid(sPath, (int)nPosDir, (int)(nPosTitle - nPosDir));
+            //'ドライブ。
+            sDrive = mdiVBfunctions.Mid(sPath, 1, (int)(nPosDir - 1));
 
         }
 
-        //'パス名を構成要素に分解する。
-        //'
-        //'引き数：
-        //'sPath パス。
-        //'sDrive ドライブ。"C:"
-        //'sDir フォルダパス。"\AAA\BBB\"
-        //'sTitle ファイルタイトル。"CCC"
-        //'sExt 拡張子。".DDD"
-        //Public Sub SplitPath(ByVal sPath As String, ByRef sDrive As String, ByRef sDir As String, ByRef sTitle As String, ByRef sExt As String)
-        //    'ディレクトリ位置。
-        //    Dim nPosDir As Long
-        //    nPosDir = InStrRev(sPath, ":") + 1
-        //    'ファイルタイトル位置。
-        //    Dim nPosTitle As Long
-        //    nPosTitle = InStrRev(sPath, "\") + 1
-        //    If nPosTitle <= 1 Then nPosTitle = nPosDir
-        //    '拡張子位置。
-        //    Dim nPosExt As Long
-        //    nPosExt = InStrRev(sPath, ".")
-        //    If nPosExt < nPosTitle Then nPosExt = Len(sPath) + 1
-        //    '拡張子。
-        //    If nPosExt < nPosTitle Then
-        //        sExt = ""
-        //    Else
-        //        sExt = Mid$(sPath, nPosExt)
-        //    End If
-        //    'ファイルタイトル。
-        //    sTitle = Mid$(sPath, nPosTitle, nPosExt - nPosTitle)
-        //    'ディレクトリパス。
-        //    sDir = Mid$(sPath, nPosDir, nPosTitle - nPosDir)
-        //    'ドライブ。
-        //    sDrive = Mid$(sPath, 1, nPosDir - 1)
-        //End Sub
 
 
         //24/01/04 K.setoguchi@NV---------->>>>>>>>>>
@@ -948,6 +1020,46 @@ namespace SurvLine
         //***************************************************************************
 
 
+        //24/01/28 K.setoguchi@NV---------->>>>>>>>>>
+        //<<<<<<<<<-----------24/01/28 K.setoguchi@NV
+        //***************************************************************************
+        //***************************************************************************
+
+        //==========================================================================================
+        /*[VB]
+            '関数ポインタ取得。
+            '
+            '引き数：
+            'lngFnPtr AddressOf の戻り値。
+            '
+            '戻り値：関数のポインタ。
+            Public Function FnPtrToLong(ByVal lngFnPtr As Long) As Long
+               FnPtrToLong = lngFnPtr
+            End Function
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        /// <summary>
+        ///    '関数ポインタ取得。
+        ///    '
+        ///    '引き数：
+        ///    'lngFnPtr AddressOf の戻り値。
+        /// 
+        /// </summary>
+        /// <param name="lngFnPtr"></param>
+        /// <returns>
+        /// </returns>
+        public long FnPtrToLong(long lngFnPtr)
+        {
+            return lngFnPtr;
+
+        }
+#if false
+        internal long FnPtrToLong(Func<long, long, long, long, long> browseCallbackProc)
+        {
+            throw new NotImplementedException();
+        }
+#endif
     }
 
 

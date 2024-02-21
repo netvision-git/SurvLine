@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -420,6 +421,76 @@ namespace SurvLine.mdl
 
         //'セキュリティチェック。
         public const long SRCURITYCHECK_TIMER_INTERVAL = 30000;         //'タイマー間隔。
+
+        [DllImport("GpsConv.dll")]
+        public static extern void WGS84xyz_to_WGS84dms(double X, double Y, double Z, ref double Lat, ref double Lon, double Height);
+        [DllImport("GpsConv.dll")]
+        public static extern void WGS84dms_to_JGDxyz(long zone, double Lat, double Lon, double Height, ref double X, ref double Y, ref double Z);
+        [DllImport("GpsConv.dll")]
+        public static extern void JGDxyz_to_WGS84dms(long zone, double X, double LoYn, double Z, ref double Lat, ref double Lon, ref double Height);
+        [DllImport("GpsConv.dll")]
+        public static extern void WGS84dms_to_WGS84xyz(double Lat, double Lon, double Height, ref double X, ref double Y, ref double Z);
+        [DllImport("GpsConv.dll")]
+        public static extern void WGS84xyz_to_WGS84dms(double X, double Y, double Z, ref double Lat, ref double Lon, ref double Height);
+        [DllImport("GpsConv.dll")]
+        public static extern void d_to_dms_decimal(double dD, ref long deg, ref long Min, ref double Sec, long deci);
+        [DllImport("GpsConv.dll")]
+        public static extern double dms_to_d(long deg, long Min, double Sec);
+        [DllImport("GpsConv.dll")]
+        public static extern long get_geo_height(string Path, double LatJGD, double LonJGD, ref double GeoHeight);
+
+
+        //==========================================================================================
+        /*[VB]
+        '*******************************************************************************
+        '関数ラップ
+
+        Public Sub WGS84xyz_to_JGDxyz(ByVal zone As Long, ByVal wgs84X As Double, ByVal wgs84Y As Double, ByVal wgs84Z As Double, ByRef X As Double, ByRef Y As Double, ByRef Z As Double)
+            Dim nLat As Double
+            Dim nLon As Double
+            Dim nHeight As Double
+            Call WGS84xyz_to_WGS84dms(wgs84X, wgs84Y, wgs84Z, nLat, nLon, nHeight)
+            Call WGS84dms_to_JGDxyz(zone, nLat, nLon, nHeight, X, Y, Z)
+        End Sub
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        /*
+        '*******************************************************************************
+        '関数ラップ
+
+        */
+        public void WGS84xyz_to_JGDxyz(long zone, double wgs84X, double wgs84Y, double wgs84Z, ref double X, ref double Y, ref double Z)
+        {
+            double nLat = 0;
+            double nLon = 0;
+            double nHeight = 0;
+            WGS84xyz_to_WGS84dms(wgs84X, wgs84Y, wgs84Z, ref nLat, ref nLon, nHeight);
+            WGS84dms_to_JGDxyz(zone, nLat, nLon, nHeight, ref X, ref Y, ref Z);
+        }
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        Public Sub JGDxyz_to_WGS84xyz(ByVal zone As Long, ByVal X As Double, ByVal Y As Double, ByVal Z As Double, ByRef wgs84X As Double, ByRef wgs84Y As Double, ByRef wgs84Z As Double)
+            Dim nLat As Double
+            Dim nLon As Double
+            Dim nHeight As Double
+            Call JGDxyz_to_WGS84dms(zone, X, Y, Z, nLat, nLon, nHeight)
+            Call WGS84dms_to_WGS84xyz(nLat, nLon, nHeight, wgs84X, wgs84Y, wgs84Z)
+        End Sub
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        public void JGDxyz_to_WGS84xyz(long zone, double X, double Y, double Z, ref double wgs84X, ref double wgs84Y, ref double wgs84Z)
+        {
+            double nLat = 0;
+            double nLon = 0;
+            double nHeight = 0;
+            JGDxyz_to_WGS84dms(zone, X, Y, Z, ref nLat, ref nLon, ref nHeight);
+            WGS84dms_to_WGS84xyz(nLat, nLon, nHeight, ref wgs84X, ref wgs84Y, ref wgs84Z);
+        }
+        //==========================================================================================
 
 
     }

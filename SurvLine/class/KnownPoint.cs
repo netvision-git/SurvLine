@@ -196,7 +196,7 @@ namespace SurvLine
             //        If Abs(Lat - clsKnownPoint.Lat) >= FLT_EPSILON Then Exit Function
             if (!(ReferenceEquals(Lat, null) == true)){
 
-                if (Math.Abs(Lat - clsKnownPoint.Lat) >= MdiDefine.DEFINE.FLT_EPSILON)
+                if (Math.Abs(Lat - clsKnownPoint.Lat) >= DEFINE.FLT_EPSILON)
                 {
                     return Compare;
                 }
@@ -209,7 +209,7 @@ namespace SurvLine
             if (!(ReferenceEquals(Lon, null) == true))
             {
 
-                if (Math.Abs(Lat - clsKnownPoint.Lon) >= MdiDefine.DEFINE.FLT_EPSILON)
+                if (Math.Abs(Lat - clsKnownPoint.Lon) >= DEFINE.FLT_EPSILON)
                 {
                     return Compare;
                 }

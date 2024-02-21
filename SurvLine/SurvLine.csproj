@@ -91,6 +91,21 @@
     <Compile Include="class\SatelliteInfoReader.cs" />
     <Compile Include="class\DXFParam.cs" />
     <Compile Include="class\CoordinatePoint.cs" />
+    <Compile Include="class\FileDialog.cs" />
+    <Compile Include="class\ErrInfo.cs" />
+    <Compile Include="class\FolderDialog.cs" />
+    <Compile Include="frmAccountInfo2.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmAccountInfo2.Designer.cs">
+      <DependentUpon>frmAccountInfo2.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmFileDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmFileDialog.Designer.cs">
+      <DependentUpon>frmFileDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="frmJobEdit2.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -117,6 +132,17 @@
     </Compile>
     <Compile Include="class\IniFileControl.cs" />
     <Compile Include="class\KnownPoint.cs" />
+    <Compile Include="frmProgressDialog2.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmProgressDialog2.Designer.cs">
+      <DependentUpon>frmProgressDialog2.cs</DependentUpon>
+    </Compile>
+    <Compile Include="class\ListViewOperator.cs" />
+    <Compile Include="class\ListViewInterface.cs" />
+    <Compile Include="class\ListViewBaseLineVector.cs" />
+    <Compile Include="class\ListViewObservationPoint.cs" />
+    <Compile Include="mdl\mdlNSCAB.cs" />
     <Compile Include="mdl\mdlNSGUI.cs" />
     <Compile Include="mdl\mdlAccountMakeNSS.cs" />
     <Compile Include="mdl\mdlMain.cs" />
@@ -134,16 +160,33 @@
     <Compile Include="mdl\mdlUtility.cs" />
     <Compile Include="class\OutputParam.cs" />
     <Compile Include="class\ObservationShared.cs" />
+    <Compile Include="class\ObjectList.cs" />
     <Compile Include="pmemo.cs" />
+    <Compile Include="class\ProcessImport.cs" />
+    <Compile Include="class\ProcessProject.cs" />
+    <Compile Include="class\ProcessInterface.cs" />
     <Compile Include="Program.cs" />
+    <Compile Include="class\ProgressInterface.cs" />
+    <Compile Include="class\ProjectSolidifyer.cs" />
+    <Compile Include="class\ProjectCompressor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="class\StringTokenizer.cs" />
+    <Compile Include="class\RegKey.cs" />
+    <Compile Include="class\RegistAngle.cs" />
+    <Compile Include="mdl\mdlFolderDialog.cs" />
+    <Compile Include="class\TwipsPoint.cs" />
     <Compile Include="user\ListPane.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="user\ListPane.Designer.cs">
       <DependentUpon>ListPane.cs</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="frmAccountInfo2.resx">
+      <DependentUpon>frmAccountInfo2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmFileDialog.resx">
+      <DependentUpon>frmFileDialog.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmJobEdit2.resx">
       <DependentUpon>frmJobEdit2.cs</DependentUpon>
     </EmbeddedResource>
@@ -155,6 +198,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="frmJobOpen.resx">
       <DependentUpon>frmJobOpen.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmProgressDialog2.resx">
+      <DependentUpon>frmProgressDialog2.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

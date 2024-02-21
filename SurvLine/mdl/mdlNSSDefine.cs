@@ -70,8 +70,8 @@ namespace SurvLine.mdl
         public const long PROFILE_DEF_DEF_DISTANCE = 1000;                  //'距離(㎝)。
 
         //'インポートファイル。
-        //public const string IMPORT_FILE_EXT = "dat" '拡張子。
-        //public const string IMPORT_FILE_FILTER = "NetSurvデータファイル (*.dat)|*.dat|RINEXファイル (*.??o)|*.??o|すべてのファイル (*.*)|*.*"; //'フィルター。
+        public const string IMPORT_FILE_EXT = "dat"; //'拡張子。
+        public const string IMPORT_FILE_FILTER = "NetSurvデータファイル (*.dat)|*.dat|RINEXファイル (*.??o)|*.??o|すべてのファイル (*.*)|*.*"; //'フィルター。
 
         //'RINEXファイル文字制限。
         public const long RINEX_STR_OBSNAME = 61;

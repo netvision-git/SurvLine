@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using static SurvLine.MdlAccountMake;
 using static System.Collections.Specialized.BitVector32;
 using static System.Net.Mime.MediaTypeNames;
+using static System.Net.WebRequestMethods;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 namespace SurvLine
@@ -18,6 +19,8 @@ namespace SurvLine
     {
 
         MdlUtility mdlUtility = new MdlUtility();
+        MdiVBfunctions mdiVBfunctions = new MdiVBfunctions();
+
 
         //'*******************************************************************************
         //'帳票パラメータ
@@ -33,7 +36,7 @@ namespace SurvLine
 
         //'インプリメンテーション
         //  Private m_objSelectedObjects As New Collection '選択オブジェクト。RangeType が RANGE_TYPE_OBJECT の時に有効。要素はオブジェクトのキー(文字列)。キーは要素と同じ。
-        Collection m_objSelectedObjects;
+        Collection m_objSelectedObjects = new Collection();
 
         //'*******************************************************************************
         //'プロパティ
@@ -104,7 +107,7 @@ namespace SurvLine
 
         //'*******************************************************************************
         //'*******************************************************************************
-        private void SelectedObjects(Collection objSelectedObjects)
+        public void SelectedObjects(object objSelectedObjects)
         {
             m_objSelectedObjects = new Collection();
 
@@ -135,7 +138,7 @@ namespace SurvLine
         /// 
         /// </summary>
         /// <returns></returns>
-        private Collection SelectedObjects()
+        public Collection SelectedObjects()
         {
             Collection SelectedObjects = m_objSelectedObjects;
             return SelectedObjects;
@@ -215,80 +218,115 @@ namespace SurvLine
         //
         //End Sub
         //'*******************************************************************************
-
-
-        
         public void Load(BinaryReader br, long nVersion)
         {
 
         }
-//'読み込み。
-//'
-//'引き数：
-//'nFile ファイル番号。
-//'nVersion ファイルバージョン。
-//Public Sub Load(ByVal nFile As Integer, ByVal nVersion As Long)
-//
-//    Get #nFile, , RangeType
-//    Session = GetString(nFile)
-//
-//
-//    If nVersion< 3200 Then
-//        ObjectType = SELECTED_OBJECT_TYPE_UNKNOWN
-//    Else
-//        Get #nFile, , ObjectType
-//    End If
-//    If nVersion < 4300 Then
-//        Initial = True
-//    Else
-//        Get #nFile, , Initial
-//    End If
-//
-//
-//    Dim nCount As Long
-//    Get #nFile, , nCount
-//    Dim vKey As Variant
-//    Dim i As Long
-//    For i = 0 To nCount - 1
-//        vKey = GetString(nFile)
-//        Call m_objSelectedObjects.Add(vKey, vKey)
-//    Next
-//    If nVersion < 1200 Then Set m_objSelectedObjects = New Collection
-//
-//End Sub
 
-#if false
-'指定されたオブジェクトと比較する。
-'
-'引き数：
-'clsAccountParam 比較対照オブジェクト。
-'
-'戻り値：
-'一致する場合 True を返す。
-'それ以外の場合 False を返す。
-Public Function Compare(ByVal clsAccountParam As AccountParam) As Boolean
+        //'読み込み。
+        //'
+        //'引き数：
+        //'nFile ファイル番号。
+        //'nVersion ファイルバージョン。
+        //Public Sub Load(ByVal nFile As Integer, ByVal nVersion As Long)
+        //
+        //    Get #nFile, , RangeType
+        //    Session = GetString(nFile)
+        //
+        //
+        //    If nVersion< 3200 Then
+        //        ObjectType = SELECTED_OBJECT_TYPE_UNKNOWN
+        //    Else
+        //        Get #nFile, , ObjectType
+        //    End If
+        //    If nVersion < 4300 Then
+        //        Initial = True
+        //    Else
+        //        Get #nFile, , Initial
+        //    End If
+        //
+        //
+        //    Dim nCount As Long
+        //    Get #nFile, , nCount
+        //    Dim vKey As Variant
+        //    Dim i As Long
+        //    For i = 0 To nCount - 1
+        //        vKey = GetString(nFile)
+        //        Call m_objSelectedObjects.Add(vKey, vKey)
+        //    Next
+        //    If nVersion < 1200 Then Set m_objSelectedObjects = New Collection
+        //
+        //End Sub
 
-    Compare = False
+        //==========================================================================================
+        /*[VB]
+            '指定されたオブジェクトと比較する。
+            '
+            '引き数：
+            'clsAccountParam 比較対照オブジェクト。
+            '
+            '戻り値：
+            '一致する場合 True を返す。
+            'それ以外の場合 False を返す。
+            Public Function Compare(ByVal clsAccountParam As AccountParam) As Boolean
 
-    If RangeType<> clsAccountParam.RangeType Then Exit Function
-    If StrComp(Session, clsAccountParam.Session) <> 0 Then Exit Function
-    If ObjectType<> clsAccountParam.ObjectType Then Exit Function
-    If Initial <> clsAccountParam.Initial Then Exit Function
+                Compare = False
 
-
-    If m_objSelectedObjects.Count<> clsAccountParam.SelectedObjects.Count Then Exit Function
-    Dim vKey As Variant
-    For Each vKey In clsAccountParam.SelectedObjects
-        If Not LookupCollectionVariant(m_objSelectedObjects, vKey, vKey) Then Exit Function
-    Next
-
-    Compare = True
+                If RangeType<> clsAccountParam.RangeType Then Exit Function
+                If StrComp(Session, clsAccountParam.Session) <> 0 Then Exit Function
+                If ObjectType<> clsAccountParam.ObjectType Then Exit Function
+                If Initial <> clsAccountParam.Initial Then Exit Function
 
 
-End Function
+                If m_objSelectedObjects.Count<> clsAccountParam.SelectedObjects.Count Then Exit Function
+                Dim vKey As Variant
+                For Each vKey In clsAccountParam.SelectedObjects
+                    If Not LookupCollectionVariant(m_objSelectedObjects, vKey, vKey) Then Exit Function
+                Next
+
+                Compare = True
 
 
-#endif
+            End Function
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        public bool Compare(AccountParam clsAccountParam)
+        {
+            bool Compare = false;
+
+            if (RangeType != clsAccountParam.RangeType)
+            {
+            }
+            if (mdiVBfunctions.StrComp(Session, clsAccountParam.Session) != 0)
+            {
+                return Compare;
+            }
+            if (ObjectType != clsAccountParam.ObjectType)
+            {
+                return Compare;
+            }
+            if (Initial != clsAccountParam.Initial)
+            {
+                return Compare;
+            }
+
+            //if (m_objSelectedObjects.Count != clsAccountParam.SelectedObjects.Count)
+            //{
+            //    return Compare;
+            //}
+
+            //Dim vKey As Variant
+            //For Each vKey In clsAccountParam.SelectedObjects
+            //    If Not LookupCollectionVariant(m_objSelectedObjects, vKey, vKey) Then Exit Function
+            //Next
+
+
+            Compare = true;
+            return Compare;
+        }
+
+
 
     }
 }

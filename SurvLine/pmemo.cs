@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace SurvLine
 {
@@ -16,12 +18,11 @@ namespace SurvLine
         //***************************************************************************
         //***************************************************************************
         //プログラム＜プロジェクト＞
-        //Git管理：コメント＞24/01/25 上書き＆名前を付けて保存
-
+        //Git管理：コメント＞24/01/28(中間)インストール/エクスポート
         //
         //＜コメント＞
-        //24/01/25 K.setoguchi@NV---------->>>>>>>>>>
-        //<<<<<<<<<-----------24/01/25 K.setoguchi@NV
+        //24/01/28 K.setoguchi@NV---------->>>>>>>>>>
+        //<<<<<<<<<-----------24/01/28 K.setoguchi@NV
         //***************************************************************************
         //***************************************************************************
 
@@ -31,6 +32,55 @@ namespace SurvLine
         //------------------------------------------------------------------------------------------
         //[C#]
 
+
+
+#if false
+
+        MessageBox.Show("無効なデータが含まれていました。", "エラー発生");
+        MessageBox.Show(ex.Message, "エラー発生");
+
+        result = MessageBox.Show(this, message, caption, buttons);
+        if(result == DialogResult.Yes)
+
+            Abort	3	      The dialog box return value is Abort(usually sent from a button labeled Abort).
+
+            Cancel	2	
+            The dialog box return value is Cancel(usually sent from a button labeled Cancel).
+
+            Continue	11	
+            The dialog box return value is Continue(usually sent from a button labeled Continue).
+
+            Ignore	5	
+            The dialog box return value is Ignore(usually sent from a button labeled Ignore).
+
+            No	7	
+            The dialog box return value is No(usually sent from a button labeled No).
+
+            None	0	
+            Nothing is returned from the dialog box.This means that the modal dialog continues running.
+
+            OK  1	
+            The dialog box return value is OK (usually sent from a button labeled OK).
+
+            Retry	4	
+            The dialog box return value is Retry(usually sent from a button labeled Retry).
+
+            TryAgain	10	
+            The dialog box return value is Try Again(usually sent from a button labeled Try Again).
+
+            Yes	6	
+            The dialog box return value is Yes(usually sent from a button labeled Yes).
+#endif
+        //***************************************************************************
+        //***************************************************************************
+        //プログラム＜プロジェクト＞
+        //Git管理：コメント＞24/01/25 上書き＆名前を付けて保存
+        //
+        //＜コメント＞
+        //24/01/25 K.setoguchi@NV---------->>>>>>>>>>
+        //<<<<<<<<<-----------24/01/25 K.setoguchi@NV
+        //***************************************************************************
+        //***************************************************************************
 
         //***************************************************************************
         //***************************************************************************

@@ -20,6 +20,7 @@ namespace SurvLine
 {
     public class Document
     {
+        MdlNSSDefine mdlNSSDefine = new MdlNSSDefine();
 
         //'*******************************************************************************
         //'ドキュメント
@@ -116,7 +117,9 @@ namespace SurvLine
         private AccountCadastralParam m_clsAccountCadastralParam;   // As AccountCadastralParam '地籍図根三角測量精度管理表パラメータ。
         private AccountParam m_clsAccountParamResultBase;           // As AccountParam '座標一覧表パラメータ。2007/7/18 NGS Yamada
         //---------------------------------------------------------
-        private List<OutputParam> m_clsOutputParam;                 //private OutputParam m_clsOutputParam[OUTPUT_TYPE_COUNT - 1];    // As OutputParam '外部出力ファイル出力パラメータ。
+        //private List<OutputParam> m_clsOutputParam;                 //private OutputParam m_clsOutputParam[OUTPUT_TYPE_COUNT - 1];    // As OutputParam '外部出力ファイル出力パラメータ。
+        List<OutputParam> m_clsOutputParam = new List<OutputParam>((int)MdlNSSDefine.OUTPUT_TYPE.OUTPUT_TYPE_COUNT - 1);
+
         //---------------------------------------------------------
         private List<DXFParam> m_clsDXFParam;                       //Private m_clsDXFParam(DXF_TYPE_COUNT - 1) As DXFParam 'DXFファイル出力パラメータ。
         //---------------------------------------------------------
@@ -124,10 +127,25 @@ namespace SurvLine
         //'*******************************************************************************
 
 
-
         MdlUtility mdiUtility = new MdlUtility();
 
         IniFileControl iniFileControl = new IniFileControl();
+
+
+
+        //24/01/28 K.setoguchi@NV---------->>>>>>>>>>
+        public Document()
+        {
+            OutputParam oOutputParam = new OutputParam();
+
+            for (int i =0; i < (int)MdlNSSDefine.OUTPUT_TYPE.OUTPUT_TYPE_COUNT; i++)
+            {
+                m_clsOutputParam.Add(oOutputParam);
+            }
+        }
+        //<<<<<<<<<-----------24/01/28 K.setoguchi@NV
+
+
 
 
         //'*******************************************************************************
@@ -838,10 +856,10 @@ namespace SurvLine
         /// 
         /// </summary>
         /// <returns></returns>
-        private OutputParam OutputParam(long nIndex)
+        public object OutputParam(long nIndex)
         {
-            OutputParam OutputParam = m_clsOutputParam[(int)nIndex];
-            return OutputParam;
+            OutputParam pOutputParam = m_clsOutputParam[(int)nIndex];
+            return pOutputParam;
         }
         //--------------------------------------------------------------------------------
         //'外部出力ファイル出力パラメータ。
@@ -919,22 +937,11 @@ namespace SurvLine
         /// <returns></returns>
         public bool GetFileBool(BinaryReader br)
         {
-            bool bBool = false;
-
             ushort uWork;
             uWork = br.ReadUInt16();
-            if (uWork == 0xffff)
-            {
-                bBool = true;
-            }
-            else
-            {
-                bBool = false;
-            }
+            bool bBool = uWork == 0xffff;
             return bBool;
         }
-
-
 
 
 
