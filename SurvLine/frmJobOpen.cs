@@ -137,10 +137,11 @@ namespace SurvLine
                 item.SubItems.Add(Genba[i].tCreateTime.ToString("yyyy/MM/dd HH:mm"));
                 lvProject.Items.Add(item);
             }
+            Result = DEFINE.vbCancel;         // As Long 'ダイアログの結果。
 
-        }
+    }
 
-        private void OKButton_Click(object sender, EventArgs e)
+    private void OKButton_Click(object sender, EventArgs e)
         {
             //DEBUG>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
             // 選択項目を取得する
@@ -154,13 +155,18 @@ namespace SurvLine
                 ListViewItem itemx = lvProject.SelectedItems[0];
                 if (itemx == null)
                 {
-                    MessageBox.Show(itemx.Text + " | " + itemx.SubItems[1].Text + " | " + itemx.SubItems[2].Text); 
+                    _ = MessageBox.Show(itemx.Text + " | " + itemx.SubItems[1].Text + " | " + itemx.SubItems[2].Text);
+                    return;
 
                 }
+
+                Result = DEFINE.vbOK;         // As Long 'ダイアログの結果。
+
+
             }
             catch (ArgumentOutOfRangeException)
             {
-                MessageBox.Show("「現場の選択画面」の操作を確認して下さい ");
+                _ = MessageBox.Show("「現場の選択画面」の操作を確認して下さい ", "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
@@ -177,7 +183,7 @@ namespace SurvLine
             this.Close();
 
             //23/12/26 K.setoguchi@NV---------->>>>>>>>>>
-            Result = DEFINE.vbCancel;    /// As Long 'ダイアログの結果。
+            //Result = DEFINE.vbCancel;    /// As Long 'ダイアログの結果。
            //<<<<<<<<<-----------23/12/26 K.setoguchi@NV
 
         }

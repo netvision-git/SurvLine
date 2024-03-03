@@ -559,10 +559,10 @@ namespace SurvLine
 
 
             //23/12/26 K.setoguchi@NV---------->>>>>>>>>>
-            //再検討            if (form.Result != MdiDefine.DEFINE.vbOK)
-            //再検討            {
-            //再検討            return false;
-            //再検討        }
+            if (form.Result != DEFINE.vbOK)
+            {
+                return false;
+            }
             //<<<<<<<<<-----------23/12/26 K.setoguchi@NV
 
             //[VB]---------------------------------------------------
@@ -1775,7 +1775,8 @@ namespace SurvLine
             // sFolderNames() As String
             List<string> sFolderNames = new List<string>();
 
-            sFolderNames.Add(frmJobSelect.FolderNames());
+            //  sFolderNames.Add(frmJobSelect.FolderNames());
+            sFolderNames = frmJobSelect.FolderNames();
 
             ProjectFileManager clsProjectFileManager = new ProjectFileManager();
 
@@ -2622,9 +2623,11 @@ namespace SurvLine
                 bool bSingle;
                 List<string> sFolderNames = new List<string>();
 
-                if (frmJobSelect.FolderNames() != null)
+                sFolderNames = frmJobSelect.FolderNames();
+
+                if (sFolderNames.Count > 1)
                 {
-                    //'出力先フォルダを選択。
+                    //'出力先フォルダを選択。  複数選択の場合は、フォルダをダイアログ
 
                     FolderDialog clsFolderDialog = new FolderDialog();
 
@@ -2641,8 +2644,7 @@ namespace SurvLine
                 }
                 else
                 {
-
-                    sFolderNames.Add(frmJobSelect.FolderNames());
+                    //選択が１つの場合
 
                     ProjectFileManager clsProjectFileManager = new ProjectFileManager();
 
