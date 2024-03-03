@@ -1,11 +1,14 @@
 ﻿//23/12/29 K.setoguchi@NV---------->>>>>>>>>>
 
+using SurvLine.mdl;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Threading.Tasks;
 using static System.Collections.Specialized.BitVector32;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace SurvLine
 {
@@ -14,6 +17,7 @@ namespace SurvLine
 
         public void DoEvents()
         {
+            return;
             throw new NotImplementedException();
         }
 
@@ -30,6 +34,70 @@ namespace SurvLine
             pot = target.IndexOf(search, stpot);
             return pot == -1 ? 0 : pot;
 
+        }
+#if false
+        public string StrConv(string sExt, int vbtype)
+        {
+            string StrConv = "";
+
+            switch (vbtype)
+            {
+                case DEFINE.vbUpperCase:       //文字列を大文字に変換します。
+                    StrConv = sExt.ToUpper();
+                    break;
+                default:
+                    break;
+
+            }
+
+            return StrConv;
+        }
+#endif
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="code"></param>
+        /// <returns></returns>
+        public byte[] StrConv(string data, int code)
+        {
+            byte[] bytes = new byte[data.Length];
+            string sGetData = "";
+
+
+            switch (code)
+            {
+                case DEFINE.vbUpperCase:        //文字列を大文字に変換します。
+                    sGetData = data.ToUpper();
+                    break;
+                case DEFINE.vbLowerCase:        //文字列を小文字に変換します。
+                    sGetData = data.ToLower();
+                    break;
+                case DEFINE.vbProperCase:       //文字列内の各単語の先頭の文字を大文字に変換します。
+                    break;
+                case DEFINE.vbWide:             //文字列内の半角文字(1 バイト) を全角文字(2 バイト) に変換します。
+                    break;
+                case DEFINE.vbNarrow:           //文字列内の全角文字(2 バイト) を半角文字(1 バイト) に変換します。
+                    break;
+                case DEFINE.vbKatakana:         //文字列内のひらがなをカタカナに変換します。
+                    break;
+                case DEFINE.vbHiragana:         //文字列内のカタカナをひらがなに変換します。
+                    break;
+                case DEFINE.vbUnicode:          //システムの既定のコード ページを使用して、文字列を Unicode に変換します。 (Macintosh では使用できません。
+                    sGetData = Encoding.Unicode.GetString(bytes);
+                    break;
+                case DEFINE.vbFromUnicode:      //文字列を Unicode からシステムの既定のコード ページに変換します。 (Macintosh では使用できません。
+                    //  sGetData = Encoding.GetEncoding("shift_jis").GetString(bytes);
+                    sGetData = Encoding.UTF8.GetString(bytes);
+                    break;
+                default:
+                    sGetData = data;
+                    break;
+            }
+
+            byte[] bytes2 = new byte[sGetData.Length];
+
+            return bytes2;
         }
 
         /// <summary>

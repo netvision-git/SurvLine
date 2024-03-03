@@ -25,6 +25,23 @@ namespace SurvLine.mdl
 
         public const long vbBSNone = 0;              //GroupBox
 
+        public const string vbCrLf = @"\r";           //キャレッジリターン
+
+        //***************************************************
+        //  StrConv 関数
+        //  StrConv ( string, conversion [, LCID ] )
+        //***************************************************
+        // 引数 conversion引数 の設定値
+        public const int vbUpperCase = 1;       //文字列を大文字に変換します。
+        public const int vbLowerCase = 2;       //文字列を小文字に変換します。
+        public const int vbProperCase = 3;      //文字列内の各単語の先頭の文字を大文字に変換します。
+        public const int vbWide = 4;            //文字列内の半角文字(1 バイト) を全角文字(2 バイト) に変換します。
+        public const int vbNarrow = 8;          //文字列内の全角文字(2 バイト) を半角文字(1 バイト) に変換します。
+        public const int vbKatakana = 16;       //文字列内のひらがなをカタカナに変換します。
+        public const int vbHiragana = 32;       //文字列内のカタカナをひらがなに変換します。
+        public const int vbUnicode = 64;        //システムの既定のコード ページを使用して、文字列を Unicode に変換します。 (Macintosh では使用できません。
+        public const int vbFromUnicode = 128;   //文字列を Unicode からシステムの既定のコード ページに変換します。 (Macintosh では使用できません。
+
         //***************************************************
         //'API定数。
         //***************************************************

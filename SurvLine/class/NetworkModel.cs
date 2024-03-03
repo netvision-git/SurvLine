@@ -66,6 +66,10 @@ namespace SurvLine
     public class NetworkModel
     {
 
+        MdlImport mdlImport = new MdlImport();
+
+
+
         //Option Explicit
         //
         //'イベント
@@ -705,7 +709,7 @@ namespace SurvLine
             //-------------------------------------------------------------------------
             GENBA_STRUCT_S Genba_S = new GENBA_STRUCT_S();
 
-             //23/12/20 K.setoguchi@NV---------->>>>>>>>>>>
+            //23/12/20 K.setoguchi@NV---------->>>>>>>>>>>
             GENBA_STRUCT_S Genba_S_Init = new GENBA_STRUCT_S();
             Genba_S = Genba_S_Init;         //構造体の初期化
             //(del)  List_Genba_S.Add(Genba_S);
@@ -718,9 +722,9 @@ namespace SurvLine
 
             //[VB]------------------------------------------------------------
             //[VB]      Call m_clsDispersion.Load(nFile, nVersion)
-            dispersion.Load( br, ref Genba_S);
+            dispersion.Load(br, ref Genba_S);
 
-             //23/12/20 K.setoguchi@NV---------->>>>>>>>>>>
+            //23/12/20 K.setoguchi@NV---------->>>>>>>>>>>
             //-----------------------------------------------------
             // 再配置<-読み込みデータ情報
             //-----------------------------------------------------
@@ -748,7 +752,7 @@ namespace SurvLine
             nCount = (long)br.ReadInt32();
             for (int i = 0; i < nCount; i++)            //87
             {
-                 //23/12/20 K.setoguchi@NV---------->>>>>>>>>>>
+                //23/12/20 K.setoguchi@NV---------->>>>>>>>>>>
                 //  //-------------------------------------------------------------------------
                 //  List_Genba_S.Add(Genba_S);
                 //  //-------------------------------------------------------------------------
@@ -760,7 +764,7 @@ namespace SurvLine
                 //[VB]          Set clsChainList = clsChainList.InsertNext(clsBaseLineVector)
                 baseLineVector.Load(br, nVersion, ref Genba_S);
 
-                 //23/12/20 K.setoguchi@NV---------->>>>>>>>>>>
+                //23/12/20 K.setoguchi@NV---------->>>>>>>>>>>
                 //-----------------------------------------------------
                 // 再配置<-読み込みデータ情報
                 //-----------------------------------------------------
@@ -933,6 +937,927 @@ namespace SurvLine
         //[VB] End Sub
         //***************************************************************************
         //***************************************************************************
+
+
+        //24/02/21 K.setoguchi@NV---------->>>>>>>>>>
+        //***************************************************************************
+
+        //==========================================================================================
+        /*[VB]
+            '外部ファイルをインポートする。
+            '
+            '引き数：
+            'nImportType インポートファイル種別。
+            'sPath インポートするファイルのパス。参照する配列の要素は(0 To ...)。Ubound 関数を使用する。
+            'sObsPointPath 観測点フォルダのパス。
+            'nSameTimeMin 最小同時観測時間(秒)。
+            'nSatelliteCountMin 最少共通衛星数。
+            'clsProgressInterface ProgressInterface オブジェクト。
+            '
+            '戻り値：
+            '全て正常にインポートできた場合は True を返す。
+            '無効なデータがあった場合は False を返す。
+            Public Function Import(ByVal nImportType As IMPORT_TYPE, ByRef sPath() As String, ByVal sObsPointPath As String, ByVal nSameTimeMin As Long, ByVal nSatelliteCountMin As Long, ByVal clsProgressInterface As ProgressInterface) As Boolean
+
+                Import = True
+
+                Select Case nImportType
+                Case IMPORT_TYPE_UNKNOWN
+                    Import = False
+                    Exit Function
+                Case IMPORT_TYPE_JOB
+                    Import = False
+                    Exit Function
+                Case IMPORT_TYPE_NVF
+                    Import = False
+                    Exit Function
+                Case IMPORT_TYPE_DAT
+                Case IMPORT_TYPE_RINEX
+                    Dim sPathO() As String
+                    Dim sPathN() As String
+                    Dim sPathG() As String
+                    '2017/07/05 NS6000対応。'''''''''''''''''''''''''''''''''''''''''''''''''''''''
+                    'Call ArrangeRinexPath(sPath, sPathO, sPathN, sPathG, clsProgressInterface)
+                    '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+                    Dim sPathJ() As String
+                    Dim sPathL() As String
+                    Dim sPathC() As String
+                    Dim sPathP() As String
+                    '2020/10/23 FDC 暦ファイルの流用'''''''''''''''''''''''''''''''''''''''''''''''
+                    'Call ArrangeRinexPath(sPath, sPathO, sPathN, sPathG, sPathJ, sPathL, sPathC, sPathP, clsProgressInterface)
+
+                    Dim bImportCheckG() As Boolean
+                    Dim bImportCheckJ() As Boolean
+                    Dim bImportCheckL() As Boolean
+                    Dim bImportCheckC() As Boolean
+                    Dim bNavFile() As Boolean
+                    Call ArrangeRinexPath(sPath, sPathO, sPathN, sPathG, sPathJ, sPathL, sPathC, sPathP, clsProgressInterface, bImportCheckG, bImportCheckJ, bImportCheckL, bImportCheckC, bNavFile)
+                    '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+                    sPath = sPathO
+                Case IMPORT_TYPE_DIRECT
+                End Select
+
+                'ファイルの読み込み。
+                Dim objNewObservationPoints As New Collection
+                Dim clsObservationPoint As ObservationPoint
+                Dim i As Long
+
+                '2020/10/26 FDC 暦ファイルの流用、衛星種別追加'''''''''''''''''''''''''''''''''
+                Dim sFileCheckResult As String
+                Dim sDatPathN() As String
+                Dim sDatPathP() As String
+                Dim sImportPathN() As String
+                Dim sImportPathP() As String
+                Dim sMessage() As String
+
+                If nImportType = IMPORT_TYPE_DAT Or nImportType = IMPORT_TYPE_DIRECT Then
+                    ReDim Preserve sPathO(-1 To -1)
+                End If
+                '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+                For i = 0 To UBound(sPath)
+                    'ファイル名文字数のチェック。
+                    If CheckFileTitle(sPath(i)) Then
+
+                        Do While (True)
+
+                            'ファイル読み込み。
+                            Select Case nImportType
+                            Case IMPORT_TYPE_DAT, IMPORT_TYPE_DIRECT   '2007/4/10 NGS Yamada
+                                Set clsObservationPoint = ReadDatFile(sPath(i), clsProgressInterface)
+
+                                '2020/10/26 FDC 暦ファイルの流用、衛星種別追加'''''''''''''''''''''''''''''''''
+                                ReDim Preserve sPathN(-1 To i)
+                                ReDim Preserve sPathP(-1 To i)
+
+                                If Not clsObservationPoint Is Nothing Then
+                                    sFileCheckResult = CheckImportDatFile(sPath(i), sPathN(i), sPathP(i), clsObservationPoint)
+                                    If sFileCheckResult <> "" Then
+                                        Dim nUBound As Long
+                                        nUBound = UBound(sPathO) + 1
+                                        ReDim Preserve sPathO(-1 To nUBound)
+                                        ReDim Preserve sDatPathN(-1 To nUBound)
+                                        ReDim Preserve sPathG(-1 To nUBound)
+                                        ReDim Preserve sPathJ(-1 To nUBound)
+                                        ReDim Preserve sPathL(-1 To nUBound)
+                                        ReDim Preserve sPathC(-1 To nUBound)
+                                        ReDim Preserve sDatPathP(-1 To nUBound)
+                                        ReDim Preserve bImportCheckG(-1 To nUBound)
+                                        ReDim Preserve bImportCheckJ(-1 To nUBound)
+                                        ReDim Preserve bImportCheckL(-1 To nUBound)
+                                        ReDim Preserve bImportCheckC(-1 To nUBound)
+                                        ReDim Preserve sMessage(-1 To nUBound)
+
+                                        sPathO(nUBound) = sPath(i)
+                                        Call DeleteTempFile(sPath(i))
+                                        bImportCheckG(nUBound) = clsObservationPoint.GlonassFlag
+                                        bImportCheckJ(nUBound) = clsObservationPoint.QZSSFlag
+                                        bImportCheckL(nUBound) = clsObservationPoint.GalileoFlag
+                                        bImportCheckC(nUBound) = clsObservationPoint.BeiDouFlag
+                                        sMessage(nUBound) = sFileCheckResult
+
+                                        Set clsObservationPoint = Nothing
+                                    End If
+                                End If
+                                Exit Do
+                                '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+                            Case IMPORT_TYPE_RINEX
+                                '2017/07/05 NS6000対応。'''''''''''''''''''''''''''''''''''''''''''''''''''''''
+                                'Set clsObservationPoint = ReadRinexFile(sPath(i), sPathN(i), sPathG(i), clsProgressInterface)
+                                '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+                                '2020/10/26 FDC 暦ファイルの流用、衛星種別追加'''''''''''''''''''''''''''''''''
+                                'Set clsObservationPoint = ReadRinexFile(sPath(i), sPathN(i), sPathG(i), sPathJ(i), sPathL(i), sPathC(i), sPathP(i), clsProgressInterface)
+                                '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+                                Set clsObservationPoint = ReadRinexFile(sPath(i), sPathN(i), sPathG(i), sPathJ(i), sPathL(i), sPathC(i), sPathP(i), clsProgressInterface, bImportCheckG(i), bImportCheckJ(i), bImportCheckL(i), bImportCheckC(i), bNavFile(i))
+
+                                If Not clsObservationPoint Is Nothing Then
+                                    sFileCheckResult = CheckImportRinexFile(sPath(i), clsObservationPoint)
+                                    If sFileCheckResult = "" Then
+                                        Exit Do
+                                    Else
+                                        Call DeleteTempFile(sPath(i))
+
+                                        bImportCheckG(i) = clsObservationPoint.GlonassFlag
+                                        bImportCheckJ(i) = clsObservationPoint.QZSSFlag
+                                        bImportCheckL(i) = clsObservationPoint.GalileoFlag
+                                        bImportCheckC(i) = clsObservationPoint.BeiDouFlag
+
+                                        Call DivertRinexPath(sPath(i), sPathN(i), sPathG(i), sPathJ(i), sPathL(i), sPathC(i), sPathP(i), clsProgressInterface, sPathN, sPathP, bImportCheckG(i), bImportCheckJ(i), bImportCheckL(i), bImportCheckC(i), True, sFileCheckResult, True)
+                                        If sPathN(i) = "" And sPathP(i) = "" Then
+                                            Set clsObservationPoint = Nothing
+                                            Exit Do
+                                        End If
+                                        bNavFile(i) = True
+                                    End If
+                                ElseIf bNavFile(i) Then
+                                    sFileCheckResult = "衛星軌道情報の適用に失敗しました。"
+                                    Call DivertRinexPath(sPath(i), sPathN(i), sPathG(i), sPathJ(i), sPathL(i), sPathC(i), sPathP(i), clsProgressInterface, sPathN, sPathP, bImportCheckG(i), bImportCheckJ(i), bImportCheckL(i), bImportCheckC(i), True, sFileCheckResult, False)
+                                    If sPathN(i) = "" And sPathP(i) = "" Then
+                                        Set clsObservationPoint = Nothing
+                                        Exit Do
+                                    End If
+                                Else
+                                    Exit Do
+                                End If
+
+                            Case Else
+                                Exit Do
+                                '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+                            End Select
+                        Loop
+
+                        If Not clsObservationPoint Is Nothing Then
+                            Call objNewObservationPoints.Add(clsObservationPoint, Hex$(GetPointer(clsObservationPoint)))
+                        Else
+                            '無効なデータがあった場合はFalseを返す。
+                            Import = False
+                        End If
+                    Else
+                        Call MsgBox(sPath(i) & vbCrLf & "このファイルはファイル名が長すぎます。", vbCritical)
+                        '無効なデータがあった場合はFalseを返す。
+                        Import = False
+                    End If
+
+                    'プログレス。
+                    Call clsProgressInterface.CheckCancel
+                Next
+
+                '2020/10/26 FDC 暦ファイルの流用、Datの流用''''''''''''''''''''''''''''''''''''
+                Dim bAlert As Boolean
+                If nImportType = IMPORT_TYPE_DAT Or nImportType = IMPORT_TYPE_DIRECT Then
+                    For i = 0 To UBound(sPathO)
+                        bAlert = True
+                        Do While (True)
+                            Call DivertRinexPath(sPathO(i), sDatPathN(i), sPathG(i), sPathJ(i), sPathL(i), sPathC(i), sDatPathP(i), clsProgressInterface, sPathN, sPathP, bImportCheckG(i), bImportCheckJ(i), bImportCheckL(i), bImportCheckC(i), False, sMessage(i), bAlert)
+                            If sDatPathN(i) = "" And sDatPathP(i) = "" Then
+                                Set clsObservationPoint = Nothing
+                                Exit Do
+                            End If
+                            Set clsObservationPoint = ReadRinexFile(sPathO(i), sDatPathN(i), sPathG(i), sPathJ(i), sPathL(i), sPathC(i), sDatPathP(i), clsProgressInterface, bImportCheckG(i), bImportCheckJ(i), bImportCheckL(i), bImportCheckC(i), True)
+                            If Not clsObservationPoint Is Nothing Then
+                                sFileCheckResult = CheckImportRinexFile(sPathO(i), clsObservationPoint)
+                                If sFileCheckResult = "" Then
+                                    nUBound = UBound(sPathN) + 1
+                                    ReDim Preserve sPathN(-1 To nUBound)
+                                    ReDim Preserve sPathP(-1 To nUBound)
+                                    sPathN(nUBound) = sDatPathN(i)
+                                    sPathP(nUBound) = sDatPathP(i)
+                                    Exit Do
+                                Else
+                                    Call DeleteTempFile(sPathO(i))
+                                    sMessage(i) = sFileCheckResult
+                                    bAlert = True
+                                End If
+                            Else
+                                sMessage(i) = "衛星軌道情報の適用に失敗しました。"
+                                bAlert = False
+                            End If
+                        Loop
+                        If Not clsObservationPoint Is Nothing Then
+                            Call objNewObservationPoints.Add(clsObservationPoint, Hex$(GetPointer(clsObservationPoint)))
+                        Else
+                            '無効なデータがあった場合はFalseを返す。
+                            Import = False
+                        End If
+                        'プログレス。
+                        Call clsProgressInterface.CheckCancel
+                    Next
+                End If
+                '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+                'これ以降キャンセルは不可。
+                clsProgressInterface.CancelEnable = False
+                clsProgressInterface.Prompt = "観測点を登録中･･･"
+
+                '既存の代表観測点のハッシュ。
+                Dim objRepresentPointCollection As New Collection
+                Dim clsChainList As ChainList
+                Set clsChainList = m_clsRepresentPointHead.NextList
+                Do While Not clsChainList Is Nothing
+                    Set clsObservationPoint = clsChainList.Element
+                    If clsObservationPoint.PrevPoint Is Nothing Then Call objRepresentPointCollection.Add(clsObservationPoint, clsObservationPoint.Number)
+                    Set clsChainList = clsChainList.NextList
+                    'プログレス。
+                    Call clsProgressInterface.CheckCancel
+                Loop
+
+                '観測点番号が空のものには自動的に設定。#0000～連番。
+                Dim nAutoNumber As Long
+                nAutoNumber = 0
+                Dim clsSameRepresentPoint As ObservationPoint
+                Dim clsNewObservationPoint As ObservationPoint
+                For Each clsNewObservationPoint In objNewObservationPoints
+                    '空？
+                    If clsNewObservationPoint.Number = "" Then
+                        '連番割り当て。重複しないように。
+                        Do
+                            nAutoNumber = nAutoNumber + 1
+                            clsNewObservationPoint.Number = Format$(nAutoNumber, "\#0000")
+                            If Not LookupCollectionObject(objRepresentPointCollection, clsSameRepresentPoint, clsNewObservationPoint.Number) Then Exit Do
+                        Loop
+                    End If
+                Next
+
+                '結合。同じ観測点番号は１つにつなげる。
+                Dim nChainNumber As Long '0=要確認。1=すべてはい。2=すべていいえ。
+                nChainNumber = 0
+                Dim nChainDistance As Long '0=要確認。1=すべてはい。2=すべていいえ。
+                nChainDistance = 0
+                Dim nMax As Long
+                nMax = GetPrivateProfileInt(PROFILE_DEF_SEC_IMPORT, PROFILE_DEF_KEY_DISTANCE, PROFILE_DEF_DEF_DISTANCE, App.Path & "\" & PROFILE_DEF_NAME)
+                Dim sMax As String
+                If 100 < nMax Then
+                    If 0 < nMax Mod 100 Then
+                        sMax = CStr(nMax) & "㎝"
+                    Else
+                        sMax = CStr(nMax / 100) & "ｍ"
+                    End If
+                Else
+                    sMax = CStr(nMax) & "㎝"
+                End If
+                Dim clsRepresentTail As ChainList
+                Dim clsRepresentPoint As ObservationPoint
+                Set clsRepresentTail = m_clsRepresentPointHead.TailList
+                For Each clsNewObservationPoint In objNewObservationPoints
+                    '代表観測点を作成。
+                    Set clsRepresentPoint = CreateRepresentPoint(clsNewObservationPoint)
+                    '既存の代表観測点の観測点番号と比較する。
+                    Dim bChain As Boolean
+                    If LookupCollectionObject(objRepresentPointCollection, clsSameRepresentPoint, clsRepresentPoint.Number) Then
+                        Select Case nChainNumber
+                        Case 0
+                            '確認。
+                            Select Case frmMsgBoxYesNo.DoModal("観測点No""" & clsRepresentPoint.Number & """はすでに存在します。結合しますか?" & vbCrLf & "結合しない場合は自動的に他の観測点Noが割り当てられます。")
+                            Case vbYes
+                                bChain = True
+                            Case 8
+                                bChain = True
+                                nChainNumber = 1
+                            Case 16
+                                bChain = False
+                                nChainNumber = 2
+                            Case Else
+                                bChain = False
+                            End Select
+                        Case 1
+                            bChain = True
+                        Case 2
+                            bChain = False
+                        End Select
+
+                        If bChain Then
+                            '距離を評価する。
+                            Dim nDistance As Double
+                            nDistance = GetDistanceRound(clsSameRepresentPoint.CoordinateDisplay, clsRepresentPoint.CoordinateDisplay)
+                            If nDistance > nMax * 0.01 Then
+                                Select Case nChainDistance
+                                Case 0
+                                    '確認。
+                                    Select Case frmMsgBoxYesNo.DoModal("観測点No""" & clsRepresentPoint.Number & """の観測点同士の距離が" & sMax & "を超えています。結合しますか?" & vbCrLf & "結合しない場合は自動的に他の観測点Noが割り当てられます。")
+                                    Case vbYes
+                                        bChain = True
+                                    Case 8
+                                        bChain = True
+                                        nChainDistance = 1
+                                    Case 16
+                                        bChain = False
+                                        nChainDistance = 2
+                                    Case Else
+                                        bChain = False
+                                    End Select
+                                Case 1
+                                    bChain = True
+                                Case Else
+                                    bChain = False
+                                End Select
+                            Else
+                                bChain = True
+                            End If
+                        End If
+
+                        '連結しない場合、観測点番号を自動的に変更。観測点番号 + "~(n)"。
+                        If Not bChain Then
+                            Dim sNumber As String
+                            sNumber = clsRepresentPoint.Number & "~("
+                            Dim nExtNumber As Long
+                            nExtNumber = 1
+                            Do
+                                nExtNumber = nExtNumber + 1
+                                clsRepresentPoint.Number = sNumber & CStr(nExtNumber) & ")"
+                                If Not LookupCollectionObject(objRepresentPointCollection, clsSameRepresentPoint, clsRepresentPoint.Number) Then Exit Do
+                            Loop
+                        End If
+                    Else
+                        bChain = False
+                    End If
+
+                    If bChain Then
+                        '観測点番号が一致する代表観測点があればつなげる。
+                        Call ChainRepresentPoint(clsSameRepresentPoint, clsRepresentPoint, 0, 0)
+                        Call clsRepresentPoint.UpdateCorrectPointImpl(clsSameRepresentPoint.CorrectPoint)
+                    Else
+                        '同じ観測点番号の代表観測点がない。
+                        Call objRepresentPointCollection.Add(clsRepresentPoint, clsRepresentPoint.Number)
+                    End If
+
+                    '代表観測点リストにつなげる。
+                    Set clsRepresentTail = InsertRepresentPoint(clsRepresentTail, clsRepresentPoint)
+                    'プログレス。
+                    Call clsProgressInterface.CheckCancel
+                Next
+
+                '重複(観測点番号、セッション名が一致)する観測点は上書きする。
+                Dim objIsolatePointChainCollection As Collection
+                Set objIsolatePointChainCollection = MakeIsolatePointChainCollection
+                Dim objBaseLineVectorChainCollection As Collection
+                Set objBaseLineVectorChainCollection = MakeBaseLineVectorChainCollection
+                Dim nResult As Long
+                Dim bMsg As Boolean
+                bMsg = True
+                For Each clsNewObservationPoint In objNewObservationPoints
+                    'つながってる兄弟全てと比較する。
+                    Dim clsTargetPoint As ObservationPoint
+                    Set clsTargetPoint = clsNewObservationPoint.HeadPoint
+                    Do While Not clsTargetPoint Is Nothing
+                        If (Not clsTargetPoint.ChildPoint Is clsNewObservationPoint) And (clsTargetPoint.Session <> "") Then
+                            'セッション名が一致したら重複と見なす。
+                            If clsTargetPoint.Session = clsNewObservationPoint.Session Then
+                                '上書き確認。
+                                If bMsg Then
+                                    Dim nStyle As Long
+                                    nStyle = 2
+                                    nResult = vbNo
+                                    RaiseEvent OverwriteNotification(clsNewObservationPoint, nStyle, nResult)
+                                    If nResult = vbYes Then
+                                        nResult = 8
+                                    ElseIf nResult = vbNo Then
+                                        nResult = 16
+                                    Else
+                                        '次から確認なし。
+                                        bMsg = False
+                                    End If
+                                End If
+                                If nResult = 8 Then
+                                    'HeadPoint を削除する場合、本点の CorrectPoint を変更する。
+                                    If clsTargetPoint.PrevPoint Is Nothing Then
+                                        If clsTargetPoint.Eccentric Then Call clsTargetPoint.CorrectPoint.UpdateCorrectPoint(clsTargetPoint.NextPoint) 'NextPoint は必ず存在するはず。
+                                    End If
+                                    '既存の観測点を削除する。
+                                    Call RemoveAtCollection(objRepresentPointCollection, Hex$(GetPointer(clsTargetPoint)))
+                                    Call RemoveAtCollection(objNewObservationPoints, Hex$(GetPointer(clsTargetPoint.ChildPoint)))
+                                    Call RemoveRepresentPoint(clsTargetPoint, sObsPointPath, objIsolatePointChainCollection, objBaseLineVectorChainCollection)
+                                    Exit Do
+                                Else
+                                    '新しい観測点を削除する。
+                                    Call RemoveAtCollection(objRepresentPointCollection, Hex$(GetPointer(clsNewObservationPoint.TopParentPoint)))
+                                    Call RemoveAtCollection(objNewObservationPoints, Hex$(GetPointer(clsNewObservationPoint)))
+                                    Call RemoveRepresentPoint(clsNewObservationPoint.TopParentPoint, sObsPointPath, objIsolatePointChainCollection, objBaseLineVectorChainCollection)
+                                    Exit Do
+                                End If
+                            End If
+                        End If
+                        Set clsTargetPoint = clsTargetPoint.NextPoint
+                    Loop
+                    'プログレス。
+                    Call clsProgressInterface.CheckCancel
+                Next
+
+                'ファイル名からセッション名が取得できていなかった場合、｢S｣＋３桁の連番。
+                For Each clsNewObservationPoint In objNewObservationPoints
+                    Set clsRepresentPoint = clsNewObservationPoint.TopParentPoint
+                    If clsRepresentPoint.Session = "" Then
+                        Set clsTargetPoint = clsRepresentPoint.HeadPoint
+                        Dim objSessionCollection As Collection
+                        Set objSessionCollection = New Collection
+                        '既存のセッション名。
+                        Do While Not clsTargetPoint Is Nothing
+                            If clsTargetPoint.Session <> "" Then Call objSessionCollection.Add(clsTargetPoint, clsTargetPoint.Session)
+                            Set clsTargetPoint = clsTargetPoint.NextPoint
+                        Loop
+                        For i = 1 To 999
+                            clsRepresentPoint.Session = "S" & Format$(i, "000")
+                            Dim objItem As Object
+                            If Not LookupCollectionObject(objSessionCollection, objItem, clsRepresentPoint.Session) Then Exit For
+                        Next
+                        If 999 < i Then
+                            'S999を超えた場合は観測点を削除する。
+                            Call RemoveAtCollection(objNewObservationPoints, Hex$(GetPointer(clsRepresentPoint.ChildPoint)))
+                            Call RemoveRepresentPoint(clsRepresentPoint, sObsPointPath, objIsolatePointChainCollection, objBaseLineVectorChainCollection)
+                        End If
+                        '仮のセッション。
+                        clsRepresentPoint.ProvisionalSession = True
+                    End If
+                    'プログレス。
+                    Call clsProgressInterface.CheckCancel
+                Next
+
+                '基線ベクトルのセッションを決めるためのコレクション。基線ベクトルキーのコレクション。
+                Dim objBaseLineVectorKeyCollection As New Collection
+                Set clsChainList = m_clsBaseLineVectorHead.NextList
+                Do While Not clsChainList Is Nothing
+                    Call objBaseLineVectorKeyCollection.Add(clsChainList.Element, clsChainList.Element.Key)
+                    Set clsChainList = clsChainList.NextList
+                    'プログレス。
+                    Call clsProgressInterface.CheckCancel
+                Loop
+
+                '新規に追加された観測点の基線を評価する。
+                Dim objObservationCollection  As New Collection
+                Set clsChainList = m_clsRepresentPointHead.NextList
+                Do While Not clsChainList Is Nothing
+                    Set clsObservationPoint = clsChainList.Element.ChildPoint
+                    '本点以外。
+                    If Not clsObservationPoint.Genuine Then
+                        Call objObservationCollection.Add(clsObservationPoint, Hex$(GetPointer(clsObservationPoint)))
+                        '遷移状態の取得。
+                        If clsObservationPoint.SatelliteInfo Is Nothing Then
+                            Dim clsSatelliteInfoReader As SatelliteInfoReader
+                            Set clsSatelliteInfoReader = New SatelliteInfoReader
+                            Call clsSatelliteInfoReader.OpenFile(sObsPointPath & clsObservationPoint.FileTitle & "." & RNX_SV_EXTENSION)
+                            Set clsObservationPoint.SatelliteInfo = clsSatelliteInfoReader.ReadChanges2(clsObservationPoint.StrTimeGPS, clsObservationPoint.Interval, clsProgressInterface)
+                        End If
+                    End If
+                    Set clsChainList = clsChainList.NextList
+                    'プログレス。
+                    Call clsProgressInterface.CheckCancel
+                Loop
+                For Each clsNewObservationPoint In objNewObservationPoints
+                    Call objObservationCollection.Remove(Hex$(GetPointer(clsNewObservationPoint)))
+                    '総当たり。
+                    For Each clsTargetPoint In objObservationCollection
+                        '観測点番号が異なる点間にのみ基線をむすべる。
+                        If clsTargetPoint.Number <> clsNewObservationPoint.Number Then
+                            '遷移状態を評価し、条件を満たす場合は基線ベクトルを追加する。
+                            Call EstimateSatelliteInfoChanges(nSameTimeMin, nSatelliteCountMin, clsTargetPoint, clsNewObservationPoint, objIsolatePointChainCollection, objBaseLineVectorKeyCollection)
+                        End If
+                        'プログレス。
+                        Call clsProgressInterface.CheckCancel
+                    Next
+                    '基線が結べなかったら孤立観測点。
+                    If clsNewObservationPoint.ChildPoint Is Nothing Then
+                        '孤立観測点リストに追加する。
+                        Set clsChainList = m_clsIsolatePointHead.TailList.InsertNext(clsNewObservationPoint)
+                        Call objIsolatePointChainCollection.Add(clsChainList, Hex$(GetPointer(clsNewObservationPoint)))
+                    End If
+                    'プログレス。
+                    Call clsProgressInterface.CheckCancel
+                Next
+
+                For Each clsNewObservationPoint In objNewObservationPoints
+                    'インポートに成功した観測点ファイルを移動。
+                    Call clsNewObservationPoint.UpdateFileName(App.Path & TEMPORARY_PATH & IMPORT_TEMPPATH, sObsPointPath)
+                    'プログレス。
+                    Call clsProgressInterface.CheckCancel
+                Next
+
+                '衛星情報の遷移状態を破棄。
+                Set clsChainList = m_clsRepresentPointHead.NextList
+                Do While Not clsChainList Is Nothing
+                    Set clsChainList.Element.ChildPoint.SatelliteInfo = Nothing
+                    Set clsChainList = clsChainList.NextList
+                    'プログレス。
+                    Call clsProgressInterface.CheckCancel
+                Loop
+
+                'テンポラリファイルのクリア。
+                Call EmptyDir(App.Path & TEMPORARY_PATH & IMPORT_TEMPPATH, True)
+
+            End Function
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        /// <summary>
+        /// 外部ファイルをインポートする。
+        /// 
+        /// 引き数：
+        ///     nImportType インポートファイル種別。
+        ///     sPath インポートするファイルのパス。参照する配列の要素は(0 To ...)。Ubound 関数を使用する。
+        ///     sObsPointPath 観測点フォルダのパス。
+        ///     nSameTimeMin 最小同時観測時間(秒)。
+        ///     nSatelliteCountMin 最少共通衛星数。
+        ///     clsProgressInterface ProgressInterface オブジェクト。
+        /// 
+        /// </summary>
+        /// <param name="nImportType"></param>
+        /// <param name="sPath"></param>
+        /// <param name="sObsPointPath"></param>
+        /// <param name="nSameTimeMin"></param>
+        /// <param name="nSatelliteCountMi"></param>
+        /// <param name="clsProgressInterface"></param>
+        /// <returns>
+        /// 戻り値：
+        ///     全て正常にインポートできた場合は True を返す。
+        ///     無効なデータがあった場合は False を返す。
+        /// </returns>
+        //public bool Import(IMPORT_TYPE nImportType, ref List<string> sPath, string sObsPointPath, long nSameTimeMin, long nSatelliteCountMi, ProgressInterface clsProgressInterface)
+        public bool Import(IMPORT_TYPE nImportType, ref List<string> sPath, string sObsPointPath, long nSameTimeMin, long nSatelliteCountMi, object clsProgressInterface)
+        {
+            bool Import = true;
+
+            switch (nImportType)
+            {
+                case IMPORT_TYPE.IMPORT_TYPE_UNKNOWN:
+                    Import = false;
+                    return Import;
+                case IMPORT_TYPE.IMPORT_TYPE_JOB:
+                    Import = false;
+                    return Import;
+                case IMPORT_TYPE.IMPORT_TYPE_NVF:
+                    Import = false;
+                    return Import;
+                case IMPORT_TYPE.IMPORT_TYPE_DAT:
+                case IMPORT_TYPE.IMPORT_TYPE_RINEX:
+                    List<string> sPathO = new List<string>();
+                    List<string> sPathN = new List<string>();
+                    List<string> sPathG = new List<string>();
+                    //  '2017/07/05 NS6000対応。'''''''''''''''''''''''''''''''''''''''''''''''''''''''
+                    //  'Call ArrangeRinexPath(sPath, sPathO, sPathN, sPathG, clsProgressInterface)
+                    //  '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+                    List<string> sPathJ = new List<string>();
+                    List<string> sPathL = new List<string>();
+                    List<string> sPathC = new List<string>();
+                    List<string> sPathP = new List<string>();
+                    //  '2020/10/23 FDC 暦ファイルの流用'''''''''''''''''''''''''''''''''''''''''''''''
+                    //  'Call ArrangeRinexPath(sPath, sPathO, sPathN, sPathG, sPathJ, sPathL, sPathC, sPathP, clsProgressInterface)
+                    List<bool> bImportCheckG = new List<bool>();
+                    List<bool> bImportCheckJ = new List<bool>();
+                    List<bool> bImportCheckL = new List<bool>();
+                    List<bool> bImportCheckC = new List<bool>();
+                    List<bool> bNavFile = new List<bool>();
+
+
+                    mdlImport.ArrangeRinexPath(ref sPath, ref sPathO, ref sPathN, ref sPathG, ref sPathJ, ref sPathL, ref sPathC, ref sPathP, (ProgressInterface)clsProgressInterface, ref bImportCheckG, ref bImportCheckJ, ref bImportCheckL, ref bImportCheckC, ref bNavFile);
+                    //'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+                    sPath = sPathO;
+                    break;
+                case IMPORT_TYPE.IMPORT_TYPE_DIRECT:
+                    break;
+                case IMPORT_TYPE.IMPORT_TYPE_NS3:
+                    break;
+                case IMPORT_TYPE.IMPORT_TYPE_NS5:
+                    break;
+                case IMPORT_TYPE.IMPORT_TYPE_NS51:
+                    break;
+                case IMPORT_TYPE.IMPORT_TYPE_NS6:
+                    break;
+                case IMPORT_TYPE.IMPORT_TYPE_PC:
+                    break;
+                case IMPORT_TYPE.IMPORT_TYPE_PDA:
+                    break;
+                case IMPORT_TYPE.IMPORT_TYPE_ANDROID:
+                    break;
+                case IMPORT_TYPE.IMPORT_TYPE_NVB:
+                    break;
+                case IMPORT_TYPE.IMPORT_TYPE_CSV:
+                    break;
+                case IMPORT_TYPE.IMPORT_TYPE_COUNT:
+                    break;
+                default:
+                    break;
+            }
+
+            //'ファイルの読み込み。
+
+            //  Dim objNewObservationPoints As New Collection
+            Collection objNewObservationPoints = new Collection();
+            ObservationPoint clsObservationPoint;
+            long i;
+
+            //'2020/10/26 FDC 暦ファイルの流用、衛星種別追加'''''''''''''''''''''''''''''''''
+            string sFileCheckResult;
+            List<string> sDatPathN = new List<string>();
+            List<string> sDatPathP = new List<string>();
+            List<string> sImportPathN = new List<string>();
+            List<string> sImportPathP = new List<string>();
+            List<string> sMessage = new List<string>();
+
+            if (nImportType == IMPORT_TYPE.IMPORT_TYPE_DAT || nImportType == IMPORT_TYPE.IMPORT_TYPE_DIRECT)
+            {
+                //ReDim Preserve sPathO(-1 To - 1)
+                List<string> sPathO = new List<string>();
+            }
+            //'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+            for (i = 0; i <= sPath.Count; i++)
+            {
+                //'ファイル名文字数のチェック。
+                MdlImport mdlImport = new MdlImport();
+
+
+
+                if (mdlImport.CheckFileTitle(sPath[(int)i]))
+                {
+                    while (true)
+                    {
+                        //'ファイル読み込み。
+                        switch (nImportType)
+                        {
+                            case IMPORT_TYPE.IMPORT_TYPE_DAT:
+                            case IMPORT_TYPE.IMPORT_TYPE_DIRECT:    //'2007/4/10 NGS Yamada
+
+#if false
+                                Set clsObservationPoint = ReadDatFile(sPath(i), clsProgressInterface)
+
+                                '2020/10/26 FDC 暦ファイルの流用、衛星種別追加'''''''''''''''''''''''''''''''''
+                                ReDim Preserve sPathN(-1 To i)
+                                ReDim Preserve sPathP(-1 To i)
+
+                                If Not clsObservationPoint Is Nothing Then
+                                    sFileCheckResult = CheckImportDatFile(sPath(i), sPathN(i), sPathP(i), clsObservationPoint)
+                                    If sFileCheckResult<> "" Then
+                                        Dim nUBound As Long
+                                        nUBound = UBound(sPathO) + 1
+                                        ReDim Preserve sPathO(-1 To nUBound)
+                                        ReDim Preserve sDatPathN(-1 To nUBound)
+                                        ReDim Preserve sPathG(-1 To nUBound)
+                                        ReDim Preserve sPathJ(-1 To nUBound)
+                                        ReDim Preserve sPathL(-1 To nUBound)
+                                        ReDim Preserve sPathC(-1 To nUBound)
+                                        ReDim Preserve sDatPathP(-1 To nUBound)
+                                        ReDim Preserve bImportCheckG(-1 To nUBound)
+                                        ReDim Preserve bImportCheckJ(-1 To nUBound)
+                                        ReDim Preserve bImportCheckL(-1 To nUBound)
+                                        ReDim Preserve bImportCheckC(-1 To nUBound)
+                                        ReDim Preserve sMessage(-1 To nUBound)
+
+                                        sPathO(nUBound) = sPath(i)
+                                        Call DeleteTempFile(sPath(i))
+                                        bImportCheckG(nUBound) = clsObservationPoint.GlonassFlag
+                                        bImportCheckJ(nUBound) = clsObservationPoint.QZSSFlag
+                                        bImportCheckL(nUBound) = clsObservationPoint.GalileoFlag
+                                        bImportCheckC(nUBound) = clsObservationPoint.BeiDouFlag
+                                        sMessage(nUBound) = sFileCheckResult
+
+                                        Set clsObservationPoint = Nothing
+                                    End If
+                                End If
+
+#endif
+                                break;
+
+                            case IMPORT_TYPE.IMPORT_TYPE_RINEX:
+
+                                //  '2017/07/05 NS6000対応。'''''''''''''''''''''''''''''''''''''''''''''''''''''''
+                                //  'Set clsObservationPoint = ReadRinexFile(sPath(i), sPathN(i), sPathG(i), clsProgressInterface)
+                                //  '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+                                //  '2020/10/26 FDC 暦ファイルの流用、衛星種別追加'''''''''''''''''''''''''''''''''
+                                //  'Set clsObservationPoint = ReadRinexFile(sPath(i), sPathN(i), sPathG(i), sPathJ(i), sPathL(i), sPathC(i), sPathP(i), clsProgressInterface)
+                                //  '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+#if false
+                                clsObservationPoint = mdlImport.ReadRinexFile(sPath[(int)i],
+                                    ref sPathN[(int)i],
+                                    sPathG[(int)i],
+                                    sPathJ[(int)i],
+                                    sPathL[(int)i],
+                                    sPathC[(int)i],
+                                    ref sPathP[(int)i],
+                                    (object)clsProgressInterface,
+                                    bImportCheckG[(int)i],
+                                    bImportCheckJ(i),
+                                    bImportCheckL[(int)i],
+                                    bImportCheckC[(int)i],
+                                    bNavFile[(int)i]);
+                                
+
+
+                                if (clsObservationPoint != null)
+                                {
+                                    sFileCheckResult = CheckImportRinexFile(sPath[(int)i], clsObservationPoint);
+                                    if (sFileCheckResult == "")
+                                    {
+                                        break;
+                                    }
+                                }
+#endif
+                                break;
+                            case IMPORT_TYPE.IMPORT_TYPE_UNKNOWN:
+                                break;
+                            case IMPORT_TYPE.IMPORT_TYPE_JOB:
+                                break;
+                            case IMPORT_TYPE.IMPORT_TYPE_NVF:
+                                break;
+                            case IMPORT_TYPE.IMPORT_TYPE_NS3:
+                                break;
+                            case IMPORT_TYPE.IMPORT_TYPE_NS5:
+                                break;
+                            case IMPORT_TYPE.IMPORT_TYPE_NS51:
+                                break;
+                            case IMPORT_TYPE.IMPORT_TYPE_NS6:
+                                break;
+                            case IMPORT_TYPE.IMPORT_TYPE_PC:
+                                break;
+                            case IMPORT_TYPE.IMPORT_TYPE_PDA:
+                                break;
+                            case IMPORT_TYPE.IMPORT_TYPE_ANDROID:
+                                break;
+                            case IMPORT_TYPE.IMPORT_TYPE_NVB:
+                                break;
+                            case IMPORT_TYPE.IMPORT_TYPE_CSV:
+                                break;
+                            case IMPORT_TYPE.IMPORT_TYPE_COUNT:
+                                break;
+                            default:
+                                break;
+                        }
+
+                    }   // while (true)
+
+                }   //if (mdlImport.CheckFileTitle(sPath[(int)i]))
+
+
+            }   //for (i = 0; i <= sPath.Count; i++{
+
+
+
+
+
+
+
+
+            return Import;
+        }
+
+
+
+        //sssssssssssss
+
+#if false
+                'ファイルの読み込み。
+                Dim objNewObservationPoints As New Collection
+                Dim clsObservationPoint As ObservationPoint
+                Dim i As Long
+
+                '2020/10/26 FDC 暦ファイルの流用、衛星種別追加'''''''''''''''''''''''''''''''''
+                Dim sFileCheckResult As String
+                Dim sDatPathN() As String
+                Dim sDatPathP() As String
+                Dim sImportPathN() As String
+                Dim sImportPathP() As String
+                Dim sMessage() As String
+
+                If nImportType = IMPORT_TYPE_DAT Or nImportType = IMPORT_TYPE_DIRECT Then
+                    ReDim Preserve sPathO(-1 To -1)
+                End If
+                '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+                For i = 0 To UBound(sPath)
+                    'ファイル名文字数のチェック。
+                    If CheckFileTitle(sPath(i)) Then
+
+                        Do While (True)
+
+                            'ファイル読み込み。
+                            Select Case nImportType
+                            Case IMPORT_TYPE_DAT, IMPORT_TYPE_DIRECT   '2007/4/10 NGS Yamada
+                                Set clsObservationPoint = ReadDatFile(sPath(i), clsProgressInterface)
+
+                                '2020/10/26 FDC 暦ファイルの流用、衛星種別追加'''''''''''''''''''''''''''''''''
+                                ReDim Preserve sPathN(-1 To i)
+                                ReDim Preserve sPathP(-1 To i)
+
+                                If Not clsObservationPoint Is Nothing Then
+                                    sFileCheckResult = CheckImportDatFile(sPath(i), sPathN(i), sPathP(i), clsObservationPoint)
+                                    If sFileCheckResult <> "" Then
+                                        Dim nUBound As Long
+                                        nUBound = UBound(sPathO) + 1
+                                        ReDim Preserve sPathO(-1 To nUBound)
+                                        ReDim Preserve sDatPathN(-1 To nUBound)
+                                        ReDim Preserve sPathG(-1 To nUBound)
+                                        ReDim Preserve sPathJ(-1 To nUBound)
+                                        ReDim Preserve sPathL(-1 To nUBound)
+                                        ReDim Preserve sPathC(-1 To nUBound)
+                                        ReDim Preserve sDatPathP(-1 To nUBound)
+                                        ReDim Preserve bImportCheckG(-1 To nUBound)
+                                        ReDim Preserve bImportCheckJ(-1 To nUBound)
+                                        ReDim Preserve bImportCheckL(-1 To nUBound)
+                                        ReDim Preserve bImportCheckC(-1 To nUBound)
+                                        ReDim Preserve sMessage(-1 To nUBound)
+
+                                        sPathO(nUBound) = sPath(i)
+                                        Call DeleteTempFile(sPath(i))
+                                        bImportCheckG(nUBound) = clsObservationPoint.GlonassFlag
+                                        bImportCheckJ(nUBound) = clsObservationPoint.QZSSFlag
+                                        bImportCheckL(nUBound) = clsObservationPoint.GalileoFlag
+                                        bImportCheckC(nUBound) = clsObservationPoint.BeiDouFlag
+                                        sMessage(nUBound) = sFileCheckResult
+
+                                        Set clsObservationPoint = Nothing
+                                    End If
+                                End If
+                                Exit Do
+                                '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+                            Case IMPORT_TYPE_RINEX
+                                '2017/07/05 NS6000対応。'''''''''''''''''''''''''''''''''''''''''''''''''''''''
+                                'Set clsObservationPoint = ReadRinexFile(sPath(i), sPathN(i), sPathG(i), clsProgressInterface)
+                                '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+                                '2020/10/26 FDC 暦ファイルの流用、衛星種別追加'''''''''''''''''''''''''''''''''
+                                'Set clsObservationPoint = ReadRinexFile(sPath(i), sPathN(i), sPathG(i), sPathJ(i), sPathL(i), sPathC(i), sPathP(i), clsProgressInterface)
+                                '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+                                Set clsObservationPoint = ReadRinexFile(sPath(i), sPathN(i), sPathG(i), sPathJ(i), sPathL(i), sPathC(i), sPathP(i), clsProgressInterface, bImportCheckG(i), bImportCheckJ(i), bImportCheckL(i), bImportCheckC(i), bNavFile(i))
+
+                                If Not clsObservationPoint Is Nothing Then
+                                    sFileCheckResult = CheckImportRinexFile(sPath(i), clsObservationPoint)
+                                    If sFileCheckResult = "" Then
+                                        Exit Do
+                                    Else
+                                        Call DeleteTempFile(sPath(i))
+
+                                        bImportCheckG(i) = clsObservationPoint.GlonassFlag
+                                        bImportCheckJ(i) = clsObservationPoint.QZSSFlag
+                                        bImportCheckL(i) = clsObservationPoint.GalileoFlag
+                                        bImportCheckC(i) = clsObservationPoint.BeiDouFlag
+
+                                        Call DivertRinexPath(sPath(i), sPathN(i), sPathG(i), sPathJ(i), sPathL(i), sPathC(i), sPathP(i), clsProgressInterface, sPathN, sPathP, bImportCheckG(i), bImportCheckJ(i), bImportCheckL(i), bImportCheckC(i), True, sFileCheckResult, True)
+                                        If sPathN(i) = "" And sPathP(i) = "" Then
+                                            Set clsObservationPoint = Nothing
+                                            Exit Do
+                                        End If
+                                        bNavFile(i) = True
+                                    End If
+                                ElseIf bNavFile(i) Then
+                                    sFileCheckResult = "衛星軌道情報の適用に失敗しました。"
+                                    Call DivertRinexPath(sPath(i), sPathN(i), sPathG(i), sPathJ(i), sPathL(i), sPathC(i), sPathP(i), clsProgressInterface, sPathN, sPathP, bImportCheckG(i), bImportCheckJ(i), bImportCheckL(i), bImportCheckC(i), True, sFileCheckResult, False)
+                                    If sPathN(i) = "" And sPathP(i) = "" Then
+                                        Set clsObservationPoint = Nothing
+                                        Exit Do
+                                    End If
+                                Else
+                                    Exit Do
+                                End If
+
+                            Case Else
+                                Exit Do
+                                '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+                            End Select
+                        Loop
+
+                        If Not clsObservationPoint Is Nothing Then
+                            Call objNewObservationPoints.Add(clsObservationPoint, Hex$(GetPointer(clsObservationPoint)))
+                        Else
+                            '無効なデータがあった場合はFalseを返す。
+                            Import = False
+                        End If
+                    Else
+                        Call MsgBox(sPath(i) & vbCrLf & "このファイルはファイル名が長すぎます。", vbCritical)
+                        '無効なデータがあった場合はFalseを返す。
+                        Import = False
+                    End If
+
+                    'プログレス。
+                    Call clsProgressInterface.CheckCancel
+                Next
+
+                '2020/10/26 FDC 暦ファイルの流用、Datの流用''''''''''''''''''''''''''''''''''''
+
+
+#endif
+
+
+        //<<<<<<<<<-----------24/02/21 K.setoguchi@NV
+        //***************************************************************************
+
+
+
 
         //24/01/04 K.setoguchi@NV---------->>>>>>>>>>
         //***************************************************************************

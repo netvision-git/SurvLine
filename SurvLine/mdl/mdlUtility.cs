@@ -23,7 +23,6 @@ namespace SurvLine
 
         MdiVBfunctions mdiVBfunctions = new MdiVBfunctions();
 
-        
 
         //==========================================================================================
         /*[VB]

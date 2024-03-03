@@ -64,8 +64,8 @@ namespace SurvLine
         public bool m_bExit;                   // As Boolean 'ダイアログ終了フラグ。True=終了。False=終了しない。
         public bool m_bCancel;                 // As Boolean 'キャンセルフラグ。True=キャンセル。False=続行。
         //----------------------------------------
-        //private ProcessInterface processInterface = new ProcessInterface();
-        private ProcessInterface m_clsProcessInterface; // As  '処理インターフェース。
+        private ProcessInterface processInterface = new ProcessInterface();
+        private ProcessInterface m_clsProcessInterface;  // As  '処理インターフェース。
 
 
         public long m_nResult;                 // As Long  '結果。
@@ -276,7 +276,11 @@ namespace SurvLine
         /// <param name="bEnable"></param>
         public void CancelEnable(bool bEnable)
         {
+#if false   //瀬戸口
             CancelButton.Enabled = bEnable;
+#else
+            CancelButton.Enabled = true;
+#endif
         }
 
 
@@ -617,6 +621,7 @@ namespace SurvLine
             InitializeComponent();
             Form_Initialize();
             this.Load += Form_Load;
+
         }
 
 
@@ -631,6 +636,7 @@ namespace SurvLine
 
                 On Error GoTo ErrorHandler
 
+                m_clsProcessInterface = processInterface;
 
                 m_bBar(0) = True
                 m_bBar(1) = False
@@ -751,10 +757,14 @@ namespace SurvLine
                 m_nProgressSpan2 = lblPrompt.Top - pgbProgress[1].Top;
                 m_nPromptSpan = CancelButton.Top - lblPrompt.Top;
                 m_nButtonBottom = CancelButton.Top + CancelButton.Height;
-                m_nHeight = Height;
+                m_nHeight = this.Height;
 
                 //'コントロールの再配置。
                 Arrange();
+
+
+                Activate();
+
 
 
                 return;
@@ -800,8 +810,7 @@ namespace SurvLine
         {
             try
             {
-                m_clsProcessInterface = null;
-
+                object m_clsProcessInterface = null;
                 m_bBar[0] = true;
                 m_bBar[1] = false;
                 m_bCancelVisible = true;
@@ -910,7 +919,8 @@ namespace SurvLine
             {
                 //  On Error GoTo ErrorHandler
 
-                if (m_bInitialActive){
+                if (m_bInitialActive)
+                {
                     m_bInitialActive = false;
                     //'処理。
                     Process();
@@ -1128,6 +1138,9 @@ namespace SurvLine
         {
             nIndex = 0;
             mdiVBfunctions.DoEvents();
+
+            
+
             CurPos(nIndex, nPos);
         }
 
@@ -1455,6 +1468,7 @@ namespace SurvLine
                 bPrompt = true;
             }
 
+#if false  //瀬戸口
 
             lblPrompt.Visible = bPrompt;
             if (bPrompt)
@@ -1465,16 +1479,10 @@ namespace SurvLine
             }
             else
             {
-                if (bTop)
-                {
-                    CancelButton.Top = pgbProgress[1].Top + (int)m_nProgressSpan2;
-                }
-                else
-                {
-                    CancelButton.Top = pgbProgress[0].Top;
-                }
+                CancelButton.Top = bTop ? pgbProgress[1].Top + (int)m_nProgressSpan2 : pgbProgress[0].Top;
 
             }
+#endif
 
             //'高さ。
             CancelButton.Visible = m_bCancelVisible;
@@ -1483,7 +1491,12 @@ namespace SurvLine
                 nBottom = CancelButton.Top + CancelButton.Height;
 
             }
+
+#if false  //瀬戸口
             Height = (int)(m_nHeight - (m_nButtonBottom - nBottom));
+#else
+            Height = this.Height;
+#endif
 
         }
 
@@ -1522,19 +1535,23 @@ namespace SurvLine
         /// </summary>
         private void Process()
         {
+
+            //'正常終了。
+
             try
             {
                 //On Error GoTo CancelHandler
 
                 //'処理。
                 //                Call m_clsProcessInterface.Process(Me)
-                ProcessProject m_clsProcessProject = new ProcessProject();
-                m_clsProcessProject.ProcessInterface_Process(m_clsProcessInterface);
+                ProcessProject processProject = new ProcessProject();
+                processProject.ProcessInterface_Process(m_clsProcessInterface);
+
+
 
                 //'正常終了。
                 EndDialog(DEFINE.vbOK);
 
-                return;
 
             }
             catch (Exception)
@@ -1589,5 +1606,9 @@ namespace SurvLine
             this.Close();
         }
 
+        private void button1_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }

@@ -50,6 +50,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Numerics" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -132,6 +133,18 @@
     </Compile>
     <Compile Include="class\IniFileControl.cs" />
     <Compile Include="class\KnownPoint.cs" />
+    <Compile Include="frmMsgBoxYesNo.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmMsgBoxYesNo.Designer.cs">
+      <DependentUpon>frmMsgBoxYesNo.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmOutputInfo.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmOutputInfo.Designer.cs">
+      <DependentUpon>frmOutputInfo.cs</DependentUpon>
+    </Compile>
     <Compile Include="frmProgressDialog2.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -142,6 +155,8 @@
     <Compile Include="class\ListViewInterface.cs" />
     <Compile Include="class\ListViewBaseLineVector.cs" />
     <Compile Include="class\ListViewObservationPoint.cs" />
+    <Compile Include="mdl\mdlNGSRDRIN.cs" />
+    <Compile Include="mdl\mdlImport.cs" />
     <Compile Include="mdl\mdlNSCAB.cs" />
     <Compile Include="mdl\mdlNSGUI.cs" />
     <Compile Include="mdl\mdlAccountMakeNSS.cs" />
@@ -175,6 +190,8 @@
     <Compile Include="class\RegistAngle.cs" />
     <Compile Include="mdl\mdlFolderDialog.cs" />
     <Compile Include="class\TwipsPoint.cs" />
+    <Compile Include="class\SatelliteInfoHeader.cs" />
+    <Compile Include="class\SatelliteInfoChanges.cs" />
     <Compile Include="user\ListPane.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -198,6 +215,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="frmJobOpen.resx">
       <DependentUpon>frmJobOpen.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmMsgBoxYesNo.resx">
+      <DependentUpon>frmMsgBoxYesNo.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmOutputInfo.resx">
+      <DependentUpon>frmOutputInfo.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmProgressDialog2.resx">
       <DependentUpon>frmProgressDialog2.cs</DependentUpon>
