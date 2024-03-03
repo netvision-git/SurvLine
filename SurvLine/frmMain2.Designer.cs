@@ -169,14 +169,31 @@
             this.dataGridViewTextBoxColumn14 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.SessionCheckedListBox = new System.Windows.Forms.CheckedListBox();
             this.panel2 = new System.Windows.Forms.Panel();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.mnuFile_btn = new System.Windows.Forms.ToolStrip();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.mnuEdit_btn = new System.Windows.Forms.ToolStrip();
+            this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripSeparator10 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripSeparator11 = new System.Windows.Forms.ToolStripSeparator();
+            this.mnuEdit2_btn = new System.Windows.Forms.ToolStrip();
+            this.mnuEditCoordNum_cmb = new System.Windows.Forms.ToolStripComboBox();
+            this.toolStripSeparator9 = new System.Windows.Forms.ToolStripSeparator();
+            this.mnuCalc_InspCalc_btn = new System.Windows.Forms.ToolStrip();
+            this.mnuTyouhyou_FileOutput_btn = new System.Windows.Forms.ToolStrip();
+            this.toolStripSeparator8 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
+            this.mnuView_btn = new System.Windows.Forms.ToolStrip();
+            this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
+            this.mnuViewReduce_ViewEnlarge_cmb = new System.Windows.Forms.ToolStripComboBox();
+            this.toolStripSeparator21 = new System.Windows.Forms.ToolStripSeparator();
+            this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.mnuFileNew_btn = new System.Windows.Forms.ToolStripButton();
             this.mnuFileOpen_btn = new System.Windows.Forms.ToolStripButton();
-            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.mnuFileSave_btn = new System.Windows.Forms.ToolStripButton();
             this.mnuFileEdit_btn = new System.Windows.Forms.ToolStripButton();
-            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.mnuFileImportPC_btn = new System.Windows.Forms.ToolStripButton();
             this.mnuFileImportAndroid_btn = new System.Windows.Forms.ToolStripButton();
             this.mnuFileImportNVP_btn = new System.Windows.Forms.ToolStripButton();
@@ -184,31 +201,21 @@
             this.mnuFileImportRINEX_btn = new System.Windows.Forms.ToolStripButton();
             this.mnuFileImportNVF_btn = new System.Windows.Forms.ToolStripButton();
             this.mnuFileImportCSV_btn = new System.Windows.Forms.ToolStripButton();
-            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
-            this.mnuEdit_btn = new System.Windows.Forms.ToolStrip();
             this.mnuEditSession_btn = new System.Windows.Forms.ToolStripButton();
             this.mnuEditAttributeCommon_btn = new System.Windows.Forms.ToolStripButton();
             this.mnuEditAttribute_btn = new System.Windows.Forms.ToolStripButton();
             this.mnuEditBaseLine_btn = new System.Windows.Forms.ToolStripButton();
             this.mnuEditEccentric_btn = new System.Windows.Forms.ToolStripButton();
-            this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
             this.mnuEditValidOn_btn = new System.Windows.Forms.ToolStripButton();
-            this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
             this.mnuEditCombination_btn = new System.Windows.Forms.ToolStripButton();
             this.mnuEditSeparationB_btn = new System.Windows.Forms.ToolStripButton();
             this.mnuEditRemove_btn = new System.Windows.Forms.ToolStripButton();
-            this.toolStripSeparator10 = new System.Windows.Forms.ToolStripSeparator();
             this.mnuEditReverse_btn = new System.Windows.Forms.ToolStripButton();
             this.mnuSessionSplit_btn = new System.Windows.Forms.ToolStripButton();
             this.mnuEditHalfFstHalfLst_btn = new System.Windows.Forms.ToolStripButton();
             this.mnuEditAddLine_btn = new System.Windows.Forms.ToolStripButton();
             this.mnuEditConstructLine_btn = new System.Windows.Forms.ToolStripButton();
             this.mnuEditAutoOrder_btn = new System.Windows.Forms.ToolStripButton();
-            this.toolStripSeparator11 = new System.Windows.Forms.ToolStripSeparator();
-            this.mnuEdit2_btn = new System.Windows.Forms.ToolStrip();
-            this.mnuEditCoordNum_cmb = new System.Windows.Forms.ToolStripComboBox();
-            this.toolStripSeparator9 = new System.Windows.Forms.ToolStripSeparator();
-            this.mnuCalc_InspCalc_btn = new System.Windows.Forms.ToolStrip();
             this.mnuCalculate_btn = new System.Windows.Forms.ToolStripDropDownButton();
             this.mnuCalculateKnownDiff_btn = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuCalculateConsistency_btn = new System.Windows.Forms.ToolStripMenuItem();
@@ -220,7 +227,6 @@
             this.mnuCheckAngleDiffRing_btn = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuCheckAngleDiffBetween_btn = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuCheckAngleDiffHeight_btn = new System.Windows.Forms.ToolStripMenuItem();
-            this.mnuTyouhyou_FileOutput_btn = new System.Windows.Forms.ToolStrip();
             this.mnuTyouhou_O_btn = new System.Windows.Forms.ToolStripDropDownButton();
             this.mnuAccountHand_O_btn = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuAccountCoordinate_O_btn = new System.Windows.Forms.ToolStripMenuItem();
@@ -299,7 +305,6 @@
             this.mnuAccountResultPracticalNoFrame_N_btn = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuAccountHorizonStddev_N_btn = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuAccountDistanceDiff_N_btn = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator8 = new System.Windows.Forms.ToolStripSeparator();
             this.mnuFileOutput_btn = new System.Windows.Forms.ToolStripDropDownButton();
             this.mnuGenerateResult_N_btn = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator15 = new System.Windows.Forms.ToolStripSeparator();
@@ -327,12 +332,7 @@
             this.mnuGenerateSima_N_btn = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuGenerateApa_N_btn = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuGenerateCsv_N_btn = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
-            this.mnuView_btn = new System.Windows.Forms.ToolStrip();
             this.mnuViewData_btn = new System.Windows.Forms.ToolStripButton();
-            this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
-            this.mnuViewReduce_ViewEnlarge_cmb = new System.Windows.Forms.ToolStripComboBox();
-            this.toolStripSeparator21 = new System.Windows.Forms.ToolStripSeparator();
             this.menuStrip1.SuspendLayout();
             this.toolStripContainer1.BottomToolStripPanel.SuspendLayout();
             this.toolStripContainer1.ContentPanel.SuspendLayout();
@@ -347,13 +347,13 @@
             this.bekutoru_tabPage.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.bekutoru_dataGridView)).BeginInit();
             this.panel2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.mnuFile_btn.SuspendLayout();
             this.mnuEdit_btn.SuspendLayout();
             this.mnuEdit2_btn.SuspendLayout();
             this.mnuCalc_InspCalc_btn.SuspendLayout();
             this.mnuTyouhyou_FileOutput_btn.SuspendLayout();
             this.mnuView_btn.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -505,6 +505,7 @@
             this.mnuFileImportNVF.Name = "mnuFileImportNVF";
             this.mnuFileImportNVF.Size = new System.Drawing.Size(239, 22);
             this.mnuFileImportNVF.Text = "NetSurvベクトルデータファイル(&N)...";
+            this.mnuFileImportNVF.Click += new System.EventHandler(this.mnuFileImportNVF_Click);
             // 
             // mnuFileImportDAT
             // 
@@ -538,7 +539,7 @@
             // mnuFileExportRinex
             // 
             this.mnuFileExportRinex.Name = "mnuFileExportRinex";
-            this.mnuFileExportRinex.Size = new System.Drawing.Size(180, 22);
+            this.mnuFileExportRinex.Size = new System.Drawing.Size(164, 22);
             this.mnuFileExportRinex.Text = "RINEXファイル(&R)...";
             this.mnuFileExportRinex.Click += new System.EventHandler(this.mnuFileExportRinex_Click);
             // 
@@ -1037,12 +1038,14 @@
             this.mnuGenerateNVF.Name = "mnuGenerateNVF";
             this.mnuGenerateNVF.Size = new System.Drawing.Size(239, 22);
             this.mnuGenerateNVF.Text = "NetSurvベクトルデータファイル(&N)...";
+            this.mnuGenerateNVF.Click += new System.EventHandler(this.mnuGenerateNVF_Click);
             // 
             // mnuGenerateJOB
             // 
             this.mnuGenerateJOB.Name = "mnuGenerateJOB";
             this.mnuGenerateJOB.Size = new System.Drawing.Size(239, 22);
             this.mnuGenerateJOB.Text = "Geodimeterジョブファイル(&G)...";
+            this.mnuGenerateJOB.Click += new System.EventHandler(this.mnuGenerateJOB_Click);
             // 
             // toolStripMenuItem14
             // 
@@ -1471,15 +1474,6 @@
             this.panel2.Size = new System.Drawing.Size(450, 617);
             this.panel2.TabIndex = 0;
             // 
-            // pictureBox1
-            // 
-            this.pictureBox1.BackColor = System.Drawing.SystemColors.WindowText;
-            this.pictureBox1.Location = new System.Drawing.Point(0, 0);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(459, 617);
-            this.pictureBox1.TabIndex = 0;
-            this.pictureBox1.TabStop = false;
-            // 
             // mnuFile_btn
             // 
             this.mnuFile_btn.Dock = System.Windows.Forms.DockStyle.None;
@@ -1506,6 +1500,198 @@
             this.mnuFile_btn.TabIndex = 16;
             this.mnuFile_btn.Text = "toolStrip1";
             // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 31);
+            // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 31);
+            // 
+            // toolStripSeparator3
+            // 
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(6, 31);
+            // 
+            // mnuEdit_btn
+            // 
+            this.mnuEdit_btn.Dock = System.Windows.Forms.DockStyle.None;
+            this.mnuEdit_btn.ImageScalingSize = new System.Drawing.Size(24, 24);
+            this.mnuEdit_btn.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.mnuEditSession_btn,
+            this.mnuEditAttributeCommon_btn,
+            this.mnuEditAttribute_btn,
+            this.mnuEditBaseLine_btn,
+            this.mnuEditEccentric_btn,
+            this.toolStripSeparator5,
+            this.mnuEditValidOn_btn,
+            this.toolStripSeparator6,
+            this.mnuEditCombination_btn,
+            this.mnuEditSeparationB_btn,
+            this.mnuEditRemove_btn,
+            this.toolStripSeparator10,
+            this.mnuEditReverse_btn,
+            this.mnuSessionSplit_btn,
+            this.mnuEditHalfFstHalfLst_btn,
+            this.mnuEditAddLine_btn,
+            this.mnuEditConstructLine_btn,
+            this.mnuEditAutoOrder_btn,
+            this.toolStripSeparator11});
+            this.mnuEdit_btn.Location = new System.Drawing.Point(341, 0);
+            this.mnuEdit_btn.Name = "mnuEdit_btn";
+            this.mnuEdit_btn.Size = new System.Drawing.Size(456, 31);
+            this.mnuEdit_btn.TabIndex = 18;
+            this.mnuEdit_btn.Text = "toolStrip2";
+            // 
+            // toolStripSeparator5
+            // 
+            this.toolStripSeparator5.Name = "toolStripSeparator5";
+            this.toolStripSeparator5.Size = new System.Drawing.Size(6, 31);
+            // 
+            // toolStripSeparator6
+            // 
+            this.toolStripSeparator6.Name = "toolStripSeparator6";
+            this.toolStripSeparator6.Size = new System.Drawing.Size(6, 31);
+            // 
+            // toolStripSeparator10
+            // 
+            this.toolStripSeparator10.Name = "toolStripSeparator10";
+            this.toolStripSeparator10.Size = new System.Drawing.Size(6, 31);
+            // 
+            // toolStripSeparator11
+            // 
+            this.toolStripSeparator11.Name = "toolStripSeparator11";
+            this.toolStripSeparator11.Size = new System.Drawing.Size(6, 31);
+            // 
+            // mnuEdit2_btn
+            // 
+            this.mnuEdit2_btn.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.mnuEdit2_btn.Dock = System.Windows.Forms.DockStyle.None;
+            this.mnuEdit2_btn.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.mnuEditCoordNum_cmb,
+            this.toolStripSeparator9});
+            this.mnuEdit2_btn.Location = new System.Drawing.Point(3, 31);
+            this.mnuEdit2_btn.Name = "mnuEdit2_btn";
+            this.mnuEdit2_btn.Size = new System.Drawing.Size(220, 25);
+            this.mnuEdit2_btn.TabIndex = 20;
+            // 
+            // mnuEditCoordNum_cmb
+            // 
+            this.mnuEditCoordNum_cmb.BackColor = System.Drawing.Color.Azure;
+            this.mnuEditCoordNum_cmb.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.mnuEditCoordNum_cmb.Items.AddRange(new object[] {
+            "９　系　500000.　1000000.",
+            "１０系　500000.　1000000.",
+            "１１系　500000.　1000000."});
+            this.mnuEditCoordNum_cmb.Name = "mnuEditCoordNum_cmb";
+            this.mnuEditCoordNum_cmb.Size = new System.Drawing.Size(200, 25);
+            this.mnuEditCoordNum_cmb.Tag = "";
+            this.mnuEditCoordNum_cmb.ToolTipText = "座標系の変更";
+            // 
+            // toolStripSeparator9
+            // 
+            this.toolStripSeparator9.Name = "toolStripSeparator9";
+            this.toolStripSeparator9.Size = new System.Drawing.Size(6, 25);
+            // 
+            // mnuCalc_InspCalc_btn
+            // 
+            this.mnuCalc_InspCalc_btn.Dock = System.Windows.Forms.DockStyle.None;
+            this.mnuCalc_InspCalc_btn.Font = new System.Drawing.Font("Yu Gothic UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.mnuCalc_InspCalc_btn.ImageScalingSize = new System.Drawing.Size(24, 24);
+            this.mnuCalc_InspCalc_btn.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.mnuCalculate_btn,
+            this.mnuInspectionCalculation_btn});
+            this.mnuCalc_InspCalc_btn.Location = new System.Drawing.Point(223, 31);
+            this.mnuCalc_InspCalc_btn.Name = "mnuCalc_InspCalc_btn";
+            this.mnuCalc_InspCalc_btn.Size = new System.Drawing.Size(86, 31);
+            this.mnuCalc_InspCalc_btn.TabIndex = 21;
+            // 
+            // mnuTyouhyou_FileOutput_btn
+            // 
+            this.mnuTyouhyou_FileOutput_btn.Dock = System.Windows.Forms.DockStyle.None;
+            this.mnuTyouhyou_FileOutput_btn.Font = new System.Drawing.Font("Yu Gothic UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.mnuTyouhyou_FileOutput_btn.ImageScalingSize = new System.Drawing.Size(24, 24);
+            this.mnuTyouhyou_FileOutput_btn.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.mnuTyouhou_O_btn,
+            this.mnuTyouhou_S_btn,
+            this.mnuTyouhou_N_btn,
+            this.toolStripSeparator8,
+            this.mnuFileOutput_btn,
+            this.toolStripSeparator4});
+            this.mnuTyouhyou_FileOutput_btn.Location = new System.Drawing.Point(309, 31);
+            this.mnuTyouhyou_FileOutput_btn.Name = "mnuTyouhyou_FileOutput_btn";
+            this.mnuTyouhyou_FileOutput_btn.Size = new System.Drawing.Size(172, 31);
+            this.mnuTyouhyou_FileOutput_btn.TabIndex = 19;
+            // 
+            // toolStripSeparator8
+            // 
+            this.toolStripSeparator8.Name = "toolStripSeparator8";
+            this.toolStripSeparator8.Size = new System.Drawing.Size(6, 31);
+            // 
+            // toolStripSeparator4
+            // 
+            this.toolStripSeparator4.Name = "toolStripSeparator4";
+            this.toolStripSeparator4.Size = new System.Drawing.Size(6, 31);
+            // 
+            // mnuView_btn
+            // 
+            this.mnuView_btn.Dock = System.Windows.Forms.DockStyle.None;
+            this.mnuView_btn.ImageScalingSize = new System.Drawing.Size(24, 24);
+            this.mnuView_btn.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.mnuViewData_btn,
+            this.toolStripSeparator7,
+            this.mnuViewReduce_ViewEnlarge_cmb,
+            this.toolStripSeparator21});
+            this.mnuView_btn.Location = new System.Drawing.Point(481, 31);
+            this.mnuView_btn.Name = "mnuView_btn";
+            this.mnuView_btn.Size = new System.Drawing.Size(129, 31);
+            this.mnuView_btn.TabIndex = 22;
+            // 
+            // toolStripSeparator7
+            // 
+            this.toolStripSeparator7.Name = "toolStripSeparator7";
+            this.toolStripSeparator7.Size = new System.Drawing.Size(6, 31);
+            // 
+            // mnuViewReduce_ViewEnlarge_cmb
+            // 
+            this.mnuViewReduce_ViewEnlarge_cmb.BackColor = System.Drawing.Color.AntiqueWhite;
+            this.mnuViewReduce_ViewEnlarge_cmb.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.mnuViewReduce_ViewEnlarge_cmb.Items.AddRange(new object[] {
+            "500%",
+            "400%",
+            "300%",
+            "200%",
+            "100%",
+            "90%",
+            "80%",
+            "70%",
+            "60%",
+            "50%",
+            "40%",
+            "30%",
+            "20%",
+            "10%"});
+            this.mnuViewReduce_ViewEnlarge_cmb.Name = "mnuViewReduce_ViewEnlarge_cmb";
+            this.mnuViewReduce_ViewEnlarge_cmb.Size = new System.Drawing.Size(75, 31);
+            this.mnuViewReduce_ViewEnlarge_cmb.ToolTipText = "縮小・拡大";
+            // 
+            // toolStripSeparator21
+            // 
+            this.toolStripSeparator21.Name = "toolStripSeparator21";
+            this.toolStripSeparator21.Size = new System.Drawing.Size(6, 31);
+            // 
+            // pictureBox1
+            // 
+            this.pictureBox1.BackColor = System.Drawing.SystemColors.WindowText;
+            this.pictureBox1.Location = new System.Drawing.Point(0, 0);
+            this.pictureBox1.Name = "pictureBox1";
+            this.pictureBox1.Size = new System.Drawing.Size(459, 617);
+            this.pictureBox1.TabIndex = 0;
+            this.pictureBox1.TabStop = false;
+            // 
             // mnuFileNew_btn
             // 
             this.mnuFileNew_btn.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
@@ -1524,12 +1710,6 @@
             this.mnuFileOpen_btn.Size = new System.Drawing.Size(28, 28);
             this.mnuFileOpen_btn.Text = "現場の選択";
             // 
-            // toolStripSeparator1
-            // 
-            this.toolStripSeparator1.BackColor = System.Drawing.SystemColors.ButtonFace;
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 31);
-            // 
             // mnuFileSave_btn
             // 
             this.mnuFileSave_btn.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
@@ -1547,11 +1727,6 @@
             this.mnuFileEdit_btn.Name = "mnuFileEdit_btn";
             this.mnuFileEdit_btn.Size = new System.Drawing.Size(28, 28);
             this.mnuFileEdit_btn.Text = "現場の編集";
-            // 
-            // toolStripSeparator2
-            // 
-            this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 31);
             // 
             // mnuFileImportPC_btn
             // 
@@ -1616,41 +1791,6 @@
             this.mnuFileImportCSV_btn.Size = new System.Drawing.Size(28, 28);
             this.mnuFileImportCSV_btn.Text = "インポートCSVベクトルデータファイル";
             // 
-            // toolStripSeparator3
-            // 
-            this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(6, 31);
-            // 
-            // mnuEdit_btn
-            // 
-            this.mnuEdit_btn.Dock = System.Windows.Forms.DockStyle.None;
-            this.mnuEdit_btn.ImageScalingSize = new System.Drawing.Size(24, 24);
-            this.mnuEdit_btn.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.mnuEditSession_btn,
-            this.mnuEditAttributeCommon_btn,
-            this.mnuEditAttribute_btn,
-            this.mnuEditBaseLine_btn,
-            this.mnuEditEccentric_btn,
-            this.toolStripSeparator5,
-            this.mnuEditValidOn_btn,
-            this.toolStripSeparator6,
-            this.mnuEditCombination_btn,
-            this.mnuEditSeparationB_btn,
-            this.mnuEditRemove_btn,
-            this.toolStripSeparator10,
-            this.mnuEditReverse_btn,
-            this.mnuSessionSplit_btn,
-            this.mnuEditHalfFstHalfLst_btn,
-            this.mnuEditAddLine_btn,
-            this.mnuEditConstructLine_btn,
-            this.mnuEditAutoOrder_btn,
-            this.toolStripSeparator11});
-            this.mnuEdit_btn.Location = new System.Drawing.Point(341, 0);
-            this.mnuEdit_btn.Name = "mnuEdit_btn";
-            this.mnuEdit_btn.Size = new System.Drawing.Size(456, 31);
-            this.mnuEdit_btn.TabIndex = 18;
-            this.mnuEdit_btn.Text = "toolStrip2";
-            // 
             // mnuEditSession_btn
             // 
             this.mnuEditSession_btn.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
@@ -1696,11 +1836,6 @@
             this.mnuEditEccentric_btn.Size = new System.Drawing.Size(28, 28);
             this.mnuEditEccentric_btn.Text = "偏心設定";
             // 
-            // toolStripSeparator5
-            // 
-            this.toolStripSeparator5.Name = "toolStripSeparator5";
-            this.toolStripSeparator5.Size = new System.Drawing.Size(6, 31);
-            // 
             // mnuEditValidOn_btn
             // 
             this.mnuEditValidOn_btn.BackColor = System.Drawing.SystemColors.AppWorkspace;
@@ -1712,11 +1847,6 @@
             this.mnuEditValidOn_btn.Name = "mnuEditValidOn_btn";
             this.mnuEditValidOn_btn.Size = new System.Drawing.Size(28, 28);
             this.mnuEditValidOn_btn.Text = "有効";
-            // 
-            // toolStripSeparator6
-            // 
-            this.toolStripSeparator6.Name = "toolStripSeparator6";
-            this.toolStripSeparator6.Size = new System.Drawing.Size(6, 31);
             // 
             // mnuEditCombination_btn
             // 
@@ -1744,11 +1874,6 @@
             this.mnuEditRemove_btn.Name = "mnuEditRemove_btn";
             this.mnuEditRemove_btn.Size = new System.Drawing.Size(28, 28);
             this.mnuEditRemove_btn.Text = "削除";
-            // 
-            // toolStripSeparator10
-            // 
-            this.toolStripSeparator10.Name = "toolStripSeparator10";
-            this.toolStripSeparator10.Size = new System.Drawing.Size(6, 31);
             // 
             // mnuEditReverse_btn
             // 
@@ -1803,54 +1928,6 @@
             this.mnuEditAutoOrder_btn.Name = "mnuEditAutoOrder_btn";
             this.mnuEditAutoOrder_btn.Size = new System.Drawing.Size(28, 28);
             this.mnuEditAutoOrder_btn.Text = "基線ベクトルの向きの自動整列";
-            // 
-            // toolStripSeparator11
-            // 
-            this.toolStripSeparator11.Name = "toolStripSeparator11";
-            this.toolStripSeparator11.Size = new System.Drawing.Size(6, 31);
-            // 
-            // mnuEdit2_btn
-            // 
-            this.mnuEdit2_btn.BackColor = System.Drawing.SystemColors.ButtonFace;
-            this.mnuEdit2_btn.Dock = System.Windows.Forms.DockStyle.None;
-            this.mnuEdit2_btn.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.mnuEditCoordNum_cmb,
-            this.toolStripSeparator9});
-            this.mnuEdit2_btn.Location = new System.Drawing.Point(3, 31);
-            this.mnuEdit2_btn.Name = "mnuEdit2_btn";
-            this.mnuEdit2_btn.Size = new System.Drawing.Size(220, 25);
-            this.mnuEdit2_btn.TabIndex = 20;
-            // 
-            // mnuEditCoordNum_cmb
-            // 
-            this.mnuEditCoordNum_cmb.BackColor = System.Drawing.Color.Azure;
-            this.mnuEditCoordNum_cmb.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.mnuEditCoordNum_cmb.Items.AddRange(new object[] {
-            "９　系　500000.　1000000.",
-            "１０系　500000.　1000000.",
-            "１１系　500000.　1000000."});
-            this.mnuEditCoordNum_cmb.Name = "mnuEditCoordNum_cmb";
-            this.mnuEditCoordNum_cmb.Size = new System.Drawing.Size(200, 25);
-            this.mnuEditCoordNum_cmb.Tag = "";
-            this.mnuEditCoordNum_cmb.ToolTipText = "座標系の変更";
-            // 
-            // toolStripSeparator9
-            // 
-            this.toolStripSeparator9.Name = "toolStripSeparator9";
-            this.toolStripSeparator9.Size = new System.Drawing.Size(6, 25);
-            // 
-            // mnuCalc_InspCalc_btn
-            // 
-            this.mnuCalc_InspCalc_btn.Dock = System.Windows.Forms.DockStyle.None;
-            this.mnuCalc_InspCalc_btn.Font = new System.Drawing.Font("Yu Gothic UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.mnuCalc_InspCalc_btn.ImageScalingSize = new System.Drawing.Size(24, 24);
-            this.mnuCalc_InspCalc_btn.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.mnuCalculate_btn,
-            this.mnuInspectionCalculation_btn});
-            this.mnuCalc_InspCalc_btn.Location = new System.Drawing.Point(223, 31);
-            this.mnuCalc_InspCalc_btn.Name = "mnuCalc_InspCalc_btn";
-            this.mnuCalc_InspCalc_btn.Size = new System.Drawing.Size(86, 31);
-            this.mnuCalc_InspCalc_btn.TabIndex = 21;
             // 
             // mnuCalculate_btn
             // 
@@ -1943,23 +2020,6 @@
             this.mnuCheckAngleDiffHeight_btn.Name = "mnuCheckAngleDiffHeight_btn";
             this.mnuCheckAngleDiffHeight_btn.Size = new System.Drawing.Size(182, 22);
             this.mnuCheckAngleDiffHeight_btn.Text = "楕円体高の閉合差";
-            // 
-            // mnuTyouhyou_FileOutput_btn
-            // 
-            this.mnuTyouhyou_FileOutput_btn.Dock = System.Windows.Forms.DockStyle.None;
-            this.mnuTyouhyou_FileOutput_btn.Font = new System.Drawing.Font("Yu Gothic UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.mnuTyouhyou_FileOutput_btn.ImageScalingSize = new System.Drawing.Size(24, 24);
-            this.mnuTyouhyou_FileOutput_btn.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.mnuTyouhou_O_btn,
-            this.mnuTyouhou_S_btn,
-            this.mnuTyouhou_N_btn,
-            this.toolStripSeparator8,
-            this.mnuFileOutput_btn,
-            this.toolStripSeparator4});
-            this.mnuTyouhyou_FileOutput_btn.Location = new System.Drawing.Point(309, 31);
-            this.mnuTyouhyou_FileOutput_btn.Name = "mnuTyouhyou_FileOutput_btn";
-            this.mnuTyouhyou_FileOutput_btn.Size = new System.Drawing.Size(172, 31);
-            this.mnuTyouhyou_FileOutput_btn.TabIndex = 19;
             // 
             // mnuTyouhou_O_btn
             // 
@@ -2592,11 +2652,6 @@
             this.mnuAccountDistanceDiff_N_btn.Size = new System.Drawing.Size(305, 22);
             this.mnuAccountDistanceDiff_N_btn.Text = "斜距離の残差の計算";
             // 
-            // toolStripSeparator8
-            // 
-            this.toolStripSeparator8.Name = "toolStripSeparator8";
-            this.toolStripSeparator8.Size = new System.Drawing.Size(6, 31);
-            // 
             // mnuFileOutput_btn
             // 
             this.mnuFileOutput_btn.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
@@ -2803,25 +2858,6 @@
             this.mnuGenerateCsv_N_btn.Size = new System.Drawing.Size(216, 22);
             this.mnuGenerateCsv_N_btn.Text = "CSVファイル(網平均)";
             // 
-            // toolStripSeparator4
-            // 
-            this.toolStripSeparator4.Name = "toolStripSeparator4";
-            this.toolStripSeparator4.Size = new System.Drawing.Size(6, 31);
-            // 
-            // mnuView_btn
-            // 
-            this.mnuView_btn.Dock = System.Windows.Forms.DockStyle.None;
-            this.mnuView_btn.ImageScalingSize = new System.Drawing.Size(24, 24);
-            this.mnuView_btn.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.mnuViewData_btn,
-            this.toolStripSeparator7,
-            this.mnuViewReduce_ViewEnlarge_cmb,
-            this.toolStripSeparator21});
-            this.mnuView_btn.Location = new System.Drawing.Point(481, 31);
-            this.mnuView_btn.Name = "mnuView_btn";
-            this.mnuView_btn.Size = new System.Drawing.Size(129, 31);
-            this.mnuView_btn.TabIndex = 22;
-            // 
             // mnuViewData_btn
             // 
             this.mnuViewData_btn.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
@@ -2830,39 +2866,6 @@
             this.mnuViewData_btn.Name = "mnuViewData_btn";
             this.mnuViewData_btn.Size = new System.Drawing.Size(28, 28);
             this.mnuViewData_btn.Text = "データ表示";
-            // 
-            // toolStripSeparator7
-            // 
-            this.toolStripSeparator7.Name = "toolStripSeparator7";
-            this.toolStripSeparator7.Size = new System.Drawing.Size(6, 31);
-            // 
-            // mnuViewReduce_ViewEnlarge_cmb
-            // 
-            this.mnuViewReduce_ViewEnlarge_cmb.BackColor = System.Drawing.Color.AntiqueWhite;
-            this.mnuViewReduce_ViewEnlarge_cmb.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.mnuViewReduce_ViewEnlarge_cmb.Items.AddRange(new object[] {
-            "500%",
-            "400%",
-            "300%",
-            "200%",
-            "100%",
-            "90%",
-            "80%",
-            "70%",
-            "60%",
-            "50%",
-            "40%",
-            "30%",
-            "20%",
-            "10%"});
-            this.mnuViewReduce_ViewEnlarge_cmb.Name = "mnuViewReduce_ViewEnlarge_cmb";
-            this.mnuViewReduce_ViewEnlarge_cmb.Size = new System.Drawing.Size(75, 31);
-            this.mnuViewReduce_ViewEnlarge_cmb.ToolTipText = "縮小・拡大";
-            // 
-            // toolStripSeparator21
-            // 
-            this.toolStripSeparator21.Name = "toolStripSeparator21";
-            this.toolStripSeparator21.Size = new System.Drawing.Size(6, 31);
             // 
             // frmMain2
             // 
@@ -2897,7 +2900,6 @@
             this.bekutoru_tabPage.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.bekutoru_dataGridView)).EndInit();
             this.panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.mnuFile_btn.ResumeLayout(false);
             this.mnuFile_btn.PerformLayout();
             this.mnuEdit_btn.ResumeLayout(false);
@@ -2910,6 +2912,7 @@
             this.mnuTyouhyou_FileOutput_btn.PerformLayout();
             this.mnuView_btn.ResumeLayout(false);
             this.mnuView_btn.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 

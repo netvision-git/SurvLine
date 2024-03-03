@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Runtime.InteropServices;
 
 namespace SurvLine
 {
@@ -14,17 +15,22 @@ namespace SurvLine
         //  変更履歴
         //***********************
 
-
+        //Git管理：コメント＞24/03/03(--)marge前
+        
+        
+        
+        
         //***************************************************************************
         //***************************************************************************
         //プログラム＜プロジェクト＞
-        //Git管理：コメント＞24/01/28(中間)インストール/エクスポート
+        //Git管理：コメント＞24/02/21(--)インストール/エクスポート
         //
         //＜コメント＞
-        //24/01/28 K.setoguchi@NV---------->>>>>>>>>>
-        //<<<<<<<<<-----------24/01/28 K.setoguchi@NV
+        //24/02/21 K.setoguchi@NV---------->>>>>>>>>>
+        //<<<<<<<<<-----------24/02/21 K.setoguchi@NV
         //***************************************************************************
         //***************************************************************************
+
 
         //==========================================================================================
         /*[VB]
@@ -36,12 +42,38 @@ namespace SurvLine
 
 #if false
 
+
+
+        //==========================================================================================
+        If m_IExplorer = Nothing Then
+            Return
+        End If
+        //------------------------------------------------------------------------------------------
+        If IsNothing(m_IExplorer) Then
+            Return
+        End If
+        //==========================================================================================
+        //瀬戸口後で
+
         MessageBox.Show("無効なデータが含まれていました。", "エラー発生");
-        MessageBox.Show(ex.Message, "エラー発生");
+        MessageBox.Show(MSG_IMPORT_FILENAMEFAILED, "エラー発生", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
 
-        result = MessageBox.Show(this, message, caption, buttons);
-        if(result == DialogResult.Yes)
 
+        //  MessageBox.Show(ex.Message, "エラー発生");
+        -------------------------------------------------------------------------------------------
+        MessageBox.Show(ex.Message,"エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        -------------------------------------------------------------------------------------------
+        DialogResult r8 = MessageBox.Show (this, "Message with Help file and keyword.", 
+                                           "Help Caption", MessageBoxButtons.OK, 
+                                           MessageBoxIcon.Question, 
+                                           MessageBoxDefaultButton.Button1, 0, 
+                                           "mspaint.chm", 
+                                           "mspaint.chm::/paint_brush.htm");
+                result = MessageBox.Show(this, message, caption, buttons);
+                if(result == DialogResult.Yes)
+
+
+        ----------------------------------------------------------------------------------------------
             Abort	3	      The dialog box return value is Abort(usually sent from a button labeled Abort).
 
             Cancel	2	
@@ -71,6 +103,19 @@ namespace SurvLine
             Yes	6	
             The dialog box return value is Yes(usually sent from a button labeled Yes).
 #endif
+
+        //***************************************************************************
+        //***************************************************************************
+        //プログラム＜プロジェクト＞
+        //Git管理：コメント＞24/01/28(中間)インストール/エクスポート
+        //
+        //＜コメント＞
+        //24/01/28 K.setoguchi@NV---------->>>>>>>>>>
+        //<<<<<<<<<-----------24/01/28 K.setoguchi@NV
+        //***************************************************************************
+        //***************************************************************************
+
+
         //***************************************************************************
         //***************************************************************************
         //プログラム＜プロジェクト＞

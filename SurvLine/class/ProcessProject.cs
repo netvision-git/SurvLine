@@ -66,6 +66,15 @@ namespace SurvLine
             [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        /// <summary>
+        /// '処理。
+        /// '
+        /// '引き数：
+        /// 'clsProgressInterface ProgressInterface オブジェクト。
+        /// 
+        /// </summary>
+        /// <param name="clsProgressInterface"></param>
+        /// 
         public void ProcessInterface_Process(ProcessInterface clsProgressInterface)
         {
             ProjectFileManager clsProjectFileManager = new ProjectFileManager();
@@ -102,7 +111,7 @@ namespace SurvLine
             [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
-        private bool ProcessInterface_ConfirmCancel()
+        public bool ProcessInterface_ConfirmCancel()
         {
             return true;
         }
@@ -156,6 +165,22 @@ namespace SurvLine
             [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        /// <summary>
+        /// 'エクスポート(nvz)ファイルをインポートするする。
+        /// '
+        /// 'sPath で指定されるエクスポートファイルをインポートする。
+        /// '
+        /// '引き数：
+        /// 'sPath エクスポートファイルのパス。
+        /// '
+        /// 
+        /// </summary>
+        /// <param name="sPath"></param>
+        /// <returns>
+        /// '戻り値：
+        ///     '正常終了の場合 True を返す。
+        ///     'キャンセルの場合 False を返す。
+        /// </returns>
         public bool ImportProjectFolders(ref List<string> sPath)
         {
             bool ImportProjectFolders = false;
@@ -177,7 +202,6 @@ namespace SurvLine
             //坂井様へ：処理の進捗を表示するゲージ表示です：
             frmProgressDialog.ShowDialog();   //検討中
 
-            frmProgressDialog.Form_Activate();
 
 
             ImportProjectFolders = true;

@@ -105,8 +105,9 @@ namespace SurvLine
             return NSCABProgress;
         }
 
-
-
-
+        //      internal static long NSFDCreate(NSCABP myNSCABProgress)
+        //      {
+        //            throw new NotImplementedException();
+        //      }
     }
 }

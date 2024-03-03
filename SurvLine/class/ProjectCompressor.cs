@@ -9,13 +9,32 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 using System.Windows.Forms;
 using SurvLine.mdl;
 using System.IO;
+using System.Runtime.InteropServices;
+using static SurvLine.ProjectCompressor;
+using Microsoft.VisualBasic;
+using System.Runtime.ExceptionServices;
+
+
+
+
+
+
+
+
+
 
 namespace SurvLine
 {
+    public delegate long NSCABP(long nCurSize);
+
+
     internal class ProjectCompressor
     {
 
         MdlUtility mdlUtility = new MdlUtility();
+
+        MdlNSCAB mdlNSCAB = new MdlNSCAB();
+
 
         //'*******************************************************************************
         //'プロジェクトファイルの圧縮。
@@ -129,25 +148,58 @@ namespace SurvLine
             [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
-        public long NSCABProgress()
-        {
-            return 0;
-
-        }
+        /// <summary>
+        /// 'エクスポート(nvz)ファイルをインポートするする。
+        /// '
+        /// 'sSrcPath で指定されるエクスポートファイルをインポートする。
+        /// '
+        /// '引き数：
+        /// 'sSrcPath エクスポートファイルのパス。
+        /// 'sDstPath インポート先フォルダのパス。
+        /// 'clsProgressInterface ProgressInterface オブジェクト。
+        /// '
+        /// 
+        /// </summary>
+        /// <param name="sSrcPath"></param>
+        /// <param name="sDstPath"></param>
+        /// <param name="clsProgressInterface"></param>
+        /// <returns>
+        /// '戻り値：インポートしたプロジェクトフォルダの名前。
+        /// </returns>
+        /// 
+        //public IntPtr GetFunctionPointer(){ }
         public string ImportProjectFolder(string sSrcPath, string sDstPath, ProgressInterface clsProgressInterface)
         {
 
             string ImportProjectFolder = "";
 
-            MdlNSCAB mdlNSCAB = new MdlNSCAB
-            {
-                ProgressNSCAB = clsProgressInterface
-            };
-
 
             //'NSCAB準備。
-            long hNSFD;
-            hNSFD = MdlNSCAB.NSFDCreate(NSCABProgress());
+            long hNSFD = 0;
+
+#if true
+            //上位に定義済み   public delegate long NSCABP(long nCurSize);
+
+            NSCABP myNSCABProgress = new NSCABP(mdlNSCAB.NSCABProgress);
+
+//           hNSFD = MdlNSCAB.NSFDCreate(myNSCABProgress);
+
+            //            string myStr="my strings"; 
+            //            string ssb=Microsoft.VisualBasic.Strings.StrConv(myStr，Microsoft.VisualBasic.VbStrConv.Wide，0); 
+
+            //            NSCABP myNSCABProgress = new NSCABP(mdlNSCAB.NSCABProgress);
+
+            //            hNSFD = MdlNSCAB.NSFDCreate(myNSCABProgress);
+
+#else
+
+            hNSFD = MdlNSCAB.NSFDCreate(AddressOf mdlNSCAB.NSCABProgress);
+
+//            hNSFD = MdlNSCAB.NSFDCreate(AddressOf mdlNSCAB.NSCABProgress);
+#endif
+
+
+
             if (hNSFD == 0)
             {
                 //If hNSFD = 0 Then Call Err.Raise(ERR_FILE, , "CAB展開の準備ができません。")

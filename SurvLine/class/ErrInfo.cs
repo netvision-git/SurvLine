@@ -88,7 +88,7 @@ namespace SurvLine
         //[C#]
         public void Raise()
         {
-            //Call Err.Raise(Number, Source, Description, HelpFile, HelpContext)
+            //  Err.Raise(Number, Source, Description, HelpFile, HelpContext);
         }
 
 

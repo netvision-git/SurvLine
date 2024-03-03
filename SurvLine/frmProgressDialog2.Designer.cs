@@ -35,10 +35,13 @@
             this.lblTextSize = new System.Windows.Forms.Label();
             this.pgbProgress0 = new System.Windows.Forms.ProgressBar();
             this.pgbProgress1 = new System.Windows.Forms.ProgressBar();
+            this.button1 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // CancelButton
             // 
+            this.CancelButton.AutoEllipsis = true;
+            this.CancelButton.AutoSize = true;
             this.CancelButton.Font = new System.Drawing.Font("ＭＳ Ｐゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
             this.CancelButton.Location = new System.Drawing.Point(181, 176);
             this.CancelButton.Name = "CancelButton";
@@ -96,11 +99,24 @@
             this.pgbProgress1.Size = new System.Drawing.Size(324, 20);
             this.pgbProgress1.TabIndex = 8;
             // 
+            // button1
+            // 
+            this.button1.AutoSize = true;
+            this.button1.Font = new System.Drawing.Font("ＭＳ Ｐゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.button1.Location = new System.Drawing.Point(60, 176);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(79, 31);
+            this.button1.TabIndex = 9;
+            this.button1.Text = "ダミー";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
             // frmProgressDialog2
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(434, 231);
+            this.Controls.Add(this.button1);
             this.Controls.Add(this.pgbProgress1);
             this.Controls.Add(this.pgbProgress0);
             this.Controls.Add(this.lblTextSize);
@@ -117,13 +133,13 @@
         }
 
         #endregion
-
-        private System.Windows.Forms.Button CancelButton;
         private System.Windows.Forms.Label lblLabel0;
         private System.Windows.Forms.Label lblLabel1;
         private System.Windows.Forms.Label lblPrompt;
         private System.Windows.Forms.Label lblTextSize;
         private System.Windows.Forms.ProgressBar pgbProgress1;
         private System.Windows.Forms.ProgressBar pgbProgress0;
+        internal System.Windows.Forms.Button CancelButton;
+        internal System.Windows.Forms.Button button1;
     }
 }

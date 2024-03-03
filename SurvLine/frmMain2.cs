@@ -2909,6 +2909,174 @@ namespace SurvLine
 
         }
 
+        //==========================================================================================
+        /*[VB]
+         * 新規
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        /// <summary>
+        /// 【インポート】NetSurvデータファイル：   'nvfファイルをインポートする。
+        ///  インポート：
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void mnuFileImportNVF_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                //'インポート。
+                FileImportClick(IMPORT_TYPE.IMPORT_TYPE_NVF);
+
+            }
+            catch (Exception ex)
+            {
+                //Call mdlMain.ErrorExit
+
+            }
+
+        }
+
+        //==========================================================================================
+        /*[VB]
+            'NVFファイルを出力する。
+            Private Sub mnuGenerateNVF_Click()
+
+                On Error GoTo ErrorHandler
+    
+                '2023/06/30 Hitz H.Nakamura **************************************************
+                'GNSS水準測量対応。
+                'NS-Netwok から楕円体高の閉合差を削除。
+                '楕円体高の閉合差の終点が重複する場合はNVFファイルの出力を許可しない。
+                Dim nAngleDiffHeightCheck As Long
+                nAngleDiffHeightCheck = 0
+                Dim i As Long
+                For i = 0 To m_clsDocument.AngleDiffParamHeight.Count - 1
+                    Dim clsAngleDiffResult As AngleDiffResult
+                    Set clsAngleDiffResult = m_clsDocument.AngleDiffParamHeight.AngleDiffs(i).AngleDiffResult
+                    If clsAngleDiffResult.FromNumber = clsAngleDiffResult.ToNumber Then
+                        '始点と終点が一致してしまう。
+                        nAngleDiffHeightCheck = -2
+                        Exit For
+                    End If
+                    Dim j As Long
+                    For j = i + 1 To m_clsDocument.AngleDiffParamHeight.Count - 1
+                        If clsAngleDiffResult.ToNumber = m_clsDocument.AngleDiffParamHeight.AngleDiffs(j).AngleDiffResult.ToNumber Then
+                            '終点が重複する。
+                            nAngleDiffHeightCheck = -3
+                            i = m_clsDocument.AngleDiffParamHeight.Count + 1
+                            Exit For
+                        End If
+                    Next
+                Next
+                If nAngleDiffHeightCheck < 0 Then
+                    If nAngleDiffHeightCheck = -3 Then
+                        Call MsgBox("楕円体高の閉合差の至点が重複しています。", vbExclamation)
+                    Else
+                        Call MsgBox("楕円体高の閉合差が不正です。", vbExclamation)
+                    End If
+                    Exit Sub
+                End If
+                '*****************************************************************************
+    
+                '帳票パラメータを入力する。
+                frmOutputInfo.AccountType = ACCOUNT_TYPE_NVF
+                Let frmOutputInfo.OutputParam = m_clsDocument.OutputParam(OUTPUT_TYPE_NVF)
+                Let frmOutputInfo.OutputParam.Fixed = m_clsDocument.AccountOverlapParam.Fixed '2023/06/26 Hitz H.Nakamura GNSS水準測量対応。前半後半較差の追加。
+                Let frmOutputInfo.EnableAutomation = CheckVersionNSN()
+                Call frmOutputInfo.Show(1)
+                If frmOutputInfo.Result<> vbOK Then Exit Sub
+    
+                '再描画。
+                If RedrawWindow(Me.hWnd, 0, 0, RDW_UPDATENOW) = 0 Then Call Err.Raise(ERR_FATAL, , GetLastErrorMessage())
+    
+                Call GenerateOutput(OUTPUT_TYPE_NVF, frmOutputInfo.OutputParam, True)
+
+
+                Exit Sub
+
+
+            ErrorHandler:
+                Call mdlMain.ErrorExit
+
+
+            End Sub
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]  
+        /// <summary>
+        ///    'NVFファイルを出力する。
+        ///     NetSurvベクトルデータファイル(&N)...
+        ///     
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void mnuGenerateNVF_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                frmOutputInfo frmOutputInfo = new frmOutputInfo();
+
+                frmOutputInfo.ShowDialog();
+
+                if (frmOutputInfo.Result != DEFINE.vbOK)
+                {
+                    return;
+                }
+
+
+
+            }
+            catch (Exception ex)
+            {
+                //ErrorHandler:
+                //    Call mdlMain.ErrorExit
+
+            }
+        }
+
+
+        //==========================================================================================
+        /*[VB]
+            'JOBファイルを出力する。
+            Private Sub mnuGenerateJOB_Click()
+
+                On Error GoTo ErrorHandler
+    
+                Dim clsOutputParam As New OutputParam
+                Let clsOutputParam = m_clsDocument.OutputParam(OUTPUT_TYPE_JOB)
+    
+                '帳票パラメータを入力する。
+                frmAccountInfo.AccountType = ACCOUNT_TYPE_JOB
+                Let frmAccountInfo.AccountParam = clsOutputParam.AccountParam
+                Let frmAccountInfo.EnableAutomation = False
+                Let frmAccountInfo.Automation = False
+                Call frmAccountInfo.Show(1)
+                If frmAccountInfo.Result <> vbOK Then Exit Sub
+    
+                '再描画。
+                If RedrawWindow(Me.hWnd, 0, 0, RDW_UPDATENOW) = 0 Then Call Err.Raise(ERR_FATAL, , GetLastErrorMessage())
+    
+                Let clsOutputParam.AccountParam = frmAccountInfo.AccountParam
+                Let clsOutputParam.Fixed = m_clsDocument.AccountOverlapParam.Fixed '2023/06/26 Hitz H.Nakamura GNSS水準測量対応。前半後半較差の追加。
+    
+                Call GenerateOutput(OUTPUT_TYPE_JOB, clsOutputParam, True)
+    
+                Exit Sub
+    
+            ErrorHandler:
+                Call mdlMain.ErrorExit
+    
+            End Sub
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        private void mnuGenerateJOB_Click(object sender, EventArgs e)
+        {
+
+        }
+
+
 
 
         //<<<<<<<<<-----------24/01/28 K.setoguchi@NV
