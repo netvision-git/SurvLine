@@ -41,7 +41,7 @@ namespace SurvLine
         /// <param name="oProgressInterface"></param>
         public void Process(ProgressInterface oProgressInterface)
         {
-            clsProgressInterface = oProgressInterface;
+            //  clsProgressInterface = oProgressInterface;
             return;
         }
 

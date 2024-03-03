@@ -54,8 +54,8 @@ namespace SurvLine
         const int COL_WID_PROJECTLIST_JOBNAME = 1620 / 9;           //'現場リストカラム幅(Twips)、現場名。
         const int COL_WID_PROJECTLIST_DISTRICTNAME = 1620 / 9;      //'現場リストカラム幅(Twips)、地区名。。
         const int COL_WID_PROJECTLIST_FOLDER = 900 / 9;             //'現場リストカラム幅(Twips)、フォルダ。
-        const int COL_WID_PROJECTLIST_MDATE = 1400 / 9;             //'現場リストカラム幅(Twips)、最終更新日。
-        const int COL_WID_PROJECTLIST_CDATE = 1400 / 9;             //'現場リストカラム幅(Twips)、作成日。
+        const int COL_WID_PROJECTLIST_MDATE = 1600 / 9;             //'現場リストカラム幅(Twips)、最終更新日。
+        const int COL_WID_PROJECTLIST_CDATE = 1600 / 9;             //'現場リストカラム幅(Twips)、作成日。
                                                                     //<<<<<<<<<-----------24/01/24 K.setoguchi@NV
                                                                     //***************************************************************************
 
@@ -102,9 +102,9 @@ namespace SurvLine
         //------------------------------------------------------------------------------------------
         //[C#]
         //'選択された現場のフォルダ名。配列の要素は(-1 To ...)、要素 -1 は未使用。
-        public string FolderNames()
+        public List<string> FolderNames()
         {
-            return m_sFolderNames[0];
+            return m_sFolderNames;
 #if false
             ListViewItem itemx = lvProject.SelectedItems[0];
             if (itemx == null)
@@ -177,112 +177,11 @@ namespace SurvLine
             catch (Exception ex)
             {
                 //Call mdlMain.ErrorExit
-                _ = MessageBox.Show(ex.Message, "エラー発生");
+                _ = MessageBox.Show(ex.Message, "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
         //------------------------------------------------------------------------------------------
-#if false
-        private void Form_Load(object sender, EventArgs e)
-        {
-
-            //23/12/26 K.setoguchi@NV---------->>>>>>>>>>
-            Result = DEFINE.vbCancel;    /// As Long 'ダイアログの結果。
-            //<<<<<<<<<-----------23/12/26 K.setoguchi@NV
-
-            List<string> m_sFolderNamesA = new List<string>();
-            m_sFolderNames = m_sFolderNamesA;
-
-
-            //'現場リストの作成。
-
-
-
-            int nWidth;             //    Dim nWidth As Long
-            long nTotalWidth;       //    Dim nTotalWidth As Long
-
-            lvProject.View = View.Details;
-            lvProject.Columns.Clear();
-
-            //'現場リストカラム名称、チェックボックス。
-            nWidth = COL_WID_PROJECTLIST_CHECK;
-            nTotalWidth = nWidth;
-            lvProject.Columns.Add(COL_NAM_PROJECTLIST_CHECK, nWidth);
-
-
-            //'現場リストカラム名称、現場名。
-            nWidth = COL_WID_PROJECTLIST_JOBNAME;
-            nTotalWidth = nWidth;
-            lvProject.Columns.Add(COL_NAM_PROJECTLIST_JOBNAME, nWidth);
-
-            //'現場リストカラム名称、地区名。
-            nWidth = COL_WID_PROJECTLIST_DISTRICTNAME;
-            nTotalWidth += nWidth;
-            lvProject.Columns.Add(COL_NAM_PROJECTLIST_DISTRICTNAME, nWidth);
-
-            //'現場リストカラム名称、フォルダ。
-            nWidth = COL_WID_PROJECTLIST_FOLDER;
-            nTotalWidth += nWidth;
-            lvProject.Columns.Add(COL_NAM_PROJECTLIST_FOLDER, nWidth);
-
-            //'現場リストカラム名称、最終更新日。
-            nWidth = COL_WID_PROJECTLIST_MDATE;
-            nTotalWidth += nWidth;
-            lvProject.Columns.Add(COL_NAM_PROJECTLIST_MDATE, nWidth);
-
-            //'現場リストカラム名称、作成日。
-            nWidth = COL_WID_PROJECTLIST_CDATE;
-            nTotalWidth += nWidth;
-            lvProject.Columns.Add(COL_NAM_PROJECTLIST_CDATE, nWidth);
-
-            lvProject.Width = (int)nTotalWidth;
-
-
-            //--- Chaeck Boxの表示を有効 ---
-            lvProject.View = View.Details;
-            lvProject.CheckBoxes = true;
-
-
-            ProjectFileManager ProjectFile = new ProjectFileManager();
-
-            //現場の情報を取得
-            int listcount = ProjectFile.GetProjectListCount();
-
-            //現場リスト数により、現場リスト領域を確保
-            var Genba = new GENBA_STRUCT[listcount];
-
-            //現場の情報を取得
-            int datacount = 0;
-            ProjectFile.MakeProjectListView(Genba, listcount, ref datacount);
-
-
-
-
-
-
-
-            //現場の情報を表示
-            for (int i = 0; i < datacount; i++)
-            {
-                string sp = "";
-                //var item = new ListViewItem(Genba[i].sJobNames);
-                var item = new ListViewItem(sp);
-
-                item.SubItems.Add(Genba[i].sJobNames);
-
-                item.SubItems.Add(Genba[i].sDistrictNames);
-                item.SubItems.Add(Genba[i].sFolderNames);
-
-                m_sFolderNames.Add(Genba[i].sFolderNames);     //データ
-
-
-                item.SubItems.Add(Genba[i].tModTime.ToString("yyyy/MM/dd HH:mm"));
-                item.SubItems.Add(Genba[i].tCreateTime.ToString("yyyy/MM/dd HH:mm"));
-                lvProject.Items.Add(item);
-            }
-
-        }
-#endif
 
         //==========================================================================================
         /*[VB]
@@ -361,8 +260,6 @@ namespace SurvLine
             int i = 0;
             foreach ( var lvItem in lvProject.Items)
             {
-                //  lvProject.CheckBoxes = false;
-
                 lvProject.Items[i].Checked = true;
                 i++;
             }
@@ -498,7 +395,7 @@ namespace SurvLine
                 if (MsgOK != "")
                 {
                     //If MsgBox(MsgOK, vbOKCancel +vbExclamation) <> vbOK Then Exit Sub
-                    if (MessageBox.Show(MsgOK, "エラー発生") != DialogResult.OK)
+                    if (MessageBox.Show(MsgOK, "確認", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation) != DialogResult.OK)
                     {
                         return;
                     }
@@ -510,26 +407,18 @@ namespace SurvLine
                 //'終了。
                 Result = DEFINE.vbOK;
 
-                this.Close();   //Call Unload(Me)
+                //  this.Close();   //Call Unload(Me)
 
-#if false
-                ListViewItem itemx = lvProject.SelectedItems[0];
-                if (itemx == null)
-                {
-                    MessageBox.Show(itemx.Text + " | " + itemx.SubItems[1].Text + " | " + itemx.SubItems[2].Text);
-
-                }
-#endif
             }
             catch (Exception ex)
             {
-                MessageBox.Show("「現場を削除 画面」の操作を確認して下さい ");
+                MessageBox.Show("「現場を削除 画面」の操作を確認して下さい ","エラー発生",MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
-            Result = DEFINE.vbOK;    /// As Long 'ダイアログの結果。
+            //Result = DEFINE.vbOK;    /// As Long 'ダイアログの結果。
 
-            this.Close();   //Call Unload(Me)
+            Close();   //Call Unload(Me)
 
 
         }
@@ -600,7 +489,7 @@ namespace SurvLine
             {
 
                 //Call MsgBox(MsgUnselected, vbCritical)
-                _ = MessageBox.Show(MsgUnselected, "エラー発生");
+                _ = MessageBox.Show(MsgUnselected, "エラー発生",MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return CheckData;
 
             }
@@ -641,7 +530,7 @@ namespace SurvLine
             {
                 if (lvItem2.Checked)
                 {
-                    m_sFolderNames.Add(mdiVBfunctions.Mid(lvItem2.ImageKey, MdlNSDefine.KEYPREFIX.Length));
+                    m_sFolderNames.Add(mdiVBfunctions.Mid(lvItem2.ImageKey, MdlNSDefine.KEYPREFIX.Length + 1));
                 }
                 i++;
             }

@@ -85,9 +85,9 @@ namespace SurvLine
         private const int COL_WID_PROJECTLIST_CHECK = 384 / 19;              //'現場リストカラム幅(Twips)、チェックボックス。
         private const int COL_WID_PROJECTLIST_JOBNAME = 1620 / 9;           //'現場リストカラム幅(Twips)、現場名。
         private const int COL_WID_PROJECTLIST_DISTRICTNAME = 1620 / 9;      //'現場リストカラム幅(Twips)、地区名。。
-        private const int COL_WID_PROJECTLIST_FOLDER = 900 / 9;             //'現場リストカラム幅(Twips)、フォルダ。
-        private const int COL_WID_PROJECTLIST_MDATE = 1400 / 9;             //'現場リストカラム幅(Twips)、最終更新日。
-        private const int COL_WID_PROJECTLIST_CDATE = 1400 / 9;             //'現場リストカラム幅(Twips)、作成日。
+        private const int COL_WID_PROJECTLIST_FOLDER = 700 / 9;             //'現場リストカラム幅(Twips)、フォルダ。
+        private const int COL_WID_PROJECTLIST_MDATE = 1500 / 9;             //'現場リストカラム幅(Twips)、最終更新日。
+        private const int COL_WID_PROJECTLIST_CDATE = 1500 / 9;             //'現場リストカラム幅(Twips)、作成日。
 
 
         //***************************************************************************
@@ -1292,6 +1292,8 @@ namespace SurvLine
             //--------------------------
             //'カラムの初期化。 リストHaeder
             //--------------------------
+
+
             int nWidth = 0;             //    Dim nWidth As Long
             long nTotalWidth = 0;       //    Dim nTotalWidth As Long
             if (bCheck)
@@ -1303,7 +1305,7 @@ namespace SurvLine
                 //'現場リストカラム名称、チェックボックス。
                 nWidth = COL_WID_PROJECTLIST_CHECK;
                 nTotalWidth = nWidth;
-                lvProject.Columns.Add(COL_NAM_PROJECTLIST_CHECK, nWidth);
+                _ = lvProject.Columns.Add(COL_NAM_PROJECTLIST_CHECK, nWidth);
             }
             else
             {
@@ -1312,30 +1314,30 @@ namespace SurvLine
 
             //'現場リストカラム名称、現場名。
             nWidth = COL_WID_PROJECTLIST_JOBNAME;
-            nTotalWidth = nWidth;
-            lvProject.Columns.Add(COL_NAM_PROJECTLIST_JOBNAME, nWidth);
+            nTotalWidth += nWidth;
+            _ = lvProject.Columns.Add(COL_NAM_PROJECTLIST_JOBNAME, nWidth);
 
             //'現場リストカラム名称、地区名。
             nWidth = COL_WID_PROJECTLIST_DISTRICTNAME;
             nTotalWidth += nWidth;
-            lvProject.Columns.Add(COL_NAM_PROJECTLIST_DISTRICTNAME, nWidth);
+            _ = lvProject.Columns.Add(COL_NAM_PROJECTLIST_DISTRICTNAME, nWidth);
 
             //'現場リストカラム名称、フォルダ。
             nWidth = COL_WID_PROJECTLIST_FOLDER;
             nTotalWidth += nWidth;
-            lvProject.Columns.Add(COL_NAM_PROJECTLIST_FOLDER, nWidth);
+            _ = lvProject.Columns.Add(COL_NAM_PROJECTLIST_FOLDER, nWidth);
 
             //'現場リストカラム名称、最終更新日。
             nWidth = COL_WID_PROJECTLIST_MDATE;
             nTotalWidth += nWidth;
-            lvProject.Columns.Add(COL_NAM_PROJECTLIST_MDATE, nWidth);
+            _ = lvProject.Columns.Add(COL_NAM_PROJECTLIST_MDATE, nWidth);
 
             //'現場リストカラム名称、作成日。
             nWidth = COL_WID_PROJECTLIST_CDATE;
             nTotalWidth += nWidth;
-            lvProject.Columns.Add(COL_NAM_PROJECTLIST_CDATE, nWidth);
+            _ = lvProject.Columns.Add(COL_NAM_PROJECTLIST_CDATE, nWidth);
 
-            lvProject.Width = (int)nTotalWidth;
+            lvProject.Width = (int)nTotalWidth + 1;
 
 
             //--------------------------

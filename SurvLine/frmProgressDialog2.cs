@@ -662,6 +662,8 @@ namespace SurvLine
 
             try
             {
+                m_clsProcessInterface = processInterface;
+
                 pgbProgress[0] = this.pgbProgress0;
                 pgbProgress[1] = this.pgbProgress1;
 

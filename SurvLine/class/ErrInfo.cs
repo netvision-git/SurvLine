@@ -68,11 +68,11 @@ namespace SurvLine
         //[C#]
         public void SetErr()
         {
-            Number = Err.HResult;
-            Source = Err.Source;
-            Description = Err.Message;
-            HelpFile = Err.HelpLink;
-            HelpContext = Err.HResult;
+            //  Number = Err.HResult;
+            //  Source = Err.Source;
+            //  Description = Err.Message;
+            //  HelpFile = Err.HelpLink;
+            //  HelpContext = Err.HResult;
         }
 
 
