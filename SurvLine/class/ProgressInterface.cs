@@ -1,33 +1,39 @@
-﻿using System;
+﻿using Microsoft.VisualBasic.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 namespace SurvLine
 {
-    internal class ProgressInterface
+    public class ProgressInterface
     {
+        //==========================================================================================
+        /*[VB]
+        '*******************************************************************************
+        'プログレスインターフェース
 
-        //'*******************************************************************************
-        //'プログレスインターフェース
-
-        //Option Explicit
+        Option Explicit
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
-            'プロパティ
-            Public CancelEnable As Boolean 'キャンセルの可否。
-            Public Prompt As String 'プロンプト。
-            [VB]*/
+        'プロパティ
+        Public CancelEnable As Boolean 'キャンセルの可否。
+        Public Prompt As String 'プロンプト。
+        [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
         //'プロパティ
         public bool CancelEnable;   //'キャンセルの可否。
         public string Prompt;       //'プロンプト。
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
@@ -37,77 +43,105 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
-        public void MinPos(long nIndex, int nPos)
+        //'プログレス最小値。
+        //public void MinPos(long nIndex = 0, int nPos)
+        public void MinPos(int nPos, long nIndex = 0)
         {
-            nIndex = 0;
+            return;
         }
-
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
-            'プログレス最小値。
-            Property Get MinPos(Optional ByVal nIndex As Long = 0) As Integer
-            End Property
+        'プログレス最小値。
+        Property Get MinPos(Optional ByVal nIndex As Long = 0) As Integer
+        End Property
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
-        public int MinPos(long nIndex)
+        //'プログレス最小値。
+        public int MinPos(long nIndex = 0)
         {
-            nIndex = 0;
             return 0;
         }
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
-            'プログレス最大値。
-            Property Let MaxPos(Optional ByVal nIndex As Long = 0, ByVal nPos As Integer)
-            End Property
+        'プログレス最大値。
+        Property Let MaxPos(Optional ByVal nIndex As Long = 0, ByVal nPos As Integer)
+        End Property
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
-        public void MaxPos(long nIndex, int nPos)
+        //'プログレス最大値。
+        //public void MaxPos(long nIndex = 0, int nPos)
+        public void MaxPos(int nPos, long nIndex = 0)
         {
-            nIndex = 0;
+            return;
         }
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
-            'プログレス最大値。
-            Property Get MaxPos(Optional ByVal nIndex As Long = 0) As Integer
-            End Property
+        'プログレス最大値。
+        Property Get MaxPos(Optional ByVal nIndex As Long = 0) As Integer
+        End Property
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
-
+        //'プログレス最大値。
+        public int MaxPos(long nIndex = 0)
+        {
+            return 0;
+        }
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
-            'プログレス現在値。
-            Property Let CurPos(Optional ByVal nIndex As Long = 0, ByVal nPos As Integer)
-            End Property
+        'プログレス現在値。
+        Property Let CurPos(Optional ByVal nIndex As Long = 0, ByVal nPos As Integer)
+        End Property
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        //'プログレス現在値。
+        //public void CurPos(long nIndex = 0, int nPos)
+        public void CurPos(int nPos, long nIndex = 0)
+        {
+            return;
+        }
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
-            'プログレス現在値。
-            Property Get CurPos(Optional ByVal nIndex As Long = 0) As Integer
-            End Property
-            [VB]*/
+        'プログレス現在値。
+        Property Get CurPos(Optional ByVal nIndex As Long = 0) As Integer
+        End Property
+        [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
-
-
+        //'プログレス現在値。
+        public int CurPos(long nIndex = 0)
+        {
+            return 0;
+        }
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
-            'キャンセル。
-            Property Get Cancel() As Boolean
-            End Property
-            [VB]*/
+        'キャンセル。
+        Property Get Cancel() As Boolean
+        End Property
+        [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        //'キャンセル。
+        public bool Cancel()
+        {
+            return true;
+        }
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
@@ -120,10 +154,17 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
-        public void SetCancel(bool bCancel)
+        /*
+        'キャンセルを設定する。
+        '
+        '引き数：
+        'bCancel キャンセルフラグ。True=キャンセル。False=続行。
+        */
+        public void SetCancel(bool bCancel = true)
         {
-            bCancel = true;
+            return;
         }
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
@@ -134,15 +175,20 @@ namespace SurvLine
         'それ以外の場合 False を返す。
         Public Function CheckCancel() As Boolean
         End Function
-            [VB]*/
+        [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        /*
+        'キャンセルをチェックする。
+        '
+        '戻り値：
+        'キャンセルの場合 True を返す。
+        'それ以外の場合 False を返す。
+        */
         public bool CheckCancel()
         {
             return true;
         }
-
-
-
+        //==========================================================================================
     }
 }

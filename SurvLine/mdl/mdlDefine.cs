@@ -1,18 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing.Printing;
+using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Runtime.Remoting;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
+using static System.Collections.Specialized.BitVector32;
+using System.Windows.Forms;
+using Microsoft.VisualBasic.FileIO;
+using System.Runtime.Remoting;
+using System.Xml.Linq;
+using System.Security.Cryptography;
 
 namespace SurvLine.mdl
 {
     public class MdiDefine
     {
     }
-
     public class DEFINE
     {
 
@@ -41,6 +48,7 @@ namespace SurvLine.mdl
         public const int vbHiragana = 32;       //文字列内のカタカナをひらがなに変換します。
         public const int vbUnicode = 64;        //システムの既定のコード ページを使用して、文字列を Unicode に変換します。 (Macintosh では使用できません。
         public const int vbFromUnicode = 128;   //文字列を Unicode からシステムの既定のコード ページに変換します。 (Macintosh では使用できません。
+
 
         //***************************************************
         //'API定数。
@@ -155,11 +163,12 @@ namespace SurvLine.mdl
         public const long FORMAT_MESSAGE_FROM_SYSTEM = 0x1000;
         public const long WAIT_OBJECT_0 = 0x0;
         public const long TME_LEAVE = 0x2;
-        public const long TME_CANCEL= 0x80000000;
+        public const long TME_CANCEL = 0x80000000;
         public const long ERROR_SUCCESS = 0;
         public const long ERROR_FILE_NOT_FOUND = 0x2;
         public const long CSIDL_PROGRAM_FILES = 0x26;
         public const long S_OK = 0x0;
+
 
         public enum TernaryRasterOperations : uint
         {
@@ -236,14 +245,14 @@ namespace SurvLine.mdl
 
         public struct BROWSEINFO
         {
-            public long hwndOwner { get; set; }
-            public long pidlRoot { get; set; }
-            public string pszDisplayName { get; set; }
-            public string lpszTitle { get; set; }
-            public long ulFlags { get; set; }
-            public long lpfn { get; set; }
-            public long lParam { get; set; }
-            public long iImage { get; set; }
+            public long hwndOwner;
+            public long pidlRoot;
+            public string pszDisplayName;
+            public string lpszTitle;
+            public long ulFlags;
+            public long lpfn;
+            public long lParam;
+            public long iImage;
         }
 
         public struct LOGFONT
@@ -418,14 +427,39 @@ namespace SurvLine.mdl
 
 
         [DllImport("kernel32.dll")]
+        public static extern void MoveMemory(ref byte Dest, ref byte Source, long length);
+        //[DllImport("kernel32.dll")]
         //public static extern int GetPrivateProfileStringA(string lpAppName, string lpKeyName, string lpDefault, string lpReturned, int nSize, string lpFileName);
+        [DllImport("kernel32.dll")]
+        public static extern long WritePrivateProfileString(string lpAppName, string lpKeyName, string lpString, string lpFileName);
+        [DllImport("kernel32.dll")]
         public static extern uint GetPrivateProfileString(string lpAppName, string lpKeyName, string lpDefault, StringBuilder lpReturnedString, uint nSize, string lpFileName);
         [DllImport("kernel32.dll")]
         public static extern int GetTempPath_Wrap(int nBufferLength, string lpBuffer);
         [DllImport("kernel32.dll")]
         public static extern int GetPrivateProfileInt(string lpAppName, string lpKeyName, int nDefault, string lpFileName);
         [DllImport("kernel32.dll")]
-        public static extern int MoveMemory(int Dest, object Src, int SIZE);
+        public static extern long CreateFile(string lpFileName, long dwDesiredAccess, long dwShareMode, long lpSecurityAttributes, long dwCreationDisposition, long dwFlagsAndAttributes, long hTemplateFile);
+        [DllImport("kernel32.dll")]
+        public static extern long CloseHandle(long hObject);
+        [DllImport("kernel32.dll")]
+        public static extern long SetFileTime(long hFile, ref FILETIME lpCreationTime, ref FILETIME lpLastAccessTime, ref FILETIME lpLastWriteTime);
+        [DllImport("kernel32.dll")]
+        public static extern long GetFileTime(long hFile, ref FILETIME lpCreationTime, ref FILETIME lpLastAccessTime, ref FILETIME lpLastWriteTime);
+        [DllImport("kernel32.dll")]
+        public static extern bool FileTimeToLocalFileTime(ref FILETIME lpFileTime, ref FILETIME lpLocalFileTime);
+        [DllImport("kernel32.dll")]
+        public static extern long FileTimeToSystemTime(ref FILETIME lpFileTime, ref SYSTEMTIME lpSystemTime);
+        [DllImport("kernel32.dll")]
+        public static extern long SystemTimeToFileTime(ref SYSTEMTIME lpSystemTime, ref FILETIME lpFileTime);
+        [DllImport("kernel32.dll")]
+        public static extern long LocalFileTimeToFileTime(ref FILETIME lpLocalFileTime, ref FILETIME lpFileTime);
+        //[DllImport("kernel32.dll")]
+        //public static extern int MoveMemory(int Dest, object Src, int SIZE);
+        //public static extern int RtlMoveMemory(ref IntPtr Dest, ref IntPtr Src, int SIZE);
+        //[DllImport("ntdll.dll", EntryPoint = "RtlMoveMemory", SetLastError = false)]
+        [DllImport("ntdll.dll")]
+        public static extern void RtlMoveMemory(ref IntPtr dest, ref object src, [MarshalAs(UnmanagedType.U4)] int length);
 
 
         [DllImport("user32.dll")]
@@ -434,26 +468,25 @@ namespace SurvLine.mdl
         public static extern int FillRect(IntPtr hDC, ref RECT lprc, int hbr);
         [DllImport("user32.dll")]
         public static extern int FrameRect(IntPtr hDC, ref RECT lprc, int hbr);
-
-
         [DllImport("rapi.dll")]
         public static extern int CeGetLastError();
 
-
-        [DllImport("advapi32.dll")] //K.S
+        [DllImport("advapi32.dll")]
         public static extern long RegCreateKeyEx(long hKey, string lpSubKey, long Reserved, long lpClass, long dwOptions, long samDesired, long lpSecurityAttributes, ref long phkResult, ref long lpdwDisposition);
-        [DllImport("advapi32.dll")] //K.S
+        [DllImport("advapi32.dll")]
         public static extern long RegOpenKeyEx(long hKey, string lpSubKey, long ulOptions, long samDesired, ref long phkResult);
-        [DllImport("advapi32.dll")] //K.S
+        [DllImport("advapi32.dll")]
         public static extern long RegCloseKey(long hKey);
-        [DllImport("advapi32.dll")] //K.S
+        [DllImport("advapi32.dll")]
         public static extern long RegSetValueEx(long hKey, string lpValueName, long Reserved, long dwType, ref long lpData, long cbData);
-        [DllImport("advapi32.dll")] //K.S
+        [DllImport("advapi32.dll")]
         public static extern long RegSetValueString(long hKey, string lpValueName, long Reserved, long dwType, ref string lpData, long cbData);
-        [DllImport("advapi32.dll")] //K.S
+        [DllImport("advapi32.dll")]
         public static extern long RegQueryValueEx(long hKey, string lpValueName, long lpReserved, ref long lpType, ref long lpData, ref long lpcbData);
-        [DllImport("advapi32.dll")] //K.S
+        [DllImport("advapi32.dll")]
         public static extern long RegQueryValueString(long hKey, string lpValueName, long lpReserved, long lpType, string lpData, ref long lpcbData);
+        [DllImport("advapi32.dll")]
+        public static extern long RegEnumKeyEx(long hKey, long dwIndex, string lpName, ref long lpcName, long lpReserved, long lpClass, long lpcClass, ref FILETIME lpftLastWriteTime);
 
         [DllImport("user32.dll")] //K.S
         public static extern long SendMessageLS(long hWnd, long msg, long wParam, string sParam);
@@ -526,7 +559,7 @@ namespace SurvLine.mdl
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
-        public string GetPrivateProfileString(string lpAppName, string lpKeyName, string lpDefault, string lpFileName)
+        public static string GetPrivateProfileString(string lpAppName, string lpKeyName, string lpDefault, string lpFileName)
         {
             /*
             string sValue = "";
@@ -542,6 +575,27 @@ namespace SurvLine.mdl
         }
         //==========================================================================================
 
-    }
+        //==========================================================================================
+        //[C#]
+        public static long DF_CreateFile(string lpFileName, long dwDesiredAccess, long dwShareMode, long lpSecurityAttributes, long dwCreationDisposition, long dwFlagsAndAttributes, long hTemplateFile)
+        {
+            return CreateFile(lpFileName, dwDesiredAccess, dwShareMode, lpSecurityAttributes, dwCreationDisposition, dwFlagsAndAttributes, hTemplateFile);
+        }
 
+        public static long DF_SetFileTime(long hFile, ref FILETIME lpCreationTime, ref FILETIME lpLastAccessTime, ref FILETIME lpLastWriteTime)
+        {
+            return SetFileTime(hFile, ref lpCreationTime, ref lpLastAccessTime, ref lpLastWriteTime);
+        }
+
+        public static long DF_GetFileTime(long hFile, ref FILETIME lpCreationTime, ref FILETIME lpLastAccessTime, ref FILETIME lpLastWriteTime)
+        {
+            return DF_GetFileTime(hFile, ref lpCreationTime, ref lpLastAccessTime, ref lpLastWriteTime);
+        }
+
+        public static long DF_CloseHandle(long hObject)
+        {
+            return CloseHandle(hObject);
+        }
+        //==========================================================================================
+    }
 }

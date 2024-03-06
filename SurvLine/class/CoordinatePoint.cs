@@ -1,6 +1,6 @@
-﻿using System;
+﻿using SurvLine.mdl;
+using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Runtime.Remoting;
 using System.Text;
@@ -10,9 +10,8 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 namespace SurvLine
 {
-    internal class CoordinatePoint
+    public abstract class CoordinatePoint
     {
-
         //==========================================================================================
         /*[VB]
         '*******************************************************************************
@@ -43,6 +42,16 @@ namespace SurvLine
         //==========================================================================================
 
         //==========================================================================================
+        //[C#]
+        public abstract void XX(double nX);
+        public abstract double XX();
+        public abstract void YY(double nY);
+        public abstract double YY();
+        public abstract void ZZ(double nZ);
+        public abstract double ZZ();
+        //==========================================================================================
+
+        //==========================================================================================
         /*[VB]
         '*******************************************************************************
         'プロパティ
@@ -68,6 +77,7 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        public abstract double RoundXX();
         //==========================================================================================
 
         //==========================================================================================
@@ -78,6 +88,7 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        public abstract double RoundYY();
         //==========================================================================================
 
         //==========================================================================================
@@ -88,6 +99,7 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        public abstract double RoundZZ();
         //==========================================================================================
 
         //==========================================================================================
@@ -99,10 +111,7 @@ namespace SurvLine
         //------------------------------------------------------------------------------------------
         //[C#]
         //'座標値種別。
-        public COORDINATE_TYPE CoordinateType()
-        {
-            return COORDINATE_TYPE.COORDINATE_XYZ;
-        }
+        public abstract COORDINATE_TYPE CoordinateType();
         //==========================================================================================
 
         //==========================================================================================
@@ -153,11 +162,7 @@ namespace SurvLine
         'nFile ファイル番号。
         'nVersion ファイルバージョン。
         */
-        //public void Load(int nFile, long nVersion)
-        public void Load(BinaryReader br, long nVersion)
-        {
-            return;
-        }
+        public abstract void Load(int nFile, long nVersion);
         //==========================================================================================
 
         //==========================================================================================
@@ -185,10 +190,7 @@ namespace SurvLine
         '一致する場合 True を返す。
         'それ以外の場合 False を返す。
         */
-        public bool Compare(CoordinatePoint clsCoordinatePoint)
-        {
-            return true;
-        }
+        public abstract bool Compare(CoordinatePoint clsCoordinatePoint);
         //==========================================================================================
 
         //==========================================================================================
@@ -212,10 +214,7 @@ namespace SurvLine
         'nY Y座標が設定される。
         'nZ Z座標が設定される。
         */
-        public void GetXYZ(ref double nX, ref double nY, ref double nZ)
-        {
-            return;
-        }
+        public abstract void GetXYZ(ref double nX, ref double nY, ref double nZ);
         //==========================================================================================
 
         //==========================================================================================
@@ -243,10 +242,7 @@ namespace SurvLine
         'vAlt 標高が設定される。標高が取得されない場合は null が設定される。
         'sGeoidoPath ジオイドモデルのパス。標高がOFFの場合、空文字を指定する。
         */
-        public void GetDEG(ref double nLat, ref double nLon, ref double nHeight, ref double vAlt, string sGeoidoPath)
-        {
-            return;
-        }
+        public abstract void GetDEG(ref double nLat, ref double nLon, ref double nHeight, ref double vAlt, string sGeoidoPath);
         //==========================================================================================
 
         //==========================================================================================
@@ -284,12 +280,8 @@ namespace SurvLine
         'nDecimal 秒の四捨五入桁。
         'sGeoidoPath ジオイドモデルのパス。標高がOFFの場合、空文字を指定する。
         */
-        //public void GetDMS(long nLatH, long nLatM, double nLatS, long nLonH, long nLonM, double nLonS, double nHeight, double vAlt, long nDecimal, string sGeoidoPath)
-        public void GetDMS(ref long nLatH, ref long nLatM, ref double nLatS, ref long nLonH, ref long nLonM, ref double nLonS, ref double nHeight,
-            ref double vAlt, long nDecimal, string sGeoidoPath)
-        {
-            return;
-        }
+        public abstract void GetDMS(ref long nLatH, ref long nLatM, ref double nLatS, ref long nLonH, ref long nLonM, ref double nLonS, ref double nHeight,
+            ref double vAlt, long nDecimal, string sGeoidoPath);
         //==========================================================================================
 
         //==========================================================================================
@@ -321,10 +313,7 @@ namespace SurvLine
         'nCoordNum 座標系番号(1～19)。
         'sGeoidoPath ジオイドモデルのパス。標高がOFFの場合、空文字を指定する。
         */
-        public void GetJGD(ref double nX, ref double nY, ref double nHeight, ref double vAlt, long nDecimal, long nCoordNum, string sGeoidoPath)
-        {
-            return;
-        }
+        public abstract void GetJGD(ref double nX, ref double nY, ref double nHeight, ref double vAlt, long nDecimal, long nCoordNum, string sGeoidoPath);
         //==========================================================================================
 
         //==========================================================================================
@@ -342,40 +331,7 @@ namespace SurvLine
         '
         '戻り値：コピーしたオブジェクト。
         */
-        public CoordinatePoint CreateCopy()
-        {
-            return new CoordinatePoint();
-        }
+        public abstract CoordinatePoint CreateCopy();
         //==========================================================================================
-
-        //'*******************************************************************************
-        //'*******************************************************************************
-        /// <summary>
-        /// メソッド
-        ///
-        /// 保存。
-        ///
-        /// 引き数：
-        ///     bw バイナリファイル
-        /// </summary>
-        /// <param name="bw"></param>
-        public void Save(BinaryWriter bw)
-        {
-        }
-        //--------------------------------------------------------------------------------
-        //'メソッド
-        //
-        //'保存。
-        //'
-        //'引き数：
-        //'nFile ファイル番号。
-        //Public Sub Save(ByVal nFile As Integer)
-        //End Sub
-        //'*******************************************************************************
-        //'*******************************************************************************
-
-
-
-
     }
 }

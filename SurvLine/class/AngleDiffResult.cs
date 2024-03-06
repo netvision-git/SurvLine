@@ -13,13 +13,20 @@ using System.Xml.Linq;
 using System.IO;
 using static System.Net.WebRequestMethods;
 using System.Security.Cryptography.X509Certificates;
+using SurvLine.mdl;
+using static SurvLine.mdl.DEFINE;
+using static SurvLine.mdl.MdlNSDefine;
+using static SurvLine.mdl.MdlUtility;
+using static SurvLine.mdl.MdlAccountMake;
+using static SurvLine.mdl.MdlNSGUI;
+using static SurvLine.mdl.MdlNSSDefine;
+
 
 namespace SurvLine
 {
     internal class AngleDiffResult
     {
 
-        MdlUtility mdlUtility = new MdlUtility();
 
         //'*******************************************************************************
         //'閉合差点検結果
@@ -390,12 +397,12 @@ End Property
         /// <param name="bw"></param>
         public void Save(BinaryWriter bw)
         {
-            mdlUtility.FileWrite_PutString(bw, FromNumber); //    Call PutString(nFile, FromNumber)
-            mdlUtility.FileWrite_PutString(bw, FromName);   //    Call PutString(nFile, FromName)
-            mdlUtility.FileWrite_PutString(bw, ToNumber);   //    Call PutString(nFile, ToNumber)
-            mdlUtility.FileWrite_PutString(bw, ToName);     //    Call PutString(nFile, ToName)
-            mdlUtility.FileWrite_PutString(bw, FixedNumber);//    Call PutString(nFile, FixedNumber)
-            mdlUtility.FileWrite_PutString(bw, FixedName);  //    Call PutString(nFile, FixedName)
+            FileWrite_PutString(bw, FromNumber); //    Call PutString(nFile, FromNumber)
+            FileWrite_PutString(bw, FromName);   //    Call PutString(nFile, FromName)
+            FileWrite_PutString(bw, ToNumber);   //    Call PutString(nFile, ToNumber)
+            FileWrite_PutString(bw, ToName);     //    Call PutString(nFile, ToName)
+            FileWrite_PutString(bw, FixedNumber);//    Call PutString(nFile, FixedNumber)
+            FileWrite_PutString(bw, FixedName);  //    Call PutString(nFile, FixedName)
                                                             //   FromCoordinate.Save(bw);                        //    Call FromCoordinate.Save(nFile)
                                                             //   ToCoordinate.Save(bw);                          //    Call ToCoordinate.Save(nFile)
                                                             //   FixedCoordinate.Save(bw);                       //    Call FixedCoordinate.Save(nFile)
@@ -418,12 +425,12 @@ End Property
             //    Next
             for (long i = 0; i <= (Count - 1); i++)
             {
-                mdlUtility.FileWrite_PutString(bw, FixedName);      //        Call PutString(nFile, StrNumber(i))
-                mdlUtility.FileWrite_PutString(bw, StrName(i));     //        Call PutString(nFile, StrName(i))
-                mdlUtility.FileWrite_PutString(bw, EndNumber(i));   //        Call PutString(nFile, EndNumber(i))
-                mdlUtility.FileWrite_PutString(bw, EndName(i));     //        Call PutString(nFile, EndName(i))
+                FileWrite_PutString(bw, FixedName);      //        Call PutString(nFile, StrNumber(i))
+                FileWrite_PutString(bw, StrName(i));     //        Call PutString(nFile, StrName(i))
+                FileWrite_PutString(bw, EndNumber(i));   //        Call PutString(nFile, EndNumber(i))
+                FileWrite_PutString(bw, EndName(i));     //        Call PutString(nFile, EndName(i))
                                                                     //    Vector(i).Save(nFile);                          //        Call Vector(i).Save(nFile)
-                mdlUtility.FileWrite_PutString(bw, Session(i));    //        Call PutString(nFile, Session(i))
+                FileWrite_PutString(bw, Session(i));    //        Call PutString(nFile, Session(i))
             }
 
 

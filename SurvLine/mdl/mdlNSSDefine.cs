@@ -70,8 +70,8 @@ namespace SurvLine.mdl
         public const long PROFILE_DEF_DEF_DISTANCE = 1000;                  //'距離(㎝)。
 
         //'インポートファイル。
-        public const string IMPORT_FILE_EXT = "dat"; //'拡張子。
-        public const string IMPORT_FILE_FILTER = "NetSurvデータファイル (*.dat)|*.dat|RINEXファイル (*.??o)|*.??o|すべてのファイル (*.*)|*.*"; //'フィルター。
+        public const string IMPORT_FILE_EXT = "dat";    //'拡張子。
+        public const string IMPORT_FILE_FILTER = "NetSurvデータファイル (*.dat)|*.dat|RINEXファイル (*.??o)|*.??o|すべてのファイル (*.*)|*.*";     //'フィルター。
 
         //'RINEXファイル文字制限。
         public const long RINEX_STR_OBSNAME = 61;
@@ -85,21 +85,17 @@ namespace SurvLine.mdl
 
         public const string GENUINE_POINT_SESSION = @"\GN\";                //'本点のセッション名。
 
-        //24/01/04 K.setoguchi@NV---------->>>>>>>>>>
-
         //'DXFファイル種別。
         public enum DXF_TYPE
         {
             DXF_TYPE_OBS = 0, //'観測図。
             DXF_TYPE_COUNT,  //'種別数。
         }
-        //<<<<<<<<<-----------24/01/04 K.setoguchi@NV
 
 
         //'DXFファイルタイトル。
         public const string DXF_TITLE_OBS = "観測図";
 
-        //24/01/04 K.setoguchi@NV---------->>>>>>>>>>
         //'外部出力ファイル種別。
         public enum OUTPUT_TYPE
         {
@@ -110,8 +106,8 @@ namespace SurvLine.mdl
             OUTPUT_TYPE_CSV,        //'CSVファイル。
             OUTPUT_TYPE_COUNT,      //'種別数。
         }
-        //<<<<<<<<<-----------24/01/04 K.setoguchi@NV
 
+#if true
         //'オブジェクトモード。
         public enum OBJ_MODE
         {
@@ -122,6 +118,7 @@ namespace SurvLine.mdl
             OBJ_MODE_HALF_LST,      //'後半。   '2023/06/26 Hitz H.Nakamura GNSS水準測量対応。前半後半較差の追加。
             //End Enum
         }
+#endif
 
         //'観測記簿出力順。
         //Public Enum WRITE_ORDER_TYPE
@@ -132,7 +129,7 @@ namespace SurvLine.mdl
         //End Enum
 
         //'定義デフォルト値。
-        public const long DEF_SAMETIMEMIN = 180;         //'最小同時観測時間(秒)。    //24/01/04 K.setoguchi@NV
+        public const long DEF_SAMETIMEMIN = 180;         //'最小同時観測時間(秒)。
         public const long DEF_SATELLITECOUNTMIN = 4;    //'最少共通衛星数。
         public const bool DEF_IMPORTENABLE = true;                  //'有効インポートフラグ。True=インポートした基線ベクトルは有効にする。False=インポートした基線ベクトルは無効にする。
         public const long DEF_WRITEORDER = WRITE_ORDER_ANALYSIS;    //'観測記簿出力順。

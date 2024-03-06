@@ -12,15 +12,22 @@ using System.Runtime.Remoting;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static SurvLine.mdl.DEFINE;
 using static SurvLine.mdl.MdlNSDefine;
+using static SurvLine.mdl.MdlUtility;
+using static SurvLine.mdl.MdlAccountMake;
+using static SurvLine.mdl.MdlNSGUI;
+using static SurvLine.mdl.MdlNSSDefine;
+using static SurvLine.mdl.MdiVBfunctions;
 using static System.Net.WebRequestMethods;
 
 namespace SurvLine
 {
     internal class MdlImport
     {
-        MdlUtility mdlUtility = new MdlUtility();
         MdiVBfunctions mdiVBfunctions = new MdiVBfunctions();
+
+        MdlUtility mdlUtility = new MdlUtility();
 
         public MdlImport()
         {
@@ -147,7 +154,7 @@ namespace SurvLine
             string sTitle = "";
             string sExt = "";
 
-            mdlUtility.SplitPath(sPath, ref sDrive, ref sDir, ref sTitle, ref sExt);
+            SplitPath(sPath, ref sDrive, ref sDir, ref sTitle, ref sExt);
 
             byte[] nCode;
             nCode = mdiVBfunctions.StrConv($"{sTitle}{sExt}", DEFINE.vbFromUnicode);
@@ -625,7 +632,7 @@ namespace SurvLine
                 string sDir = "";
                 string sTitle = "";
                 string sExt = "";
-                mdlUtility.SplitPath(sPath[i2], ref sDrive, ref sDir, ref sTitle, ref sExt);
+                SplitPath(sPath[i2], ref sDrive, ref sDir, ref sTitle, ref sExt);
 
 
                 //'拡張子は３文字。
@@ -718,7 +725,7 @@ namespace SurvLine
 
                 string vItem = "";   // As Variant
                 //'まずoファイルを探して、ヒットすればよしとする。
-                if (mdlUtility.LookupCollectionVariant(objTitles, ref vItem, sKey)){
+                if (LookupCollectionVariant(objTitles, ref vItem, sKey)){
                     //'既に見つけているのでスキップする。
                 }
                 else
@@ -1568,7 +1575,7 @@ End Function
                 string sDir = "";
                 string sTitle = "";
                 string sExt = "";
-                mdlUtility.SplitPath(sPathO, ref sDrive, ref sDir, ref sTitle, ref sExt);
+                SplitPath(sPathO, ref sDrive, ref sDir, ref sTitle, ref sExt);
                 string sSvInfoPath = "";
                 sSvInfoPath = $"{sTempDir}{sTitle}.{MdlRINEXTYPE.RNX_SV_EXTENSION}";
 
@@ -1606,7 +1613,7 @@ End Function
 
                         if (Directory.Exists(sTmpPath))
                         {
-                            mdlUtility.EmptyDir(sSplitPath);
+                            EmptyDir(sSplitPath);
                         }
                         else
                         {
@@ -2596,7 +2603,7 @@ End Function
             string sDir = "";
             string sTitle = "";
             string sExt = "";
-            mdlUtility.SplitPath(sPath, ref sDrive, ref sDir, ref sTitle, ref sExt);
+            SplitPath(sPath, ref sDrive, ref sDir, ref sTitle, ref sExt);
 
             string sRinexExt;
             sRinexExt = mdiVBfunctions.Left(mdiVBfunctions.Right(sPath, 3), 2);

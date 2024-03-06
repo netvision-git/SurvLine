@@ -35,7 +35,7 @@ namespace SurvLine
 
 
         private string sendData = "";
-        public frmMain2 fMain;
+        public frmMain fMain;
 
         public frmJobOpen()
         {

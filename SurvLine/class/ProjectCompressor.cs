@@ -13,12 +13,13 @@ using System.Runtime.InteropServices;
 using static SurvLine.ProjectCompressor;
 using Microsoft.VisualBasic;
 using System.Runtime.ExceptionServices;
-
-
-
-
-
-
+using static SurvLine.mdl.DEFINE;
+using static SurvLine.mdl.MdlNSDefine;
+using static SurvLine.mdl.MdlUtility;
+using static SurvLine.mdl.MdlAccountMake;
+using static SurvLine.mdl.MdlNSGUI;
+using static SurvLine.mdl.MdlNSSDefine;
+using static SurvLine.mdl.MdiVBfunctions;
 
 
 
@@ -31,10 +32,9 @@ namespace SurvLine
     internal class ProjectCompressor
     {
 
-        MdlUtility mdlUtility = new MdlUtility();
-
         MdlNSCAB mdlNSCAB = new MdlNSCAB();
 
+        MdlUtility mdlUtility = new MdlUtility();
 
         //'*******************************************************************************
         //'プロジェクトファイルの圧縮。
@@ -248,7 +248,7 @@ namespace SurvLine
                     //フォルダ名を設定   
                     //------------------------------------------
                     sImportName = files[i];
-                    if (mdlUtility.IsDots(sImportName))
+                    if (IsDots(sImportName))
                     {
                         if (sImportName != "")
                         {

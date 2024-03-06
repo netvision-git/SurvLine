@@ -1,7 +1,10 @@
-﻿using System;
+﻿using Microsoft.VisualBasic.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Runtime.Remoting;
+using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -11,34 +14,33 @@ namespace SurvLine.mdl
     {
 
         //'定数
-        //public const DateTime MIN_TIME = (DateTime)"1899/12/30 00:00:00";     //'アプリ最小時刻。
-        public const string MIN_TIME = "1899/12/30 00:00:00";     //'アプリ最小時刻。
-
+        //public const DateTime MIN_TIME = "1899/12/30 00:00:00";     //'アプリ最小時刻。
+        public const string MIN_TIME = "1899/12/30 00:00:00";       //'アプリ最小時刻。
         public const long DEF_LEAP_SEC = 16;                        //'デフォルトのうるう秒。
 
         public const long DOCUMENT_FILE_VERSION = 9700;              //'ドキュメントファイルバージョン。
-                                                  //'7800 2008/10/11 精度管理表（別表）にパラメータを追加 NS-Network
-                                                  //'7800 2007/3/22 座標計算簿２を追加　NGS Yamada NS-Note
-                                                  //'7800 偏心設定に「手入力」を追加　2007/3/15 NGS Yamada NS-Survey
-                                                  //'7900 2007/8/14 補正量を追加　NGS Yamada NS-Note
-                                                  //'7900 帳票「座標一覧表」を追加　　2007/7/18 NGS Yamada NS-Survey
-                                                  //'8000 2008/10/16 基準点フラグ、ローカル座標追加　2008/10/16 NGS Yamada NS-Note
-                                                  //'8202 2009/11 H.Nakamura
-                                                  //'8300 2011/08 GLONASS対応。
-                                                  //'8400 2012/05 重み付け補間対応。
-                                                  //'8500 2012/06/05 平均座標変換計算簿の追加。
-                                                  //'8600 2013/11/07 静止測量のGLONASS対応。
-                                                  //'8700 2015/12/16 最小 probability of success 追加。
-                                                  //'8800 2016/01/07 電子基準点のみを既知点とした基準点測量を追加。
-                                                  //'8900 2016/01/08 点検計算結果を追加。
-                                                  //'9000 2016/02/06 大気遅延を推定しない。
-                                                  //'9100 2017/06/05 NS6000対応。
-                                                  //'9200 2018/07/17 電離層遅延推定パラメータの追加。
-                                                  //'9300 2018/08/21 最大衛星数の拡張(E 30 > 36、C 35 > 37)
-                                                  //'9400 2022/02/07 衛星信号の追加。
-                                                  //'9500 2022/03/10 衛星情報の OBS TYPES は信号が無くても記載されていたので記載しないように修正。すでに読み込み済みのデータはあらためて評価する。
-                                                  //'9600 2022/10/20 精度管理表を別表へ分けない、を追加。
-                                                  //'9700 2023/06/27 楕円体高の閉合差を追加。平均成果表を追加。前半後半較差の追加。
+                                                                     //'7800 2008/10/11 精度管理表（別表）にパラメータを追加 NS-Network
+                                                                     //'7800 2007/3/22 座標計算簿２を追加　NGS Yamada NS-Note
+                                                                     //'7800 偏心設定に「手入力」を追加　2007/3/15 NGS Yamada NS-Survey
+                                                                     //'7900 2007/8/14 補正量を追加　NGS Yamada NS-Note
+                                                                     //'7900 帳票「座標一覧表」を追加　　2007/7/18 NGS Yamada NS-Survey
+                                                                     //'8000 2008/10/16 基準点フラグ、ローカル座標追加　2008/10/16 NGS Yamada NS-Note
+                                                                     //'8202 2009/11 H.Nakamura
+                                                                     //'8300 2011/08 GLONASS対応。
+                                                                     //'8400 2012/05 重み付け補間対応。
+                                                                     //'8500 2012/06/05 平均座標変換計算簿の追加。
+                                                                     //'8600 2013/11/07 静止測量のGLONASS対応。
+                                                                     //'8700 2015/12/16 最小 probability of success 追加。
+                                                                     //'8800 2016/01/07 電子基準点のみを既知点とした基準点測量を追加。
+                                                                     //'8900 2016/01/08 点検計算結果を追加。
+                                                                     //'9000 2016/02/06 大気遅延を推定しない。
+                                                                     //'9100 2017/06/05 NS6000対応。
+                                                                     //'9200 2018/07/17 電離層遅延推定パラメータの追加。
+                                                                     //'9300 2018/08/21 最大衛星数の拡張(E 30 > 36、C 35 > 37)
+                                                                     //'9400 2022/02/07 衛星信号の追加。
+                                                                     //'9500 2022/03/10 衛星情報の OBS TYPES は信号が無くても記載されていたので記載しないように修正。すでに読み込み済みのデータはあらためて評価する。
+                                                                     //'9600 2022/10/20 精度管理表を別表へ分けない、を追加。
+                                                                     //'9700 2023/06/27 楕円体高の閉合差を追加。平均成果表を追加。前半後半較差の追加。
         public const long FILEIOMEMSIZE = 16384;  //'ファイル読み書きバッファサイズ。
 
         //'座標系原点座標
@@ -422,20 +424,19 @@ namespace SurvLine.mdl
         //'セキュリティチェック。
         public const long SRCURITYCHECK_TIMER_INTERVAL = 30000;         //'タイマー間隔。
 
+
         [DllImport("GpsConv.dll")]
-        public static extern void WGS84xyz_to_WGS84dms(double X, double Y, double Z, ref double Lat, ref double Lon, double Height);
+        public static extern void WGS84dms_to_JGDxyz(int zone, double Lat, double Lon, double Height, ref double X, ref double Y, ref double Z);
         [DllImport("GpsConv.dll")]
-        public static extern void WGS84dms_to_JGDxyz(long zone, double Lat, double Lon, double Height, ref double X, ref double Y, ref double Z);
-        [DllImport("GpsConv.dll")]
-        public static extern void JGDxyz_to_WGS84dms(long zone, double X, double LoYn, double Z, ref double Lat, ref double Lon, ref double Height);
+        public static extern void JGDxyz_to_WGS84dms(int zone, double X, double LoYn, double Z, ref double Lat, ref double Lon, ref double Height);
         [DllImport("GpsConv.dll")]
         public static extern void WGS84dms_to_WGS84xyz(double Lat, double Lon, double Height, ref double X, ref double Y, ref double Z);
         [DllImport("GpsConv.dll")]
         public static extern void WGS84xyz_to_WGS84dms(double X, double Y, double Z, ref double Lat, ref double Lon, ref double Height);
         [DllImport("GpsConv.dll")]
-        public static extern void d_to_dms_decimal(double dD, ref long deg, ref long Min, ref double Sec, long deci);
+        public static extern void d_to_dms_decimal(double dD, ref int deg, ref int Min, ref double Sec, int deci);
         [DllImport("GpsConv.dll")]
-        public static extern double dms_to_d(long deg, long Min, double Sec);
+        public static extern double dms_to_d(int deg, int Min, double Sec);
         [DllImport("GpsConv.dll")]
         public static extern long get_geo_height(string Path, double LatJGD, double LonJGD, ref double GeoHeight);
 
@@ -460,13 +461,13 @@ namespace SurvLine.mdl
         '関数ラップ
 
         */
-        public void WGS84xyz_to_JGDxyz(long zone, double wgs84X, double wgs84Y, double wgs84Z, ref double X, ref double Y, ref double Z)
+        public static void WGS84xyz_to_JGDxyz(long zone, double wgs84X, double wgs84Y, double wgs84Z, ref double X, ref double Y, ref double Z)
         {
             double nLat = 0;
             double nLon = 0;
             double nHeight = 0;
-            WGS84xyz_to_WGS84dms(wgs84X, wgs84Y, wgs84Z, ref nLat, ref nLon, nHeight);
-            WGS84dms_to_JGDxyz(zone, nLat, nLon, nHeight, ref X, ref Y, ref Z);
+            WGS84xyz_to_WGS84dms(wgs84X, wgs84Y, wgs84Z, ref nLat, ref nLon, ref nHeight);
+            WGS84dms_to_JGDxyz((int)zone, nLat, nLon, nHeight, ref X, ref Y, ref Z);
         }
         //==========================================================================================
 
@@ -480,18 +481,28 @@ namespace SurvLine.mdl
             Call WGS84dms_to_WGS84xyz(nLat, nLon, nHeight, wgs84X, wgs84Y, wgs84Z)
         End Sub
         [VB]*/
-        //------------------------------------------------------------------------------------------
+        //--------------------------------------]----------------------------------------------------
         //[C#]
-        public void JGDxyz_to_WGS84xyz(long zone, double X, double Y, double Z, ref double wgs84X, ref double wgs84Y, ref double wgs84Z)
+        public static void JGDxyz_to_WGS84xyz(long zone, double X, double Y, double Z, ref double wgs84X, ref double wgs84Y, ref double wgs84Z)
         {
             double nLat = 0;
             double nLon = 0;
             double nHeight = 0;
-            JGDxyz_to_WGS84dms(zone, X, Y, Z, ref nLat, ref nLon, ref nHeight);
+            JGDxyz_to_WGS84dms((int)zone, X, Y, Z, ref nLat, ref nLon, ref nHeight);
             WGS84dms_to_WGS84xyz(nLat, nLon, nHeight, ref wgs84X, ref wgs84Y, ref wgs84Z);
         }
         //==========================================================================================
 
-
+        //==========================================================================================
+        //[C#]
+        public static void D_to_Dms_decimal(double dD, ref long deg, ref long Min, ref double Sec, long deci)
+        {
+            int Deg = (int)deg;
+            int min = (int)Min;
+            d_to_dms_decimal(dD, ref Deg, ref min, ref Sec, (int)deci);
+            deg = Deg;
+            Min = min;
+        }
+        //==========================================================================================
     }
 }

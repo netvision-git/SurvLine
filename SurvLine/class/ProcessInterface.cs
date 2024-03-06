@@ -3,48 +3,51 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 namespace SurvLine
 {
-    internal class ProcessInterface
+    public class ProcessInterface
     {
-        public ProgressInterface clsProgressInterface;
+        //==========================================================================================
+        /*[VB]
+        '*******************************************************************************
+        '処理インターフェース
 
-
-        //'*******************************************************************************
-        //'処理インターフェース
-
-        //Option Explicit
-
-        //'*******************************************************************************
-        //'メソッド
-
+        Option Explicit
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
+        '*******************************************************************************
+        'メソッド
+
         '処理。
         '
         '引き数：
         'clsProgressInterface ProgressInterface オブジェクト。
         Public Sub Process(ByVal clsProgressInterface As ProgressInterface)
         End Sub
-            [VB]*/
+        [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
-        /// <summary>
-        /// 処理。
-        ///
-        /// 引き数：
-        ///     clsProgressInterface ProgressInterface オブジェクト。
-        /// 
-        /// </summary>
-        /// <param name="oProgressInterface"></param>
-        public void Process(ProgressInterface oProgressInterface)
+        /*
+        '*******************************************************************************
+        'メソッド
+
+        '処理。
+        '
+        '引き数：
+        'clsProgressInterface ProgressInterface オブジェクト。
+        */
+        public void Process(ProgressInterface clsProgressInterface)
         {
-            //  clsProgressInterface = oProgressInterface;
             return;
         }
-
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
@@ -55,21 +58,20 @@ namespace SurvLine
         'それ以外の場合は False を返す。
         Public Function ConfirmCancel() As Boolean
         End Function
-            [VB]*/
+        [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
-        /// <summary>
-        /// キャンセル確認。
-        /// 
-        /// </summary>
-        /// <returns>
-        /// 戻り値：
-        ///     キャンセルが指定されている場合は True を返す。
-        ///     それ以外の場合は False を返す。
-        /// </returns>
+        /*
+        'キャンセル確認。
+        '
+        '戻り値：
+        'キャンセルが指定されている場合は True を返す。
+        'それ以外の場合は False を返す。
+        */
         public bool ConfirmCancel()
         {
-            return true;
+            return false;
         }
+        //==========================================================================================
     }
 }

@@ -10,6 +10,14 @@ using System.IO;
 using static SurvLine.mdl.DEFINE;
 using System.Runtime.InteropServices.ComTypes;
 using static System.Windows.Forms.AxHost;
+using SurvLine.mdl;
+using static SurvLine.mdl.DEFINE;
+using static SurvLine.mdl.MdlNSDefine;
+using static SurvLine.mdl.MdlUtility;
+using static SurvLine.mdl.MdlAccountMake;
+using static SurvLine.mdl.MdlNSGUI;
+using static SurvLine.mdl.MdlNSSDefine;
+
 
 namespace SurvLine
 {
@@ -237,7 +245,7 @@ namespace SurvLine
             {
                 sImportPath = $"{sDstPath}{sImportName}\\";
                 _ = mdlUtility.CreateDir(sImportPath);
-                _ = mdlUtility.EmptyDir(sImportPath);
+                _ = EmptyDir(sImportPath);
 
                 //'エクスポートファイル。
                 using (var fs = System.IO.File.OpenRead($"{sSrcPath}"))

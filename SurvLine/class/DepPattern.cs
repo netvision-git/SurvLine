@@ -7,25 +7,23 @@ using static System.Net.Mime.MediaTypeNames;
 using System.Windows.Forms;
 using System.IO;
 
+
 namespace SurvLine
 {
-    internal class DepPattern
+    public class DepPattern
     {
-        //23/12/22 K.setoguchi@NV---------->>>>>>>>>
-        //   extrnalに移動
-        //(del)     public struct NSPPS3_DEP_PATTERN
-        //(del)     {
-        //(del)     public Single PatternEle;
-        //(del)     public Single PatternL1;
-        //(del)     public Single PatternL2;
-        //(del)     }
-        //<<<<<<<<<-----------23/12/22 K.setoguchi@NV
+        public struct NSPPS3_DEP_PATTERN
+        {
+            public Single PatternEle;
+            public Single PatternL1;
+            public Single PatternL2;
+        }
         //----------------------------------------------------------------------------------
 
         public void Load(BinaryReader br, long nVersion, ref GENBA_STRUCT_S Genba_S)
         {
 
-            MdlUtility mdlUtility = new MdlUtility();
+            mdl.MdlUtility mdlUtility = new mdl.MdlUtility();
 
             //[VB]    Dim nUBound As Long
             //[VB]    Get #nFile, , nUBound
@@ -36,21 +34,14 @@ namespace SurvLine
 
             var m_tDepPattern_struct = new NSPPS3_DEP_PATTERN();
 
-            //23/12/22 K.setoguchi@NV---------->>>>>>>>>
-            //(del) List<NSPPS3_DEP_PATTERN> m_tDepPattern = new List<NSPPS3_DEP_PATTERN>();
-            List<NSPPS3_DEP_PATTERN> m_tDepPatternA = new List<NSPPS3_DEP_PATTERN>();
-            Genba_S.m_tDepPattern = m_tDepPatternA;
-            //<<<<<<<<<-----------23/12/22 K.setoguchi@NV
+            List<NSPPS3_DEP_PATTERN> m_tDepPattern = new List<NSPPS3_DEP_PATTERN>();
 
             for (long i = 0; i <= nUBound; i++)
             {
-                //23/12/22 K.setoguchi@NV---------->>>>>>>>>
-                //   下位に移動
-                //(del) //-----------------------------------------------------
-                //(del) // 配列と再配置
-                //(del) //-----------------------------------------------------
-                //(del) m_tDepPattern.Add(m_tDepPattern_struct);
-                //<<<<<<<<<-----------23/12/22 K.setoguchi@NV
+                //-----------------------------------------------------
+                // 配列と再配置
+                //-----------------------------------------------------
+                m_tDepPattern.Add(m_tDepPattern_struct);
 
 
                 //-----------------------------------------------------
@@ -71,26 +62,42 @@ namespace SurvLine
                 //        Else
                 //            Get #nFile, , m_tDepPattern(i).PatternL5
                 //        End If
-                //23/12/22 K.setoguchi@NV---------->>>>>>>>>>
-                if (nVersion < 9300)
-                {
-                    m_tDepPattern_struct.PatternL5 = 0;
-                }
-                else
-                {
-                    m_tDepPattern_struct.PatternL5 = br.ReadSingle();
-                }
-                //-----------------------------------------------------
-                // 配列と再配置
-                //-----------------------------------------------------
-                Genba_S.m_tDepPattern.Add(m_tDepPattern_struct);
-                //<<<<<<<<<-----------23/12/22 K.setoguchi@NV
+
             }
-            //23/12/22 K.setoguchi@NV---------->>>>>>>>>>
-            //サンプルプログラム 全削除
-            //<<<<<<<<<-----------23/12/22 K.setoguchi@NV
+#if flase   //サンプルプログラム *******************************************************
+            Single abc1 = m_tDepPattern[5].PatternEle;
+            Single abc2 = m_tDepPattern[5].PatternL1;
+            Single abc3 = m_tDepPattern[5].PatternL2;
+#endif  //サンプルプログラム *******************************************************    
+
+
+#if flase   //サンプルプログラム *******************************************************
+
+            Single[] m_tDepPatternA = new Single[nUBound + 1];
+
+            for (long i = 0; i <= nUBound; i++)
+            {
+                //[VB]  Get #nFile, , m_tDepPattern(i).PatternEle
+                m_tDepPatternA[i] = br.ReadSingle();
+
+                //-----------------------------------------------------
+                //[VB]  Get #nFile, , m_tDepPattern(i).PatternL1
+                m_tDepPatternA[i] = br.ReadSingle();
+                //-----------------------------------------------------
+                //[VB]  Get #nFile, , m_tDepPattern(i).PatternL2
+                m_tDepPatternA[i] = br.ReadSingle();
+
+                //        If nVersion< 9300 Then
+                //            m_tDepPattern(i).PatternL5 = 0
+                //        Else
+                //            Get #nFile, , m_tDepPattern(i).PatternL5
+                //        End If
+
+            }
+#endif  //サンプルプログラム *******************************************************    
+
         }
-        //---------------------------------------------------------------
+
         //'読み込み。
         //'
         //'引き数：

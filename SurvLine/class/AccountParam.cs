@@ -1,4 +1,5 @@
 ﻿using SurvLine;
+using SurvLine.mdl;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -7,18 +8,19 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using static SurvLine.MdlAccountMake;
+using static SurvLine.mdl.MdlAccountMake;
 using static System.Collections.Specialized.BitVector32;
 using static System.Net.Mime.MediaTypeNames;
 using static System.Net.WebRequestMethods;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
+using static SurvLine.mdl.MdlUtility;
+
 
 namespace SurvLine
 {
     internal class AccountParam
     {
 
-        MdlUtility mdlUtility = new MdlUtility();
         MdiVBfunctions mdiVBfunctions = new MdiVBfunctions();
 
 
@@ -186,9 +188,9 @@ namespace SurvLine
         public void Save(BinaryWriter bw)
         {
             bw.Write((Int32)RangeType);                     //    Put #nFile, , RangeType
-            mdlUtility.FileWrite_PutString(bw, Session);    //    Call PutString(nFile, Session)
+            FileWrite_PutString(bw, Session);    //    Call PutString(nFile, Session)
             bw.Write((Int32)ObjectType);                    //    Put #nFile, , ObjectType
-            mdlUtility.PutFileBool(bw,Initial);                       //    Put #nFile, , Initial
+            PutFileBool(bw,Initial);                       //    Put #nFile, , Initial
 
             bw.Write(m_objSelectedObjects.Count);           //    Put #nFile, , m_objSelectedObjects.Count
             //    Dim vKey As Variant

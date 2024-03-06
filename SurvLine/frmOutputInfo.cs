@@ -8,7 +8,7 @@ using System.Net.Mail;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using static SurvLine.MdlAccountMakeNSS;
+using static SurvLine.mdl.MdlAccountMakeNSS;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 namespace SurvLine

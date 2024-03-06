@@ -37,6 +37,7 @@
     <DefineConstants>TRACE;DEBUG;SEMIDYNA</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -47,10 +48,14 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>
+    </StartupObject>
+  </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Numerics" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -62,21 +67,55 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="class\AngleDiffResult.cs" />
-    <Compile Include="class\AngleDiff.cs" />
-    <Compile Include="class\AutoOrderVectorParam.cs" />
     <Compile Include="class\AccountCadastralParam.cs" />
+    <Compile Include="class\AccountMaker.cs" />
     <Compile Include="class\AccountOverlapParam.cs" />
     <Compile Include="class\AccountParam.cs" />
-    <Compile Include="class\AccountMaker.cs" />
-    <Compile Include="class\AngleDiffParam.cs" />
-    <Compile Include="class\BaseLineAnalysisParam.cs" />
-    <Compile Include="class\ChainList.cs" />
     <Compile Include="class\AmbInfo.cs" />
+    <Compile Include="class\AngleDiff.cs" />
+    <Compile Include="class\AngleDiffParam.cs" />
+    <Compile Include="class\AngleDiffResult.cs" />
+    <Compile Include="class\AutoOrderVectorParam.cs" />
+    <Compile Include="class\BaseLineAnalysisParam.cs" />
     <Compile Include="class\BaseLineVector.cs" />
+    <Compile Include="class\ChainList.cs" />
+    <Compile Include="class\ClickArea.cs" />
+    <Compile Include="class\ClickCircle.cs" />
+    <Compile Include="class\ClickManager.cs" />
+    <Compile Include="class\ClickObjectInterface.cs" />
+    <Compile Include="class\ClickRect.cs" />
+    <Compile Include="class\ClickTriangle.cs" />
+    <Compile Include="class\ClickVector.cs" />
     <Compile Include="class\Collection.cs" />
+    <Compile Include="class\CoordinatePoint.cs" />
     <Compile Include="class\CoordinatePointFix.cs" />
     <Compile Include="class\CoordinatePointXYZ.cs" />
+    <Compile Include="class\CtrlValue.cs" />
+    <Compile Include="class\DXFParam.cs" />
+    <Compile Include="class\ErrInfo.cs" />
+    <Compile Include="class\FileDialog.cs" />
+    <Compile Include="class\FileObject.cs" />
+    <Compile Include="class\FolderDialog.cs" />
+    <Compile Include="class\IniFileControl.cs" />
+    <Compile Include="class\KnownPoint.cs" />
+    <Compile Include="class\LicenseCheck.cs" />
+    <Compile Include="class\ListSort.cs" />
+    <Compile Include="class\ListViewBaseLineVector.cs" />
+    <Compile Include="class\ListViewInterface.cs" />
+    <Compile Include="class\ListViewObservationPoint.cs" />
+    <Compile Include="class\ListViewOperator.cs" />
+    <Compile Include="class\ObjectList.cs" />
+    <Compile Include="class\ObservationPointKey_NSO.cs" />
+    <Compile Include="class\OutputParam.cs" />
+    <Compile Include="class\ProcessImport.cs" />
+    <Compile Include="class\ProcessProject.cs" />
+    <Compile Include="class\ProjectCompressor.cs" />
+    <Compile Include="class\ProjectSolidifyer.cs" />
+    <Compile Include="class\RegKey.cs" />
+    <Compile Include="class\SatelliteInfoChanges.cs" />
+    <Compile Include="class\SatelliteInfoHeader.cs" />
+    <Compile Include="class\SproDataInterface.cs" />
+    <Compile Include="class\SproObject.cs" />
     <Compile Include="class\DepPattern.cs" />
     <Compile Include="class\Dispersion.cs" />
     <Compile Include="class\Document.cs" />
@@ -87,19 +126,22 @@
     <Compile Include="class\ObservationCommonAttributes.cs" />
     <Compile Include="class\ObservationPoint.cs" />
     <Compile Include="class\ObservationPointAttributes.cs" />
+    <Compile Include="class\ObservationShared.cs" />
     <Compile Include="class\ObsInfo.cs" />
+    <Compile Include="class\PlotNative.cs" />
+    <Compile Include="class\PlotPort.cs" />
+    <Compile Include="class\ProcessInterface.cs" />
+    <Compile Include="class\ProgressInterface.cs" />
     <Compile Include="class\ProjectFileManager.cs" />
+    <Compile Include="class\RegistAngle.cs" />
     <Compile Include="class\SatelliteInfoReader.cs" />
-    <Compile Include="class\DXFParam.cs" />
-    <Compile Include="class\CoordinatePoint.cs" />
-    <Compile Include="class\FileDialog.cs" />
-    <Compile Include="class\ErrInfo.cs" />
-    <Compile Include="class\FolderDialog.cs" />
-    <Compile Include="frmAccountInfo2.cs">
+    <Compile Include="class\StringTokenizer.cs" />
+    <Compile Include="class\TwipsPoint.cs" />
+    <Compile Include="frmAccountInfo.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="frmAccountInfo2.Designer.cs">
-      <DependentUpon>frmAccountInfo2.cs</DependentUpon>
+    <Compile Include="frmAccountInfo.Designer.cs">
+      <DependentUpon>frmAccountInfo.cs</DependentUpon>
     </Compile>
     <Compile Include="frmFileDialog.cs">
       <SubType>Form</SubType>
@@ -107,32 +149,30 @@
     <Compile Include="frmFileDialog.Designer.cs">
       <DependentUpon>frmFileDialog.cs</DependentUpon>
     </Compile>
-    <Compile Include="frmJobEdit2.cs">
+    <Compile Include="frmJobEdit.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="frmJobEdit2.Designer.cs">
-      <DependentUpon>frmJobEdit2.cs</DependentUpon>
-    </Compile>
-    <Compile Include="frmJobSelect2.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="frmJobSelect2.Designer.cs">
-      <DependentUpon>frmJobSelect2.cs</DependentUpon>
-    </Compile>
-    <Compile Include="frmMain2.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="frmMain2.Designer.cs">
-      <DependentUpon>frmMain2.cs</DependentUpon>
+    <Compile Include="frmJobEdit.Designer.cs">
+      <DependentUpon>frmJobEdit.cs</DependentUpon>
     </Compile>
     <Compile Include="frmJobOpen.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="frmJobOpen.Designer.cs">
+    <Compile Include="frmJobOpen.designer.cs">
       <DependentUpon>frmJobOpen.cs</DependentUpon>
     </Compile>
-    <Compile Include="class\IniFileControl.cs" />
-    <Compile Include="class\KnownPoint.cs" />
+    <Compile Include="frmJobSelect.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmJobSelect.Designer.cs">
+      <DependentUpon>frmJobSelect.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmMain.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmMain.Designer.cs">
+      <DependentUpon>frmMain.cs</DependentUpon>
+    </Compile>
     <Compile Include="frmMsgBoxYesNo.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -151,70 +191,72 @@
     <Compile Include="frmProgressDialog2.Designer.cs">
       <DependentUpon>frmProgressDialog2.cs</DependentUpon>
     </Compile>
-    <Compile Include="class\ListViewOperator.cs" />
-    <Compile Include="class\ListViewInterface.cs" />
-    <Compile Include="class\ListViewBaseLineVector.cs" />
-    <Compile Include="class\ListViewObservationPoint.cs" />
-    <Compile Include="mdl\mdlNGSRDRIN.cs" />
-    <Compile Include="mdl\mdlImport.cs" />
-    <Compile Include="mdl\mdlNSCAB.cs" />
-    <Compile Include="mdl\mdlNSGUI.cs" />
-    <Compile Include="mdl\mdlAccountMakeNSS.cs" />
-    <Compile Include="mdl\mdlMain.cs" />
-    <Compile Include="mdl\mdlSemiDyna.cs" />
     <Compile Include="mdl\mdiVBfunctions.cs" />
-    <Compile Include="mdl\mdlGUI.cs" />
-    <Compile Include="mdl\mdlNSPPS2.cs" />
-    <Compile Include="mdl\mdlRINEXTYPE.cs" />
     <Compile Include="mdl\mdlAccountMake.cs" />
+    <Compile Include="mdl\mdlAccountMakeNSS.cs" />
+    <Compile Include="mdl\mdlAtvRpt.cs" />
     <Compile Include="mdl\mdlBaseLineAnalyser.cs" />
     <Compile Include="mdl\mdlDefine.cs" />
-    <Compile Include="mdl\mdlListPane.cs" />
-    <Compile Include="mdl\mdlNSDefine.cs" />
-    <Compile Include="mdl\mdlNSSDefine.cs" />
-    <Compile Include="mdl\mdlUtility.cs" />
-    <Compile Include="class\OutputParam.cs" />
-    <Compile Include="class\ObservationShared.cs" />
-    <Compile Include="class\ObjectList.cs" />
-    <Compile Include="pmemo.cs" />
-    <Compile Include="class\ProcessImport.cs" />
-    <Compile Include="class\ProcessProject.cs" />
-    <Compile Include="class\ProcessInterface.cs" />
-    <Compile Include="Program.cs" />
-    <Compile Include="class\ProgressInterface.cs" />
-    <Compile Include="class\ProjectSolidifyer.cs" />
-    <Compile Include="class\ProjectCompressor.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="class\StringTokenizer.cs" />
-    <Compile Include="class\RegKey.cs" />
-    <Compile Include="class\RegistAngle.cs" />
+    <Compile Include="mdl\mdlEccentricCorrection.cs" />
     <Compile Include="mdl\mdlFolderDialog.cs" />
-    <Compile Include="class\TwipsPoint.cs" />
-    <Compile Include="class\SatelliteInfoHeader.cs" />
-    <Compile Include="class\SatelliteInfoChanges.cs" />
+    <Compile Include="mdl\mdlGUI.cs" />
+    <Compile Include="mdl\mdlImport.cs" />
+    <Compile Include="mdl\mdlListPane.cs" />
+    <Compile Include="mdl\mdlListProc.cs" />
+    <Compile Include="mdl\mdlMain.cs" />
+    <Compile Include="mdl\mdlMath.cs" />
+    <Compile Include="mdl\mdlMatrix.cs" />
+    <Compile Include="mdl\mdlNGSRDRIN.cs" />
+    <Compile Include="mdl\mdlNSCAB.cs" />
+    <Compile Include="mdl\mdlNSDefine.cs" />
+    <Compile Include="mdl\mdlNSGUI.cs" />
+    <Compile Include="mdl\mdlNSNote.cs" />
+    <Compile Include="mdl\mdlNSPPS.cs" />
+    <Compile Include="mdl\mdlNSPPS2.cs" />
+    <Compile Include="mdl\mdlNSSDefine.cs" />
+    <Compile Include="mdl\mdlNSSUtility.cs" />
+    <Compile Include="mdl\mdlNSUtility.cs" />
+    <Compile Include="mdl\mdlOutputFile.cs" />
+    <Compile Include="mdl\mdlPlotProc.cs" />
+    <Compile Include="mdl\mdlRegistAngle.cs" />
+    <Compile Include="mdl\mdlRINEXTYPE.cs" />
+    <Compile Include="mdl\mdlSemiDyna.cs" />
+    <Compile Include="mdl\mdlSession.cs" />
+    <Compile Include="mdl\mdlSurveyParam.cs" />
+    <Compile Include="mdl\mdlUtility.cs" />
+    <Compile Include="pmemo.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="user\PlotPane.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="user\PlotPane.Designer.cs">
+      <DependentUpon>PlotPane.cs</DependentUpon>
+    </Compile>
     <Compile Include="user\ListPane.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="user\ListPane.Designer.cs">
       <DependentUpon>ListPane.cs</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="frmAccountInfo2.resx">
-      <DependentUpon>frmAccountInfo2.cs</DependentUpon>
+    <EmbeddedResource Include="frmAccountInfo.resx">
+      <DependentUpon>frmAccountInfo.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmFileDialog.resx">
       <DependentUpon>frmFileDialog.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="frmJobEdit2.resx">
-      <DependentUpon>frmJobEdit2.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="frmJobSelect2.resx">
-      <DependentUpon>frmJobSelect2.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="frmMain2.resx">
-      <DependentUpon>frmMain2.cs</DependentUpon>
+    <EmbeddedResource Include="frmJobEdit.resx">
+      <DependentUpon>frmJobEdit.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmJobOpen.resx">
       <DependentUpon>frmJobOpen.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmJobSelect.resx">
+      <DependentUpon>frmJobSelect.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmMain.resx">
+      <DependentUpon>frmMain.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="frmMsgBoxYesNo.resx">
       <DependentUpon>frmMsgBoxYesNo.cs</DependentUpon>
@@ -235,8 +277,13 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <EmbeddedResource Include="user\PlotPane.resx">
+      <DependentUpon>PlotPane.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="user\ListPane.resx">
       <DependentUpon>ListPane.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <None Include="..\.editorconfig">
       <Link>.editorconfig</Link>
@@ -368,6 +415,8 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

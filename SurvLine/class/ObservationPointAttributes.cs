@@ -10,18 +10,34 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using static SurvLine.GENBA_STRUCT_S;
+using static SurvLine.mdl.DEFINE;
 using static SurvLine.mdl.MdlNSDefine;
+using static SurvLine.mdl.MdlUtility;
+using static SurvLine.mdl.MdlAccountMake;
+using static SurvLine.mdl.MdlNSGUI;
 using static SurvLine.mdl.MdlNSSDefine;
+using static SurvLine.mdl.MdiVBfunctions;
 using static System.Collections.Specialized.BitVector32;
 using static System.Net.WebRequestMethods;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
-
+using System.Windows.Forms;
 
 namespace SurvLine
 {
     public class ObservationPointAttributes
     {
 
+
+
+
+        public ObservationPointAttributes(MdlMain mdlMain)
+        {
+            this.mdlMain = mdlMain;
+            document = mdlMain.GetDocument();
+            m_clsCommon = new ObservationCommonAttributes(mdlMain);
+        }
+
+        //==========================================================================================
         /*[VB]
         '*******************************************************************************
         '観測点属性
@@ -126,9 +142,12 @@ namespace SurvLine
         //------------------------------------------------------------------------------------------
         //[C#]
         //'インプリメンテーション
-        private ObservationCommonAttributes m_clsCommon = new ObservationCommonAttributes();    //'観測点共通属性。
+        //private ObservationCommonAttributes m_clsCommon = new ObservationCommonAttributes();    //'観測点共通属性。
+        private ObservationCommonAttributes m_clsCommon;                                        //'観測点共通属性。
         private CoordinatePointXYZ m_clsCoordinateObservation = new CoordinatePointXYZ();       //'観測座標。
 
+        private CoordinatePoint m_CoordinatePoint;
+        private Document document;
         private MdlMain mdlMain;
         //==========================================================================================
 
@@ -182,15 +201,9 @@ namespace SurvLine
         //------------------------------------------------------------------------------------------
         //[C#]
         //'観測座標。
-        //public void CoordinateObservation(CoordinatePoint clsCoordinateObservation)
-        public void CoordinateObservation(object clsCoordinateObservation)
+        public void CoordinateObservation(CoordinatePoint clsCoordinateObservation)
         {
-#if false
-            /*
-             *************************** 修正要 sakai
-             */
             m_clsCoordinateObservation = (CoordinatePointXYZ)clsCoordinateObservation;
-#endif
             return;
         }
         //==========================================================================================
@@ -204,17 +217,15 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
-        //'観測座標。
-        //瀬戸口   public CoordinatePoint CoordinateObservation()
-        public object CoordinateObservation()
+        //'観測座標。        
+        public  CoordinatePoint CoordinateObservation()
         {
-#if false
-            /*
-             *************************** 修正要 sakai
-             */
-            return (CoordinatePoint)m_clsCoordinateObservation;
+#if true
+            return m_clsCoordinateObservation;
+#else
+            //debug
+            return new CoordinatePoint();
 #endif
-            return null;
         }
         //==========================================================================================
 
@@ -337,6 +348,37 @@ namespace SurvLine
 
 
 
+        /*
+        //'*******************************************************************************
+        //  ObservationPointAttributes
+        //'*******************************************************************************
+        //'観測点属性
+        //ption Explicit
+        //
+        //'プロパティ
+        public int Mode;                //As OBJ_MODE '観測点モード。
+        public string Session;          //As String 'セッション名。
+        public bool ProvisionalSession; //As Boolean '仮のセッション。
+        public string FileTitle;        //As String 'ファイルタイトル。
+        public string RinexExt;         //As String 'RINEXファイル拡張子(先頭２文字)。
+        public string SrcPath;          //As String 'ソースファイルのパス。
+        public DateTime StrTimeGPS;     //As Date '観測開始日時(GPS)。
+        public DateTime EndTimeGPS;     //As Date '観測終了日時(GPS)。
+        public long LeapSeconds;        //As Long 'うるう秒。
+        //    public SatelliteInfo As Object '衛星数情報。
+        public bool GlonassFlag;        //As Boolean 'GLONASSフラグ。
+        //'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        public bool IsList;             //As Boolean 'リスト更新必要フラグ。
+        //'2022/02/07 SattSignal の追加。''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        public int SattSignalGPS;           //'GPS衛星信号。ビットフラグ。0x01＝L1、0x02＝L2、0x04＝L5。
+        public int SattSignalGLONASS;       //'GLONASS衛星信号。ビットフラグ。0x01＝G1、0x02＝G2、0x04＝G3。
+        public int SattSignalQZSS;          //'QZSS衛星信号。ビットフラグ。0x01＝L1、0x02＝L2、0x04＝L5。
+        public int SattSignalGalileo;       //'Galileo衛星信号。ビットフラグ。0x01＝E1、0x02＝E5。
+        public int SattSignalBeiDou;        //'BeiDou衛星信号。ビットフラグ。0x01＝B1、0x02＝B2、0x04＝B3。
+        //'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        */
+
+
         //***************************************************************************
         //***************************************************************************
         /// <summary>
@@ -358,93 +400,113 @@ namespace SurvLine
         //[VB] Public Sub Load(ByVal nFile As Integer, ByVal nVersion As Long)
         public void Load(BinaryReader br, long nVersion, ref GENBA_STRUCT_S Genba_S)
         {
-            MdlUtility mdlUtility = new MdlUtility();
-            Document document = new Document();
+            MdlUtility mdlUtility = new MdlUtility();   //Add K.setoguchi
+            //MdlUtility mdlUtility = new MdlUtility();
+            ////Document document = new Document();
             //MdlNSDefine mdlNSDefine
 
             byte[] buf = new byte[8]; int ret;
 
+            string AppPath = Path.GetDirectoryName(Application.ExecutablePath);
 
             if (nVersion < 7000) {
                 //Mode = OBJ_MODE_ADOPT
                 Genba_S.OPA.Mode = (int)MdlNSSDefine.OBJ_MODE.OBJ_MODE_ADOPT;
+                Mode = (OBJ_MODE)Genba_S.OPA.Mode;
             }
             else
             {
                 //Get #nFile, , Mode
                 Genba_S.OPA.Mode = br.ReadInt32();
+                Mode = (OBJ_MODE)Genba_S.OPA.Mode;
 
             }
             //---------------------------------------
             //[VB]  Session = GetString(nFile)  //(Ex.)"017H"
-            Genba_S.OPA.Session = mdlUtility.FileRead_GetString(br);
+            Genba_S.OPA.Session = FileRead_GetString(br);
+            Session = Genba_S.OPA.Session;
 
             if (nVersion < 2000) {
                 Genba_S.OPA.ProvisionalSession = false;
+                ProvisionalSession = Genba_S.OPA.ProvisionalSession;
             }
             else
             {
                 //[VB]Get #nFile, , ProvisionalSession
                 Genba_S.OPA.ProvisionalSession = document.GetFileBool(br);
+                ProvisionalSession = Genba_S.OPA.ProvisionalSession;
             }
             //---------------------------------------
             //[VB]FileTitle = GetString(nFile)
-            Genba_S.OPA.FileTitle = mdlUtility.FileRead_GetString(br);
+            Genba_S.OPA.FileTitle = FileRead_GetString(br);
+            FileTitle = Genba_S.OPA.FileTitle;
             //---------------------------------------
             //[VB]RinexExt = GetString(nFile)
-            Genba_S.OPA.RinexExt = mdlUtility.FileRead_GetString(br);
+            Genba_S.OPA.RinexExt = FileRead_GetString(br);
+            RinexExt = Genba_S.OPA.RinexExt;
             //---------------------------------------
             //[VB]SrcPath = GetString(nFile)
-            Genba_S.OPA.SrcPath = mdlUtility.FileRead_GetString(br);
+            Genba_S.OPA.SrcPath = FileRead_GetString(br);
+            SrcPath = Genba_S.OPA.SrcPath;
             //---------------------------------------
             //[VB]  Get #nFile, , StrTimeGPS
             ret = br.Read(buf, 0, 8);
             Genba_S.OPA.StrTimeGPS = DateTime.FromOADate(BitConverter.ToDouble(buf, 0));
+            StrTimeGPS = Genba_S.OPA.StrTimeGPS;
             //---------------------------------------
             //[VB]  Get #nFile, , EndTimeGPS
             ret = br.Read(buf, 0, 8);
             Genba_S.OPA.EndTimeGPS = DateTime.FromOADate(BitConverter.ToDouble(buf, 0));
+            EndTimeGPS = Genba_S.OPA.EndTimeGPS;
             //---------------------------------------
             //[VB]  Get #nFile, , LeapSeconds
             Genba_S.OPA.LeapSeconds = br.ReadInt32();
+            LeapSeconds = Genba_S.OPA.LeapSeconds;
             //-----------------------------------------------------------------------------------
             //[VB]  Get #nFile, , Interval          public double Interval;         //As Double '間隔(秒)。
             Genba_S.OPA.Interval = br.ReadDouble();
+            Interval = Genba_S.OPA.Interval;
             //-----------------------------------------------------------------------------------
             //[VB]  RecType = GetString(nFile)      public string RecType;          //As String '受信機名称。
-            Genba_S.OPA.RecType = mdlUtility.FileRead_GetString(br);
+            Genba_S.OPA.RecType = FileRead_GetString(br);
+            RecType = Genba_S.OPA.RecType;
             //-----------------------------------------------------------------------------------
             //[VB]  RecNumber = GetString(nFile)    public string RecNumber;        //As String '受信機シリアル。RecType
-            Genba_S.OPA.RecNumber = mdlUtility.FileRead_GetString(br);
-
+            Genba_S.OPA.RecNumber = FileRead_GetString(br);
+            RecNumber = Genba_S.OPA.RecNumber;
             //-----------------------------------------------------------------------------------
             //[VB]  AntType = GetString(nFile)      public string AntType;          //As String 'アンテナ種別。
-            Genba_S.OPA.AntType = mdlUtility.FileRead_GetString(br);
+            Genba_S.OPA.AntType = FileRead_GetString(br);
+            AntType = Genba_S.OPA.AntType;
             //-----------------------------------------------------------------------------------
             //[VB]  If nVersion < 3800 Then AntType = GetPrivateProfileString(PROFILE_SUB_SEC_SECV1TOSECV2, AntType, GetPrivateProfileString(PROFILE_ANT_SEC_LIST, PROFILE_ANT_KEY_ANT & GetPrivateProfileString(PROFILE_ANT_SEC_LIST, PROFILE_ANT_KEY_UNKNOWN, "0", App.Path & "\" & PROFILE_ANT_FILE), "", App.Path & "\" & PROFILE_ANT_FILE), App.Path & "\" & PROFILE_SUB_FILE)
-            ///            if (nVersion < 3800){
-            //検討                Genba_S.OPA.AntType = GetPrivateProfileString(PROFILE_SUB_SEC_SECV1TOSECV2, Genba_S.OPA.AntType, GetPrivateProfileString(PROFILE_ANT_SEC_LIST, PROFILE_ANT_KEY_ANT & GetPrivateProfileString(PROFILE_ANT_SEC_LIST, PROFILE_ANT_KEY_UNKNOWN, "0", App.Path & "\" & PROFILE_ANT_FILE), "", App.Path & "\" & PROFILE_ANT_FILE), App.Path & "\" & PROFILE_SUB_FILE)
-            //            }
+            if (nVersion < 3800){
+                DEFINE clsDEFINE = new DEFINE();
+                string s2 = GetPrivateProfileString(PROFILE_ANT_SEC_LIST, PROFILE_ANT_KEY_UNKNOWN, "0", AppPath + "\\" + PROFILE_ANT_FILE);
+                string s3 = GetPrivateProfileString(PROFILE_ANT_SEC_LIST, PROFILE_ANT_KEY_ANT + s2, "", AppPath + "\\" + PROFILE_ANT_FILE);
+                Genba_S.OPA.AntType = GetPrivateProfileString(PROFILE_SUB_SEC_SECV1TOSECV2, Genba_S.OPA.AntType, s3, AppPath + "\\" + PROFILE_SUB_FILE);
+                AntType = Genba_S.OPA.AntType;
+            }
             //-----------------------------------------------------------------------------------
             //[VB]  AntNumber = GetString(nFile)    public string AntNumber;        //As String 'アンテナシリアル番号。
-            Genba_S.OPA.AntNumber = mdlUtility.FileRead_GetString(br);
-
+            Genba_S.OPA.AntNumber = FileRead_GetString(br);
+            AntNumber = Genba_S.OPA.AntNumber;
             //-----------------------------------------------------------------------------------
             //[VB]  AntMeasurement = GetString(nFile)   public string AntMeasurement;   //As String 'アンテナ測位方法。
-            Genba_S.OPA.AntMeasurement = mdlUtility.FileRead_GetString(br);
-
+            Genba_S.OPA.AntMeasurement = FileRead_GetString(br);
+            AntMeasurement = Genba_S.OPA.AntMeasurement;
             //-----------------------------------------------------------------------------------
             //[VB]  Get #nFile, , AntHeight         public double AntHeight;        //As Double 'アンテナ高(ｍ)。
             Genba_S.OPA.AntHeight = br.ReadDouble();
-
+            AntHeight = Genba_S.OPA.AntHeight;
             //-----------------------------------------------------------------------------------
             //[VB]  Get #nFile, , ElevationMask     public double ElevationMask;    //As Double '仰角マスク(度)。
             Genba_S.OPA.ElevationMask = br.ReadDouble();
-
+            ElevationMask = Genba_S.OPA.ElevationMask;
             //-----------------------------------------------------------------------------------
             //[VB]  Get #nFile, , NumberOfMinSV     public long NumberOfMinSV;      //As Long '最少衛星数。
             Genba_S.OPA.NumberOfMinSV = br.ReadInt32();
-
+            NumberOfMinSV = Genba_S.OPA.NumberOfMinSV;
 
             //********************************************************
             //'インポートファイル種別。 public enum IMPORT_TYPE
@@ -459,19 +521,22 @@ namespace SurvLine
             //[VB]     Get #nFile, , ImportType
             //[VB]  End If
 #if true
-            string SrcPath = @"C:\Documents and Settings\shuji\デスクトップ\GPSデ－タ\Netsurvデ－タファイル\20120117NGS\受信機1\305017H.DAT";
+            SrcPath = @"C:\Documents and Settings\shuji\デスクトップ\GPSデ－タ\Netsurvデ－タファイル\20120117NGS\受信機1\305017H.DAT";
 #endif
             if (nVersion < 1400) {
                 if (SrcPath.Contains(".DAT"))
                 {
-                    Genba_S.OPA.ImportType = (int)MdlNSDefine.IMPORT_TYPE.IMPORT_TYPE_DAT;
+                    Genba_S.OPA.ImportType = (int)IMPORT_TYPE.IMPORT_TYPE_DAT;
+                    ImportType = (IMPORT_TYPE)Genba_S.OPA.ImportType;
                 } else {
-                    Genba_S.OPA.ImportType = (int)MdlNSDefine.IMPORT_TYPE.IMPORT_TYPE_UNKNOWN;
+                    Genba_S.OPA.ImportType = (int)IMPORT_TYPE.IMPORT_TYPE_UNKNOWN;
+                    ImportType = (IMPORT_TYPE)Genba_S.OPA.ImportType;
                 }
             } else {
                 //-----------------------------------------------------------------------------------
                 //[VB]  Get #nFile, , ImportType        public int ImportType;          //As IMPORT_TYPE 'インポートファイルの種別。
                 Genba_S.OPA.ImportType = br.ReadInt32();
+                ImportType = (IMPORT_TYPE)Genba_S.OPA.ImportType;
             }
             //-----------------------------------------------------------------------------------
 
@@ -479,53 +544,73 @@ namespace SurvLine
             //********************************************************
             if (nVersion < 8600) {
                 Genba_S.OPA.GlonassFlag = false;
+                GlonassFlag = Genba_S.OPA.GlonassFlag;
             }
             else {
                 //[VB] Get #nFile, , GlonassFlag     public bool GlonassFlag;        //As Boolean 'GLONASSフラグ。
                 Genba_S.OPA.GlonassFlag = document.GetFileBool(br);
+                GlonassFlag = Genba_S.OPA.GlonassFlag;
             }
 
             //********************************************************
             //'2017/07/06 NS6000対応。'''''''''''''''''''''''''''''''''''''''''''''''''''''''
             if (nVersion < 9100) {
                 Genba_S.OPA.QZSSFlag = false;
+                QZSSFlag = Genba_S.OPA.QZSSFlag;
                 Genba_S.OPA.GalileoFlag = false;
+                GalileoFlag = Genba_S.OPA.GalileoFlag;
                 Genba_S.OPA.BeiDouFlag = false;
+                BeiDouFlag = Genba_S.OPA.BeiDouFlag;
                 Genba_S.OPA.MixedNav = false;
+                MixedNav = Genba_S.OPA.MixedNav;
                 Genba_S.OPA.RinexVersion = 2110;
-            } else {
+                RinexVersion = Genba_S.OPA.RinexVersion;
+            }
+            else {
                 //[VB] Get #nFile, , QZSSFlag      public bool QZSSFlag;           //As Boolean 'QZSSフラグ。
                 Genba_S.OPA.QZSSFlag = document.GetFileBool(br);
+                QZSSFlag = Genba_S.OPA.QZSSFlag;
                 //[VB] Get #nFile, , GalileoFlag   public bool GalileoFlag;        //As Boolean 'Galileoフラグ。
                 Genba_S.OPA.GalileoFlag = document.GetFileBool(br);
+                GalileoFlag = Genba_S.OPA.GalileoFlag;
                 //[VB] Get #nFile, , BeiDouFlag    public bool BeiDouFlag;         //As Boolean 'BeiDouフラグ。
                 Genba_S.OPA.BeiDouFlag = document.GetFileBool(br);
+                BeiDouFlag = Genba_S.OPA.BeiDouFlag;
                 //[VB] Get #nFile, , MixedNav      public bool MixedNav;           //As Boolean '混合タイプの暦ファイルか？
                 Genba_S.OPA.MixedNav = document.GetFileBool(br);
+                MixedNav = Genba_S.OPA.MixedNav;
                 //[VB] Get #nFile, , RinexVersion  public long RinexVersion;       //As Long 'RINEXファイルのバージョン。バージョン番号を1000倍した整数。
                 Genba_S.OPA.RinexVersion = br.ReadInt32();
+                RinexVersion = Genba_S.OPA.RinexVersion;
             }
 
 
             //********************************************************
             //    Call m_clsCommon.Load(nFile, nVersion)                            OK
-            ObservationCommonAttributes observationCommonAttributes = new ObservationCommonAttributes();
-            observationCommonAttributes.Load(br, nVersion, ref Genba_S);
+            //ObservationCommonAttributes observationCommonAttributes = new ObservationCommonAttributes();
+            //observationCommonAttributes.Load(br, nVersion, ref Genba_S);
+            m_clsCommon.Load(br, nVersion, ref Genba_S);
 
             //********************************************************
             //    Call m_clsCoordinateObservation.Load(nFile, nVersion)             OK
-            CoordinatePointXYZ coordinatePointXYZ = new CoordinatePointXYZ();
-            coordinatePointXYZ.Load(br, nVersion, ref Genba_S);
+            //CoordinatePointXYZ coordinatePointXYZ = new CoordinatePointXYZ();
+            //coordinatePointXYZ.Load(br, nVersion, ref Genba_S);
+            m_clsCoordinateObservation.Load(br, nVersion, ref Genba_S);
 
             //********************************************************
             if (nVersion < 4600) {
                 Genba_S.OPA.ElevationMaskHand = -1;
+                ElevationMaskHand = Genba_S.OPA.ElevationMaskHand;
                 Genba_S.OPA.NumberOfMinSVHand = 0;
-            } else {
+                NumberOfMinSVHand = Genba_S.OPA.NumberOfMinSVHand;
+            }
+            else {
                 //[VB]  Get #nFile, , ElevationMaskHand   public long ElevationMaskHand;  //As Long '手簿に出力する最低高度角(度)。負の値の場合OFFとする。                          -1
                 Genba_S.OPA.ElevationMaskHand = br.ReadInt32();
+                ElevationMaskHand = Genba_S.OPA.ElevationMaskHand;
                 //[VB]  Get #nFile, , NumberOfMinSVHand   public long NumberOfMinSVHand;  //As Long '手簿に出力する最少衛星数。0の場合はオプション設定から取得。1～12が最少衛星数。  0
                 Genba_S.OPA.NumberOfMinSVHand = br.ReadInt32();
+                NumberOfMinSVHand = Genba_S.OPA.NumberOfMinSVHand;
             }
 
             //    '2022/03/10 Hitz H.Nakamura '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -545,22 +630,27 @@ namespace SurvLine
                     //---------------------------------------------
                     //Get #nFile, , SattSignalGPS
                     Genba_S.OPA.SattSignalGPS = br.ReadInt32();
+                    SattSignalGPS = (int)Genba_S.OPA.SattSignalGPS;
 
                     //---------------------------------------------
                     //Get #nFile, , SattSignalGLONASS
                     Genba_S.OPA.SattSignalGLONASS = br.ReadInt32();
+                    SattSignalGLONASS = (int)Genba_S.OPA.SattSignalGLONASS;
 
                     //---------------------------------------------
                     //Get #nFile, , SattSignalQZSS
                     Genba_S.OPA.SattSignalQZSS = br.ReadInt32();
+                    SattSignalQZSS = (int)Genba_S.OPA.SattSignalQZSS;
 
                     //---------------------------------------------
                     //Get #nFile, , SattSignalGalileo
                     Genba_S.OPA.SattSignalGalileo = br.ReadInt32();
+                    SattSignalGalileo = (int)Genba_S.OPA.SattSignalGalileo;
 
                     //---------------------------------------------
                     //Get #nFile, , SattSignalBeiDou
                     Genba_S.OPA.SattSignalBeiDou = br.ReadInt32();
+                    SattSignalBeiDou = (int)Genba_S.OPA.SattSignalBeiDou;
                 }
 
 
@@ -591,22 +681,12 @@ namespace SurvLine
                     //[VB]  Call clsSatelliteInfoReader.ReadSattSignal(nSattSignalGPS, nSattSignalGLONASS, nSattSignalQZSS, nSattSignalGalileo, nSattSignalBeiDou, clsProgressInterface)
                     string App_Path = @"C:\Develop\NetSurv\Src\NS-App\NS-Survey";
                     SatelliteInfoReader satelliteInfoReader = new SatelliteInfoReader();
-                    //--------------------------------------------------------------------"C:\Develop\NetSurv\Src\NS-App\NS-Survey\Temp\.\ObsPoint\017H305.log"
-
-                    //23/12/24 K.setoguchi@NV---------->>>>>>>>>>
-                    //---------------------------------------------------------------------------------------------------
-                    //(del)     satelliteInfoReader.OpenFile($"{App_Path}{TEMPORARY_PATH}.{OBSPOINT_PATH}{FileTitle}.RNX_SV_EXTENSION");
-                    //      satelliteInfoReader.OpenFile($"{App_Path}{TEMPORARY_PATH}.{OBSPOINT_PATH}{Genba_S.OPA.FileTitle}.RNX_SV_EXTENSION");
-                    //---------------------------------------------------------------------------------------------------
-                    //
+                    //"C:\Develop\NetSurv\Src\NS-App\NS-Survey\Temp\.\ObsPoint\017H305.log"
+                    satelliteInfoReader.OpenFile($"{App_Path}{TEMPORARY_PATH}.{ OBSPOINT_PATH}{ FileTitle}.RNX_SV_EXTENSION");
                     //-----------------------------
                     //<<< 衛星信号の読み込み。 >>>
+                    satelliteInfoReader.ReadSattSignal(nSattSignalGPS, nSattSignalGLONASS, nSattSignalQZSS, nSattSignalGalileo, nSattSignalBeiDou);
                     //-----------------------------
-                    //(del) satelliteInfoReader.ReadSattSignal(nSattSignalGPS, nSattSignalGLONASS, nSattSignalQZSS, nSattSignalGalileo, nSattSignalBeiDou);
-                    string SattAatePath = $"{App_Path}{TEMPORARY_PATH}{OBSPOINT_PATH}{Genba_S.OPA.FileTitle}.{MdlRINEXTYPE.RNX_SV_EXTENSION}";
-                    satelliteInfoReader.ReadSattSignal(SattAatePath, ref nSattSignalGPS, ref nSattSignalGLONASS, ref nSattSignalQZSS, ref nSattSignalGalileo, ref nSattSignalBeiDou);
-                    //---------------------------------------------------------------------------------------------------
-                    //<<<<<<<<<-----------23/12/24 K.setoguchi@NV
 
 
                     //-------------------------------------------------------------------------------
@@ -620,34 +700,47 @@ namespace SurvLine
                     //'        ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
                     Genba_S.OPA.SattSignalGPS = nSattSignalGPS;
+                    SattSignalGPS = (int)Genba_S.OPA.SattSignalGPS;
 
-                    if(Genba_S.OPA.GlonassFlag){
+                    if (Genba_S.OPA.GlonassFlag)
+                    {
                         Genba_S.OPA.SattSignalGLONASS = nSattSignalGLONASS;
+                        SattSignalGLONASS = (int)Genba_S.OPA.SattSignalGLONASS;
                     }
                     else
                     {
                         Genba_S.OPA.SattSignalGLONASS = 0;                  //0
+                        SattSignalGLONASS = (int)Genba_S.OPA.SattSignalGLONASS;                  //0
                     }
-                    if (Genba_S.OPA.QZSSFlag){
+                    if (Genba_S.OPA.QZSSFlag)
+                    {
                         Genba_S.OPA.SattSignalQZSS = nSattSignalQZSS;
+                        SattSignalQZSS = (int)Genba_S.OPA.SattSignalQZSS;
                     }
                     else
                     {
                         Genba_S.OPA.SattSignalQZSS = 0;                     //0
+                        SattSignalQZSS = (int)Genba_S.OPA.SattSignalQZSS;                     //0
                     }
-                    if(Genba_S.OPA.GalileoFlag){
+                    if (Genba_S.OPA.GalileoFlag)
+                    {
                         Genba_S.OPA.SattSignalGalileo = nSattSignalGalileo;
+                        SattSignalGalileo = (int)Genba_S.OPA.SattSignalGalileo;
                     }
                     else
                     {
                         Genba_S.OPA.SattSignalGalileo = 0;                  //0
+                        SattSignalGalileo = (int)Genba_S.OPA.SattSignalGalileo;                  //0
                     }
-                    if (Genba_S.OPA.BeiDouFlag){
+                    if (Genba_S.OPA.BeiDouFlag)
+                    {
                         Genba_S.OPA.SattSignalBeiDou = nSattSignalBeiDou;
+                        SattSignalBeiDou = (int)Genba_S.OPA.SattSignalBeiDou;
                     }
                     else
                     {
                         Genba_S.OPA.SattSignalBeiDou = 0;                   //0
+                        SattSignalBeiDou = (int)Genba_S.OPA.SattSignalBeiDou;                   //0
                     }
 
 
@@ -659,22 +752,27 @@ namespace SurvLine
                 //---------------------------------------------
                 //Get #nFile, , SattSignalGPS
                 Genba_S.OPA.SattSignalGPS = br.ReadInt32();
+                SattSignalGPS = (int)Genba_S.OPA.SattSignalGPS;
 
                 //---------------------------------------------
                 //Get #nFile, , SattSignalGLONASS
                 Genba_S.OPA.SattSignalGLONASS = br.ReadInt32();
+                SattSignalGLONASS = (int)Genba_S.OPA.SattSignalGLONASS;
 
                 //---------------------------------------------
                 //Get #nFile, , SattSignalQZSS
                 Genba_S.OPA.SattSignalQZSS = br.ReadInt32();
+                SattSignalQZSS = (int)Genba_S.OPA.SattSignalQZSS;
 
                 //---------------------------------------------
                 //Get #nFile, , SattSignalGalileo
                 Genba_S.OPA.SattSignalGalileo = br.ReadInt32();
+                SattSignalGalileo = (int)Genba_S.OPA.SattSignalGalileo;
 
                 //---------------------------------------------
                 //Get #nFile, , SattSignalBeiDou
                 Genba_S.OPA.SattSignalBeiDou = br.ReadInt32();
+                SattSignalBeiDou = (int)Genba_S.OPA.SattSignalBeiDou;
 
             }
             //'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

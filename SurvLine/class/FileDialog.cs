@@ -1,4 +1,5 @@
 ﻿//24/01/28 K.setoguchi@NV---------->>>>>>>>>>
+using SurvLine.mdl;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,6 +8,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using static System.Net.Mime.MediaTypeNames;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
+using static SurvLine.mdl.MdlUtility;
 
 namespace SurvLine
 {
@@ -183,11 +185,11 @@ namespace SurvLine
             string sDir = "";
             string sTitle = "";
             string sExt = "";
-            mdlUtility.SplitPath(dlgCommonDialog.FileName, ref sDrive, ref sDir, ref sTitle, ref sExt);
+            SplitPath(dlgCommonDialog.FileName, ref sDrive, ref sDir, ref sTitle, ref sExt);
             string sPath;
 
 
-            sPath = mdlUtility.RTrimEx($"{sDrive}{sDir}", "\\");
+            sPath = RTrimEx($"{sDrive}{sDir}", "\\");
 
 
             if(System.IO.File.Exists(sPath))
@@ -304,9 +306,9 @@ namespace SurvLine
             string sDir = "";
             string sTitle = "";
             string sExt = "";
-            mdlUtility.SplitPath(dlgCommonDialog.FileName, ref sDrive, ref sDir, ref sTitle, ref sExt);
+            SplitPath(dlgCommonDialog.FileName, ref sDrive, ref sDir, ref sTitle, ref sExt);
             string sPath;
-            sPath = mdlUtility.RTrimEx($"{sDrive}{sDir}", "\\");
+            sPath = RTrimEx($"{sDrive}{sDir}", "\\");
 
 
             if (System.IO.File.Exists(sPath))

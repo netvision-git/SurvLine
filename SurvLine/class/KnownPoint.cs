@@ -9,12 +9,18 @@ using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
+using static SurvLine.mdl.DEFINE;
+using static SurvLine.mdl.MdlNSDefine;
+using static SurvLine.mdl.MdlUtility;
+using static SurvLine.mdl.MdlAccountMake;
+using static SurvLine.mdl.MdlNSGUI;
+using static SurvLine.mdl.MdlNSSDefine;
+
 
 namespace SurvLine
 {
     internal class KnownPoint
     {
-        MdlUtility mdlUtility = new MdlUtility();
 
         //'*******************************************************************************
         //'既知点
@@ -86,12 +92,12 @@ namespace SurvLine
         ///     bw バイナリファイル
         /// </summary>
         /// <param name="bw"></param>
-        public void Save( BinaryWriter bw)
+        public void Save(BinaryWriter bw)
         {
-            mdlUtility.PutFileBool(bw, Coordinate);     //    Put #nFile, , Coordinate
+            PutFileBool(bw, Coordinate);     //    Put #nFile, , Coordinate
             bw.Write((int)Lat);                         //    Put #nFile, , Lat
             bw.Write((int)Lon);                         //    Put #nFile, , Lon
-            mdlUtility.FileWrite_PutString(bw, Number); //    Call PutString(nFile, Number)
+            FileWrite_PutString(bw, Number); //    Call PutString(nFile, Number)
 
         }
         //--------------------------------------------------------------------------------
@@ -122,7 +128,7 @@ namespace SurvLine
         /// <param name="nVersion"></param>
         public void Load(BinaryReader br, long nVersion)
         {
-            Coordinate = mdlUtility.GetFileBool(br);    //    Get #nFile, , Coordinate
+            Coordinate = GetFileBool(br);    //    Get #nFile, , Coordinate
             if (nVersion < 3600)
             {
                 double nValue;              //        Dim nValue As Double

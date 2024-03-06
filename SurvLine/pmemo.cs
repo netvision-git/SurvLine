@@ -14,12 +14,40 @@ namespace SurvLine
         //***********************
         //  変更履歴
         //***********************
+        //***************************************************************************
+        //***************************************************************************
+        //プログラム＜プロジェクト＞
+        //Git管理：コメント＞(ブランチ:M240304)
+        //                  24/03/06(marge)SurvLine_Prog_20240229_0637
+        //Git管理：コメント＞24/03/03(--)2marge前_SurvLine_Prog_20240229_0637
+        //Git管理：コメント＞24/03/03(--)marge前
+        //
+        //＜コメント＞
+        //***************************************************************************
+        //***************************************************************************
+
 
         //Git管理：コメント＞24/03/03(--)marge前
         //Git管理：コメント＞24/03/03(--)2marge前_SurvLine_Prog_20240229_0637
 
+        //修正要 saka -> K.Setoguchi
 
 
+
+        /*
+            #if false   //坂井様へエラーがでます
+                        Obspnt_Color_Symbol_Candidate = (PS_SOLID << 56) | (Vector_Width_Normal << 32) | (lngColR << 16) | (lngColG << 8) | lngColB;
+            #endif
+
+                    //'閉合候補固定観測点記号色。
+                    lngColR = GetPrivateProfileInt(PROFILE_OBSPNT_COLOR_SEC, OBSPNT_COLOR_KEY_SYMBOL_CANDIDATE_FIXED_R, (int) OBSPNT_COLOR_DEF_SYMBOL_CANDIDATE_FIXED_R, AppPath + "\\" + PROFILE_DEF_NAME);
+                    lngColG = GetPrivateProfileInt(PROFILE_OBSPNT_COLOR_SEC, OBSPNT_COLOR_KEY_SYMBOL_CANDIDATE_FIXED_G, (int) OBSPNT_COLOR_DEF_SYMBOL_CANDIDATE_FIXED_G, AppPath + "\\" + PROFILE_DEF_NAME);
+                    lngColB = GetPrivateProfileInt(PROFILE_OBSPNT_COLOR_SEC, OBSPNT_COLOR_KEY_SYMBOL_CANDIDATE_FIXED_B, (int) OBSPNT_COLOR_DEF_SYMBOL_CANDIDATE_FIXED_B, AppPath + "\\" + PROFILE_DEF_NAME);
+                    //Obspnt_Color_Symbol_Candidate_Fixed = (uint)((lngColR << 16) | (lngColG << 8) | lngColB); //'閉合候補固定観測点記号色。
+            #if false   //坂井様へエラーがでます
+                        Obspnt_Color_Symbol_Candidate_Fixed = (PS_SOLID << 56) | (Vector_Width_Normal << 32) | (lngColR << 16) | (lngColG << 8) | lngColB;
+            #endif
+        */
 
         //***************************************************************************
         //***************************************************************************
@@ -44,6 +72,13 @@ namespace SurvLine
 #if false
 
 
+        using static SurvLine.mdl.DEFINE;
+        using static SurvLine.mdl.MdlNSDefine;
+        using static SurvLine.mdl.MdlUtility;
+        using static SurvLine.mdl.MdlAccountMake;
+        using static SurvLine.mdl.MdlNSGUI;
+        using static SurvLine.mdl.MdlNSSDefine;
+        using static SurvLine.mdl.MdiVBfunctions;
 
         //==========================================================================================
         If m_IExplorer = Nothing Then

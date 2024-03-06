@@ -1,4 +1,4 @@
-﻿using SurvLine;
+﻿using SurvLine.mdl;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -13,20 +13,46 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Linq;
+using static SurvLine.mdl.DEFINE;
 using static SurvLine.mdl.MdlNSDefine;
+using static SurvLine.mdl.MdlNSSDefine;
+using static SurvLine.mdl.mdlEccentricCorrection;
+using static SurvLine.mdl.MdlUtility;
+using static SurvLine.mdl.MdlNSUtility;
+using static SurvLine.mdl.MdlNSSUtility;
+using static SurvLine.mdl.MdlRINEXTYPE;
+using static SurvLine.mdl.MdlBaseLineAnalyser;
 using static System.Collections.Specialized.BitVector32;
 using static System.Net.Mime.MediaTypeNames;
 using static System.Net.WebRequestMethods;
 using static System.Windows.Forms.AxHost;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Rebar;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
-
-
+using System.Security.Policy;
 
 namespace SurvLine
 {
-    public class ObservationPoint
+    public class ObservationPoint : ChainList
     {
+
+        ////Document document = new Document();
+        public ObservationPoint(MdlMain mdlMain)
+        {
+            this.mdlMain = mdlMain;
+            document = mdlMain.GetDocument();
+            m_clsAttributes = new ObservationPointAttributes(mdlMain);  //'観測点属性。
+            Class_Initialize();
+        }
+#if true   //K.S 0304
+        public ObservationPoint()
+        {
+            this.mdlMain = mdlMain;
+            document = mdlMain.GetDocument();
+            m_clsAttributes = new ObservationPointAttributes(mdlMain);  //'観測点属性。
+            Class_Initialize();
+        }
+
+#endif
 
         //==========================================================================================
         /*[VB]
@@ -54,8 +80,7 @@ namespace SurvLine
         public object WorkObject;       //'汎用作業オブジェクト。
         public long ObjectType;         //'オブジェクト種別。
         public object Owner;            //'所有者。接合観測点の場合、基線ベクトルが保持される。代表観測点の場合、チェーンリストが保持される。
-                                        //==========================================================================================
-                                        //==========================================================================================
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
@@ -72,7 +97,8 @@ namespace SurvLine
         //------------------------------------------------------------------------------------------
         //[C#]
         //'インプリメンテーション
-        private ObservationPointAttributes m_clsAttributes = new ObservationPointAttributes();  //'観測点属性。
+        //private ObservationPointAttributes m_clsAttributes = new ObservationPointAttributes();  //'観測点属性。
+        private ObservationPointAttributes m_clsAttributes;                                     //'観測点属性。
         private ObservationShared m_clsObservationShared;                                       //'観測共有情報。
         private ObservationPoint m_clsParentPoint;                                              //'親観測点。
         private ObservationPoint m_clsChildPoint;                                               //'子観測点。
@@ -80,6 +106,8 @@ namespace SurvLine
         private ObservationPoint m_clsNextPoint;                                                //'弟観測点。
         private ObservationPoint m_clsCorrectPoint;                                             //'補正点。自オブジェクトが本点の場合は偏心点(HeadPoint)が設定される。自オブジェクトが偏心点の場合は本点(実観測点)が設定される。※相互参照なので Attributes や CommonAttributes のメンバにしてはいけない。
         private bool m_bEnable;                                                                 //'有効フラグ。True=有効。False=無効。
+        private Document document;
+        MdlMain mdlMain;
         //==========================================================================================
 
         //==========================================================================================
@@ -102,10 +130,7 @@ namespace SurvLine
         */
         public void Number(string sNumber)
         {
-#if false　  //瀬戸口
             m_clsAttributes.Common().Number = sNumber;
-#endif 　    //瀬戸口
-
         }
         //==========================================================================================
 
@@ -121,10 +146,8 @@ namespace SurvLine
         //'観測点番号。
         public string Number()
         {
-#if false　  //瀬戸口
-            return m_clsAttributes.Common().Number;
-#endif 　    //瀬戸口
-            return "";
+            string w_Number = m_clsAttributes.Common().Number;
+            return w_Number;
         }
         //==========================================================================================
 
@@ -141,6 +164,20 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        //'観測点番号。
+        public string DispNumber()
+        {
+            string w_DispNumber;
+            if (Genuine())
+            {
+                w_DispNumber = m_clsCorrectPoint.Attributes().Common().GenuineNumber;
+            }
+            else
+            {
+                w_DispNumber = m_clsAttributes.Common().Number;
+            }
+            return w_DispNumber;
+        }
         //==========================================================================================
 
         //==========================================================================================
@@ -158,6 +195,22 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        //'出力観測点番号。
+        public string OutputNumber()
+        {
+            if (Genuine())
+            {
+                return m_clsCorrectPoint.Attributes().Common().GenuineNumber;
+            }
+            else if (Eccentric())
+            {
+                return m_clsAttributes.Common().GenuineNumber;
+            }
+            else
+            {
+                return m_clsAttributes.Common().Number;
+            }
+        }
         //==========================================================================================
 
         //==========================================================================================
@@ -178,23 +231,20 @@ namespace SurvLine
         //'本点番号。
         public string GenuineNumber()
         {
-#if false　  //瀬戸口
+            string w_GenuineNumber;
             if (Genuine())
             {
-                return m_clsCorrectPoint.Attributes().Common().GenuineNumber;
+                w_GenuineNumber = m_clsCorrectPoint.Attributes().Common().GenuineNumber;
             }
             else if (Eccentric())
             {
-                return m_clsAttributes.Common().GenuineNumber;
+                w_GenuineNumber = m_clsAttributes.Common().GenuineNumber;
             }
             else
             {
-                return m_clsAttributes.Common().Number;
+                w_GenuineNumber = m_clsAttributes.Common().Number;
             }
-#else
-            return "";
-#endif 　    //瀬戸口
-
+            return w_GenuineNumber;
         }
         //==========================================================================================
 
@@ -210,9 +260,7 @@ namespace SurvLine
         //'観測点名称。
         public void Name(string sName)
         {
-#if false　  //瀬戸口
             m_clsAttributes.Common().Name = sName;
-#endif 　    //瀬戸口
         }
         //==========================================================================================
 
@@ -232,18 +280,16 @@ namespace SurvLine
         //'観測点名称。
         public string Name()
         {
-#if false　  //瀬戸口
+            string w_Name;
             if (Genuine())
             {
-                return m_clsCorrectPoint.Attributes().Common().GenuineName;
+                w_Name = m_clsCorrectPoint.Attributes().Common().GenuineName;
             }
             else
             {
-                return m_clsAttributes.Common().Name;
+                w_Name = m_clsAttributes.Common().Name;
             }
-#else
-            return "";
-#endif 　    //瀬戸口
+            return w_Name;
         }
         //==========================================================================================
 
@@ -262,6 +308,22 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        //'出力観測点名称。
+        public string OutputName()
+        {
+            if (Genuine())
+            {
+                return m_clsCorrectPoint.Attributes().Common().GenuineName;
+            }
+            else if (Eccentric())
+            {
+                return m_clsAttributes.Common().GenuineName;
+            }
+            else
+            {
+                return m_clsAttributes.Common().Name;
+            }
+        }
         //==========================================================================================
 
         //==========================================================================================
@@ -282,22 +344,20 @@ namespace SurvLine
         //'本点名称。
         public string GenuineName()
         {
-#if false　  //瀬戸口
+            string w_GenuineName;
             if (Genuine())
             {
-                return m_clsCorrectPoint.Attributes().Common().GenuineName;
+                w_GenuineName = m_clsCorrectPoint.Attributes().Common().GenuineName;
             }
             else if (Eccentric())
             {
-                return m_clsAttributes.Common().GenuineName;
+                w_GenuineName = m_clsAttributes.Common().GenuineName;
             }
             else
             {
-                return m_clsAttributes.Common().Name;
+                w_GenuineName = m_clsAttributes.Common().Name;
             }
-#else
-            return "";
-#endif 　    //瀬戸口
+            return w_GenuineName;
         }
         //==========================================================================================
 
@@ -310,6 +370,11 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        //'固定座標。
+        public void CoordinateFixed(CoordinatePointFix clsCoordinateFixed)
+        {
+            m_clsAttributes.Common().CoordinateFixed(clsCoordinateFixed);
+        }
         //==========================================================================================
 
         //==========================================================================================
@@ -321,6 +386,11 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        //'固定座標。
+        public CoordinatePointFix CoordinateFixed()
+        {
+            return m_clsAttributes.Common().CoordinateFixed();
+        }
         //==========================================================================================
 
         //==========================================================================================
@@ -336,6 +406,18 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        //'代表座標。
+        public CoordinatePoint CoordinateRepresent()
+        {
+            if (Fixed())
+            {
+                return m_clsAttributes.Common().CoordinateFixed();
+            }
+            else
+            {
+                return m_clsAttributes.CoordinateObservation();
+            }
+        }
         //==========================================================================================
 
         //==========================================================================================
@@ -363,8 +445,35 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        /*
+        '参照座標。
+        '2006/10/5 NGS Yamada
+        '解析の始点座標が「固定点＆固定点を偏心＆角度を方位角」の場合、固定座標に偏心補正量を引いたものにする。
+        '→始点が固定点の場合、固定点が偏心 &&（方位標を手入力 || 角度が方位角)の場合に変更。2007/7/28 NGS Yamada
+        */
+        public CoordinatePoint CoordinateAnalysisStr()
+        {
+            if (Fixed() && Eccentric() &&
+                (m_clsAttributes.Common().EccentricCorrectionParam().AngleType == (int)ANGLE_TYPE.ANGLETYPE_MARK
+                    || m_clsAttributes.Common().EccentricCorrectionParam().AngleType == (int)ANGLE_TYPE.ANGLETYPE_DIRECTION))
+            {
+                CoordinatePointXYZ clsCoordinatePoint = new CoordinatePointXYZ();
+                clsCoordinatePoint.X = m_clsAttributes.Common().CoordinateFixed().RoundXX() - m_clsAttributes.Common().VectorEccentric().RoundXX();
+                clsCoordinatePoint.Y = m_clsAttributes.Common().CoordinateFixed().RoundYY() - m_clsAttributes.Common().VectorEccentric().RoundYY();
+                clsCoordinatePoint.Z = m_clsAttributes.Common().CoordinateFixed().RoundZZ() - m_clsAttributes.Common().VectorEccentric().RoundZZ();
+                return clsCoordinatePoint;
+                //'固定点＆固定点を偏心＆角度を方位角の場合はこちら。
+                //'        Set CoordinateAnalysisStr = ?????
+                //'        m_clsAttributes.Common.CoordinateFixed （固定座標）と
+                //'        m_clsAttributes.Common.VectorEccentric （偏心補正量）を足したもの（引いたもの？）。
+            }
+            else
+            {
+                //'通常の解析始点。
+                return CoordinateReference();
+            }
+        }
         //==========================================================================================
-
 
         //==========================================================================================
         /*[VB]
@@ -409,6 +518,57 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        //'参照座標。
+        public CoordinatePoint CoordinateReference()
+        {
+#if false
+            if (Fixed())
+            {
+                return m_clsAttributes.Common().CoordinateFixed();
+            }
+            else
+            {
+                BaseLineVector objOwner = null;
+                long nResult;
+                nResult = 0;
+
+
+                ObservationPoint clsObservationPoint;
+                clsObservationPoint = HeadPoint();
+                BaseLineVector objOwnerTmp;
+                long nResultTmp;
+                while (clsObservationPoint != null)
+                {
+                    nResultTmp = clsObservationPoint.GetCoordinateAnalysisEnd(ref (object)objOwnerTmp, false);
+                    if (nResult > nResultTmp)
+                    {
+                        objOwner = objOwnerTmp;
+                        nResult = nResultTmp;
+                    }
+                    clsObservationPoint = clsObservationPoint.NextPoint();
+                }
+
+                if (0 > nResult)
+                {
+                    CoordinatePoint clsCoordinateAnalysis;
+                    CoordinatePoint clsVectorAnalysis;
+                    clsCoordinateAnalysis = objOwner.CoordinateAnalysis();
+                    clsVectorAnalysis = objOwner.VectorAnalysis();
+                    CoordinatePointXYZ clsCoordinatePoint = new CoordinatePointXYZ();
+                    clsCoordinatePoint.X = clsCoordinateAnalysis.RoundXX() + clsVectorAnalysis.RoundXX();
+                    clsCoordinatePoint.Y = clsCoordinateAnalysis.RoundYY() + clsVectorAnalysis.RoundYY();
+                    clsCoordinatePoint.Z = clsCoordinateAnalysis.RoundZZ() + clsVectorAnalysis.RoundZZ();
+                    return clsCoordinatePoint;
+                }
+                else
+                {
+                    return m_clsAttributes.CoordinateObservation();
+                }
+            }
+#else
+            return null;
+#endif
+        }
         //==========================================================================================
 
         //==========================================================================================
@@ -420,6 +580,11 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        //'閉合差座標。
+        public CoordinatePoint CoordinateAngleDiff()
+        {
+            return CoordinateRepresent();
+        }
         //==========================================================================================
 
         //==========================================================================================
@@ -434,12 +599,7 @@ namespace SurvLine
         //'平面直角座標(ｍ)。
         public void PlanePoint(TwipsPoint clsPlanePoint)
         {
-#if false
-            /*
-             *************************** 修正要 sakai
-            */
-            m_clsAttributes.Common().PlanePoint() = clsPlanePoint;
-#endif
+            m_clsAttributes.Common().PlanePoint(clsPlanePoint);
         }
         //==========================================================================================
 
@@ -455,11 +615,7 @@ namespace SurvLine
         //'平面直角座標(ｍ)。
         public TwipsPoint PlanePoint()
         {
-#if false　  //瀬戸口
             return m_clsAttributes.Common().PlanePoint();
-#else
-            return (TwipsPoint)null;
-#endif 　    //瀬戸口
         }
         //==========================================================================================
 
@@ -475,10 +631,8 @@ namespace SurvLine
         //'デバイス座標(ピクセル)。
         public void DevicePoint(TwipsPoint clsDevicePoint)
         {
-#if false　  //瀬戸口
             m_clsAttributes.Common().DevicePoint().X = clsDevicePoint.X;
             m_clsAttributes.Common().DevicePoint().Y = clsDevicePoint.Y;
-#endif 　    //瀬戸口
         }
         //==========================================================================================
 
@@ -494,11 +648,7 @@ namespace SurvLine
         //'デバイス座標(ピクセル)。
         public TwipsPoint DevicePoint()
         {
-#if false　  //瀬戸口
             return m_clsAttributes.Common().DevicePoint();
-#else
-            return (TwipsPoint)null;
-#endif 　    //瀬戸口
         }
         //==========================================================================================
 
@@ -511,6 +661,11 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        //'セッション名。
+        public void Session(string sSession)
+        {
+            m_clsAttributes.Session = sSession;
+        }
         //==========================================================================================
 
         //==========================================================================================
@@ -522,6 +677,11 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        //'セッション名。
+        public string Session()
+        {
+            return m_clsAttributes.Session;
+        }
         //==========================================================================================
 
         //==========================================================================================
@@ -533,6 +693,11 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        //'仮のセッション。
+        public void ProvisionalSession(bool bProvisionalSession)
+        {
+            m_clsAttributes.ProvisionalSession = bProvisionalSession;
+        }
         //==========================================================================================
 
         //==========================================================================================
@@ -544,6 +709,11 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        //'仮のセッション。
+        public bool ProvisionalSession()
+        {
+            return m_clsAttributes.ProvisionalSession;
+        }
         //==========================================================================================
 
         //==========================================================================================
@@ -555,6 +725,11 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        //'ファイルタイトル。
+        public void FileTitle(string sFileTitle)
+        {
+            m_clsAttributes.FileTitle = sFileTitle;
+        }
         //==========================================================================================
 
         //==========================================================================================
@@ -566,6 +741,11 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        //'ファイルタイトル。
+        public string FileTitle()
+        {
+            return m_clsAttributes.FileTitle;
+        }
         //==========================================================================================
 
         //==========================================================================================
@@ -577,6 +757,11 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        //'RINEXファイル拡張子(先頭２文字)。
+        public void RinexExt(string sRinexExt)
+        {
+            m_clsAttributes.RinexExt = sRinexExt;
+        }
         //==========================================================================================
 
         //==========================================================================================
@@ -588,6 +773,11 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        //'RINEXファイル拡張子(先頭２文字)。
+        public string RinexExt()
+        {
+            return m_clsAttributes.RinexExt;
+        }
         //==========================================================================================
 
         //==========================================================================================
@@ -599,6 +789,11 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        //'ソースファイルのパス。
+        public void SrcPath(string sSrcPath)
+        {
+            m_clsAttributes.SrcPath = sSrcPath;
+        }
         //==========================================================================================
 
         //==========================================================================================
@@ -610,6 +805,11 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        //'ソースファイルのパス。
+        public string SrcPath()
+        {
+            return m_clsAttributes.SrcPath;
+        }
         //==========================================================================================
 
         //==========================================================================================
@@ -626,6 +826,16 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        //'ソースファイルのファイルタイトル。
+        public string SrcTitle()
+        {
+            string sDrive = null;
+            string sDir = null;
+            string sTitle = null;
+            string sExt = null;
+            SplitPath(m_clsAttributes.SrcPath, ref sDrive, ref sDir, ref sTitle, ref sExt);
+            return sTitle;
+        }
         //==========================================================================================
 
         //==========================================================================================
@@ -637,6 +847,11 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        //'RINEXファイルのファイルタイトル。
+        public string RinexTitle()
+        {
+            return DispNumber() + Session();
+        }
         //==========================================================================================
 
         //==========================================================================================
@@ -648,6 +863,11 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        //'観測開始日時(GPS)。
+        public DateTime StrTimeGPS()
+        {
+            return m_clsAttributes.StrTimeGPS;
+        }
         //==========================================================================================
 
         //==========================================================================================
@@ -659,6 +879,11 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        //'観測終了日時(GPS)。
+        public DateTime EndTimeGPS()
+        {
+            return m_clsAttributes.EndTimeGPS;
+        }
         //==========================================================================================
 
         //==========================================================================================
@@ -670,6 +895,11 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        //'観測開始日時(UTC)。
+        public DateTime StrTimeUTC()
+        {
+            return GetTimeFromGPS(m_clsAttributes.StrTimeGPS, m_clsAttributes.LeapSeconds, TIME_ZONE.TIME_ZONE_UTC);
+        }
         //==========================================================================================
 
         //==========================================================================================
@@ -681,6 +911,11 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        //'観測終了日時(UTC)。
+        public DateTime EndTimeUTC()
+        {
+            return GetTimeFromGPS(m_clsAttributes.EndTimeGPS, m_clsAttributes.LeapSeconds, TIME_ZONE.TIME_ZONE_UTC);
+        }
         //==========================================================================================
 
         //==========================================================================================
@@ -692,6 +927,11 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        //'観測開始日時(JST)。
+        public DateTime StrTimeJST()
+        {
+            return GetTimeFromGPS(m_clsAttributes.StrTimeGPS, m_clsAttributes.LeapSeconds, TIME_ZONE.TIME_ZONE_JST);
+        }
         //==========================================================================================
 
         //==========================================================================================
@@ -703,6 +943,11 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        //'観測終了日時(JST)。
+        public DateTime EndTimeJST()
+        {
+            return GetTimeFromGPS(m_clsAttributes.EndTimeGPS, m_clsAttributes.LeapSeconds, TIME_ZONE.TIME_ZONE_JST);
+        }
         //==========================================================================================
 
         //==========================================================================================
@@ -718,6 +963,18 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        //'うるう秒。
+        public long LeapSeconds()
+        {
+            if (Genuine())
+            {
+                return m_clsCorrectPoint.LeapSeconds();
+            }
+            else
+            {
+                return m_clsAttributes.LeapSeconds;
+            }
+        }
         //==========================================================================================
 
         //==========================================================================================
@@ -729,11 +986,12 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
-        //==========================================================================================
+        //'間隔(秒)。
         public void Interval(double nInterval)
         {
             m_clsAttributes.Interval = nInterval;
         }
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
@@ -744,11 +1002,12 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
-        //==========================================================================================
+        //'間隔(秒)。
         public double Interval()
         {
             return m_clsAttributes.Interval;
         }
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
@@ -759,11 +1018,12 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
-        //==========================================================================================
+        //'受信機名称。
         public void RecType(string sRecType)
         {
             m_clsAttributes.RecType = sRecType;
         }
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
@@ -774,11 +1034,12 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
-        //==========================================================================================
+        //'受信機名称。
         public string RecType()
         {
             return m_clsAttributes.RecType;
         }
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
@@ -789,6 +1050,11 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        //'受信機表示名称(日本語)。
+        public string RecTypeDispJ()
+        {
+            return GetRecTypeDispJ(m_clsAttributes.RecType);
+        }
         //==========================================================================================
 
         //==========================================================================================
@@ -800,6 +1066,11 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        //'受信機表示名称(英語)。
+        public string RecTypeDispE()
+        {
+            return GetRecTypeDispE(m_clsAttributes.RecType);
+        }
         //==========================================================================================
 
         //==========================================================================================
@@ -811,11 +1082,12 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
-        //==========================================================================================
+        //'受信機シリアル。
         public void RecNumber(string sRecNumber)
         {
             m_clsAttributes.RecNumber = sRecNumber;
         }
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
@@ -826,13 +1098,12 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
-        //==========================================================================================
+        //'受信機シリアル。
         public string RecNumber()
         {
             return m_clsAttributes.RecNumber;
         }
-
-
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
@@ -843,11 +1114,12 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
-        //==========================================================================================
+        //'アンテナ種別。
         public void AntType(string sAntType)
         {
             m_clsAttributes.AntType = sAntType;
         }
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
@@ -858,11 +1130,12 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
-        //==========================================================================================
+        //'アンテナ種別。
         public string AntType()
         {
             return m_clsAttributes.AntType;
         }
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
@@ -873,6 +1146,11 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        //'アンテナ表示名称。
+        public string AntTypeDisp()
+        {
+            return GetPrivateProfileString(m_clsAttributes.AntType, PROFILE_ANT_KEY_TYPE, m_clsAttributes.AntType, AppPath + "\\" + PROFILE_ANT_FILE);
+        }
         //==========================================================================================
 
         //==========================================================================================
@@ -884,11 +1162,12 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
-        //==========================================================================================
+        //'アンテナシリアル番号。
         public void AntNumber(string sAntNumber)
         {
             m_clsAttributes.AntNumber = sAntNumber;
         }
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
@@ -899,13 +1178,12 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
-        //==========================================================================================
+        //'アンテナシリアル番号。
         public string AntNumber()
         {
             return m_clsAttributes.AntNumber;
         }
-
-
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
@@ -916,11 +1194,12 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
-        //==========================================================================================
+        //'アンテナ測位方法。
         public void AntMeasurement(string sAntMeasurement)
         {
             m_clsAttributes.AntMeasurement = sAntMeasurement;
         }
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
@@ -931,11 +1210,12 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
-        //==========================================================================================
+        //'アンテナ測位方法。
         public string AntMeasurement()
         {
             return m_clsAttributes.AntMeasurement;
         }
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
@@ -950,6 +1230,18 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        //'アンテナ測位方法表示文字列。
+        public string DispMeasurement()
+        {
+            if (m_clsObservationShared == null)
+            {
+                return "";
+            }
+            else
+            {
+                return m_clsObservationShared.DispMeasurement(m_clsAttributes.AntType, m_clsAttributes.AntMeasurement);
+            }
+        }
         //==========================================================================================
 
         //==========================================================================================
@@ -961,11 +1253,12 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
-        //==========================================================================================
+        //'アンテナ高(ｍ)。
         public void AntHeight(double nAntHeight)
         {
             m_clsAttributes.AntHeight = nAntHeight;
         }
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
@@ -976,11 +1269,12 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
-        //==========================================================================================
+        //'アンテナ高(ｍ)。
         public double AntHeight()
         {
             return m_clsAttributes.AntHeight;
         }
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
@@ -991,11 +1285,12 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
-        //==========================================================================================
+        //'仰角マスク(度)。
         public void ElevationMask(double nElevationMask)
         {
             m_clsAttributes.ElevationMask = nElevationMask;
         }
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
@@ -1006,19 +1301,12 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
-        //==========================================================================================
-        /// <summary>
-        ///  '仰角マスク(度)。
-        /// </summary>
-        /// <returns>
-        /// 戻り値：仰角マスク(度)
-        /// </returns>
+        //'仰角マスク(度)。
         public double ElevationMask()
         {
             return m_clsAttributes.ElevationMask;
         }
-
-
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
@@ -1029,15 +1317,12 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
-        //==========================================================================================
-        /// <summary>
-        /// '最少衛星数。0の場合は観測データから取得。1～12が固定値。
-        /// </summary>
-        /// <param name="nNumberOfMinSV"></param>
+        //'最少衛星数。0の場合は観測データから取得。1～12が固定値。
         public void NumberOfMinSV(long nNumberOfMinSV)
         {
             m_clsAttributes.NumberOfMinSV = nNumberOfMinSV;
         }
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
@@ -1048,18 +1333,12 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
-        //==========================================================================================
-        /// <summary>
-        /// '最少衛星数。0の場合は観測データから取得。1～12が固定値。
-        /// 
-        /// </summary>
-        /// <returns>
-        /// 戻り値：最少衛星数。0の場合は観測データから取得。1～12が固定値。
-        /// </returns>
+        //'最少衛星数。0の場合は観測データから取得。1～12が固定値。
         public long NumberOfMinSV()
         {
             return m_clsAttributes.NumberOfMinSV;
         }
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
@@ -1070,16 +1349,12 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
-        //==========================================================================================
-        /// <summary>
-        /// 衛星情報。
-        /// 
-        /// </summary>
-        /// <param name="clsSatelliteInfo"></param>
+        //'衛星情報。
         public void SatelliteInfo(object clsSatelliteInfo)
         {
             m_clsAttributes.SatelliteInfo = clsSatelliteInfo;
         }
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
@@ -1090,19 +1365,12 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
-        //==========================================================================================
-        /// <summary>
-        /// 衛星情報。
-        /// </summary>
-        /// <returns>
-        /// 戻り値：衛星情報
-        /// </returns>
+        //'衛星情報。
         public object SatelliteInfo()
         {
             return m_clsAttributes.SatelliteInfo;
         }
-
-
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
@@ -1113,13 +1381,12 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
-        //==========================================================================================
+        //'インポートファイルの種別。
         public void ImportType(IMPORT_TYPE nImportType)
         {
             m_clsAttributes.ImportType = nImportType;
         }
-
-
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
@@ -1130,14 +1397,12 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
-        //==========================================================================================
+        //'インポートファイルの種別。
         public long ImportType()
         {
             return (long)m_clsAttributes.ImportType;
         }
-
-
-
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
@@ -1148,12 +1413,12 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
-        //==========================================================================================
+        //'GLONASSフラグ。
         public void GlonassFlag(bool bGlonassFlag)
         {
             m_clsAttributes.GlonassFlag = bGlonassFlag;
         }
-
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
@@ -1164,14 +1429,12 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
-        //==========================================================================================
+        //'GLONASSフラグ。
         public bool GlonassFlag()
         {
             return m_clsAttributes.GlonassFlag;
         }
-
-
-
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
@@ -1183,11 +1446,13 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
-        //==========================================================================================
+        //'2017/06/22 NS6000対応。'''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        //'QZSSフラグ。
         public void QZSSFlag(bool bQZSSFlag)
         {
             m_clsAttributes.QZSSFlag = bQZSSFlag;
         }
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
@@ -1198,11 +1463,12 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
-        //==========================================================================================
+        //'QZSSフラグ。
         public bool QZSSFlag()
         {
             return m_clsAttributes.QZSSFlag;
         }
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
@@ -1213,11 +1479,12 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
-        //==========================================================================================
-        public void GalileoFlag( bool bGalileoFlag)
+        //'Galileoフラグ。
+        public void GalileoFlag(bool bGalileoFlag)
         {
             m_clsAttributes.GalileoFlag = bGalileoFlag;
         }
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
@@ -1228,15 +1495,12 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
-        //==========================================================================================
+        //'Galileoフラグ。
         public bool GalileoFlag()
         {
             return m_clsAttributes.GalileoFlag;
         }
-
-
-
-
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
@@ -1247,11 +1511,12 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
-        //==========================================================================================
+        //'BeiDouフラグ。
         public void BeiDouFlag(bool bBeiDouFlag)
         {
             m_clsAttributes.BeiDouFlag = bBeiDouFlag;
         }
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
@@ -1262,14 +1527,12 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
-        //==========================================================================================
+        //'BeiDouフラグ。
         public bool BeiDouFlag()
         {
             return m_clsAttributes.BeiDouFlag;
         }
-
-
-
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
@@ -1280,11 +1543,12 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
-        //==========================================================================================
+        //'混合タイプの暦ファイルか？
         public void MixedNav(bool bMixedNav)
         {
             m_clsAttributes.MixedNav = bMixedNav;
         }
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
@@ -1295,13 +1559,12 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
-        //==========================================================================================
+        //'混合タイプの暦ファイルか？
         public bool MixedNav()
         {
             return m_clsAttributes.MixedNav;
         }
-
-
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
@@ -1312,6 +1575,11 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        //'RINEXファイルのバージョン。
+        public void RinexVersion(long nRinexVersion)
+        {
+            m_clsAttributes.RinexVersion = nRinexVersion;
+        }
         //==========================================================================================
 
         //==========================================================================================
@@ -1324,11 +1592,12 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
-        //==========================================================================================
+        //'RINEXファイルのバージョン。
         public long RinexVersion()
         {
             return m_clsAttributes.RinexVersion;
         }
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
@@ -1340,16 +1609,14 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
-        //==========================================================================================
-        /// <summary>
-        /// GPS衛星信号
-        /// 
-        /// </summary>
-        /// <param name="nSattSignalGPS"></param>
+        //'2022/02/07 SattSignal の追加。''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+        //'GPS衛星信号。
         public void SattSignalGPS(long nSattSignalGPS)
         {
             m_clsAttributes.SattSignalGPS = (int)nSattSignalGPS;
         }
+        //==========================================================================================
+
         //==========================================================================================
         /*[VB]
         'GPS衛星信号。
@@ -1359,18 +1626,12 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
-        //==========================================================================================
-        /// <summary>
-        /// GPS衛星信号。
-        /// </summary>
-        /// <returns>
-        /// 戻り値：GPS衛星信号。
-        /// </returns>
+        //'GPS衛星信号。
         public long SattSignalGPS()
         {
             return m_clsAttributes.SattSignalGPS;
         }
-
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
@@ -1381,11 +1642,13 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
-        //==========================================================================================
+        //'GLONASS衛星信号。
         public void SattSignalGLONASS(long nSattSignalGLONASS)
         {
             m_clsAttributes.SattSignalGLONASS = (int)nSattSignalGLONASS;
         }
+        //==========================================================================================
+
         //==========================================================================================
         /*[VB]
         'GLONASS衛星信号。
@@ -1395,17 +1658,12 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
-        /// <summary>
-        /// GLONASS衛星信号。
-        /// </summary>
-        /// <returns>
-        /// 戻り値：GLONASS衛星信号。
-        /// </returns>
+        //'GLONASS衛星信号。
         public long SattSignalGLONASS()
         {
             return m_clsAttributes.SattSignalGLONASS;
         }
-
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
@@ -1416,11 +1674,12 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
-        //==========================================================================================
+        //'QZSS衛星信号。
         public void SattSignalQZSS(long nSattSignalQZSS)
         {
             m_clsAttributes.SattSignalQZSS = (int)nSattSignalQZSS;
         }
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
@@ -1431,11 +1690,12 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
-        //==========================================================================================
+        //'QZSS衛星信号。
         public long SattSignalQZSS()
         {
             return m_clsAttributes.SattSignalQZSS;
         }
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
@@ -1446,11 +1706,12 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
-        //==========================================================================================
+        //'Galileo衛星信号。
         public void SattSignalGalileo(long nSattSignalGalileo)
         {
             m_clsAttributes.SattSignalGalileo = (int)nSattSignalGalileo;
         }
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
@@ -1461,11 +1722,12 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
-        //==========================================================================================
+        //'Galileo衛星信号。
         public long SattSignalGalileo()
         {
             return m_clsAttributes.SattSignalGalileo;
         }
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
@@ -1476,11 +1738,12 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
-        //==========================================================================================
+        //'BeiDou衛星信号。
         public void SattSignalBeiDou(long nSattSignalBeiDou)
         {
             m_clsAttributes.SattSignalBeiDou = (int)nSattSignalBeiDou;
-         }
+        }
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
@@ -1492,11 +1755,12 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
-        //==========================================================================================
+        //'BeiDou衛星信号。
         public long SattSignalBeiDou()
         {
             return m_clsAttributes.SattSignalBeiDou;
         }
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
@@ -1508,17 +1772,10 @@ namespace SurvLine
         //------------------------------------------------------------------------------------------
         //[C#]
         //'観測座標。
-#if false　  //瀬戸口
         public void CoordinateObservation(CoordinatePoint clsCoordinateObservation)
         {
             m_clsAttributes.CoordinateObservation(clsCoordinateObservation);
         }
-#else   
-        public void CoordinateObservation(object clsCoordinateObservation)
-        {
-            m_clsAttributes.CoordinateObservation((CoordinatePoint)clsCoordinateObservation);
-        }
-#endif 　    //瀬戸口
         //==========================================================================================
 
         //==========================================================================================
@@ -1531,17 +1788,10 @@ namespace SurvLine
         //------------------------------------------------------------------------------------------
         //[C#]
         //'観測座標。
-#if false　  //瀬戸口
         public CoordinatePoint CoordinateObservation()
         {
             return m_clsAttributes.CoordinateObservation();
         }
-#else
-        public object CoordinateObservation()
-        {
-            return m_clsAttributes.CoordinateObservation();
-        }
-#endif 　    //瀬戸口
         //==========================================================================================
 
         //==========================================================================================
@@ -1581,33 +1831,23 @@ namespace SurvLine
         //------------------------------------------------------------------------------------------
         //[C#]
         //'表示座標。
-#if false　  //瀬戸口
         public CoordinatePoint CoordinateDisplay()
-#else
-        public object CoordinateDisplay()
-#endif 　    //瀬戸口
         {
             if (Genuine())
             {
                 CoordinatePointXYZ CoordinateDisplay = new CoordinatePointXYZ();
                 CoordinateDisplay.CoordinatePointXYZcpy(m_clsCorrectPoint.CoordinateDisplay());
-                //瀬戸口   CoordinateDisplay.X(CoordinateDisplay.RoundX() + Math.Round(m_clsCorrectPoint.VectorEccentric().X));
-                //瀬戸口   CoordinateDisplay.Y(CoordinateDisplay.RoundY() + Math.Round(m_clsCorrectPoint.VectorEccentric().Y));
-                //瀬戸口   CoordinateDisplay.Z(CoordinateDisplay.RoundZ() + Math.Round(m_clsCorrectPoint.VectorEccentric().Z));
+                CoordinateDisplay.XX(CoordinateDisplay.RoundXX() + Math.Round(m_clsCorrectPoint.VectorEccentric().X));
+                CoordinateDisplay.YY(CoordinateDisplay.RoundYY() + Math.Round(m_clsCorrectPoint.VectorEccentric().Y));
+                CoordinateDisplay.ZZ(CoordinateDisplay.RoundZZ() + Math.Round(m_clsCorrectPoint.VectorEccentric().Z));
+                return CoordinateDisplay;
             }
             else
             {
                 if (Fixed())
                 {
                     //'固定座標。
-#if false
-                    /*
-                     *************************** 修正要 sakai
-                     */
-                    return (CoordinatePoint)m_clsAttributes.Common().CoordinateFixed();
-#else
-                    return null;
-#endif
+                    return m_clsAttributes.Common().CoordinateFixed();
                 }
                 else
                 {
@@ -1615,29 +1855,34 @@ namespace SurvLine
                     ObservationPoint clsObservationPoint;
                     clsObservationPoint = HeadPoint();
                     CoordinatePointXYZ CoordinateDisplay = new CoordinatePointXYZ();
+                    CoordinatePoint clsCoordinatePoint = clsObservationPoint.ChildPoint().CoordinateObservation();
                     long nCount = 0;
+                    double XX;
+                    double YY;
+                    double ZZ;
                     while (clsObservationPoint != null)
                     {
-                        //瀬戸口   CoordinateDisplay.X(CoordinateDisplay.X() + clsObservationPoint.ChildPoint().CoordinateObservation().X);
-                        //瀬戸口   CoordinateDisplay.Y(CoordinateDisplay.Y() + clsObservationPoint.ChildPoint().CoordinateObservation().Y);
-                        //瀬戸口   CoordinateDisplay.Z(CoordinateDisplay.Z() + clsObservationPoint.ChildPoint().CoordinateObservation().Z);
-                        nCount = nCount + 1;
+                        XX = clsObservationPoint.ChildPoint().CoordinateObservation().XX();
+                        YY = clsObservationPoint.ChildPoint().CoordinateObservation().YY();
+                        ZZ = clsObservationPoint.ChildPoint().CoordinateObservation().ZZ();
+                        CoordinateDisplay.XX(CoordinateDisplay.XX() + XX);
+                        CoordinateDisplay.YY(CoordinateDisplay.YY() + YY);
+                        CoordinateDisplay.ZZ(CoordinateDisplay.ZZ() + ZZ);
+                        nCount++;
                         clsObservationPoint = clsObservationPoint.NextPoint();
                     }
-                    CoordinateDisplay.X(CoordinateDisplay.X() / nCount);
-                    CoordinateDisplay.Y(CoordinateDisplay.Y() / nCount);
-                    CoordinateDisplay.Z(CoordinateDisplay.Z() / nCount);
-#if false
-                    /*
-                     *************************** 修正要 sakai
-                     */
-                    return (CoordinatePoint)CoordinateDisplay;
-#else
-                    return null;
-#endif
+                    CoordinateDisplay.XX(CoordinateDisplay.XX() / nCount);
+                    CoordinateDisplay.YY(CoordinateDisplay.YY() / nCount);
+                    CoordinateDisplay.ZZ(CoordinateDisplay.ZZ() / nCount);
+                    CoordinateDisplay.X = CoordinateDisplay.XX() / nCount;
+                    CoordinateDisplay.Y = CoordinateDisplay.YY() / nCount;
+                    CoordinateDisplay.Z = CoordinateDisplay.ZZ() / nCount;
+                    clsCoordinatePoint.X = CoordinateDisplay.X;
+                    clsCoordinatePoint.Y = CoordinateDisplay.Y;
+                    clsCoordinatePoint.Z = CoordinateDisplay.Z;
+                    return CoordinateDisplay;
                 }
             }
-            return null;
         }
         //==========================================================================================
 
@@ -1650,11 +1895,12 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
-        //==========================================================================================
-        private CoordinatePoint CoordinateDXF()
+        //'DXF座標。
+        public CoordinatePoint CoordinateDXF()
         {
-            return (CoordinatePoint)CoordinateDisplay();
+            return CoordinateDisplay();
         }
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
@@ -1704,21 +1950,25 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
-        //==========================================================================================
-        private void ObservationShared(ObservationShared clsObservationShared)
+        //'観測共有情報｡
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="clsObservationShared"></param>
+        public void ObservationShared(ObservationShared clsObservationShared)
         {
             m_clsObservationShared = clsObservationShared;
             //'子観測点すべてに反映させる。
             ObservationPoint clsChildPoint;
             clsChildPoint = m_clsChildPoint;
-
             while (clsChildPoint != null)
             {
-                ObservationShared(clsObservationShared);
+                clsChildPoint.ObservationShared(clsObservationShared);
                 clsChildPoint = clsChildPoint.NextPoint();
             }
-
+            return;
         }
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
@@ -1729,10 +1979,12 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        //'親観測点。
         public void ParentPoint(ObservationPoint clsParentPoint)
         {
             m_clsParentPoint = clsParentPoint;
         }
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
@@ -1743,11 +1995,12 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        //'親観測点。
         public ObservationPoint ParentPoint()
         {
             return m_clsParentPoint;
         }
-
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
@@ -1767,7 +2020,7 @@ namespace SurvLine
         {
             if (m_clsParentPoint == null)
             {
-                return null;
+                return this;
             }
             else
             {
@@ -1826,11 +2079,11 @@ namespace SurvLine
 
         //==========================================================================================
         /*[VB]
-            '子観測点。
-            Property Get ChildPoint() As ObservationPoint
-                Set ChildPoint = m_clsChildPoint
-            End Property
-            [VB]*/
+        '子観測点。
+        Property Get ChildPoint() As ObservationPoint
+            Set ChildPoint = m_clsChildPoint
+        End Property
+        [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
         //'子観測点。
@@ -1838,6 +2091,8 @@ namespace SurvLine
         {
             return m_clsChildPoint;
         }
+        //==========================================================================================
+
         //==========================================================================================
         /*[VB]
         '最下位親観測点。
@@ -1851,6 +2106,7 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        //'最下位親観測点。
         public ObservationPoint BottomChildPoint()
         {
             if (m_clsChildPoint == null)
@@ -1861,8 +2117,8 @@ namespace SurvLine
             {
                 return m_clsChildPoint.BottomChildPoint();
             }
-
         }
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
@@ -1873,10 +2129,12 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        //'兄観測点。
         public void PrevPoint(ObservationPoint clsPrevPoint)
         {
             m_clsPrevPoint = clsPrevPoint;
         }
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
@@ -1887,10 +2145,12 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        //'兄観測点。
         public ObservationPoint PrevPoint()
         {
             return m_clsPrevPoint;
         }
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
@@ -1906,6 +2166,7 @@ namespace SurvLine
         {
             m_clsNextPoint = clsNextPoint;
         }
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
@@ -1921,6 +2182,7 @@ namespace SurvLine
         {
             return m_clsNextPoint;
         }
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
@@ -1937,15 +2199,15 @@ namespace SurvLine
         //'長男観測点。
         public ObservationPoint OldestPoint()
         {
-            ObservationPoint OldestPoint = this;
-
-            while (OldestPoint.PrevPoint() != null)
+            ObservationPoint w_OldestPoint;
+            w_OldestPoint = this;
+            while (w_OldestPoint.PrevPoint() != null)
             {
-                OldestPoint = OldestPoint.PrevPoint();
+                w_OldestPoint = w_OldestPoint.PrevPoint();
             }
-
-            return OldestPoint;
+            return w_OldestPoint;
         }
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
@@ -1961,6 +2223,7 @@ namespace SurvLine
         {
             return m_clsCorrectPoint;
         }
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
@@ -1991,6 +2254,7 @@ namespace SurvLine
                 clsChildPoint = clsChildPoint.NextPoint();
             }
         }
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
@@ -2036,6 +2300,7 @@ namespace SurvLine
                 return false;
             }
         }
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
@@ -2053,23 +2318,22 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
-        //==========================================================================================
+        //'有効フラグ。弟観測点全てが無効なら無効とする。
         public bool EnableHead()
         {
-            bool EnableHead = true;
-            ObservationPoint clsObservationPoint;
+            ObservationPoint clsObservationPoint = null;
             clsObservationPoint = this;
             while (clsObservationPoint != null)
             {
                 if (clsObservationPoint.Enable())
                 {
-                    return EnableHead;
+                    return true;
                 }
+                clsObservationPoint = clsObservationPoint.NextPoint();
             }
-
-            EnableHead = false;
-            return EnableHead;
+            return false;
         }
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
@@ -2093,36 +2357,32 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        //'無効化した場合、最上位親観測点が無効になるか？
         public bool IfDisable()
         {
-            bool IfDisable = false;
             if (m_clsParentPoint == null)
             {
-                IfDisable = true;
-
+                return true;
             }
             else
             {
-                IfDisable = false;
-
                 ObservationPoint clsChildPoint;
                 clsChildPoint = m_clsParentPoint.ChildPoint();
-
                 while (clsChildPoint != null)
                 {
                     if (clsChildPoint.Enable())
                     {
-                        if (!(clsChildPoint == this))
+                        if (clsChildPoint != this)
                         {
-                            return IfDisable;
+                            return false;
                         }
                     }
                     clsChildPoint = clsChildPoint.NextPoint();
                 }
-                IfDisable = m_clsParentPoint.IfDisable();
+                return m_clsParentPoint.IfDisable();
             }
-            return IfDisable;
         }
+        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
@@ -2142,12 +2402,11 @@ namespace SurvLine
         {
             if (bFixed)
             {
-                //瀬戸口   m_clsAttributes.Common().ObjectType = m_clsAttributes.Common().ObjectType | OBS_TYPE_FIXED;
-
+                m_clsAttributes.Common().ObjectType = m_clsAttributes.Common().ObjectType | OBS_TYPE_FIXED;
             }
             else
             {
-                //瀬戸口   m_clsAttributes.Common().ObjectType = m_clsAttributes.Common().ObjectType & (OBS_TYPE_FIXED ^ 0xFFFFFFFF);
+                m_clsAttributes.Common().ObjectType = m_clsAttributes.Common().ObjectType & (~OBS_TYPE_FIXED);  //反転
             }
         }
         //==========================================================================================
@@ -2164,7 +2423,7 @@ namespace SurvLine
         //'固定点フラグ。
         public bool Fixed()
         {
-            return true;    //瀬戸口   return ((m_clsAttributes.Common().ObjectType & OBS_TYPE_FIXED) != 0);
+            return (m_clsAttributes.Common().ObjectType & OBS_TYPE_FIXED) != 0;
         }
         //==========================================================================================
 
@@ -2193,6 +2452,11 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        //'観測点キー。
+        public string Key()
+        {
+            return GetObservationPointKey(Number(), Session());
+        }
         //==========================================================================================
 
         //==========================================================================================
@@ -2207,7 +2471,7 @@ namespace SurvLine
         //'本点フラグ。
         public bool Genuine()
         {
-            return true;    //瀬戸口   return (m_clsAttributes.Common().ObjectType & OBS_TYPE_GENUIE) != 0;
+            return (m_clsAttributes.Common().ObjectType & OBS_TYPE_GENUIE) != 0;
         }
         //==========================================================================================
 
@@ -2274,6 +2538,11 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        //'偏心補正パラメータ。
+        public void EccentricCorrectionParam(EccentricCorrectionParam clsEccentricCorrectionParam)
+        {
+            m_clsAttributes.Common().EccentricCorrectionParam(clsEccentricCorrectionParam);
+        }
         //==========================================================================================
 
         //==========================================================================================
@@ -2285,6 +2554,11 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        //'偏心補正パラメータ。
+        public EccentricCorrectionParam EccentricCorrectionParam()
+        {
+            return m_clsAttributes.Common().EccentricCorrectionParam();
+        }
         //==========================================================================================
 
         //==========================================================================================
@@ -2297,10 +2571,9 @@ namespace SurvLine
         //------------------------------------------------------------------------------------------
         //[C#]
         //'偏心ベクトル。
-        //瀬戸口   public CoordinatePoint VectorEccentric()
-        public object VectorEccentric()
+        public CoordinatePoint VectorEccentric()
         {
-            return null;    //瀬戸口  return m_clsAttributes.Common().VectorEccentric();
+            return m_clsAttributes.Common().VectorEccentric();
         }
         //==========================================================================================
 
@@ -2313,6 +2586,11 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        //'DXF観測点番号。
+        public string DXFNumber()
+        {
+            return DispNumber();
+        }
         //==========================================================================================
 
         //==========================================================================================
@@ -2331,6 +2609,20 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        //'DXFサブテキスト。
+        public string DXFSubText()
+        {
+            /*
+            '    If Genuine Then
+            '        DXFSubText = "本点"
+            '    ElseIf Eccentric Then
+            '        DXFSubText = "偏心点"
+            '    Else
+            '        DXFSubText = ""
+            '    End If
+            */
+            return "";
+        }
         //==========================================================================================
 
         //==========================================================================================
@@ -2342,6 +2634,11 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        //'リスト更新必要フラグ。
+        public void IsList(bool bIsList)
+        {
+            m_clsAttributes.IsList = bIsList;
+        }
         //==========================================================================================
 
         //==========================================================================================
@@ -2353,6 +2650,11 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        //'リスト更新必要フラグ。
+        public bool IsList()
+        {
+            return m_clsAttributes.IsList;
+        }
         //==========================================================================================
 
         //==========================================================================================
@@ -2364,6 +2666,11 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        //'リスト表示フラグ。
+        public bool VisibleList()
+        {
+            return true;
+        }
         //==========================================================================================
 
         //==========================================================================================
@@ -2375,6 +2682,11 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        //'プロット表示フラグ。
+        public bool VisiblePlot()
+        {
+            return true;
+        }
         //==========================================================================================
 
         //==========================================================================================
@@ -2386,6 +2698,11 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        //'観測点モード。
+        public OBJ_MODE Mode()
+        {
+            return m_clsAttributes.Mode;
+        }
         //==========================================================================================
 
         //==========================================================================================
@@ -2413,6 +2730,27 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        /*
+        '*******************************************************************************
+        'イベント
+
+        '初期化。
+        */
+        private void Class_Initialize()
+        {
+            try
+            {
+                m_bEnable = true;
+                ObjectType = OBJ_TYPE_OBSERVATIONPOINT | OBS_TYPE_REAL;
+                return;
+            }
+
+            catch (Exception)
+            {
+                mdlMain.ErrorExit();
+                return;
+            }
+        }
         //==========================================================================================
 
         //==========================================================================================
@@ -2448,6 +2786,38 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        /*
+        '*******************************************************************************
+        'メソッド
+
+        '終了。
+        */
+        public void Terminate()
+        {
+
+            Owner = null;
+            m_clsObservationShared = null;
+
+
+            ObservationPoint clsChildPoint;
+            ObservationPoint clsObservationPoint;
+            clsChildPoint = m_clsChildPoint;
+            while (clsChildPoint != null)
+            {
+                clsObservationPoint = clsChildPoint;
+                clsChildPoint = clsChildPoint.NextPoint();
+                clsObservationPoint.Terminate();
+            }
+
+
+            m_clsParentPoint = null;
+            m_clsChildPoint = null;
+            m_clsPrevPoint = null;
+            m_clsNextPoint = null;
+            m_clsCorrectPoint = null;
+
+
+        }
         //==========================================================================================
 
         //==========================================================================================
@@ -2466,6 +2836,23 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        /*
+        '汎用作業キーを初期化する。
+        '
+        'nWorkKey で指定される値で WorkKey を初期化する。
+        '
+        '引き数：
+        'nWorkKey 初期化する値。
+        */
+        public void ClearWorkKey(long nWorkKey)
+        {
+            WorkKey = nWorkKey;
+            //'長男の場合は親も初期化する。
+            if ((m_clsPrevPoint == null) && (m_clsParentPoint != null))
+            {
+                m_clsParentPoint.ClearWorkKey(nWorkKey);
+            }
+        }
         //==========================================================================================
 
         //==========================================================================================
@@ -2519,6 +2906,55 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        /*
+        '保存。
+        '
+        '長男が親観測点の Save を呼ぶ。
+        '
+        '引き数：
+        'nFile ファイル番号。
+        'nJointKey 結合キー。
+        */
+        public void Save(int nFile, long nJointKey)
+        {
+            /*
+            Call m_clsAttributes.Save(nFile)
+            Put #nFile, , m_bEnable
+            Put #nFile, , ObjectType
+    
+            '長男フラグ。
+            Dim bFirst As Boolean
+            bFirst = m_clsPrevPoint Is Nothing
+            Put #nFile, , bFirst
+            '親フラグ。
+            Dim bParent As Boolean
+            bParent = Not m_clsParentPoint Is Nothing
+            Put #nFile, , bParent
+    
+            '結合キーがまだ設定されていない場合は設定する。
+            If WorkKey< 0 Then
+                WorkKey = nJointKey
+                nJointKey = nJointKey + 1
+            End If
+            '弟の結合キーも設定されていなければ設定する。
+            Dim nNextJointKey As Long
+            If Not m_clsNextPoint Is Nothing Then
+                If m_clsNextPoint.WorkKey < 0 Then
+                    m_clsNextPoint.WorkKey = nJointKey
+                    nJointKey = nJointKey + 1
+                End If
+                nNextJointKey = m_clsNextPoint.WorkKey
+            Else
+                nNextJointKey = nJointKey
+                nJointKey = nJointKey + 1
+            End If
+            Put #nFile, , WorkKey 'Prev結合キー。
+            Put #nFile, , nNextJointKey 'Next結合キー。
+    
+            '長男であり親がいる場合は親を保存する。
+            If bFirst And bParent Then Call m_clsParentPoint.Save(nFile, nJointKey)
+            */
+        }
         //==========================================================================================
 
 
@@ -2526,13 +2962,6 @@ namespace SurvLine
 
 
 
-
-
-        //'*******************************************************************************
-        //'*******************************************************************************
-
-
-        Document document = new Document();
 
         //***************************************************************************
         //***************************************************************************
@@ -2561,23 +2990,28 @@ namespace SurvLine
         // 旧処理を全削除
         //<<<<----23/12/22 K.Setoguchi
         //---------------------------------------------------------------------------
-         //23/12/20 K.setoguchi@NV---------->>>>>>>>>>>
-        public void Load(BinaryReader br, long nVersion, ref GENBA_STRUCT_S Genba_S, ref List<OPA_STRUCT_SUB> OPA_List)
+        //23/12/20 K.setoguchi@NV---------->>>>>>>>>>>
+        //Public Sub Load(ByVal nFile As Integer, ByVal nVersion As Long, ByRef clsObservationPoints() As ObservationPoint, ByVal clsChildPoint As ObservationPoint)
+        public void Load(BinaryReader br, long nVersion, ref GENBA_STRUCT_S Genba_S, ref List<OPA_STRUCT_SUB> OPA_List,
+            ref ObservationPoint[] clsObservationPoints, ObservationPoint clsChildPoint = null)
         //<<<<<<<<<-----------23/12/20 K.setoguchi@NV
         {
 
             //----------------------------------------------------------------    
             //[VB]  Call m_clsAttributes.Load(nFile, nVersion)
-            ObservationPointAttributes observationPointAttributes = new ObservationPointAttributes();
-            observationPointAttributes.Load(br, nVersion, ref Genba_S);
+            //ObservationPointAttributes observationPointAttributes = new ObservationPointAttributes();
+            //observationPointAttributes.Load(br, nVersion, ref Genba_S);
+            m_clsAttributes.Load(br, nVersion, ref Genba_S);
 
 
             //----------------------------------------------------------------    
             //[VB]  Get #nFile, , m_bEnable     public bool m_bEnable;          //As Boolean '有効フラグ。True=有効。False=無効。   //true
             Genba_S.m_bEnable = document.GetFileBool(br);
+            m_bEnable = Genba_S.m_bEnable;
 
             //[VB]  Get #nFile, , ObjectType    public long OP_ObjectType;      //As Long 'オブジェクト種別。                        //-2147483520
             Genba_S.OP_ObjectType = br.ReadInt32();
+            ObjectType = Genba_S.OP_ObjectType;
 
             //----------------------------------------------------------------    
             //    '長男フラグ｡                                                           //true
@@ -2624,7 +3058,14 @@ namespace SurvLine
             {
                 nMoreJointKey = nPrevJointKey;
             }
-            //If UBound(clsObservationPoints) < nMoreJointKey Then ReDim Preserve clsObservationPoints(nMoreJointKey)
+            if (clsObservationPoints.Length < nMoreJointKey + 1)
+            {
+                //clsObservationPoints = new ObservationPoint[nMoreJointKey + 1];
+                ObservationPoint[] wk = new ObservationPoint[nMoreJointKey + 1];
+                Array.Copy(clsObservationPoints, wk, Math.Min(clsObservationPoints.Length, wk.Length));
+                clsObservationPoints = wk;
+            }
+
             var Genba_S2 = new GENBA_STRUCT_S[nMoreJointKey];
 
 
@@ -2649,8 +3090,11 @@ namespace SurvLine
 
 
 
-            //検討      //[VB]'子がいる場合は加える。
-            //検討      //[VB]  If Not clsChildPoint Is Nothing Then Call AddChildPoint(clsChildPoint)
+            //[VB]'子がいる場合は加える。
+            if (clsChildPoint != null)
+            {
+                AddChildPoint(clsChildPoint);
+            }
 
             //-------------------------------------------------------------------------------    
             //    '長男であり親がいる場合は親をロードする。
@@ -2661,9 +3105,10 @@ namespace SurvLine
             //    
             if (bFirst && bParent)
             {
-                ObservationPoint observationPoint = new ObservationPoint();
+                ObservationPoint observationPoint = new ObservationPoint(mdlMain);
                 //    observationPoint.Load(br, nVersion, ref Genba_S2[0]);
-                observationPoint.Load(br, nVersion, ref Genba_S, ref OPA_List);
+                //observationPoint.Load(br, nVersion, ref Genba_S, ref OPA_List);
+                observationPoint.Load(br, nVersion, ref Genba_S, ref OPA_List, ref clsObservationPoints, this);
             }
 
             //-------------------------------------------------------------------------------    
@@ -2676,9 +3121,16 @@ namespace SurvLine
             //        Call clsObservationPoints(nPrevJointKey).AddNextPoint(Me)
             //    End If
             //
-
-
-            //検討    <<<<<< データを配列にロードする >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+            if (clsObservationPoints[nPrevJointKey] == null)
+            {
+                //'兄が未ロードであれば自分を設定する。
+                clsObservationPoints[nPrevJointKey] = this;
+            }
+            else
+            {
+                //'兄がすでにロードされている場合は連結する。
+                clsObservationPoints[nPrevJointKey].AddNextPoint(this);
+            }
 
 
             //-------------------------------------------------------------------------------    
@@ -2694,32 +3146,23 @@ namespace SurvLine
             //        '弟を連結する。
             //        Call AddNextPoint(clsObservationPoints(nNextJointKey))
             //    End If
-
-
-
-            //検討    <<<<<< データを配列にロードする >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+            if (clsObservationPoints[nNextJointKey] == null)
+            {
+                //'弟が未ロードであれば自分を設定する。
+                clsObservationPoints[nNextJointKey] = this;
+                //'弟が未ロードなら結合キーは初期化する。
+                WorkKey = -1;
+            }
+            else
+            {
+                //'弟がすでにロードされている場合は結合キーを覚えておく。
+                WorkKey = nNextJointKey;
+                //'弟を連結する。
+                AddNextPoint(clsObservationPoints[nNextJointKey]);
+            }
 
 
         }
-
-        public override bool Equals(object obj)
-        {
-            return obj is ObservationPoint point &&
-                   WorkKey == point.WorkKey &&
-                   EqualityComparer<object>.Default.Equals(WorkObject, point.WorkObject) &&
-                   ObjectType == point.ObjectType &&
-                   EqualityComparer<object>.Default.Equals(Owner, point.Owner) &&
-                   EqualityComparer<ObservationPointAttributes>.Default.Equals(m_clsAttributes, point.m_clsAttributes) &&
-                   EqualityComparer<ObservationShared>.Default.Equals(m_clsObservationShared, point.m_clsObservationShared) &&
-                   EqualityComparer<ObservationPoint>.Default.Equals(m_clsParentPoint, point.m_clsParentPoint) &&
-                   EqualityComparer<ObservationPoint>.Default.Equals(m_clsChildPoint, point.m_clsChildPoint) &&
-                   EqualityComparer<ObservationPoint>.Default.Equals(m_clsPrevPoint, point.m_clsPrevPoint) &&
-                   EqualityComparer<ObservationPoint>.Default.Equals(m_clsNextPoint, point.m_clsNextPoint) &&
-                   EqualityComparer<ObservationPoint>.Default.Equals(m_clsCorrectPoint, point.m_clsCorrectPoint) &&
-                   m_bEnable == point.m_bEnable &&
-                   EqualityComparer<Document>.Default.Equals(document, point.document);
-        }
-
         //
         //'読み込み。
         //'
@@ -2794,5 +3237,839 @@ namespace SurvLine
 
 
 
+
+
+        //==========================================================================================
+        /*[VB]
+        '子観測点を追加する。
+        '
+        'clsNewChildPoint で指定される観測点を、子観測点リストの最後尾に連結する。
+        '
+        '引き数：
+        'clsNewChildPoint 追加する子観測点。
+        Public Sub AddChildPoint(ByVal clsNewChildPoint As ObservationPoint)
+
+            Dim clsPrevPoint As ObservationPoint
+    
+            '現在の末弟観測点を兄観測点とする。
+            If m_clsChildPoint Is Nothing Then
+                '子観測点がない。
+                Set m_clsChildPoint = clsNewChildPoint
+            Else
+                Set clsPrevPoint = m_clsChildPoint
+                Do While Not clsPrevPoint.NextPoint Is Nothing
+                    Set clsPrevPoint = clsPrevPoint.NextPoint
+                Loop
+                Set clsPrevPoint.NextPoint = clsNewChildPoint
+            End If
+            Set clsNewChildPoint.PrevPoint = clsPrevPoint
+    
+            '後続全てに設定。
+            Dim clsNextPoint As ObservationPoint
+            Set clsNextPoint = clsNewChildPoint
+            Do While Not clsNextPoint Is Nothing
+                Set clsNextPoint.ParentPoint = Me
+                Set clsNextPoint.ObservationShared = m_clsObservationShared
+                Set clsNextPoint = clsNextPoint.NextPoint
+            Loop
+
+        End Sub
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        private ObservationPoint clsPrevPoint;
+        /*
+        '子観測点を追加する。
+        '
+        'clsNewChildPoint で指定される観測点を、子観測点リストの最後尾に連結する。
+        '
+        '引き数：
+        'clsNewChildPoint 追加する子観測点。
+        */
+        public void AddChildPoint(ObservationPoint clsNewChildPoint)
+        {
+
+            //ObservationPoint clsPrevPoint = new ObservationPoint();
+
+            //'現在の末弟観測点を兄観測点とする。
+            if (m_clsChildPoint == null)
+            {
+                //'子観測点がない。
+                m_clsChildPoint = clsNewChildPoint;
+            }
+            else
+            {
+                clsPrevPoint = m_clsChildPoint;
+                while (clsPrevPoint.NextPoint() != null)
+                {
+                    clsPrevPoint = clsPrevPoint.NextPoint();
+                }
+                clsPrevPoint.NextPoint(clsNewChildPoint);
+            }
+            clsNewChildPoint.PrevPoint(clsPrevPoint);
+
+
+            //'後続全てに設定。
+            ObservationPoint clsNextPoint;
+            clsNextPoint = clsNewChildPoint;
+            while (clsNextPoint != null)
+            {
+                clsNextPoint.ParentPoint(this);
+                clsNextPoint.ObservationShared(m_clsObservationShared);
+                clsNextPoint = clsNextPoint.NextPoint();
+            }
+
+        }
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '弟観測点を追加する。
+        '
+        'clsNewNextPoint で指定される観測点を、リストの最後尾に連結する。
+        '
+        '引き数：
+        'clsNewNextPoint 追加する子観測点。
+        Public Sub AddNextPoint(ByVal clsNewNextPoint As ObservationPoint)
+
+            '現在の末弟観測点を兄観測点とする。
+            Dim clsPrevPoint As ObservationPoint
+            Set clsPrevPoint = Me
+            Do While Not clsPrevPoint.NextPoint Is Nothing
+                Set clsPrevPoint = clsPrevPoint.NextPoint
+            Loop
+
+            Set clsPrevPoint.NextPoint = clsNewNextPoint
+            Set clsNewNextPoint.PrevPoint = clsPrevPoint
+    
+            '後続全てに設定。
+            Dim clsNextPoint As ObservationPoint
+            Set clsNextPoint = clsNewNextPoint
+            Do While Not clsNextPoint Is Nothing
+                Set clsNextPoint.ParentPoint = m_clsParentPoint
+                Set clsNextPoint.ObservationShared = m_clsObservationShared
+                Set clsNextPoint = clsNextPoint.NextPoint
+            Loop
+
+        End Sub
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        /*
+        '弟観測点を追加する。
+        '
+        'clsNewNextPoint で指定される観測点を、リストの最後尾に連結する。
+        '
+        '引き数：
+        'clsNewNextPoint 追加する子観測点。
+        */
+        public void AddNextPoint(ObservationPoint clsNewNextPoint)
+        {
+            //'現在の末弟観測点を兄観測点とする。
+            ObservationPoint clsPrevPoint;
+            clsPrevPoint = this;
+            while (clsPrevPoint.NextPoint() != null)
+            {
+                clsPrevPoint = clsPrevPoint.NextPoint();
+            }
+
+            clsPrevPoint.NextPoint(clsNewNextPoint);
+            clsNewNextPoint.PrevPoint(clsPrevPoint);
+
+
+            //'後続全てに設定。
+            ObservationPoint clsNextPoint;
+            clsNextPoint = clsNewNextPoint;
+            while (clsNextPoint != null)
+            {
+                clsNextPoint.ParentPoint(m_clsParentPoint);
+                clsNextPoint.ObservationShared(m_clsObservationShared);
+                clsNextPoint = clsNextPoint.NextPoint();
+            }
+
+        }
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '親観測点から分離する。
+        Public Sub LeaveParentPoint()
+
+            If m_clsPrevPoint Is Nothing Then
+                If Not m_clsParentPoint Is Nothing Then Set m_clsParentPoint.ChildPoint = m_clsNextPoint
+            Else
+                Set m_clsPrevPoint.NextPoint = m_clsNextPoint
+            End If
+            If Not m_clsNextPoint Is Nothing Then Set m_clsNextPoint.PrevPoint = m_clsPrevPoint
+
+
+            Set m_clsParentPoint = Nothing
+            Set m_clsPrevPoint = Nothing
+            Set m_clsNextPoint = Nothing
+
+
+        End Sub
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //'親観測点から分離する。
+        public void LeaveParentPoint()
+        {
+            if (m_clsPrevPoint == null)
+            {
+                if (m_clsParentPoint != null)
+                {
+                    m_clsParentPoint.ChildPoint(m_clsNextPoint);
+                }
+            }
+            else
+            {
+                m_clsPrevPoint.NextPoint(m_clsNextPoint);
+            }
+            if (m_clsNextPoint != null)
+            {
+                m_clsNextPoint.PrevPoint(m_clsPrevPoint);
+            }
+
+            m_clsParentPoint = null;
+            m_clsPrevPoint = null;
+            m_clsNextPoint = null;
+        }
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '所属する実観測点を取得する。
+        '
+        '自分の子孫として所属している実観測点を取得する。
+        '自分が実観測点であれば自分を返す。
+        '
+        '戻り値：取得された実観測点を返す。配列の要素は(0 to UBound)。
+        Public Function GetRealPoints() As ObservationPoint()
+            Dim clsObservationPoints() As ObservationPoint
+            Dim nUBound As Long
+            nUBound = -1
+            Call GetRealPointsImpl(clsObservationPoints, nUBound)
+            GetRealPoints = clsObservationPoints
+        End Function
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        /*
+        '所属する実観測点を取得する。
+        '
+        '自分の子孫として所属している実観測点を取得する。
+        '自分が実観測点であれば自分を返す。
+        '
+        '戻り値：取得された実観測点を返す。配列の要素は(0 to UBound)。
+        */
+        public ObservationPoint[] GetRealPoints()
+        {
+            ObservationPoint[] clsObservationPoints = null;
+            long nUBound;
+            nUBound = -1;
+            GetRealPointsImpl(ref clsObservationPoints, ref nUBound);
+            return clsObservationPoints;
+        }
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        'ファイル名を更新する。
+        '
+        '観測点ファイル(RINEXファイルや衛星情報ファイル)のファイル名を更新する。
+        'sDstDirPath が空文字で無い場合、ファイルの移動も行われる。
+        '
+        '引き数：
+        'sSrcDirPath 観測点フォルダのパス。
+        'sDstDirPath 更新後の観測点フォルダのパス。ファイルの移動が必要なければ空文字を指定する。
+        Public Sub UpdateFileName(ByVal sSrcDirPath As String, Optional ByVal sDstDirPath As String = "")
+            If sDstDirPath = "" Then sDstDirPath = sSrcDirPath
+            Dim sFileTitle As String
+            sFileTitle = Key
+            Name sSrcDirPath & FileTitle & "." & RinexExt & RNX_OBS_EXTENSION As sDstDirPath & sFileTitle & "." & RinexExt & RNX_OBS_EXTENSION
+            '2017/07/05 NS6000対応。'''''''''''''''''''''''''''''''''''''''''''''''''''''''
+            'Name sSrcDirPath & FileTitle & "." & RinexExt & RNX_NAV_EXTENSION As sDstDirPath & sFileTitle & "." & RinexExt & RNX_NAV_EXTENSION
+            '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+            Name sSrcDirPath & FileTitle & "." & RNX_SV_EXTENSION As sDstDirPath & sFileTitle & "." & RNX_SV_EXTENSION
+            '2017/07/05 NS6000対応。'''''''''''''''''''''''''''''''''''''''''''''''''''''''
+            'If m_clsAttributes.GlonassFlag Then
+            '    Name sSrcDirPath & FileTitle & "." & RinexExt & RNX_GLO_EXTENSION As sDstDirPath & sFileTitle & "." & RinexExt & RNX_GLO_EXTENSION
+            'End If
+            '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+            If m_clsAttributes.MixedNav Then
+                Name sSrcDirPath & FileTitle & "." & RinexExt & RNX_MIX_EXTENSION As sDstDirPath & sFileTitle & "." & RinexExt & RNX_MIX_EXTENSION
+            Else
+                Name sSrcDirPath & FileTitle & "." & RinexExt & RNX_NAV_EXTENSION As sDstDirPath & sFileTitle & "." & RinexExt & RNX_NAV_EXTENSION
+                If m_clsAttributes.GlonassFlag Then
+                    Name sSrcDirPath & FileTitle & "." & RinexExt & RNX_GLO_EXTENSION As sDstDirPath & sFileTitle & "." & RinexExt & RNX_GLO_EXTENSION
+                End If
+                If m_clsAttributes.QZSSFlag Then
+                    Name sSrcDirPath & FileTitle & "." & RinexExt & RNX_QZS_EXTENSION As sDstDirPath & sFileTitle & "." & RinexExt & RNX_QZS_EXTENSION
+                End If
+                If m_clsAttributes.GalileoFlag Then
+                    Name sSrcDirPath & FileTitle & "." & RinexExt & RNX_GAL_EXTENSION As sDstDirPath & sFileTitle & "." & RinexExt & RNX_GAL_EXTENSION
+                End If
+                If m_clsAttributes.BeiDouFlag Then
+                    Name sSrcDirPath & FileTitle & "." & RinexExt & RNX_BEI_EXTENSION As sDstDirPath & sFileTitle & "." & RinexExt & RNX_BEI_EXTENSION
+                End If
+            End If
+            '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+            FileTitle = sFileTitle
+        End Sub
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        /*
+        'ファイル名を更新する。
+        '
+        '観測点ファイル(RINEXファイルや衛星情報ファイル)のファイル名を更新する。
+        'sDstDirPath が空文字で無い場合、ファイルの移動も行われる。
+        '
+        '引き数：
+        'sSrcDirPath 観測点フォルダのパス。
+        'sDstDirPath 更新後の観測点フォルダのパス。ファイルの移動が必要なければ空文字を指定する。
+        */
+        public void UpdateFileName(string sSrcDirPath, string sDstDirPath = "")
+        {
+            if (sDstDirPath == "")
+            {
+                sDstDirPath = sSrcDirPath;
+            }
+            string sFileTitle;
+            sFileTitle = Key();
+            Name(sSrcDirPath + FileTitle() + "." + RinexExt() + RNX_OBS_EXTENSION + sDstDirPath + sFileTitle + "." + RinexExt() + RNX_OBS_EXTENSION);
+            //'2017/07/05 NS6000対応。'''''''''''''''''''''''''''''''''''''''''''''''''''''''
+            //'Name sSrcDirPath & FileTitle & "." & RinexExt & RNX_NAV_EXTENSION As sDstDirPath & sFileTitle & "." & RinexExt & RNX_NAV_EXTENSION
+            //'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+            Name(sSrcDirPath + FileTitle() + "." + RNX_SV_EXTENSION + sDstDirPath + sFileTitle + "." + RNX_SV_EXTENSION);
+            //'2017/07/05 NS6000対応。'''''''''''''''''''''''''''''''''''''''''''''''''''''''
+            //'If m_clsAttributes.GlonassFlag Then
+            //'    Name sSrcDirPath & FileTitle & "." & RinexExt & RNX_GLO_EXTENSION As sDstDirPath & sFileTitle & "." & RinexExt & RNX_GLO_EXTENSION
+            //'End If
+            //'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+            if (m_clsAttributes.MixedNav)
+            {
+                Name(sSrcDirPath + FileTitle() + "." + RinexExt() + RNX_MIX_EXTENSION + sDstDirPath + sFileTitle + "." + RinexExt() + RNX_MIX_EXTENSION);
+            }
+            else
+            {
+                Name(sSrcDirPath + FileTitle() + "." + RinexExt() + RNX_NAV_EXTENSION + sDstDirPath + sFileTitle + "." + RinexExt() + RNX_NAV_EXTENSION);
+                if (m_clsAttributes.GlonassFlag)
+                {
+                    Name(sSrcDirPath + FileTitle() + "." + RinexExt() + RNX_GLO_EXTENSION + sDstDirPath + sFileTitle + "." + RinexExt() + RNX_GLO_EXTENSION);
+                }
+                if (m_clsAttributes.QZSSFlag)
+                {
+                    Name(sSrcDirPath + FileTitle() + "." + RinexExt() + RNX_QZS_EXTENSION + sDstDirPath + sFileTitle + "." + RinexExt() + RNX_QZS_EXTENSION);
+                }
+                if (m_clsAttributes.GalileoFlag)
+                {
+                    Name(sSrcDirPath + FileTitle() + "." + RinexExt() + RNX_GAL_EXTENSION + sDstDirPath + sFileTitle + "." + RinexExt() + RNX_GAL_EXTENSION);
+                }
+                if (m_clsAttributes.BeiDouFlag)
+                {
+                    Name(sSrcDirPath + FileTitle() + "." + RinexExt() + RNX_BEI_EXTENSION + sDstDirPath + sFileTitle + "." + RinexExt() + RNX_BEI_EXTENSION);
+                }
+            }
+            //'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+            FileTitle(sFileTitle);
+        }
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '位相中心高を取得する。
+        '
+        '引き数：
+        'nTrueVertical 位相中心高(ｍ)が設定される。
+        '
+        '戻り値：
+        '位相中心高が取得できた場合は True を返す。
+        '位相中心高が取得できなかった場合は False を返す。
+        Public Function GetTrueVertical(ByRef nTrueVertical As Double) As Boolean
+            If m_clsObservationShared Is Nothing Then
+                GetTrueVertical = False
+            Else
+                GetTrueVertical = m_clsObservationShared.GetTrueVertical(m_clsAttributes.AntType, m_clsAttributes.AntMeasurement, m_clsAttributes.AntHeight, nTrueVertical)
+            End If
+        End Function
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        /*
+        '位相中心高を取得する。
+        '
+        '引き数：
+        'nTrueVertical 位相中心高(ｍ)が設定される。
+        '
+        '戻り値：
+        '位相中心高が取得できた場合は True を返す。
+        '位相中心高が取得できなかった場合は False を返す。
+        */
+        public bool GetTrueVertical(ref double nTrueVertical)
+        {
+            if (m_clsObservationShared == null)
+            {
+                return false;
+            }
+            else
+            {
+                return m_clsObservationShared.GetTrueVertical(m_clsAttributes.AntType, m_clsAttributes.AntMeasurement, m_clsAttributes.AntHeight, ref nTrueVertical);
+            }
+        }
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        'アンテナマウント高を取得する。
+        '
+        '引き数：
+        'nMountVertical アンテナマウント高(ｍ)が設定される。
+        '
+        '戻り値：
+        'アンテナマウント高が取得できた場合は True を返す。
+        'アンテナマウント高が取得できなかった場合は False を返す。
+        Public Function GetMountVertical(ByRef nMountVertical As Double) As Boolean
+            If m_clsObservationShared Is Nothing Then
+                GetMountVertical = False
+            Else
+                GetMountVertical = m_clsObservationShared.GetMountVertical(m_clsAttributes.AntType, m_clsAttributes.AntMeasurement, m_clsAttributes.AntHeight, nMountVertical)
+            End If
+        End Function
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        /*
+        'アンテナマウント高を取得する。
+        '
+        '引き数：
+        'nMountVertical アンテナマウント高(ｍ)が設定される。
+        '
+        '戻り値：
+        'アンテナマウント高が取得できた場合は True を返す。
+        'アンテナマウント高が取得できなかった場合は False を返す。
+        */
+        public bool GetMountVertical(ref double nMountVertical)
+        {
+            if (m_clsObservationShared == null)
+            {
+                return false;
+            }
+            else
+            {
+                return m_clsObservationShared.GetMountVertical(m_clsAttributes.AntType, m_clsAttributes.AntMeasurement, m_clsAttributes.AntHeight, ref nMountVertical);
+            }
+        }
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '補正点を更新する。
+        '
+        '補正点を clsCorrectPoint で指定される補正点で上書きする。
+        'HeadPoint 以下全ての観測点を更新する。
+        '本点に偏心点を設定する場合は clsCorrectPoint は HeadPoint。
+        '偏心点に本点を設定する場合は clsCorrectPoint は 実観測点。
+        '
+        '引き数：
+        'clsCorrectPoint 新しい補正点。
+        Public Sub UpdateCorrectPoint(ByVal clsCorrectPoint As ObservationPoint)
+            Call HeadPoint.UpdateCorrectPointImpl(clsCorrectPoint)
+        End Sub
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        /*
+        '補正点を更新する。
+        '
+        '補正点を clsCorrectPoint で指定される補正点で上書きする。
+        'HeadPoint 以下全ての観測点を更新する。
+        '本点に偏心点を設定する場合は clsCorrectPoint は HeadPoint。
+        '偏心点に本点を設定する場合は clsCorrectPoint は 実観測点。
+        '
+        '引き数：
+        'clsCorrectPoint 新しい補正点。
+        */
+        public void UpdateCorrectPoint(ObservationPoint clsCorrectPoint)
+        {
+            HeadPoint().UpdateCorrectPointImpl(clsCorrectPoint);
+        }
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '補正点を更新する。
+        '
+        '補正点を clsCorrectPoint で指定される補正点で上書きする。
+        '子観測点、弟観測点も更新する。
+        '
+        '引き数：
+        'clsCorrectPoint 新しい補正点。
+        Public Sub UpdateCorrectPointImpl(ByVal clsCorrectPoint As ObservationPoint)
+            Set m_clsCorrectPoint = clsCorrectPoint
+            If Not m_clsChildPoint Is Nothing Then Call m_clsChildPoint.UpdateCorrectPointImpl(clsCorrectPoint)
+            If Not m_clsNextPoint Is Nothing Then Call m_clsNextPoint.UpdateCorrectPointImpl(clsCorrectPoint)
+        End Sub
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        /*
+        '補正点を更新する。
+        '
+        '補正点を clsCorrectPoint で指定される補正点で上書きする。
+        '子観測点、弟観測点も更新する。
+        '
+        '引き数：
+        'clsCorrectPoint 新しい補正点。
+        */
+        public void UpdateCorrectPointImpl(ObservationPoint clsCorrectPoint)
+        {
+            m_clsCorrectPoint = clsCorrectPoint;
+            if (m_clsChildPoint != null)
+            {
+                m_clsChildPoint.UpdateCorrectPointImpl(clsCorrectPoint);
+            }
+            if (m_clsNextPoint != null)
+            {
+                m_clsNextPoint.UpdateCorrectPointImpl(clsCorrectPoint);
+            }
+        }
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '本点情報を更新する。
+        '
+        '現在の属性に合わせて本点の情報を新しく更新する。
+        Public Sub UpdateGenuineInfo()
+            'Commonでない情報を更新する時にはHeadからすべて変更するのを忘れないように。
+            Number = GENUINE_POINT_SESSION & m_clsCorrectPoint.Number
+        End Sub
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        /*
+        '本点情報を更新する。
+        '
+        '現在の属性に合わせて本点の情報を新しく更新する。
+        */
+        public void UpdateGenuineInfo()
+        {
+            //'Commonでない情報を更新する時にはHeadからすべて変更するのを忘れないように。
+            Number(GENUINE_POINT_SESSION + m_clsCorrectPoint.Number());
+        }
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '*******************************************************************************
+        'インプリメンテーション
+
+        '代表子観測点を取得する。
+        '
+        '所属する適当な子観測点を取得する。
+        '最下層の ChildPoint を取得する。
+        '自分が最下層なら自分を返す。
+        '有効な観測点が優先される。
+        '有効な観測点が無ければ無効な観測点を返す。
+        '
+        '引き数：
+        'bEnable 取得された観測点の有効フラグが設定される。
+        '
+        '戻り値：取得された代表子観測点を返す。
+        Public Function ChildPointRepresent(ByRef bEnable As Boolean) As ObservationPoint
+            If m_clsChildPoint Is Nothing Then
+                '最下位なら無効でもかまわないので自分を返す。
+                bEnable = m_bEnable
+                Set ChildPointRepresent = Me
+            Else
+                Dim clsChildPoint As ObservationPoint
+                Set clsChildPoint = m_clsChildPoint
+                Do While Not clsChildPoint Is Nothing
+                    Set ChildPointRepresent = clsChildPoint.ChildPointRepresent(bEnable)
+                    '有効な子観測点が見つかったか？
+                    If bEnable Then Exit Function
+                    Set clsChildPoint = clsChildPoint.NextPoint
+                Loop
+                '有効な子観測点が見つからなかった場合、無効でもかまわないので最下位子観測点を返す。
+                Set ChildPointRepresent = m_clsChildPoint.BottomChildPoint
+            End If
+        End Function
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        /*
+        '*******************************************************************************
+        'インプリメンテーション
+
+        '代表子観測点を取得する。
+        '
+        '所属する適当な子観測点を取得する。
+        '最下層の ChildPoint を取得する。
+        '自分が最下層なら自分を返す。
+        '有効な観測点が優先される。
+        '有効な観測点が無ければ無効な観測点を返す。
+        '
+        '引き数：
+        'bEnable 取得された観測点の有効フラグが設定される。
+        '
+        '戻り値：取得された代表子観測点を返す。
+        */
+        public ObservationPoint ChildPointRepresent(bool bEnable)
+        {
+            ObservationPoint w_ChildPointRepresent;
+            if (m_clsChildPoint == null)
+            {
+                //'最下位なら無効でもかまわないので自分を返す。
+                bEnable = m_bEnable;
+                w_ChildPointRepresent = this;
+                return w_ChildPointRepresent;
+            }
+            else
+            {
+                ObservationPoint clsChildPoint;
+                clsChildPoint = m_clsChildPoint;
+                while (clsChildPoint != null)
+                {
+                    w_ChildPointRepresent = clsChildPoint.ChildPointRepresent(bEnable);
+                    //'有効な子観測点が見つかったか？
+                    if (bEnable)
+                    {
+                        return w_ChildPointRepresent;
+                    }
+                    clsChildPoint = clsChildPoint.NextPoint();
+                }
+                //'有効な子観測点が見つからなかった場合、無効でもかまわないので最下位子観測点を返す。
+                return m_clsChildPoint.BottomChildPoint();
+            }
+        }
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '所属する実観測点を取得する。
+        '
+        '自分の子孫として所属している実観測点を取得する。
+        '自分が実観測点であれば自分を設定する。
+        '
+        '引き数：
+        'clsObservationPoints 取得された実観測点が設定される。配列の要素は(0 to UBound)。
+        'nUBound clsObservationPoints の UBound。
+        Public Sub GetRealPointsImpl(ByRef clsObservationPoints() As ObservationPoint, ByRef nUBound As Long)
+            '自分が実観測点であるか？
+            If(ObjectType And OBS_TYPE_WORD) = 0 Then
+                nUBound = nUBound + 1
+                ReDim Preserve clsObservationPoints(nUBound)
+                Set clsObservationPoints(nUBound) = Me
+                Exit Sub
+            End If
+            '子観測点の数だけ繰り返す。
+            Dim clsChildPoint As ObservationPoint
+            Set clsChildPoint = ChildPoint
+            Do While Not clsChildPoint Is Nothing
+                If(clsChildPoint.ObjectType And OBS_TYPE_WORD) = 0 Then
+                    nUBound = nUBound + 1
+                    ReDim Preserve clsObservationPoints(nUBound)
+                    Set clsObservationPoints(nUBound) = clsChildPoint
+                Else
+                    '再帰。
+                    Call clsChildPoint.GetRealPointsImpl(clsObservationPoints, nUBound)
+                End If
+                Set clsChildPoint = clsChildPoint.NextPoint
+            Loop
+        End Sub
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        /*
+        '所属する実観測点を取得する。
+        '
+        '自分の子孫として所属している実観測点を取得する。
+        '自分が実観測点であれば自分を設定する。
+        '
+        '引き数：
+        'clsObservationPoints 取得された実観測点が設定される。配列の要素は(0 to UBound)。
+        'nUBound clsObservationPoints の UBound。
+        */
+        public void GetRealPointsImpl(ref ObservationPoint[] clsObservationPoints, ref long nUBound)
+        {
+            //'自分が実観測点であるか？
+            if ((ObjectType & OBS_TYPE_WORD) == 0)
+            {
+                nUBound++;
+                clsObservationPoints = new ObservationPoint[nUBound];
+                clsObservationPoints[nUBound] = this;
+                return;
+            }
+            //'子観測点の数だけ繰り返す。
+            ObservationPoint clsChildPoint;
+            clsChildPoint = ChildPoint();
+            while (clsChildPoint != null)
+            {
+                if ((clsChildPoint.ObjectType & OBS_TYPE_WORD) == 0)
+                {
+                    nUBound++;
+                    clsObservationPoints = new ObservationPoint[nUBound];
+                    clsObservationPoints[nUBound] = clsChildPoint;
+                }
+                else
+                {
+                    //'再帰。
+                    clsChildPoint.GetRealPointsImpl(ref clsObservationPoints, ref nUBound);
+                }
+                clsChildPoint = clsChildPoint.NextPoint();
+            }
+        }
+        //==========================================================================================
+
+        //==========================================================================================
+        /*[VB]
+        '解析終点座標を取得する。
+        '
+        '自分が、解析済基線ベクトルの終点となっている基線ベクトルを取得する。
+        '優先順位は次の通り。
+        '①FIX解である基線ベクトル。
+        '②解析済である基線ベクトル。
+        '※条件が同じ場合はより後に解析した基線ベクトルを優先する。
+        '
+        '引き数：
+        'objOwner 取得された Owner オブジェクトが設定される。
+        'bWork Owner の代わりに WorkObject を使用する。
+        '
+        '戻り値：
+        '優先度を返す。優先度が高いほど戻り値は低い(負の値)。
+        '解析済基線ベクトルが無い場合は 0 を返す。
+        Public Function GetCoordinateAnalysisEnd(ByRef objOwner As Object, ByVal bWork As Boolean) As Long
+
+            Dim nResult As Long
+            nResult = 0
+    
+            If(ObjectType And OBS_TYPE_CONNECT) <> 0 Then
+                If bWork Then
+                    Set objOwner = WorkObject
+                Else
+                    Set objOwner = Owner
+                End If
+                '解析済基線ベクトルの終点であれば候補とする。
+                If objOwner.AnalysisEndPoint Is Me And objOwner.Enable Then
+                    If objOwner.Analysis = ANALYSIS_STATUS_FIX Then
+                        '① FIX解が、最優先。
+                        nResult = &H80000000 Or objOwner.AnalysisOrder
+                    ElseIf objOwner.Analysis = ANALYSIS_STATUS_FLOAT Then
+                        '② 有効であり、解析済みが、最低条件。
+                        nResult = &H90000000 Or objOwner.AnalysisOrder
+                    End If
+                    '参考：
+                    '① nResult = &H80000000 Or Owner.AnalysisOrder
+                    '② nResult = &H90000000 Or Owner.AnalysisOrder
+                    '③ nResult = &HA0000000 Or Owner.AnalysisOrder
+                    '④ nResult = &HB0000000 Or Owner.AnalysisOrder
+                    '                  ：
+                    '⑧ nResult = &HF0000000 Or Owner.AnalysisOrder
+                End If
+            Else
+                Dim clsNextPoint As ObservationPoint
+                Set clsNextPoint = m_clsChildPoint
+                Do While Not clsNextPoint Is Nothing
+                    Dim objOwnerTmp As Object
+                    Dim nResultTmp As Long
+                    nResultTmp = clsNextPoint.GetCoordinateAnalysisEnd(objOwnerTmp, bWork)
+                    If nResult > nResultTmp Then
+                        Set objOwner = objOwnerTmp
+                        nResult = nResultTmp
+                    End If
+                    Set clsNextPoint = clsNextPoint.NextPoint
+                Loop
+            End If
+
+            GetCoordinateAnalysisEnd = nResult
+
+
+        End Function
+        [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        /*
+        '解析終点座標を取得する。
+        '
+        '自分が、解析済基線ベクトルの終点となっている基線ベクトルを取得する。
+        '優先順位は次の通り。
+        '①FIX解である基線ベクトル。
+        '②解析済である基線ベクトル。
+        '※条件が同じ場合はより後に解析した基線ベクトルを優先する。
+        '
+        '引き数：
+        'objOwner 取得された Owner オブジェクトが設定される。
+        'bWork Owner の代わりに WorkObject を使用する。
+        '
+        '戻り値：
+        '優先度を返す。優先度が高いほど戻り値は低い(負の値)。
+        '解析済基線ベクトルが無い場合は 0 を返す。
+        */
+        public long GetCoordinateAnalysisEnd(ref object objOwner, bool bWork)
+        {
+#if false
+            long nResult;
+            nResult = 0;
+
+            if ((ObjectType & OBS_TYPE_CONNECT) != 0)
+            {
+                if (bWork)
+                {
+                    objOwner = WorkObject;
+                }
+                else
+                {
+                    objOwner = Owner;
+                }
+                //'解析済基線ベクトルの終点であれば候補とする。
+                if (objOwner.AnalysisEndPoint() == this && objOwner.Enable() == true)
+                {
+                    if (objOwner.Analysis == ANALYSIS_STATUS.ANALYSIS_STATUS_FIX)
+                    {
+                        //'① FIX解が、最優先。
+                        nResult = 0x80000000 | objOwner.AnalysisOrder;
+                    }
+                    else if (objOwner.Analysis == ANALYSIS_STATUS.ANALYSIS_STATUS_FLOAT)
+                    {
+                        //'② 有効であり、解析済みが、最低条件。
+                        nResult = 0x90000000 | objOwner.AnalysisOrder;
+                    }
+                    /*
+                    '参考：
+                    '① nResult = &H80000000 Or Owner.AnalysisOrder
+                    '② nResult = &H90000000 Or Owner.AnalysisOrder
+                    '③ nResult = &HA0000000 Or Owner.AnalysisOrder
+                    '④ nResult = &HB0000000 Or Owner.AnalysisOrder
+                    '                  ：
+                    '⑧ nResult = &HF0000000 Or Owner.AnalysisOrder
+                    */
+                }
+            }
+            else
+            {
+                ObservationPoint clsNextPoint;
+                clsNextPoint = m_clsChildPoint;
+                while (clsNextPoint != null)
+                {
+                    object objOwnerTmp;
+                    long nResultTmp;
+                    nResultTmp = clsNextPoint.GetCoordinateAnalysisEnd(objOwnerTmp, bWork);
+                    if (nResult > nResultTmp)
+                    {
+                        objOwner = objOwnerTmp;
+                        nResult = nResultTmp;
+                    }
+                    clsNextPoint = clsNextPoint.NextPoint();
+                }
+            }
+            return nResult;
+#else
+            objOwner = null;
+            return -1;
+#endif
+        }
+        //==========================================================================================
     }
 }

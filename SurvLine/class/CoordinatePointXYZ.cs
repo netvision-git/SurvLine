@@ -9,13 +9,15 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using static SurvLine.mdl.MdlNSDefine;
-using static SurvLine.MdlUtility;
+using static SurvLine.mdl.MdlUtility;
+using static SurvLine.mdl.MdlAccountMake;
 using static System.Net.WebRequestMethods;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
+using Microsoft.VisualBasic;
 
 namespace SurvLine
 {
-    public class CoordinatePointXYZ
+    public class CoordinatePointXYZ : CoordinatePoint
     {
 
         //==========================================================================================
@@ -27,6 +29,14 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        //[C#]
+        public CoordinatePointXYZ()
+        {
+            Class_Initialize();
+        }
         //==========================================================================================
 
         //==========================================================================================
@@ -44,10 +54,6 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
-
-        //  private interface CoordinatePoint
-
-
         //'インプリメンテーション
         private double m_nX;                        //'X。
         private double m_nY;                        //'Y。
@@ -55,7 +61,7 @@ namespace SurvLine
         private double m_nRoundX;                   //'丸めX。
         private double m_nRoundY;                   //'丸めY。
         private double m_nRoundZ;                   //'丸めZ。
-        private MdlNSDefine.COORDINATE_TYPE m_nCoordinateType;  //'座標値種別。
+        private COORDINATE_TYPE m_nCoordinateType;  //'座標値種別。
 
         //==========================================================================================
 
@@ -88,9 +94,9 @@ namespace SurvLine
         'clsCoordinatePoint コピー元のオブジェクト。
         */
         //public void CoordinatePointXYZ(CoordinatePoint clsCoordinatePoint)
-        public void CoordinatePointXYZcpy(object clsCoordinatePoint)
+        public void CoordinatePointXYZcpy(CoordinatePoint clsCoordinatePoint)
         {
-            CoordinatePoint_CoordinatePoint((CoordinatePoint)clsCoordinatePoint);
+            CoordinatePoint_CoordinatePoint(clsCoordinatePoint);
             return;
         }
         //==========================================================================================
@@ -105,9 +111,12 @@ namespace SurvLine
         //------------------------------------------------------------------------------------------
         //[C#]
         //'X。
-        public void X(double nX)
+        public override void XX(double nX)
         {
-            CoordinatePoint_X(nX);
+            //CoordinatePoint_X(nX);
+            m_nX = nX;
+            m_nRoundX = JpnRound(m_nX, MdlAccountMake.ACCOUNT_DECIMAL_XYZ);
+            return;
         }
         //==========================================================================================
 
@@ -121,9 +130,11 @@ namespace SurvLine
         //------------------------------------------------------------------------------------------
         //[C#]
         //'X。
-        public double X()
+        //public double X()
+        public override double XX()
         {
-            return CoordinatePoint_X();
+            //return CoordinatePoint_X();
+            return m_nX;
         }
         //==========================================================================================
 
@@ -137,9 +148,12 @@ namespace SurvLine
         //------------------------------------------------------------------------------------------
         //[C#]
         //'Y。
-        public void Y(double nY)
+        public override void YY(double nY)
         {
-            CoordinatePoint_Y(nY);
+            //CoordinatePoint_Y(nY);
+            m_nY = nY;
+            m_nRoundY = JpnRound(m_nY, MdlAccountMake.ACCOUNT_DECIMAL_XYZ);
+            return;
         }
         //==========================================================================================
 
@@ -153,9 +167,11 @@ namespace SurvLine
         //------------------------------------------------------------------------------------------
         //[C#]
         //'Y。
-        public double Y()
+        //public double Y()
+        public override double YY()
         {
-            return CoordinatePoint_Y();
+            //return CoordinatePoint_Y();
+            return m_nY;
         }
         //==========================================================================================
 
@@ -169,9 +185,12 @@ namespace SurvLine
         //------------------------------------------------------------------------------------------
         //[C#]
         //'Z。
-        public void Z(double nZ)
+        public override void ZZ(double nZ)
         {
-            CoordinatePoint_Z(nZ);
+            //CoordinatePoint_Z(nZ);
+            m_nZ = nZ;
+            m_nRoundZ = JpnRound(m_nZ, MdlAccountMake.ACCOUNT_DECIMAL_XYZ);
+            return;
         }
         //==========================================================================================
 
@@ -185,9 +204,11 @@ namespace SurvLine
         //------------------------------------------------------------------------------------------
         //[C#]
         //'Z。
-        public double Z()
+        //public double Z()
+        public override double ZZ()
         {
-            return CoordinatePoint_Z();
+            //return CoordinatePoint_Z();
+            return m_nZ;
         }
         //==========================================================================================
 
@@ -201,9 +222,11 @@ namespace SurvLine
         //------------------------------------------------------------------------------------------
         //[C#]
         //'丸めX。
-        public double RoundX()
+        //public double RoundX()
+        public override double RoundXX()
         {
-            return CoordinatePoint_RoundX();
+            //return CoordinatePoint_RoundX();
+            return m_nRoundX;
         }
         //==========================================================================================
 
@@ -217,9 +240,11 @@ namespace SurvLine
         //------------------------------------------------------------------------------------------
         //[C#]
         //'丸めY。
-        public double RoundY()
+        //public double RoundY()
+        public override double RoundYY()
         {
-            return CoordinatePoint_RoundY();
+            //return CoordinatePoint_RoundY();
+            return m_nRoundY;
         }
         //==========================================================================================
 
@@ -233,9 +258,11 @@ namespace SurvLine
         //------------------------------------------------------------------------------------------
         //[C#]
         //'丸めZ。
-        public double RoundZ()
+        //public double RoundZ()
+        public override double RoundZZ()
         {
-            return CoordinatePoint_RoundZ();
+            //return CoordinatePoint_RoundZ();
+            return m_nRoundZ;
         }
         //==========================================================================================
 
@@ -249,10 +276,10 @@ namespace SurvLine
         //------------------------------------------------------------------------------------------
         //[C#]
         //'座標値種別。
-        //瀬戸口   public COORDINATE_TYPE CoordinateType()
-        public MdlNSDefine.COORDINATE_TYPE CoordinateType()
+        public override COORDINATE_TYPE CoordinateType()
         {
-            return CoordinatePoint_CoordinateType();
+            //return CoordinatePoint_CoordinateType();
+            return m_nCoordinateType;
         }
         //==========================================================================================
 
@@ -268,6 +295,16 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        /*
+        '*******************************************************************************
+        'イベント
+
+        '初期化。
+        */
+        private void Class_Initialize()
+        {
+            m_nCoordinateType = COORDINATE_TYPE.COORDINATE_XYZ;
+        }
         //==========================================================================================
 
         //==========================================================================================
@@ -313,6 +350,17 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        /*
+        '読み込み。
+        '
+        '引き数：
+        'nFile ファイル番号。
+        'nVersion ファイルバージョン。
+        */
+        public override void Load(int nFile, long nVersion)
+        {
+            CoordinatePoint_Load(nFile, nVersion);
+        }
         //==========================================================================================
 
         //==========================================================================================
@@ -341,10 +389,9 @@ namespace SurvLine
         '一致する場合 True を返す。
         'それ以外の場合 False を返す。
         */
-        //瀬戸口   public bool Compare(CoordinatePoint clsCoordinatePoint)
-        public bool Compare(object clsCoordinatePoint)
+        public override bool Compare(CoordinatePoint clsCoordinatePoint)
         {
-            return CoordinatePoint_Compare((CoordinatePoint)clsCoordinatePoint);
+            return CoordinatePoint_Compare(clsCoordinatePoint);
         }
         //==========================================================================================
 
@@ -370,7 +417,7 @@ namespace SurvLine
         'nY Y座標が設定される。
         'nZ Z座標が設定される。
         */
-        public void GetXYZ(ref double nX, ref double nY, ref double nZ)
+        public override void GetXYZ(ref double nX, ref double nY, ref double nZ)
         {
             CoordinatePoint_GetXYZ(ref nX, ref nY, ref nZ);
         }
@@ -402,7 +449,7 @@ namespace SurvLine
         'vAlt 標高が設定される。標高が取得されない場合は null が設定される。
         'sGeoidoPath ジオイドモデルのパス。標高がOFFの場合、空文字を指定する。
         */
-        public void GetDEG(ref double nLat, ref double nLon, ref double nHeight, ref double vAlt, string sGeoidoPath)
+        public override void GetDEG(ref double nLat, ref double nLon, ref double nHeight, ref double vAlt, string sGeoidoPath)
         {
             CoordinatePoint_GetDEG(nLat, nLon, nHeight, vAlt, sGeoidoPath);
         }
@@ -444,8 +491,8 @@ namespace SurvLine
         'nDecimal 秒の四捨五入桁。
         'sGeoidoPath ジオイドモデルのパス。標高がOFFの場合、空文字を指定する。
         */
-        public void GetDMS(ref long nLatH, ref long nLatM, ref double nLatS, ref long nLonH, ref long nLonM, ref double nLonS, ref double nHeight,
-            double vAlt, long nDecimal, string sGeoidoPath)
+        public override void GetDMS(ref long nLatH, ref long nLatM, ref double nLatS, ref long nLonH, ref long nLonM, ref double nLonS, ref double nHeight,
+            ref double vAlt, long nDecimal, string sGeoidoPath)
         {
             CoordinatePoint_GetDMS(nLatH, nLatM, nLatS, nLonH, nLonM, nLonS, nHeight, vAlt, nDecimal, sGeoidoPath);
         }
@@ -481,7 +528,7 @@ namespace SurvLine
         'nCoordNum 座標系番号(1～19)。
         'sGeoidoPath ジオイドモデルのパス。標高がOFFの場合、空文字を指定する。
         */
-        public void GetJGD(ref double nX, ref double nY, ref double nHeight, ref long vAlt, long nDecimal, long nCoordNum, string sGeoidoPath)
+        public override void GetJGD(ref double nX, ref double nY, ref double nHeight, ref double vAlt, long nDecimal, long nCoordNum, string sGeoidoPath)
         {
             CoordinatePoint_GetJGD(nX, nY, nHeight, vAlt, nDecimal, nCoordNum, sGeoidoPath);
         }
@@ -503,8 +550,7 @@ namespace SurvLine
         '
         '戻り値：コピーしたオブジェクト。
         */
-        //瀬戸口   public CoordinatePoint CreateCopy()
-        public object CreateCopy()
+        public override CoordinatePoint CreateCopy()
         {
             return CoordinatePoint_CreateCopy();
         }
@@ -549,7 +595,7 @@ namespace SurvLine
         'X。
         Private Property Let CoordinatePoint_X(ByVal RHS As Double)
             m_nX = RHS
-                m_nRoundX = JpnRound(m_nX, ACCOUNT_DECIMAL_XYZ)
+            m_nRoundX = JpnRound(m_nX, ACCOUNT_DECIMAL_XYZ)
         End Property
         [VB]*/
         //------------------------------------------------------------------------------------------
@@ -557,9 +603,9 @@ namespace SurvLine
         //'X。
         private void CoordinatePoint_X(double RHS)
         {
-            MdlUtility clsMdlUtility = new MdlUtility();
+            //MdlUtility clsMdlUtility = new MdlUtility();
             m_nX = RHS;
-            m_nRoundX = clsMdlUtility.JpnRound(m_nX, MdlAccountMake.ACCOUNT_DECIMAL_XYZ);
+            m_nRoundX = JpnRound(m_nX, ACCOUNT_DECIMAL_XYZ);
         }
         //==========================================================================================
 
@@ -592,9 +638,9 @@ namespace SurvLine
         //'Y。
         private void CoordinatePoint_Y(double RHS)
         {
-            MdlUtility clsMdlUtility = new MdlUtility();
+            //MdlUtility clsMdlUtility = new MdlUtility();
             m_nY = RHS;
-            m_nRoundY = clsMdlUtility.JpnRound(m_nY, MdlAccountMake.ACCOUNT_DECIMAL_XYZ);
+            m_nRoundY = JpnRound(m_nY, ACCOUNT_DECIMAL_XYZ);
         }
         //==========================================================================================
 
@@ -627,9 +673,9 @@ namespace SurvLine
         //'Z。
         private void CoordinatePoint_Z(double RHS)
         {
-            MdlUtility clsMdlUtility = new MdlUtility();
+            //MdlUtility clsMdlUtility = new MdlUtility();
             m_nZ = RHS;
-            m_nRoundZ = clsMdlUtility.JpnRound(m_nZ, MdlAccountMake.ACCOUNT_DECIMAL_XYZ);
+            m_nRoundZ = JpnRound(m_nZ, ACCOUNT_DECIMAL_XYZ);
         }
         //==========================================================================================
 
@@ -707,8 +753,7 @@ namespace SurvLine
         //------------------------------------------------------------------------------------------
         //[C#]
         //'座標値種別。
-        //瀬戸口   private COORDINATE_TYPE CoordinatePoint_CoordinateType()
-        private MdlNSDefine.COORDINATE_TYPE CoordinatePoint_CoordinateType()
+        private COORDINATE_TYPE CoordinatePoint_CoordinateType()
         {
             return m_nCoordinateType;
         }
@@ -769,6 +814,30 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        //'読み込み。
+        private void CoordinatePoint_Load(int nFile, long nVersion)
+        {
+            /*
+            Get #nFile, , m_nRoundX;
+            Get #nFile, , m_nRoundY;
+            Get #nFile, , m_nRoundZ;
+            if (nVersion < 6400)
+            {
+                m_nX = m_nRoundX;
+                m_nY = m_nRoundY;
+                m_nZ = m_nRoundZ;
+                m_nRoundX = JpnRound(m_nX, ACCOUNT_DECIMAL_XYZ);
+                m_nRoundY = JpnRound(m_nY, ACCOUNT_DECIMAL_XYZ);
+                m_nRoundZ = JpnRound(m_nZ, ACCOUNT_DECIMAL_XYZ);
+            }
+            else
+            {
+                Get #nFile, , m_nX;
+                Get #nFile, , m_nY;
+                Get #nFile, , m_nZ;
+            }
+            */
+        }
         //==========================================================================================
 
         //==========================================================================================
@@ -877,8 +946,10 @@ namespace SurvLine
             double nLat = 0;
             double nLon = 0;
             WGS84xyz_to_WGS84dms(m_nRoundX, m_nRoundY, m_nRoundZ, ref nLat, ref nLon, ref nHeight);
-            d_to_dms_decimal(nLat, ref nLatH, ref nLatM, ref nLatS, nDecimal);
-            d_to_dms_decimal(nLon, ref nLonH, ref nLonM, ref nLonS, nDecimal);
+            //d_to_dms_decimal(nLat, ref nLatH, ref nLatM, ref nLatS, nDecimal);
+            //d_to_dms_decimal(nLon, ref nLonH, ref nLonM, ref nLonS, nDecimal);
+            D_to_Dms_decimal(nLat, ref nLatH, ref nLatM, ref nLatS, nDecimal);
+            D_to_Dms_decimal(nLon, ref nLonH, ref nLonM, ref nLonS, nDecimal);
             GetAlt(nLat, nLon, nHeight, ref vAlt, sGeoidoPath);
         }
         //==========================================================================================
@@ -915,12 +986,14 @@ namespace SurvLine
             long nH = 0;
             long nM = 0;
             double nS = 0;
-            d_to_dms_decimal(nLat, ref nH, ref nM, ref nS, nDecimal);
-            nLat = dms_to_d(nH, nM, nS);
-            d_to_dms_decimal(nLon, ref nH, ref nM, ref nS, nDecimal);
-            nLon = dms_to_d(nH, nM, nS);
+            //d_to_dms_decimal(nLat, ref nH, ref nM, ref nS, nDecimal);
+            D_to_Dms_decimal(nLat, ref nH, ref nM, ref nS, nDecimal);
+            nLat = dms_to_d((int)nH, (int)nM, nS);
+            //d_to_dms_decimal(nLon, ref nH, ref nM, ref nS, nDecimal);
+            D_to_Dms_decimal(nLon, ref nH, ref nM, ref nS, nDecimal);
+            nLon = dms_to_d((int)nH, (int)nM, nS);
             double nZ = 0;
-            WGS84dms_to_JGDxyz(nCoordNum, nLat, nLon, 0, ref nX, ref nY, ref nZ);
+            WGS84dms_to_JGDxyz((int)nCoordNum, nLat, nLon, 0, ref nX, ref nY, ref nZ);
             GetAlt(nLat, nLon, nHeight, ref vAlt, sGeoidoPath);
         }
         //==========================================================================================
@@ -1015,6 +1088,13 @@ namespace SurvLine
         //==========================================================================================
 
 
+
+
+
+
+
+
+
         //***************************************************************************
         /// <summary>
         //'イベント
@@ -1038,9 +1118,11 @@ namespace SurvLine
         //End Sub
         private void Class_Initialize(ref GENBA_STRUCT_S Genba_S)
         {
-            //[VB]m_nCoordinateType = COORDINATE_XYZ
-            //(del)     Genba_S.CPXYZ_m_nCoordinateType = 0;        //23/12/20 K.Setoguchi
-            Genba_S.CPXYZ.m_nCoordinateType = 0;                    //23/12/20 K.Setoguchi
+            ////[VB]m_nCoordinateType = COORDINATE_XYZ
+            ////(del)     Genba_S.CPXYZ_m_nCoordinateType = 0;        //23/12/20 K.Setoguchi
+            //Genba_S.CPXYZ.m_nCoordinateType = 0;                    //23/12/20 K.Setoguchi
+            Genba_S.CPXYZ.m_nCoordinateType = (int)COORDINATE_TYPE.COORDINATE_XYZ;
+            m_nCoordinateType = (int)COORDINATE_TYPE.COORDINATE_XYZ;
         }
         //***************************************************************************
         //***************************************************************************
@@ -1113,14 +1195,17 @@ namespace SurvLine
             //[VB]  Get #nFile, , m_nRoundX                         0       -3796335.47
             //(del)     Genba_S.CPXYZ_m_nRoundX = br.ReadDouble();  //23/12/20 K.Setoguchi
             Genba_S.CPXYZ.m_nRoundX = br.ReadDouble();              //23/12/20 K.Setoguchi
+            m_nRoundX = Genba_S.CPXYZ.m_nRoundX;
             //-------------------------------------------
             //[VB]  Get #nFile, , m_nRoundY                         0       3572066.263
             //(del)     Genba_S.CPXYZ_m_nRoundY = br.ReadDouble();  //23/12/20 K.Setoguchi
             Genba_S.CPXYZ.m_nRoundY = br.ReadDouble();              //23/12/20 K.Setoguchi    
+            m_nRoundY = Genba_S.CPXYZ.m_nRoundY;
             //-------------------------------------------
             //[VB]  Get #nFile, , m_nRoundZ                         0       3663194.625
             //(del)     Genba_S.CPXYZ_m_nRoundZ = br.ReadDouble();  //23/12/20 K.Setoguchi
             Genba_S.CPXYZ.m_nRoundZ = br.ReadDouble();              //23/12/20 K.Setoguchi
+            m_nRoundZ = Genba_S.CPXYZ.m_nRoundZ;
             //-------------------------------------------
             if (nVersion < 6400)
             {
@@ -1128,25 +1213,31 @@ namespace SurvLine
                 //m_nX = m_nRoundX
                 //(del)     Genba_S.CPXYZ_m_nX = Genba_S.CPXYZ_m_nRoundX;   //23/12/20 K.Setoguchi
                 Genba_S.CPXYZ.m_nX = Genba_S.CPXYZ.m_nRoundX;               //23/12/20 K.Setoguchi
+                m_nX = Genba_S.CPXYZ.m_nRoundX;
                 //-------------------------------------------
                 //m_nY = m_nRoundY
                 //(del)     Genba_S.CPXYZ_m_nY = Genba_S.CPXYZ_m_nRoundX;   //23/12/20 K.Setoguchi
-                Genba_S.CPXYZ.m_nY = Genba_S.CPXYZ.m_nRoundX;               //23/12/20 K.Setoguchi
+                Genba_S.CPXYZ.m_nY = Genba_S.CPXYZ.m_nRoundY;               //23/12/20 K.Setoguchi
+                m_nY = Genba_S.CPXYZ.m_nRoundY;
                 //-------------------------------------------
                 //m_nZ = m_nRoundZ
                 //(del)     Genba_S.CPXYZ_m_nZ = Genba_S.CPXYZ_m_nRoundX;   //23/12/20 K.Setoguchi
-                Genba_S.CPXYZ.m_nZ = Genba_S.CPXYZ.m_nRoundX;               //23/12/20 K.Setoguchi
+                Genba_S.CPXYZ.m_nZ = Genba_S.CPXYZ.m_nRoundZ;               //23/12/20 K.Setoguchi
+                m_nZ = Genba_S.CPXYZ.m_nRoundZ;
 
 
 
                 //-------------------------------------------//23/12/20 K.Setoguchi
                 //[VB]      m_nRoundX = JpnRound(m_nX, ACCOUNT_DECIMAL_XYZ)                                             //23/12/20 K.Setoguchi
-                MdlUtility mdlUtility = new MdlUtility();                                                               //23/12/20 K.Setoguchi
-                Genba_S.CPXYZ.m_nRoundX = mdlUtility.JpnRound(Genba_S.CPXYZ.m_nX, MdlAccountMake.ACCOUNT_DECIMAL_XYZ);  //23/12/20 K.Setoguchi
+                //MdlUtility mdlUtility = new MdlUtility();                                                               //23/12/20 K.Setoguchi
+                Genba_S.CPXYZ.m_nRoundX = JpnRound(Genba_S.CPXYZ.m_nX, MdlAccountMake.ACCOUNT_DECIMAL_XYZ);  //23/12/20 K.Setoguchi
+                m_nRoundX = Genba_S.CPXYZ.m_nRoundX;
                 //[VB]      m_nRoundY = JpnRound(m_nY, ACCOUNT_DECIMAL_XYZ)     //23/12/20 K.Setoguchi                  //23/12/20 K.Setoguchi       
-                Genba_S.CPXYZ.m_nRoundY = mdlUtility.JpnRound(Genba_S.CPXYZ.m_nY, MdlAccountMake.ACCOUNT_DECIMAL_XYZ);  //23/12/20 K.Setoguchi
+                Genba_S.CPXYZ.m_nRoundY = JpnRound(Genba_S.CPXYZ.m_nY, MdlAccountMake.ACCOUNT_DECIMAL_XYZ);  //23/12/20 K.Setoguchi
+                m_nRoundY = Genba_S.CPXYZ.m_nRoundY;
                 //[VB]      m_nRoundZ = JpnRound(m_nZ, ACCOUNT_DECIMAL_XYZ)     //23/12/20 K.Setoguchi                  //23/12/20 K.Setoguchi
-                Genba_S.CPXYZ.m_nRoundZ = mdlUtility.JpnRound(Genba_S.CPXYZ.m_nZ, MdlAccountMake.ACCOUNT_DECIMAL_XYZ);  //23/12/20 K.Setoguchi
+                Genba_S.CPXYZ.m_nRoundZ = JpnRound(Genba_S.CPXYZ.m_nZ, MdlAccountMake.ACCOUNT_DECIMAL_XYZ);  //23/12/20 K.Setoguchi
+                m_nRoundZ = Genba_S.CPXYZ.m_nRoundZ;
                 //-------------------------------------------//23/12/20 K.Setoguchi
 
 
@@ -1159,13 +1250,16 @@ namespace SurvLine
                 //Get #nFile, , m_nX                                0 /-3796335.4701
                 //(del)     Genba_S.CPXYZ_m_nX = br.ReadDouble();           //23/12/20 K.Setoguchi
                 Genba_S.CPXYZ.m_nX = br.ReadDouble();                       //23/12/20 K.Setoguchi
+                m_nX = Genba_S.CPXYZ.m_nX;
                 //-------------------------------------------   
                 //Get #nFile, , m_nY                                0 /3572066.2631
                 //(del)     Genba_S.CPXYZ_m_nY = br.ReadDouble();           //23/12/20 K.Setoguchi
                 Genba_S.CPXYZ.m_nY = br.ReadDouble();                       //23/12/20 K.Setoguchi
+                m_nY = Genba_S.CPXYZ.m_nY;
                 //Get #nFile, , m_nZ                                0 /3663194.625 
                 //(del)     Genba_S.CPXYZ_m_nZ = br.ReadDouble();           //23/12/20 K.Setoguchi
                 Genba_S.CPXYZ.m_nZ = br.ReadDouble();                       //23/12/20 K.Setoguchi    
+                m_nZ = Genba_S.CPXYZ.m_nZ;
                 //-------------------------------------------
             }
         }
@@ -1190,7 +1284,6 @@ namespace SurvLine
         //End Sub
         //***************************************************************************
         //***************************************************************************
-
 
     }
 }

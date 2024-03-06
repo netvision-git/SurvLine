@@ -1,5 +1,4 @@
-﻿//24/01/04 K.setoguchi@NV---------->>>>>>>>>>
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,7 +9,7 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 namespace SurvLine
 {
-    internal class ChainList
+    public class ChainList
     {
         //==========================================================================================
         /*[VB]
@@ -42,8 +41,8 @@ namespace SurvLine
         public object Element;                  //'要素。
 
         //'インプリメンテーション
-        private ChainList m_clsPrevList;         //'リストの前。
-        private ChainList m_clsNextList;         //'リストの次。
+        private ChainList m_clsPrevList;        //'リストの前。
+        private ChainList m_clsNextList;        //'リストの次。
         //==========================================================================================
 
         //==========================================================================================
@@ -64,10 +63,10 @@ namespace SurvLine
 
         'リストの前。
         */
-        public ChainList PrevList(ChainList clsPrevList)
+        public void PrevList(ChainList clsPrevList)
         {
             m_clsPrevList = clsPrevList;
-            return this;
+            return;
         }
         //==========================================================================================
 
@@ -97,10 +96,10 @@ namespace SurvLine
         //------------------------------------------------------------------------------------------
         //[C#]
         //'リストの次。
-        public ChainList NextList(ChainList clsNextList)
+        public void NextList(ChainList clsNextList)
         {
             m_clsNextList = clsNextList;
-            return this;
+            return;
         }
         //==========================================================================================
 
@@ -135,11 +134,10 @@ namespace SurvLine
         //'リストの先頭。
         public ChainList HeadList()
         {
-            ChainList w_HeadList = (ChainList)Element;
-            ChainList clsPrevList = m_clsPrevList;
-            while (clsPrevList.NextList() != null)
+            ChainList w_HeadList = this;
+            while (w_HeadList.PrevList() != null)
             {
-                w_HeadList = clsPrevList.NextList();
+                w_HeadList = w_HeadList.PrevList();
             }
             return w_HeadList;
         }
@@ -160,11 +158,10 @@ namespace SurvLine
         //'リストの最後尾。
         public ChainList TailList()
         {
-            ChainList w_TailList = (ChainList)Element;
-            ChainList clsChainList = m_clsNextList;
-            while (clsChainList.NextList() != null)
+            ChainList w_TailList = this;
+            while (w_TailList.NextList() != null)
             {
-                w_TailList = clsChainList.NextList();
+                w_TailList = w_TailList.NextList();
             }
             return w_TailList;
         }
@@ -204,7 +201,7 @@ namespace SurvLine
             while (clsChainList != null)
             {
                 clsChainList = clsChainList.NextList();
-                w_FollowingCount++;
+                w_FollowingCount = w_FollowingCount + 1;
             }
 
             return w_FollowingCount;
@@ -273,15 +270,14 @@ namespace SurvLine
         */
         public ChainList InsertPrev(object objElement)
         {
-            ChainList w_clsPrevList = m_clsPrevList;
             ChainList clsChainList = new ChainList();
             clsChainList.Element = (ChainList)objElement;
             if (m_clsPrevList != null)
             {
-                _ = m_clsPrevList.NextList(clsChainList);
+                m_clsPrevList.NextList(clsChainList);
             }
-            _ = clsChainList.PrevList(m_clsPrevList);
-            _ = clsChainList.NextList((ChainList)Element);
+            clsChainList.PrevList(m_clsPrevList);
+            clsChainList.NextList(this);
             m_clsPrevList = clsChainList;
             return clsChainList;
         }
@@ -318,13 +314,13 @@ namespace SurvLine
         public ChainList InsertNext(object objElement)
         {
             ChainList clsChainList = new ChainList();
-            clsChainList.Element = (ChainList)objElement;
+            clsChainList.Element = objElement;
             if (m_clsNextList != null)
             {
-                _ = m_clsNextList.PrevList(clsChainList);
+                m_clsNextList.PrevList(clsChainList);
             }
-            _ = clsChainList.PrevList((ChainList)Element);
-            _ = clsChainList.NextList(m_clsNextList);
+            clsChainList.PrevList(this);
+            clsChainList.NextList(m_clsNextList);
             m_clsNextList = clsChainList;
             return clsChainList;
         }
@@ -352,11 +348,11 @@ namespace SurvLine
         {
             if (m_clsPrevList != null)
             {
-                _ = m_clsPrevList.NextList(m_clsNextList);
+                m_clsPrevList.NextList(m_clsNextList);
             }
             if (m_clsNextList != null)
             {
-                _ = m_clsNextList.PrevList(m_clsPrevList);
+                m_clsNextList.PrevList(m_clsPrevList);
             }
             Terminate();
         }
@@ -459,162 +455,5 @@ namespace SurvLine
         }
         //==========================================================================================
 
-#if false
-
-        //24/01/04 K.setoguchi@NV---------->>>>>>>>>>
-        //'*******************************************************************************
-        //'チェーンリスト
-        //'
-        //'オブジェクトのチェーンリスト。
-        //
-        //Option Explicit
-        //
-        //'プロパティ
-        public Object Element;          // As Object '要素。
-        //
-        //'インプリメンテーション
-        public ChainList m_clsPrevList; //As ChainList 'リストの前。
-        public ChainList m_clsNextList; //As ChainList 'リストの次。
-
-        //'*******************************************************************************
-        //'プロパティ
-        //
-        //***************************************************
-        //'リストの前。
-        //Property Set PrevList(ByVal clsPrevList As ChainList)
-        //    Set m_clsPrevList = clsPrevList
-        //End Property
-        //
-        //'リストの前。
-        //Property Get PrevList() As ChainList
-        //    Set PrevList = m_clsPrevList
-        //End Property
-        //-------------------------------
-        public ChainList PrevList
-        {
-            get{return m_clsPrevList; }
-            set{m_clsPrevList = value; }
-        }
-
-        //***************************************************
-        //'リストの次。
-        //Property Set NextList(ByVal clsNextList As ChainList)
-        //    Set m_clsNextList = clsNextList
-        //End Property
-        //
-        //'リストの次。
-        //Property Get NextList() As ChainList
-        //    Set NextList = m_clsNextList
-        //End Property
-        //
-        public ChainList NextList
-        {
-            set { m_clsPrevList = value; }
-            get { return m_clsPrevList; }
-        }
-
-        //***************************************************
-        //'リストの先頭。
-        //Property Get HeadList() As ChainList
-        //    Set HeadList = Me
-        //    Do While Not HeadList.PrevList Is Nothing
-        //        Set HeadList = HeadList.PrevList
-        //    Loop
-        //End Property
-        public ChainList HeadList
-        {
-            get
-            {
-                ChainList HeadList = this;
-                for (; ; )
-                {
-                    if (HeadList.PrevList != null)
-                    {
-                        HeadList = HeadList.PrevList;
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-                return HeadList;
-            }
-        }
-
-        //***************************************************
-        //'リストの最後尾。
-        //Property Get TailList() As ChainList
-        //    Set TailList = Me
-        //    Do While Not TailList.NextList Is Nothing
-        //        Set TailList = TailList.NextList
-        //    Loop
-        //End Property
-        //
-        private ChainList TailList
-        {
-            get
-            {
-                ChainList TailList = this;
-                for (; ; )
-                {
-                    if (TailList.NextList != null)
-                    {
-                        TailList = TailList.NextList;
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-                return TailList;
-            }
-        }
-
-        //***************************************************
-        //'後続要素数。
-        //Property Get FollowingCount() As Long
-        //
-        //    FollowingCount = 0
-        //
-        //
-        //    Dim clsChainList As ChainList
-        //    Set clsChainList = m_clsNextList
-        //
-        //
-        //    Do While Not clsChainList Is Nothing
-        //        Set clsChainList = clsChainList.NextList
-        //        FollowingCount = FollowingCount + 1
-        //    Loop
-        //
-        //End Property
-        //
-        private long FollowingCount
-        {
-            get
-            {
-                long FollowingCount = 0;
-                ChainList clsChainList;
-                clsChainList = m_clsNextList;
-
-                for (; ; )
-                {
-                    if (clsChainList != null)
-                    {
-                        clsChainList = clsChainList.NextList;
-                        FollowingCount += 1;
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-                return FollowingCount;
-            }
-        }
-
-        //<<<<<<<<<-----------24/01/04 K.setoguchi@NV
-#endif
-
     }
 }
-//<<<<<<<<<-----------24/01/04 K.setoguchi@NV

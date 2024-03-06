@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static SurvLine.mdl.DEFINE;
-using static SurvLine.MdlListPane;
+using static SurvLine.mdl.MdlListPane;
 using static System.Collections.Specialized.BitVector32;
 using static System.Net.WebRequestMethods;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
