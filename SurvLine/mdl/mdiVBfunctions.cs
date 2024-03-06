@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using static System.Collections.Specialized.BitVector32;
 using static System.Net.Mime.MediaTypeNames;
 
-namespace SurvLine
+namespace SurvLine.mdl
 {
     public class MdiVBfunctions
     {
@@ -20,15 +20,23 @@ namespace SurvLine
             return;
             throw new NotImplementedException();
         }
-
-        public long InStrRev(string target, string search, int stpot)
+        //====================================================================
+        public static long InStrRev(string target, string search, int stpot)
         {
             int pot;
             pot = target.IndexOf(search, stpot);
             return pot == -1 ? 0 : pot;
         }
+        public static long InStrRev(string target, string search)
+        {
+            int pot;
+            int stpot = 0;
+            pot = target.IndexOf(search, stpot);
+            return pot == -1 ? 0 : pot;
+        }
+        //====================================================================
 
-        public long InStr(int stpot, string target, string search)
+        public static long InStr(int stpot, string target, string search)
         {
             int pot;
             pot = target.IndexOf(search, stpot);

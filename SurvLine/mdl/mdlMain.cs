@@ -11,9 +11,9 @@ using System.IO;
 using SurvLine.mdl;
 using static SurvLine.mdl.MdlNSDefine;
 using static SurvLine.mdl.MdlNSSDefine;
+using static SurvLine.mdl.MdlBaseLineAnalyser;
 
-
-namespace SurvLine
+namespace SurvLine.mdl
 {
     public class MdlMain
     {
@@ -40,8 +40,7 @@ namespace SurvLine
 
         private Random rnd;
 
-        //private MdlMain mdlMain;
-
+        private MdlMain mdlMain;
         //==========================================================================================
 
         //==========================================================================================
@@ -91,7 +90,7 @@ namespace SurvLine
 
 
         ErrorHandler:
-            Call mdlMain.ErrorExit
+            Call ErrorExit
 
 
         End Sub
@@ -224,10 +223,23 @@ namespace SurvLine
         {
             if (m_clsDocument == null)
             {
-                m_clsDocument = new Document();
+                m_clsDocument = new Document(this);
+                //  m_clsDocument = new Document();
                 m_clsDocument.Class_Initialize();
             }
             return m_clsDocument;
+        }
+        //==========================================================================================
+
+        //==========================================================================================
+        //[C#]
+        /*
+        'Documentを破棄する。
+        */
+        public void Document_Dispose()
+        {
+            m_clsDocument.Clear();
+            m_clsDocument = null;
         }
         //==========================================================================================
 
@@ -243,11 +255,13 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
-        /*
-        'ファイルダイアログを取得する。
-        '
-        '戻り値：FileDialog オブジェクト。
-        */
+        /// <summary>
+        ///'ファイルダイアログを取得する。
+        /// 
+        /// </summary>
+        /// <returns>
+        ///     '戻り値：FileDialog オブジェクト。
+        /// </returns>
 #if false
         public FileDialog GetFileDialog()
         {

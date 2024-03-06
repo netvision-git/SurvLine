@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SurvLine.mdl;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -7,13 +8,18 @@ using System.Threading.Tasks;
 using static System.Collections.Specialized.BitVector32;
 using static System.Net.WebRequestMethods;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
+using static SurvLine.mdl.DEFINE;
+using static SurvLine.mdl.MdlNSDefine;
+using static SurvLine.mdl.MdlUtility;
+using static SurvLine.mdl.MdlAccountMake;
+using static SurvLine.mdl.MdlNSGUI;
+using static SurvLine.mdl.MdlNSSDefine;
+using static SurvLine.mdl.MdiVBfunctions;
 
 namespace SurvLine
 {
     internal class OutputParam
     {
-
-        MdlUtility mdlUtility = new MdlUtility();
 
         //'*******************************************************************************
         //'外部出力ファイル出力パラメータ
@@ -154,8 +160,8 @@ namespace SurvLine
         public void Save(BinaryWriter bw)
         {
 
-            mdlUtility.FileWrite_PutString(bw, Path);
-            mdlUtility.PutFileBool(bw, Automation);
+            FileWrite_PutString(bw, Path);
+            PutFileBool(bw, Automation);
             m_clsAccountParam.Save(bw);
         }
 

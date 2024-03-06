@@ -12,6 +12,10 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement.Rebar;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 using System.Windows.Forms;
 using System.Collections.ObjectModel;
+using static SurvLine.mdl.DEFINE;
+using static SurvLine.mdl.MdlNSDefine;
+using static SurvLine.mdl.MdlNSSDefine;
+using static SurvLine.mdl.MdlRegistAngle;
 
 namespace SurvLine
 {
@@ -40,6 +44,14 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        //==========================================================================================
+
+        //==========================================================================================
+        //[C#]
+        public RegistAngle()
+        {
+            Class_Initialize();
+        }
         //==========================================================================================
 
         //==========================================================================================
@@ -95,7 +107,7 @@ namespace SurvLine
         //------------------------------------------------------------------------------------------
         //[C#]
         //'プロパティ
-        public bool Ring;                           //'環フラグ。True=環閉合、False=電子基準点間閉合。
+        public bool Ring;                                       //'環フラグ。True=環閉合、False=電子基準点間閉合。
         //==========================================================================================
 
         //==========================================================================================
@@ -117,12 +129,7 @@ namespace SurvLine
         private ObservationPoint m_clsStartPoint;               //'スタート観測点(接合観測点)。
         private ChainList m_clsRegistHead = new ChainList();    //'登録オブジェクトリストのヘッダー。
         private ChainList m_clsCandidateHead = new ChainList(); //'候補オブジェクトリストのヘッダー。
-#if false
-        /*
-         *************************** 修正要 sakai
-         */
-        private Collection m_clsRegistVectors;                  //'登録基線ベクトルコレクション。要素は BaseLineVector オブジェクト。キーは要素のポインタ。
-#endif
+        private Dictionary<string, object> m_clsRegistVectors;  //'登録基線ベクトルコレクション。要素は BaseLineVector オブジェクト。キーは要素のポインタ。
         private long m_hHook;                                   //'フックハンドル。
         private bool m_bCompleted;                              //'閉合完成フラグ。
         private double m_nConnectDistance;                      //'繋がっていなくても接続と見なす距離(ｍ)。
@@ -146,7 +153,7 @@ namespace SurvLine
         
         '登録オブジェクトリスト。
         */
-        public object RegistList()
+        public ChainList RegistList()
         {
             return m_clsRegistHead.NextList();
         }
@@ -162,7 +169,7 @@ namespace SurvLine
         //------------------------------------------------------------------------------------------
         //[C#]
         //'候補オブジェクトリスト。
-        public object CandidateList()
+        public ChainList CandidateList()
         {
             return m_clsCandidateHead.NextList();
         }
@@ -223,7 +230,28 @@ namespace SurvLine
         */
         private void Class_Initialize()
         {
-            return;
+            try
+            {
+                m_hHook = 0;
+
+                string AppPath = System.IO.Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath);
+                string AppTitle = "NS-Survey";
+
+                if (GetPrivateProfileInt(PROFILE_SAVE_SEC_CHECKCONNECT, PROFILE_SAVE_KEY_ENABLE, (int)REGISTANGLE_DEF_CONNECTENABLE, AppPath + "\\" + AppTitle + PROFILE_SAVE_EXT) != 0)
+                {
+                    m_nConnectDistance = GetPrivateProfileInt(PROFILE_SAVE_SEC_CHECKCONNECT, PROFILE_SAVE_KEY_DISTANCE, (int)REGISTANGLE_DEF_CONNECTDISTANCE,
+                                    AppPath + "\\" + AppTitle + PROFILE_SAVE_EXT) / 100;
+                }
+                else
+                {
+                    m_nConnectDistance = -1;
+                }
+            }
+
+            catch (Exception)
+            {
+                return;
+            }
         }
         //==========================================================================================
 

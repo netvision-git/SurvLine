@@ -12,12 +12,18 @@ using System.Windows.Forms;
 using System.Xml.Linq;
 using System.IO;
 using System.Diagnostics.Eventing.Reader;
+using SurvLine.mdl;
+using static SurvLine.mdl.DEFINE;
+using static SurvLine.mdl.MdlNSDefine;
+using static SurvLine.mdl.MdlUtility;
+using static SurvLine.mdl.MdlAccountMake;
+using static SurvLine.mdl.MdlNSGUI;
+using static SurvLine.mdl.MdlNSSDefine;
 
 namespace SurvLine
 {
     internal class AngleDiff
     {
-        MdlUtility mdlUtility = new MdlUtility();
 
         //'*******************************************************************************
         //'閉合差
@@ -70,21 +76,21 @@ namespace SurvLine
             Number = clsAngleDiff.Number;
             Name = clsAngleDiff.Name;
             Ring = clsAngleDiff.Ring;
-        //    m_sRegistVectors = clsAngleDiff.RegistVectors;
+            //    m_sRegistVectors = clsAngleDiff.RegistVectors;
 
-        //    if (clsAngleDiff.AngleDiffResult != null){
-        //       m_clsAngleDiffResult = null;
-        //   }
-        //    else
-        //    {
-        //       if (m_clsAngleDiffResult != null){
-        //            m_clsAngleDiffResult = new AngleDiffResult();
-        //            m_clsAngleDiffResult = clsAngleDiff.AngleDiffResult;
-        //        }
-        //    }
-            for (int i = 0; i < m_bAccount.Count;i++)
+            //    if (clsAngleDiff.AngleDiffResult != null){
+            //       m_clsAngleDiffResult = null;
+            //   }
+            //    else
+            //    {
+            //       if (m_clsAngleDiffResult != null){
+            //            m_clsAngleDiffResult = new AngleDiffResult();
+            //            m_clsAngleDiffResult = clsAngleDiff.AngleDiffResult;
+            //        }
+            //    }
+            for (int i = 0; i < m_bAccount.Count; i++)
             {
-         //       m_bAccount[i] = clsAngleDiff.Account[i];
+                //       m_bAccount[i] = clsAngleDiff.Account[i];
             }
 
 
@@ -200,7 +206,7 @@ namespace SurvLine
         /// <param name="bAccount"></param>
         public void Account(long nIndex, bool bAccount)
         {
-            nIndex = 0;
+            //  nIndex = 0;
             m_bAccount[(int)nIndex] = bAccount;
         }
         //--------------------------------------------------------------------------------
@@ -257,7 +263,6 @@ namespace SurvLine
         /// <returns></returns>
         public KnownPoint KnownPoint()
         {
-            KnownPoint KnownPoint = m_clsKnownPoint;
             return m_clsKnownPoint;
         }
         //'既知点。
@@ -309,17 +314,17 @@ namespace SurvLine
         /// 
         /// </summary>
         /// <param name="bw"></param>
-        public void Save( BinaryWriter bw)
+        public void Save(BinaryWriter bw)
         {
 
-            mdlUtility.FileWrite_PutString(bw, Number); //    Call PutString(nFile, Number)
-            mdlUtility.FileWrite_PutString(bw, Name);   //    Call PutString(nFile, Name)
+            FileWrite_PutString(bw, Number); //    Call PutString(nFile, Number)
+            FileWrite_PutString(bw, Name);   //    Call PutString(nFile, Name)
 
             KnownPoint m_clsKnownPoint = new KnownPoint();
 
             m_clsKnownPoint.Save(bw);                   //    Call m_clsKnownPoint.Save(nFile)
 
-            mdlUtility.PutFileBool(bw, Ring);           //    Put #nFile, , Ring
+            PutFileBool(bw, Ring);           //    Put #nFile, , Ring
 
 
 

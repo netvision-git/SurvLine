@@ -15,12 +15,8 @@ using System.Net.NetworkInformation;
 using System.Net.Security;
 using static System.Windows.Forms.AxHost;
 using SurvLine.mdl;
+using static SurvLine.mdl.MdlUtility;
 using System.Drawing;
-using static SurvLine.mdl.MdiDefine;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.ToolTip;
-using System.Data.Common;
-using System.Security.Cryptography;
 
 namespace SurvLine
 {
@@ -28,10 +24,7 @@ namespace SurvLine
     public class ProjectFileManager
     {
 
-        //23/12/29 K.setoguchi@NV---------->>>>>>>>>>
         MdlUtility mdlUtility = new MdlUtility();
-
-
 
         //'*******************************************************************************
         //'プロジェクトファイル管理
@@ -54,7 +47,6 @@ namespace SurvLine
             COL_NUM_PROJECTLIST_COUNT,          //'番号数。
         }
 
-        //<<<<<<<<<-----------23/12/29 K.setoguchi@NV
 
         //==========================================================================================
         /*[VB]
@@ -88,8 +80,6 @@ namespace SurvLine
         private const int COL_WID_PROJECTLIST_FOLDER = 700 / 9;             //'現場リストカラム幅(Twips)、フォルダ。
         private const int COL_WID_PROJECTLIST_MDATE = 1500 / 9;             //'現場リストカラム幅(Twips)、最終更新日。
         private const int COL_WID_PROJECTLIST_CDATE = 1500 / 9;             //'現場リストカラム幅(Twips)、作成日。
-
-
         //***************************************************************************
         /// <summary>
         /// 現場リスト数を算出。
@@ -136,79 +126,6 @@ namespace SurvLine
             return listcount;
         }
 
-
-
-
-
-        //23/12/26 K.setoguchi@NV---------->>>>>>>>>>
-        //***************************************************************************
-        //***************************************************************************
-
-
-
-        //'*******************************************************************************
-        //'メソッド
-
-
-        //==========================================================================================
-        /*[VB]
-            'プロジェクトのリストを取得する。
-            '
-            '現在保存されているプロジェクトの一覧情報を取得する。
-            '
-            '引き数：
-            'sJobNames 現場名が設定される。配列の要素は(-1 To ...)、要素 -1 は未使用。
-            'sDistrictNames 地区名が設定される。配列の要素は(-1 To ...)、要素 -1 は未使用。
-            'sFolderNames フォルダ名が設定される。配列の要素は(-1 To ...)、要素 -1 は未使用。
-            'tModTime 更新日時が設定される。配列の要素は(-1 To ...)、要素 -1 は未使用。
-            'tCreateTime 作成日時が設定される。配列の要素は(-1 To ...)、要素 -1 は未使用。
-            Public Sub GetProjectList(ByRef sJobNames() As String, ByRef sDistrictNames() As String, ByRef sFolderNames() As String, ByRef tModTime() As Date, ByRef tCreateTime() As Date)
-
-                ReDim sJobNames(-1 To -1)
-                ReDim sDistrictNames(-1 To -1)
-                ReDim sFolderNames(-1 To -1)
-                ReDim tModTime(-1 To -1)
-                ReDim tCreateTime(-1 To -1)
-
-
-                Dim clsFind As New FileFind
-                Dim nUBound As Long
-                Dim sPath As String
-                Dim sJobName As String
-                Dim sDistrictName As String
-                Dim sFolderName As String
-                nUBound = -1
-                sPath = frmMain.UserDataPath  '2008/10/13 NGS Yamada
-            '    sPath = App.Path & DATA_FOLDER_NAME
-                If Not clsFind.FindFile(sPath & "*") Then Exit Sub
-
-                Do
-                    If(clsFind.Attributes And FILE_ATTRIBUTE_DIRECTORY) = 0 Then GoTo ContinueHandler
-                    sFolderName = clsFind.Name
-                    If IsDots(sFolderName) Then GoTo ContinueHandler
-                    If Not ReadInfo(sPath & sFolderName & "\" & DATA_FILE_NAME, sJobName, sDistrictName) Then GoTo ContinueHandler
-                    nUBound = nUBound + 1
-                    ReDim Preserve sJobNames(-1 To nUBound)
-                    ReDim Preserve sDistrictNames(-1 To nUBound)
-                    ReDim Preserve sFolderNames(-1 To nUBound)
-                    ReDim Preserve tModTime(-1 To nUBound)
-                    ReDim Preserve tCreateTime(-1 To nUBound)
-                    sJobNames(nUBound) = sJobName
-                    sDistrictNames(nUBound) = sDistrictName
-                    sFolderNames(nUBound) = sFolderName
-                    Dim clsFind2 As FileFind
-                    Set clsFind2 = New FileFind
-                    If clsFind2.FindFile(sPath & sFolderName & "\" & DATA_FILE_NAME) Then
-                        tModTime(nUBound) = clsFind2.LastWriteTime
-                        tCreateTime(nUBound) = clsFind2.CreationTime
-                    End If
-            ContinueHandler:
-                Loop While clsFind.FindNext()
-
-            End Sub
-            [VB]*/
-        //------------------------------------------------------------------------------------------
-        //[C#]
         //***************************************************************************
         /// <summary>
         /// 現場リスト情報を取得
@@ -304,7 +221,7 @@ namespace SurvLine
             string sDistrictName = "";
 
             //------------------------------------------
-            MdlUtility Utility = new MdlUtility();
+            //MdlUtility Utility = new MdlUtility();
 
 
             //******************************************************************
@@ -331,13 +248,13 @@ namespace SurvLine
 
                 //------------------------------------------
                 //[VB]  If IsDots(sFolderName) Then GoTo ContinueHandler
-                if (Utility.IsDots(sFolderName))
+                if (IsDots(sFolderName))
                 {
                     goto ContinueHandler;
                 }
                 //------------------------------------------
                 //[VB]      If Not ReadInfo(sPath &sFolderName & "\" & DATA_FILE_NAME, sJobName, sDistrictName) Then GoTo ContinueHandler
-                if (!(ReadInfo($"{sFolderName}\\{GENBA_CONST.DATA_FILE_NAME}", ref sJobName, ref sDistrictName)))
+                if (!ReadInfo($"{sFolderName}\\{GENBA_CONST.DATA_FILE_NAME}", ref sJobName, ref sDistrictName))
                 {
                     goto ContinueHandler;
                 }
@@ -469,7 +386,6 @@ namespace SurvLine
             } while (i < nUBound);
 
         }
-        //23/12/26 K.setoguchi@NV---------->>>>>>>>>>
         /// <summary>
         /// 'メソッド
         ///
@@ -563,13 +479,13 @@ namespace SurvLine
 
                 //------------------------------------------
                 //[VB]  If IsDots(sFolderName) Then GoTo ContinueHandler
-                if (Utility.IsDots(sFolderName))
+                if (IsDots(sFolderName))
                 {
                     goto ContinueHandler2;
                 }
                 //------------------------------------------
                 //[VB]      If Not ReadInfo(sPath &sFolderName & "\" & DATA_FILE_NAME, sJobName, sDistrictName) Then GoTo ContinueHandler
-                if (!(ReadInfo($"{sFolderName}\\{GENBA_CONST.DATA_FILE_NAME}", ref sJobName, ref sDistrictName)))
+                if (!ReadInfo($"{sFolderName}\\{GENBA_CONST.DATA_FILE_NAME}", ref sJobName, ref sDistrictName))
                 {
                     goto ContinueHandler2;
                 }
@@ -618,16 +534,6 @@ namespace SurvLine
             }
 
         }
-
-
-
-
-
-
-
-        //***************************************************************************
-        //***************************************************************************
-        //<<<<<<<<<-----------23/12/26 K.setoguchi@NV
 
         //***************************************************************************
         //==========================================================================================
@@ -684,11 +590,11 @@ namespace SurvLine
             //[VB]'    sDataFolderPath = App.Path & DATA_FOLDER_NAME
             //[VB]    Call CreateDir(sDataFolderPath, True)
             string sDataFolderPath;
-            //frmMain2 frmMain2 = new frmMain2(); 
-            //sDataFolderPath = frmMain2.UserDataPath;  //'2008/10/13 NGS Yamada
+            //  frmMain2 frmMain2 = new frmMain2(); 
+            //  sDataFolderPath = frmMain2.UserDataPath;  //'2008/10/13 NGS Yamada
             sDataFolderPath = @"C:\Develop\NetSurv\Src\NS-App\NS-Survey\UserData\";
 
-            MdlUtility mdlUtility = new MdlUtility();
+            //  MdlUtility mdlUtility = new MdlUtility();
             mdlUtility.CreateDir(sDataFolderPath, true);
 
 
@@ -715,12 +621,6 @@ namespace SurvLine
             }
             return CreateProjectFolder;
         }
-
-        //23/12/29 K.setoguchi@NV---------->>>>>>>>>>
-        //***************************************************************************
-
-
-
 
         //==========================================================================================
         /*[VB]
@@ -751,16 +651,9 @@ namespace SurvLine
         {
             string UserDataPath = @"C:\Develop\NetSurv\Src\NS-App\NS-Survey\UserData\";
 
-            mdlUtility.DeleteDir($"{UserDataPath}{sFolderName}{MdlNSSDefine.OBSPOINT_PATH}", true);
-            mdlUtility.DeleteDir($"{UserDataPath}{sFolderName}", true);
+            DeleteDir($"{UserDataPath}{sFolderName}{MdlNSSDefine.OBSPOINT_PATH}", true);
+            DeleteDir($"{UserDataPath}{sFolderName}", true);
         }
-
-
-
-        //24/01/28 K.setoguchi@NV---------->>>>>>>>>>
-        //<<<<<<<<<-----------24/01/28 K.setoguchi@NV
-        //***************************************************************************
-        //***************************************************************************
 
         //==========================================================================================
         /*[VB]
@@ -905,7 +798,7 @@ namespace SurvLine
             //'既存の現場名。
             List<string> sJobNames = new List<string>();
             List<string> sDistrictNames = new List<string>();
-            List<string> sFolderNames = new List<string>(); 
+            List<string> sFolderNames = new List<string>();
             List<DateTime> tModTime = new List<DateTime>();
             List<DateTime> tCreateTime = new List<DateTime>(); ;
             GetProjectList(ref sJobNames, ref sDistrictNames, ref sFolderNames, ref tModTime, ref tCreateTime);
@@ -931,7 +824,7 @@ namespace SurvLine
 
                 //'テンポラリフォルダを空にする。
                 string App_Path = @"C:\Develop\NetSurv\Src\NS-App\NS-Survey";
-                bool bDMY = mdlUtility.EmptyDir($"{App_Path}{MdlNSDefine.TEMPORARY_PATH}{MdlNSSDefine.NSCAB_PATH}", false); //"C:\Develop\NetSurv\Src\NS-App\NS-Survey\Temp\NSCAB\"
+                bool bDMY = EmptyDir($"{App_Path}{MdlNSDefine.TEMPORARY_PATH}{MdlNSSDefine.NSCAB_PATH}", false); //"C:\Develop\NetSurv\Src\NS-App\NS-Survey\Temp\NSCAB\"
 
 
                 //'プログレス。
@@ -1005,9 +898,6 @@ namespace SurvLine
 
 
         }
-
-
-
         //==========================================================================================
         /*[VB]
             'プロジェクトフォルダをエクスポートする。
@@ -1086,8 +976,6 @@ namespace SurvLine
 
         }
 
-
-
         //==========================================================================================
         /*[VB]
             'プロジェクトフォルダをエクスポートする。
@@ -1131,13 +1019,6 @@ namespace SurvLine
             }
 
         }
-
-
-
-
-        //<<<<<<<<<-----------24/01/28 K.setoguchi@NV
-        //***************************************************************************
-        //***************************************************************************
 
         //==========================================================================================
         /*[VB]
@@ -1350,7 +1231,7 @@ namespace SurvLine
             List<DateTime> tModTime = new List<DateTime>(); ;       //Dim tModTime() As Date
             List<DateTime> tCreateTime = new List<DateTime>(); ;    //Dim tCreateTime() As Date
 
-            GetProjectList(ref sJobNames,  ref sDistrictNames, ref sFolderNames, ref tModTime, ref tCreateTime);
+            GetProjectList(ref sJobNames, ref sDistrictNames, ref sFolderNames, ref tModTime, ref tCreateTime);
 
 
             //--------------------------
@@ -1379,13 +1260,6 @@ namespace SurvLine
             }
 
         }
-        //***************************************************************************
-        //***************************************************************************
-        //***************************************************************************
-
-
-        //23/12/29 K.setoguchi@NV---------->>>>>>>>>>
-        //***************************************************************************
 
         //==========================================================================================
         /*[VB]
@@ -1481,10 +1355,6 @@ namespace SurvLine
             return CheckJobName;
         }
 
-
-        //24/01/28 K.setoguchi@NV---------->>>>>>>>>>
-        //***************************************************************************
-
         //==========================================================================================
         /*[VB]
             '現場名、地区名を取得する。
@@ -1522,12 +1392,6 @@ namespace SurvLine
         }
 
 
-        //<<<<<<<<<-----------24/01/28 K.setoguchi@NV
-        //***************************************************************************
-
-        //'*******************************************************************************
-        //'インプリメンテーション
-
 
         //==========================================================================================
         /*[VB]
@@ -1559,6 +1423,7 @@ namespace SurvLine
         //------------------------------------------------------------------------------------------
         //[C#]
         //***************************************************************************
+        //***************************************************************************
         /// <summary>
         /// 現場名、地区名をファイルから取得する。
         //  '引き数：
@@ -1578,7 +1443,7 @@ namespace SurvLine
         {
             bool ReadInfo = false;
             long nVersion;
-            MdlUtility Utility = new MdlUtility();
+            //MdlUtility Utility = new MdlUtility();
 
             using (var fs = System.IO.File.OpenRead($"{sPath}"))
             {
@@ -1593,12 +1458,12 @@ namespace SurvLine
                     //******************************************
                     //  現場名をグローバル領域に設定
                     //******************************************
-                    sJobName = Utility.FileRead_GetString(br);
+                    sJobName = FileRead_GetString(br);
 
                     //******************************************
                     //  地区名をグローバル領域に設定
                     //******************************************
-                    sDistrictName = Utility.FileRead_GetString(br);
+                    sDistrictName = FileRead_GetString(br);
 
                 }
                 fs.Close();
@@ -1727,6 +1592,7 @@ namespace SurvLine
             }
         }
         //==========================================================================================
+
 
 
     }

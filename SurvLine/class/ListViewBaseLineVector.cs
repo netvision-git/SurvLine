@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SurvLine.mdl;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data.Common;
@@ -6,14 +7,20 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using static SurvLine.MdlListPane;
+using static SurvLine.mdl.MdlListPane;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
+using static SurvLine.mdl.DEFINE;
+using static SurvLine.mdl.MdlNSDefine;
+using static SurvLine.mdl.MdlUtility;
+using static SurvLine.mdl.MdlAccountMake;
+using static SurvLine.mdl.MdlNSGUI;
+using static SurvLine.mdl.MdlNSSDefine;
+
 
 namespace SurvLine
 {
     internal class ListViewBaseLineVector : ListViewInterface
     {
-        MdlUtility mdlUtility = new MdlUtility();
 
 
         //'*******************************************************************************
@@ -266,7 +273,7 @@ namespace SurvLine
 
 
 
-            ListViewInterface_IsCheck = mdlUtility.LookupCollectionVariant(objCheckObjects, ref vItem, sKey);
+            ListViewInterface_IsCheck = LookupCollectionVariant(objCheckObjects, ref vItem, sKey);
 
 
             return ListViewInterface_IsCheck;

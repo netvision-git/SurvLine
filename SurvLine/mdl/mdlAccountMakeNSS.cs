@@ -9,10 +9,10 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 using System.Windows.Forms;
 using System.Xml.Linq;
 using System.Runtime.CompilerServices;
-using static SurvLine.MdlAccountMake;
+using static SurvLine.mdl.MdlAccountMake;
 using static SurvLine.mdl.MdlNSDefine;
 
-namespace SurvLine
+namespace SurvLine.mdl
 {
     internal class MdlAccountMakeNSS
     {
