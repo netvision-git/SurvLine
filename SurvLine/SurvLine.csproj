@@ -143,6 +143,30 @@
     <Compile Include="frmAccountInfo.Designer.cs">
       <DependentUpon>frmAccountInfo.cs</DependentUpon>
     </Compile>
+    <Compile Include="frmAttribute.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmAttribute.Designer.cs">
+      <DependentUpon>frmAttribute.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmAttributeCommon.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmAttributeCommon.Designer.cs">
+      <DependentUpon>frmAttributeCommon.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmCombination.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmCombination.Designer.cs">
+      <DependentUpon>frmCombination.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmEccentricCorrection.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmEccentricCorrection.Designer.cs">
+      <DependentUpon>frmEccentricCorrection.cs</DependentUpon>
+    </Compile>
     <Compile Include="frmFileDialog.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -191,6 +215,12 @@
     <Compile Include="frmProgressDialog2.Designer.cs">
       <DependentUpon>frmProgressDialog2.cs</DependentUpon>
     </Compile>
+    <Compile Include="frmSession.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmSession.Designer.cs">
+      <DependentUpon>frmSession.cs</DependentUpon>
+    </Compile>
     <Compile Include="mdl\mdiVBfunctions.cs" />
     <Compile Include="mdl\mdlAccountMake.cs" />
     <Compile Include="mdl\mdlAccountMakeNSS.cs" />
@@ -227,6 +257,7 @@
     <Compile Include="pmemo.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Settings.cs" />
     <Compile Include="user\PlotPane.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -241,6 +272,18 @@
     </Compile>
     <EmbeddedResource Include="frmAccountInfo.resx">
       <DependentUpon>frmAccountInfo.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmAttribute.resx">
+      <DependentUpon>frmAttribute.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmAttributeCommon.resx">
+      <DependentUpon>frmAttributeCommon.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmCombination.resx">
+      <DependentUpon>frmCombination.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmEccentricCorrection.resx">
+      <DependentUpon>frmEccentricCorrection.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmFileDialog.resx">
       <DependentUpon>frmFileDialog.cs</DependentUpon>
@@ -266,6 +309,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="frmProgressDialog2.resx">
       <DependentUpon>frmProgressDialog2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmSession.resx">
+      <DependentUpon>frmSession.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

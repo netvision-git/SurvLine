@@ -1998,7 +1998,7 @@ namespace SurvLine.mdl
         '座標が正常である場合 True を返す。
         'それ以外の場合 False を返す。
         */
-        public bool CheckCoordDMS(double nLat, double nLon, double nHeight)
+        public static bool CheckCoordDMS(double nLat, double nLon, double nHeight)
         {
             try
             {
@@ -2053,7 +2053,8 @@ namespace SurvLine.mdl
         '座標が正常である場合 True を返す。
         'それ以外の場合 False を返す。
         */
-        public bool CheckCoordXYZ(double nX, double nY, double nZ)
+        //public bool CheckCoordXYZ(double nX, double nY, double nZ)
+        public static bool CheckCoordXYZ(double nX, double nY, double nZ)
         {
             double nLat = 0;
             double nLon = 0;

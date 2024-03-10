@@ -157,7 +157,7 @@ namespace SurvLine
             SplitPath(sPath, ref sDrive, ref sDir, ref sTitle, ref sExt);
 
             byte[] nCode;
-            nCode = mdiVBfunctions.StrConv($"{sTitle}{sExt}", DEFINE.vbFromUnicode);
+            nCode = StrConv($"{sTitle}{sExt}", DEFINE.vbFromUnicode);
 
             if (nCode.Length >= 60)
             {
@@ -637,7 +637,7 @@ namespace SurvLine
 
                 //'拡張子は３文字。
                 byte[] bExt = new byte[sExt.Length];
-                bExt = mdiVBfunctions.StrConv(sExt, DEFINE.vbUpperCase);
+                bExt = StrConv(sExt, DEFINE.vbUpperCase);
                 sExt = bExt.ToString();
                 if (sExt.Length != 4)
                 {
@@ -648,7 +648,7 @@ namespace SurvLine
                 }
                 //'年の評価。
                 byte[] nCode = new byte[sExt.Length];
-                nCode = mdiVBfunctions.StrConv(sExt, DEFINE.vbFromUnicode);
+                nCode = StrConv(sExt, DEFINE.vbFromUnicode);
 
                 if (nCode[0] != 0x2E)
                 {
@@ -720,7 +720,7 @@ namespace SurvLine
 
                 byte[] bKey = new byte[sExt.Length];
                 string sKey = "";
-                bKey = mdiVBfunctions.StrConv($"{sDrive}{sDir}{sTitle}{mdiVBfunctions.Left(sExt, 3)}\\", DEFINE.vbUpperCase);
+                bKey = StrConv($"{sDrive}{sDir}{sTitle}{mdiVBfunctions.Left(sExt, 3)}\\", DEFINE.vbUpperCase);
                 sKey = bKey.ToString();
 
                 string vItem = "";   // As Variant
@@ -773,7 +773,7 @@ namespace SurvLine
                     sTitle = mdiVBfunctions.Left(vItem, vItem.Length - 1);
                     //'検索するファイル。
                     byte[] bKey2 = new byte[sTitle.Length];
-                    bKey2 = mdiVBfunctions.StrConv(sTitle, DEFINE.vbUpperCase);
+                    bKey2 = StrConv(sTitle, DEFINE.vbUpperCase);
                     sKey = bKey2.ToString();
                     //'検索。
                     if (System.IO.File.Exists($"{sKey}{MdlRINEXTYPE.RNX_MIX_EXTENSION}"))
@@ -917,7 +917,7 @@ namespace SurvLine
                         }
                         //'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
                         byte[] bKey2 = new byte[sTitle.Length];
-                        bKey2 = mdiVBfunctions.StrConv(sTitle, DEFINE.vbUpperCase);
+                        bKey2 = StrConv(sTitle, DEFINE.vbUpperCase);
                         sKey = bKey2.ToString();
                         //'G検索。
                         //      Set clsFind = New FileFind

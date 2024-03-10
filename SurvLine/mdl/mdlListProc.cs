@@ -298,5 +298,44 @@ namespace SurvLine.mdl
 
         }
         //==========================================================================================
+        /*
+        '観測点リストを再作成する。
+        '
+        'リストの行を設定する。
+        '
+        '引き数：
+        'nList リスト種別。
+        'grdFlexGrid リストコントロール。
+        'objMap 要素マップ。要素はオブジェクト。キーは要素のポインタ(リストの RowData に設定する)。
+        */
+        public object SelectedElement_ObsPnt(long nList, DataGridView grdFlexGrid, ref Dictionary<string, object> objMap)
+        {
+            object[] objElements = new object[m_clsMdlMain.GetDocument().NetworkModel().RepresentPointCount()];
+
+            int nRows;
+            nRows = 0;
+            ChainList clsChainList;
+            clsChainList = m_clsMdlMain.GetDocument().NetworkModel().RepresentPointHead();
+
+            while (clsChainList != null)
+            {
+                if (grdFlexGrid.CurrentRow != null)         //選択の有無
+                {
+                    objElements[nRows] = clsChainList.Element;
+
+                    //if (nRows == grdFlexGrid.Rows[nRows].Index)
+                    if (nRows == 0)
+                    {
+                        return objElements[nRows];
+                    }
+                    nRows++;
+                    clsChainList = clsChainList.NextList();
+                }
+            }
+            return objElements[nRows];
+
+        }
+
+
     }
 }

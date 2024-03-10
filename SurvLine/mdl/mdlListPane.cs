@@ -2409,5 +2409,51 @@ namespace SurvLine.mdl
         }
         //==========================================================================================
 
+
+        //24/03/07(--)編集メニュー K.setoguchi@NV---------->>>>>>>>>>
+        //新規
+        /// <summary>
+        ///  編集＞観測点情報の編集
+        /// 
+        /// nList 0=観測点データ
+        /// リストの行を設定する。
+        /// リストの初期化は MakeList 関係のメソッド。
+        ///'
+        /// 引き数：
+        /// nList 観測点種別。
+        //  'grdFlexGrid リストコントロール。
+        //  'objMap 要素マップ。要素はオブジェクト。キーは要素のポインタ(リストの RowData に設定されている)。
+        /// </summary>
+        /// <param name="nList"></param>
+        /// <param name="grdFlexGrid"></param>
+        /// <param name="objMap"></param>
+        public object SelectedElement(long nList, DataGridView grdFlexGrid, ref Dictionary<string, object> objMap)
+        {
+
+            object SelectedElement = null;
+
+            if (nList == (long)LIST_NUM_PANE.LIST_NUM_OBSPNT)
+            {
+                //'観測点。
+                SelectedElement = m_clsMdlListProc.SelectedElement_ObsPnt(nList, grdFlexGrid, ref objMap);
+
+            }
+            else if (nList == (long)LIST_NUM_PANE.LIST_NUM_VECTOR)
+            {
+                //'ベクトル。
+                m_clsMdlListProc.RemakeListVector(nList, grdFlexGrid, ref objMap);
+            }
+            else
+            {
+                //'座標。
+
+            }
+            return SelectedElement;
+
+
+        }
+        //<<<<<<<<<-----------24/03/07(--)編集メニュー K.setoguchi@NV
+
+
     }
 }
