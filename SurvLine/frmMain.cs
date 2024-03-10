@@ -19,6 +19,10 @@ using static SurvLine.mdl.DEFINE;
 using static SurvLine.mdl.MdlMain;
 using static SurvLine.mdl.MdlNSDefine;
 using static SurvLine.mdl.MdlAccountMakeNSS;
+using static SurvLine.mdl.MdlListPane;
+using static SurvLine.mdl.MdlBaseLineAnalyser;
+using Microsoft.VisualBasic.Logging;
+using System.Xml.Linq;
 
 namespace SurvLine
 {
@@ -3510,6 +3514,1487 @@ namespace SurvLine
         {
 
         }
+
+        //************************************************************************************
+        //************************************************************************************
+        //************************************************************************************
+
+
+        //1==========================================================================================
+        /*[VB]
+            '観測点の共通属性を編集する。
+            Private Sub mnuEditAttributeCommon_Click()
+
+                On Error GoTo ErrorHandler
+    
+                '属性の編集。
+                Dim clsObservationPoint As ObservationPoint
+                Set clsObservationPoint = objListPane.SelectedElement(LIST_NUM_OBSPNT)
+                If Not EditAttributeCommon(clsObservationPoint) Then Exit Sub
+    
+                '砂時計。
+                Dim clsWaitCursor As New WaitCursor
+                Set clsWaitCursor.Object = Me
+    
+                '再描画抑制。
+                Dim clsCtrlValue As New CtrlValue
+                Call clsCtrlValue.SetObject(m_clsChangeSelRow, False)
+    
+                'スクロールはしないようにする。
+                objListPane.RowLock = True
+                '汎用作業キーを利用して、設定が変更された観測点を記憶する。
+                Call m_clsDocument.NetworkModel.ClearIsList
+                If clsObservationPoint.Eccentric Then clsObservationPoint.CorrectPoint.TopParentPoint.IsList = True
+                Set clsObservationPoint = clsObservationPoint.HeadPoint
+                Do While Not clsObservationPoint Is Nothing
+                    clsObservationPoint.IsList = True
+                    Dim clsBaseLineVectors() As BaseLineVector
+                    ReDim clsBaseLineVectors(-1 To -1)
+                    Call m_clsDocument.NetworkModel.GetConnectBaseLineVectors(clsObservationPoint, clsBaseLineVectors)
+                    Dim i As Long
+                    For i = 0 To UBound(clsBaseLineVectors)
+                        clsBaseLineVectors(i).IsList = True
+                    Next
+                    Set clsObservationPoint = clsObservationPoint.NextPoint
+                Loop
+                'リストの更新。
+                Call objListPane.UpdateRowIsList
+                 'スクロールを元に戻す。
+                objListPane.RowLock = False
+    
+                'プロットの再描画。
+                Call objPlotPane.UpdateLogicalDrawArea(False)
+                Call objPlotPane.Redraw
+    
+                'メニューの更新。
+                Call clsCtrlValue.Back
+                Call objListPane_ChangeSelRow(objListPane.List)
+    
+                Call clsWaitCursor.Back
+    
+                Exit Sub
+    
+            ErrorHandler:
+                Call mdlMain.ErrorExit
+    
+            End Sub
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        /// <summary>
+        /// 編集＞観測点情報の編集
+        /// 
+        /// '観測点の共通属性を編集する。
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void mnuEditAttributeCommon_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                //On Error GoTo ErrorHandler
+
+                //'属性の編集。
+                ObservationPoint clsObservationPoint;
+                clsObservationPoint = (ObservationPoint)objListPane.SelectedElement((long)LIST_NUM_PANE.LIST_NUM_OBSPNT);
+                if (!EditAttributeCommon(clsObservationPoint))
+                {
+                    Cursor = Cursors.Default;
+                    return;
+                }
+
+                //'砂時計。
+                Cursor = Cursors.WaitCursor;
+
+                //'再描画抑制。
+                CtrlValue clsCtrlValue = new CtrlValue();
+                clsCtrlValue.SetObject(m_clsChangeSelRow, false);
+
+#if false
+                //'スクロールはしないようにする。
+                objListPane.RowLock = true;
+                '汎用作業キーを利用して、設定が変更された観測点を記憶する。
+                Call m_clsDocument.NetworkModel.ClearIsList
+                If clsObservationPoint.Eccentric Then clsObservationPoint.CorrectPoint.TopParentPoint.IsList = True
+                Set clsObservationPoint = clsObservationPoint.HeadPoint
+                Do While Not clsObservationPoint Is Nothing
+                    clsObservationPoint.IsList = True
+                    Dim clsBaseLineVectors() As BaseLineVector
+                    ReDim clsBaseLineVectors(-1 To - 1)
+                    Call m_clsDocument.NetworkModel.GetConnectBaseLineVectors(clsObservationPoint, clsBaseLineVectors)
+                    Dim i As Long
+                    For i = 0 To UBound(clsBaseLineVectors)
+                        clsBaseLineVectors(i).IsList = True
+                    Next
+                    Set clsObservationPoint = clsObservationPoint.NextPoint
+                Loop
+#endif
+
+                //'リストの更新。
+                //  Call objListPane.UpdateRowIsList
+                //'スクロールを元に戻す。
+                //  objListPane.RowLock = False
+
+
+                //'プロットの再描画。
+                //  Call objPlotPane.UpdateLogicalDrawArea(False)
+                //  Call objPlotPane.Redraw
+
+
+                //'メニューの更新。
+                //  Call clsCtrlValue.Back
+                //  Call objListPane_ChangeSelRow(objListPane.List)
+
+
+                Cursor = Cursors.Default;
+
+
+            }
+            catch (Exception ex)
+            {
+                //    Call mdlMain.ErrorExit
+                MessageBox.Show(ex.Message, "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
+
+        }
+        //1==========================================================================================
+        /*[VB]
+             '観測点の属性を編集する。
+            Private Sub mnuEditAttribute_Click()
+
+                On Error GoTo ErrorHandler
+    
+                Dim clsObservationPoint As ObservationPoint
+                Set clsObservationPoint = objListPane.SelectedElement(LIST_NUM_OBSPNT)
+    
+                '汎用作業キーを利用して、設定が変更された観測点を記憶する。
+                Call m_clsDocument.NetworkModel.ClearIsList
+                clsObservationPoint.IsList = True
+    
+                Dim clsBaseLineVectors() As BaseLineVector
+                ReDim clsBaseLineVectors(-1 To -1)
+                Call GetDocument().NetworkModel.GetConnectBaseLineVectors(clsObservationPoint, clsBaseLineVectors)
+                Dim bAnalysis As Boolean '解析済か？
+                Dim i As Long
+                For i = 0 To UBound(clsBaseLineVectors)
+                    If clsBaseLineVectors(i).Analysis <= ANALYSIS_STATUS_FIX Then
+                        '解析削除あり。
+                        bAnalysis = True
+                        '偏心補正の再計算の有無にかかわらず更新する。方位票の評価にはコストがかかる。
+                        If clsBaseLineVectors(i).StrPoint.Number = clsObservationPoint.Number Then
+                            Call GetDocument().NetworkModel.SetConnectBaseLineVectorsIsListEx(clsBaseLineVectors(i).EndPoint)
+                        Else
+                            Call GetDocument().NetworkModel.SetConnectBaseLineVectorsIsListEx(clsBaseLineVectors(i).StrPoint)
+                        End If
+                    End If
+                Next
+                Call GetDocument().NetworkModel.SetConnectBaseLineVectorsIsListEx(clsObservationPoint)
+    
+                '属性の編集。
+                If Not EditAttribute(clsObservationPoint, bAnalysis) Then Exit Sub
+    
+                '砂時計。
+                Dim clsWaitCursor As New WaitCursor
+                Set clsWaitCursor.Object = Me
+    
+                '再描画抑制。
+                Dim clsCtrlValue As New CtrlValue
+                Call clsCtrlValue.SetObject(m_clsChangeSelRow, False)
+    
+                'スクロールはしないようにする。
+                objListPane.RowLock = True
+                'リストの更新。
+                Call objListPane.UpdateRowIsList
+                 'スクロールを元に戻す。
+                objListPane.RowLock = False
+    
+                'プロットの再描画。
+                Call objPlotPane.UpdateLogicalDrawArea(False)
+                Call objPlotPane.Redraw
+    
+                'メニューの更新。
+                Call clsCtrlValue.Back
+                Call objListPane_ChangeSelRow(objListPane.List)
+    
+                Call clsWaitCursor.Back
+    
+                Exit Sub
+    
+            ErrorHandler:
+                Call mdlMain.ErrorExit
+
+            End Sub
+           [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //
+        /// <summary>
+        /// 編集＞観測点データの編集
+        ///
+        /// '観測点の属性を編集する。
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void mnuEditAttribute_Click(object sender, EventArgs e)
+        {
+            try
+            {
+
+                ObservationPoint clsObservationPoint;
+
+                clsObservationPoint = (ObservationPoint)objListPane.SelectedElement((long)LIST_NUM_PANE.LIST_NUM_OBSPNT);
+
+
+#if false
+                //'汎用作業キーを利用して、設定が変更された観測点を記憶する。
+                m_clsDocument.NetworkModel.ClearIsList;
+                clsObservationPoint.IsList(true);
+                List<BaseLineVector> clsBaseLineVectors = new List<BaseLineVector>();
+                clsBaseLineVectors.Clear();
+
+                Call GetDocument().NetworkModel.GetConnectBaseLineVectors(clsObservationPoint, clsBaseLineVectors)
+#endif
+                bool bAnalysis = false;     //'解析済か？
+#if false
+                long i;
+                for (i = 0; i < clsBaseLineVectors.Count; i++)
+                {
+                    if (clsBaseLineVectors[(int)i].Analysis <= ANALYSIS_STATUS.ANALYSIS_STATUS_FIX)
+                    {
+                        //'解析削除あり。
+                        bAnalysis = true;
+                        //'偏心補正の再計算の有無にかかわらず更新する。方位票の評価にはコストがかかる。
+                        if (clsBaseLineVectors[(int)i].StrPoint.Number = clsObservationPoint.Number)
+                        {
+                            //  Call GetDocument().NetworkModel.SetConnectBaseLineVectorsIsListEx(clsBaseLineVectors(i).EndPoint)
+                        }
+                        else
+                        {
+                            //Call GetDocument().NetworkModel.SetConnectBaseLineVectorsIsListEx(clsBaseLineVectors(i).StrPoint)
+                        }
+
+                    }
+
+                }
+
+                Call GetDocument().NetworkModel.SetConnectBaseLineVectorsIsListEx(clsObservationPoint)
+#endif
+
+                //'属性の編集。
+                if (!EditAttribute(clsObservationPoint, bAnalysis))
+                {
+                    Cursor = Cursors.Default;
+                    return;
+                }
+
+
+                //'砂時計。
+                Cursor = Cursors.WaitCursor;
+
+                //'再描画抑制。
+                CtrlValue clsCtrlValue = new CtrlValue();
+                clsCtrlValue.SetObject(m_clsChangeSelRow, false);
+
+
+
+                //'スクロールはしないようにする。
+                //      objListPane.RowLock = True
+                //'リストの更新。
+                //      Call objListPane.UpdateRowIsList
+                // 'スクロールを元に戻す。
+                //      objListPane.RowLock = False
+
+
+                //'プロットの再描画。
+                //      Call objPlotPane.UpdateLogicalDrawArea(False)
+                //      Call objPlotPane.Redraw
+
+
+                //'メニューの更新。
+                //      Call clsCtrlValue.Back
+                //      Call objListPane_ChangeSelRow(objListPane.List)
+
+
+                Cursor = Cursors.Default;
+
+
+            }
+            catch (Exception ex)
+            {
+                //    Call mdlMain.ErrorExit
+                MessageBox.Show(ex.Message, "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+        //1==========================================================================================
+        /*[VB]
+            '基線ベクトルを編集する。
+            Private Sub mnuEditBaseLine_Click()
+
+                On Error GoTo ErrorHandler
+    
+                If m_clsPopupMenuController.IsPopup(mnuEditBaseLine) Then Exit Sub
+    
+                Dim clsBaseLineVector As BaseLineVector
+                Set clsBaseLineVector = objListPane.SelectedElement(LIST_NUM_VECTOR)
+    
+                '属性の編集。
+                If Not EditBaseLine(clsBaseLineVector) Then Exit Sub
+    
+                Exit Sub
+    
+            ErrorHandler:
+                Call mdlMain.ErrorExit
+
+            End Sub
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        /// <summary>
+        /// 編集＞基線ベクトルの編集
+        /// 
+        /// 基線ベクトルを編集する。
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void mnuEditBaseLine_Click(object sender, EventArgs e)
+        {
+
+        }
+        //1==========================================================================================
+        /*[VB]
+            'セッションを変更する。
+            Private Sub mnuEditSession_Click()
+
+                On Error GoTo ErrorHandler
+    
+                '選択オブジェクト。
+                Dim objElements As New Collection
+                Dim objElement As Object
+                Dim nPos As Long
+                '観測点、基線ベクトルのどちらかのみ選択されているはず。
+                nPos = objListPane.StartSelectedAssoc(LIST_NUM_OBSPNT)
+                Do While (nPos > 0)
+                    Set objElement = objListPane.GetNextAssoc(nPos)
+                    '観測点の場合、本点は除外する。
+                    If objElement.Genuine Then GoTo ContinueHandler
+                    Call objElements.Add(objElement, Hex$(GetPointer(objElement)))
+            ContinueHandler:
+                Loop
+                nPos = objListPane.StartSelectedAssoc(LIST_NUM_VECTOR)
+                Do While (nPos > 0)
+                    Set objElement = objListPane.GetNextAssoc(nPos)
+                    Call objElements.Add(objElement, Hex$(GetPointer(objElement)))
+                Loop
+    
+                '同じ観測点番号が選択されていたら許可しない。
+                If Not CheckSessionObsName(objElements, "同じ観測点Noの観測点が選択されています。" & vbCrLf & "同じ観測点Noの観測点を同じセッションに変更することは出来ません｡ ", "始点と終点で同じ観測点Noの基線ベクトルが選択されています。" & vbCrLf & "同じ観測点Noを始点終点に持つ基線ベクトルを同じセッションに変更することは出来ません｡ ") Then Exit Sub
+    
+                'セッションの変更。
+                If Not EditSession(objElements) Then Exit Sub
+    
+                '砂時計。
+                Dim clsWaitCursor As New WaitCursor
+                Set clsWaitCursor.Object = Me
+    
+                '再描画抑制。
+                Dim clsCtrlValue As New CtrlValue
+                Call clsCtrlValue.SetObject(m_clsChangeSelRow, False)
+    
+                'スクロールはしないようにする。
+                objListPane.RowLock = True
+                '汎用作業キーを利用して、設定が変更された観測点を記憶する。
+                Call m_clsDocument.NetworkModel.ClearIsList
+                For Each objElement In objElements
+                    objElement.IsList = True
+                    If (objElement.ObjectType And OBJ_TYPE_OBSERVATIONPOINT) <> 0 Then
+                        Dim clsBaseLineVectors() As BaseLineVector
+                        ReDim clsBaseLineVectors(-1 To -1)
+                        Call GetDocument().NetworkModel.GetConnectBaseLineVectors(objElement, clsBaseLineVectors)
+                        Dim i As Long
+                        For i = 0 To UBound(clsBaseLineVectors)
+                            clsBaseLineVectors(i).IsList = True
+                        Next
+                    Else
+                        objElement.StrPoint.TopParentPoint.IsList = True
+                        objElement.EndPoint.TopParentPoint.IsList = True
+                    End If
+                Next
+                'リストの更新。
+                Call objListPane.UpdateRowIsList
+                 'スクロールを元に戻す。
+                objListPane.RowLock = False
+    
+                'メニューの更新。
+                Call clsCtrlValue.Back
+                Call objListPane_ChangeSelRow(objListPane.List)
+    
+                Call clsWaitCursor.Back
+    
+                Exit Sub
+    
+            ErrorHandler:
+                Call mdlMain.ErrorExit
+    
+            End Sub
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        /// <summary>
+        /// 編集＞セクション名の変更
+        /// 
+        /// 'セッションを変更する。
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void mnuEditSession_Click(object sender, EventArgs e)
+        {
+            try
+            {
+
+                //'選択オブジェクト。
+                Collection objElements = new Collection();
+#if false
+                Dim objElement As Object
+                Dim nPos As Long
+                '観測点、基線ベクトルのどちらかのみ選択されているはず。
+                nPos = objListPane.StartSelectedAssoc(LIST_NUM_OBSPNT)
+                Do While(nPos > 0)
+                    Set objElement = objListPane.GetNextAssoc(nPos)
+                    '観測点の場合、本点は除外する。
+                    If objElement.Genuine Then GoTo ContinueHandler
+                    Call objElements.Add(objElement, Hex$(GetPointer(objElement)))
+            ContinueHandler:
+                Loop
+                nPos = objListPane.StartSelectedAssoc(LIST_NUM_VECTOR)
+                Do While(nPos > 0)
+                    Set objElement = objListPane.GetNextAssoc(nPos)
+                    Call objElements.Add(objElement, Hex$(GetPointer(objElement)))
+                Loop
+
+
+                '同じ観測点番号が選択されていたら許可しない。
+                If Not CheckSessionObsName(objElements, "同じ観測点Noの観測点が選択されています。" & vbCrLf & "同じ観測点Noの観測点を同じセッションに変更することは出来ません｡ ", "始点と終点で同じ観測点Noの基線ベクトルが選択されています。" & vbCrLf & "同じ観測点Noを始点終点に持つ基線ベクトルを同じセッションに変更することは出来ません｡ ") Then Exit Sub
+#endif
+
+                //'セッションの変更。
+                if (!EditSession(objElements))
+                {
+                    Cursor = Cursors.Default;
+                    return;
+                }
+
+                //'砂時計。
+                Cursor = Cursors.WaitCursor;
+
+                //'再描画抑制。
+                CtrlValue clsCtrlValue = new CtrlValue();
+                clsCtrlValue.SetObject(m_clsChangeSelRow, false);
+
+#if false
+                'スクロールはしないようにする。
+                objListPane.RowLock = True
+                '汎用作業キーを利用して、設定が変更された観測点を記憶する。
+                Call m_clsDocument.NetworkModel.ClearIsList
+                For Each objElement In objElements
+                    objElement.IsList = True
+                    If(objElement.ObjectType And OBJ_TYPE_OBSERVATIONPOINT) <> 0 Then
+                        Dim clsBaseLineVectors() As BaseLineVector
+                        ReDim clsBaseLineVectors(-1 To - 1)
+                        Call GetDocument().NetworkModel.GetConnectBaseLineVectors(objElement, clsBaseLineVectors)
+                        Dim i As Long
+                        For i = 0 To UBound(clsBaseLineVectors)
+                            clsBaseLineVectors(i).IsList = True
+                        Next
+                    Else
+                        objElement.StrPoint.TopParentPoint.IsList = True
+                        objElement.EndPoint.TopParentPoint.IsList = True
+                    End If
+                Next
+                'リストの更新。
+                Call objListPane.UpdateRowIsList
+                 'スクロールを元に戻す。
+                objListPane.RowLock = False
+
+
+                'メニューの更新。
+                Call clsCtrlValue.Back
+                Call objListPane_ChangeSelRow(objListPane.List)
+#endif
+
+                Cursor = Cursors.Default;
+
+            }
+            catch (Exception ex)
+            {
+                //    Call mdlMain.ErrorExit
+                MessageBox.Show(ex.Message, "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
+        }
+
+        //1==========================================================================================
+        /*[VB]
+            '偏心補正設定を行う。
+            Private Sub mnuEditEccentric_Click()
+
+                On Error GoTo ErrorHandler
+    
+                Dim clsObservationPoint As ObservationPoint
+                Set clsObservationPoint = objListPane.SelectedElement(LIST_NUM_OBSPNT)
+                If clsObservationPoint.Genuine Then Set clsObservationPoint = clsObservationPoint.CorrectPoint
+    
+                Dim bEccentric As Boolean
+                bEccentric = clsObservationPoint.Eccentric
+    
+                '偏心補正設定。
+                If Not EditEccentric(clsObservationPoint.HeadPoint) Then Exit Sub
+    
+                '砂時計。
+                Dim clsWaitCursor As New WaitCursor
+                Set clsWaitCursor.Object = Me
+    
+                '再描画抑制。
+                Dim clsCtrlValue As New CtrlValue
+                Call clsCtrlValue.SetObject(m_clsChangeSelRow, False)
+    
+                If bEccentric Then
+                    'スクロールはしないようにする。
+                    objListPane.RowLock = True
+                    '汎用作業キーを利用して、設定が変更されたオブジェクトを記憶する。
+                    Call m_clsDocument.NetworkModel.ClearIsList
+                    clsObservationPoint.CorrectPoint.TopParentPoint.IsList = True
+                    Call m_clsDocument.NetworkModel.SetConnectBaseLineVectorsIsListEx(clsObservationPoint)
+                    'リストの更新。
+                    Call objListPane.UpdateRowIsList
+                     'スクロールを元に戻す。
+                    objListPane.RowLock = False
+                Else
+                    'リストの作成。
+                    Call objListPane.RemakeList(True)
+                End If
+    
+                'プロットの再描画。
+                Call objPlotPane.UpdateLogicalDrawArea(False)
+                Call objPlotPane.Redraw
+    
+                'メニューの更新。
+                Call clsCtrlValue.Back
+                Call objListPane_ChangeSelRow(objListPane.List)
+    
+                Call clsWaitCursor.Back
+    
+                Exit Sub
+    
+            ErrorHandler:
+                Call mdlMain.ErrorExit
+    
+            End Sub
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        /// <summary>
+        ///  編集＞偏心設定
+        /// 
+        /// '偏心補正設定を行う。
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void mnuEditEccentric_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                ObservationPoint clsObservationPoint;
+                clsObservationPoint = (ObservationPoint)objListPane.SelectedElement((long)LIST_NUM_PANE.LIST_NUM_OBSPNT);
+#if false
+                if (clsObservationPoint.Genuine())
+                {
+                    clsObservationPoint = clsObservationPoint.CorrectPoint();
+                }
+
+                bool bEccentric;
+                bEccentric = clsObservationPoint.Eccentric();
+#endif
+
+                //'偏心補正設定。
+                if (!EditEccentric(clsObservationPoint.HeadPoint()))
+                {
+                    return;
+                }
+
+
+                //'砂時計。
+                Cursor = Cursors.WaitCursor;
+
+                //'再描画抑制。
+                CtrlValue clsCtrlValue = new CtrlValue();
+                clsCtrlValue.SetObject(m_clsChangeSelRow, false);
+
+#if false
+                If bEccentric Then
+                    'スクロールはしないようにする。
+                    objListPane.RowLock = True
+                    '汎用作業キーを利用して、設定が変更されたオブジェクトを記憶する。
+                    Call m_clsDocument.NetworkModel.ClearIsList
+                    clsObservationPoint.CorrectPoint.TopParentPoint.IsList = True
+                    Call m_clsDocument.NetworkModel.SetConnectBaseLineVectorsIsListEx(clsObservationPoint)
+                    'リストの更新。
+                    Call objListPane.UpdateRowIsList
+                     'スクロールを元に戻す。
+                    objListPane.RowLock = False
+                Else
+                    'リストの作成。
+                    Call objListPane.RemakeList(True)
+                End If
+
+
+                'プロットの再描画。
+                Call objPlotPane.UpdateLogicalDrawArea(False)
+                Call objPlotPane.Redraw
+
+
+                'メニューの更新。
+                Call clsCtrlValue.Back
+                Call objListPane_ChangeSelRow(objListPane.List)
+#endif
+
+                Cursor = Cursors.Default;
+
+            }
+            catch (Exception ex)
+            {
+                //    Call mdlMain.ErrorExit
+                MessageBox.Show(ex.Message, "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+        //1==========================================================================================
+        /*[VB]
+            '観測点を結合する。
+            Private Sub mnuEditCombination_Click()
+
+                On Error GoTo ErrorHandler
+    
+                '観測点の結合。
+                If Not CombinationObservationPoint() Then Exit Sub
+    
+                '砂時計。
+                Dim clsWaitCursor As New WaitCursor
+                Set clsWaitCursor.Object = Me
+    
+                '再描画抑制。
+                Dim clsCtrlValue As New CtrlValue
+                Call clsCtrlValue.SetObject(m_clsChangeSelRow, False)
+    
+                'リストの作成。本点が削除される可能性がある。
+                Call objListPane.RemakeList(True)
+    
+                'プロットの再描画。
+                Call objPlotPane.UpdateLogicalDrawArea(False)
+                Call objPlotPane.Redraw
+    
+                'メニューの更新。
+                Call clsCtrlValue.Back
+                Call objListPane_ChangeSelRow(objListPane.List)
+    
+                Call clsWaitCursor.Back
+    
+                Exit Sub
+    
+            ErrorHandler:
+                Call mdlMain.ErrorExit
+    
+            End Sub
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //編集＞結合
+        private void mnuEditCombination_Click(object sender, EventArgs e)
+        {
+
+        }
+        //1==========================================================================================
+        /*[VB]
+            '観測点を分離する。
+            Private Sub mnuEditSeparation_Click()
+
+                On Error GoTo ErrorHandler
+    
+                Exit Sub
+    
+            ErrorHandler:
+                Call mdlMain.ErrorExit
+
+            End Sub
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //編集＞分離
+        private void mnuEditSeparation_Click(object sender, EventArgs e)
+        {
+
+        }
+        //1==========================================================================================
+        /*[VB]
+            '観測点または基線ベクトルの有効/無効を設定する。
+            Private Sub mnuEditValidOn_Click()
+
+                On Error GoTo ErrorHandler
+    
+                Call EditValid(True)
+    
+                Exit Sub
+    
+            ErrorHandler:
+                Call mdlMain.ErrorExit
+
+            End Sub
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //編集＞有効
+        private void mnuEditValidOn_Click(object sender, EventArgs e)
+        {
+
+        }
+        //1==========================================================================================
+        /*[VB]
+            '観測点または基線ベクトルの有効/無効を設定する。
+            Private Sub mnuEditValidOff_Click()
+
+                On Error GoTo ErrorHandler
+    
+                Call EditValid(False)
+    
+                Exit Sub
+    
+            ErrorHandler:
+                Call mdlMain.ErrorExit
+
+            End Sub
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //編集＞無効
+        private void mnuEditValidOff_Click(object sender, EventArgs e)
+        {
+
+        }
+        //1==========================================================================================
+        /*[VB]
+            'オブジェクトに採用を設定する。
+            Private Sub mnuEditAdopt_Click()
+
+                On Error GoTo ErrorHandler
+    
+                If 0 < objListPane.StartSelectedAssoc(LIST_NUM_VECTOR) Then
+                    Call EditLineType(OBJ_MODE_ADOPT)
+                Else
+                    Call EditObsPntMode(OBJ_MODE_ADOPT)
+                End If
+    
+                Exit Sub
+    
+            ErrorHandler:
+                Call mdlMain.ErrorExit
+
+            End Sub
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //編集＞採用
+        private void mnuEditAdopt_Click(object sender, EventArgs e)
+        {
+
+        }
+        //1==========================================================================================
+        /*[VB]
+            'オブジェクトに点検を設定する。
+            Private Sub mnuEditCheck_Click()
+
+                On Error GoTo ErrorHandler
+    
+                If 0 < objListPane.StartSelectedAssoc(LIST_NUM_VECTOR) Then
+                    Call EditLineType(OBJ_MODE_CHECK)
+                Else
+                    Call EditObsPntMode(OBJ_MODE_CHECK)
+                End If
+    
+                Exit Sub
+    
+            ErrorHandler:
+                Call mdlMain.ErrorExit
+
+            End Sub
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //編集＞点検
+        private void mnuEditCheck_Click(object sender, EventArgs e)
+        {
+
+        }
+        //1==========================================================================================
+        /*[VB]
+            'オブジェクトに重複を設定する。
+            Private Sub mnuEditDuplicate_Click()
+
+                On Error GoTo ErrorHandler
+    
+                If 0 < objListPane.StartSelectedAssoc(LIST_NUM_VECTOR) Then
+                    Call EditLineType(OBJ_MODE_DUPLICATE)
+                Else
+                    Call EditObsPntMode(OBJ_MODE_DUPLICATE)
+                End If
+    
+                Exit Sub
+    
+            ErrorHandler:
+                Call mdlMain.ErrorExit
+
+            End Sub
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //編集＞重複
+        private void mnuEditDuplicate_Click(object sender, EventArgs e)
+        {
+
+        }
+        //1==========================================================================================
+        /*[VB]
+            '2023/06/26 Hitz H.Nakamura **************************************************
+            'GNSS水準測量対応。
+            '前半後半較差の追加。
+            'オブジェクトに前半を設定する。
+            Private Sub mnuEditHalfFst_Click()
+
+                On Error GoTo ErrorHandler
+    
+                If 0 < objListPane.StartSelectedAssoc(LIST_NUM_VECTOR) Then
+                    Call EditLineType(OBJ_MODE_HALF_FST)
+                Else
+                End If
+    
+                Exit Sub
+    
+            ErrorHandler:
+                Call mdlMain.ErrorExit
+
+            End Sub
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //編集＞前半
+        private void mnuEditHalfFst_Click(object sender, EventArgs e)
+        {
+
+        }
+        //1==========================================================================================
+        /*[VB]
+            'オブジェクトに後半を設定する。
+            Private Sub mnuEditHalfLst_Click()
+
+                On Error GoTo ErrorHandler
+    
+                If 0 < objListPane.StartSelectedAssoc(LIST_NUM_VECTOR) Then
+                    Call EditLineType(OBJ_MODE_HALF_LST)
+                Else
+                End If
+    
+                Exit Sub
+    
+            ErrorHandler:
+                Call mdlMain.ErrorExit
+
+            End Sub
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //編集＞後半
+        private void mnuEditHalfLst_Click(object sender, EventArgs e)
+        {
+
+        }
+        //1==========================================================================================
+        /*[VB]
+            '基線ベクトルの向きを反転する。
+            Private Sub mnuEditReverse_Click()
+
+                On Error GoTo ErrorHandler
+    
+                '砂時計。
+                Dim clsWaitCursor As New WaitCursor
+                Set clsWaitCursor.Object = Me
+    
+                '再描画抑制。
+                Dim clsCtrlValue As New CtrlValue
+                Call clsCtrlValue.SetObject(m_clsChangeSelRow, False)
+    
+                '同じ向きの重複する基線ベクトルも一緒に反転させる。
+                Dim nPos As Long
+                nPos = objListPane.StartSelectedAssoc(LIST_NUM_VECTOR)
+                Dim objBaseLineVectors As New Collection
+                Do While (nPos > 0)
+                    Dim clsBaseLineVector As BaseLineVector
+                    Set clsBaseLineVector = objListPane.GetNextAssoc(nPos)
+                    Call SetAtCollectionObject(objBaseLineVectors, clsBaseLineVector, GetPointer(clsBaseLineVector))
+                    Dim clsDuplicationBaseLineVectors() As BaseLineVector
+                    clsDuplicationBaseLineVectors = m_clsDocument.NetworkModel.GetDuplicationBaseLineVectors(clsBaseLineVector)
+                    Dim i As Long
+                    For i = 0 To UBound(clsDuplicationBaseLineVectors)
+                        If clsBaseLineVector.StrPoint.HeadPoint Is clsDuplicationBaseLineVectors(i).StrPoint.HeadPoint Then Call SetAtCollectionObject(objBaseLineVectors, clsDuplicationBaseLineVectors(i), GetPointer(clsDuplicationBaseLineVectors(i)))
+                    Next
+                Loop
+    
+                '解析結果削除確認。
+                For Each clsBaseLineVector In objBaseLineVectors
+                    If clsBaseLineVector.Analysis < ANALYSIS_STATUS_FAILED Then
+                        If MsgBox("解析済みの基線ベクトルが含まれています。反転を行いますと解析の結果が失われます。よろしいですか?", vbExclamation Or vbOKCancel) = vbOK Then
+                            Exit For
+                        Else
+                            Exit Sub
+                        End If
+                    End If
+                Next
+    
+                '汎用作業キーを利用して、設定が変更された観測点を記憶する。
+                Call m_clsDocument.NetworkModel.ClearIsList
+    
+                '反転。
+                For Each clsBaseLineVector In objBaseLineVectors
+                    Call m_clsDocument.ReplaceBaseLineVector(clsBaseLineVector)
+                    clsBaseLineVector.IsList = True
+                    '偏心補正の再計算の有無にかかわらず更新する。方位票の評価にはコストがかかる。
+                    Call m_clsDocument.NetworkModel.SetConnectBaseLineVectorsIsListEx(clsBaseLineVector.StrPoint)
+                    Call m_clsDocument.NetworkModel.SetConnectBaseLineVectorsIsListEx(clsBaseLineVector.EndPoint)
+                Next
+    
+                'スクロールはしないようにする。
+                objListPane.RowLock = True
+                'リストの更新。
+                Call objListPane.UpdateRowIsList
+                'スクロールを元に戻す。
+                objListPane.RowLock = False
+    
+                'プロットの再描画。
+                Call objPlotPane.UpdateLogicalDrawArea(False)
+                Call objPlotPane.Redraw
+    
+                'メニューの更新。
+                Call clsCtrlValue.Back
+                Call objListPane_ChangeSelRow(objListPane.List)
+    
+                Call clsWaitCursor.Back
+    
+                Exit Sub
+    
+            ErrorHandler:
+                Call mdlMain.ErrorExit
+
+            End Sub
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //編集＞反転
+        private void mnuEditReverse_Click(object sender, EventArgs e)
+        {
+
+        }
+        //1==========================================================================================
+        /*[VB]
+            '観測点を削除する。
+            Private Sub mnuEditRemove_Click()
+
+                On Error GoTo ErrorHandler
+    
+                If MsgBox("選択されている観測点、または偏心補正後の本点を削除します。", vbOKCancel Or vbExclamation) <> vbOK Then Exit Sub
+    
+                '砂時計。
+                Dim clsWaitCursor As New WaitCursor
+                Set clsWaitCursor.Object = Me
+    
+                '再描画抑制。
+                Dim clsCtrlValue As New CtrlValue
+                Call clsCtrlValue.SetObject(m_clsChangeSelRow, False)
+    
+                '選択オブジェクト。
+                Dim objElements As New Collection
+                Dim objElement As Object
+                Dim nPos As Long
+                nPos = objListPane.StartSelectedAssoc(LIST_NUM_OBSPNT)
+                Do While (nPos > 0)
+                    Set objElement = objListPane.GetNextAssoc(nPos)
+                    Call objElements.Add(objElement, Hex$(GetPointer(objElement)))
+                Loop
+    
+                '削除。
+                Call m_clsDocument.RemoveObservationPoint(objElements)
+    
+                'リストの作成。
+                Call objListPane.RemakeList(True)
+    
+                'プロットの再描画。
+                Call objPlotPane.UpdateLogicalDrawArea(False)
+                Call objPlotPane.Redraw
+    
+                'メニューの更新。
+                Call clsCtrlValue.Back
+                Call objListPane_ChangeSelRow(objListPane.List)
+    
+                Call clsWaitCursor.Back
+    
+                Exit Sub
+    
+            ErrorHandler:
+                Call mdlMain.ErrorExit
+
+            End Sub
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //編集＞削除
+        private void mnuEditRemove_Click(object sender, EventArgs e)
+        {
+
+        }
+        //1==========================================================================================
+        /*[VB]
+            '基線ベクトルの向きの自動整列。
+            Private Sub mnuEditAutoOrder_Click()
+
+                On Error GoTo ErrorHandler
+    
+                '基線ベクトルの向きの自動整列。
+                If Not AutoOrderVector() Then Exit Sub
+    
+                '砂時計。
+                Dim clsWaitCursor As New WaitCursor
+                Set clsWaitCursor.Object = Me
+    
+                'スクロールはしないようにする。
+                objListPane.RowLock = True
+                'リストの更新。
+                Call objListPane.UpdateAllRow(LIST_NUM_VECTOR)
+                'スクロールを元に戻す。
+                objListPane.RowLock = False
+    
+                'プロットの再描画。
+                Call objPlotPane.UpdateLogicalDrawArea(False)
+                Call objPlotPane.Redraw
+                Call objPlotPane.Refresh
+    
+                Call clsWaitCursor.Back
+    
+                Exit Sub
+    
+            ErrorHandler:
+                Call mdlMain.ErrorExit
+    
+            End Sub
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //編集＞基線ベクトルの向きの自動整列(&O)...
+        private void mnuEditAutoOrder_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        //1==========================================================================================
+        //1==========================================================================================
+        //1==========================================================================================
+
+        //1==========================================================================================
+        /*[VB]
+            '観測点の共通属性の編集を行なう。
+            '
+            '引き数：
+            'clsObservationPoint 対象とする観測点(代表観測点)。
+            '
+            '戻り値：
+            '正常終了の場合 True を返す。
+            'キャンセルの場合 False を返す。
+            Private Function EditAttributeCommon(ByVal clsObservationPoint As ObservationPoint) As Boolean
+
+                EditAttributeCommon = False
+    
+                '既存の値。
+                frmAttributeCommon.PointNumber = clsObservationPoint.Number
+                frmAttributeCommon.PointName = clsObservationPoint.Name
+                frmAttributeCommon.Fixed = clsObservationPoint.Fixed
+                frmAttributeCommon.CoordinateDisplay = clsObservationPoint.CoordinateDisplay
+                frmAttributeCommon.CoordinateFixed = clsObservationPoint.CoordinateFixed
+                frmAttributeCommon.OldEditCode = clsObservationPoint.Attributes.Common.OldEditCode
+    
+                '編集ダイアログ。
+                Call frmAttributeCommon.Show(1)
+                If frmAttributeCommon.Result <> vbOK Then Exit Function
+    
+                '再描画。
+                If RedrawWindow(Me.hWnd, 0, 0, RDW_UPDATENOW) = 0 Then Call Err.Raise(ERR_FATAL, , GetLastErrorMessage())
+    
+                '砂時計。
+                Dim clsWaitCursor As New WaitCursor
+                Set clsWaitCursor.Object = Me
+    
+                '設定。
+                Call m_clsDocument.SetAttributeCommon(clsObservationPoint, frmAttributeCommon.PointNumber, frmAttributeCommon.PointName, frmAttributeCommon.Fixed, frmAttributeCommon.CoordinateFixed)
+    
+                Call clsWaitCursor.Back
+    
+                EditAttributeCommon = True
+    
+            End Function
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="clsObservationPoint"></param>
+        /// <returns>
+        /// </returns>
+        private bool EditAttributeCommon(ObservationPoint clsObservationPoint)
+        {
+            bool EditAttributeCommon = false;
+
+
+            frmAttributeCommon frmAttributeCommon = new frmAttributeCommon(m_clsMdlMain);
+
+
+            //'既存の値。
+            frmAttributeCommon.PointNumber = clsObservationPoint.Number();
+            frmAttributeCommon.PointName = clsObservationPoint.Name();
+            frmAttributeCommon.Fixed = clsObservationPoint.Fixed();
+            frmAttributeCommon.CoordinateFixed(clsObservationPoint.CoordinateFixed());
+            frmAttributeCommon.OldEditCode = (int)clsObservationPoint.Attributes().Common().OldEditCode;
+
+
+            //'編集ダイアログ。
+            _ = frmAttributeCommon.ShowDialog();
+            if (frmAttributeCommon.Result != vbOK)
+            {
+                return EditAttributeCommon;
+            }
+
+            //'再描画。
+            if (RedrawWindow(Handle, IntPtr.Zero, IntPtr.Zero, (int)RDW_UPDATENOW) == false)
+            {
+                //Then Call Err.Raise(ERR_FATAL, , GetLastErrorMessage())
+                return EditAttributeCommon;
+            }
+
+
+            //'砂時計。
+
+
+            //'設定。
+            //Call m_clsDocument.SetAttributeCommon(clsObservationPoint, frmAttributeCommon.PointNumber, frmAttributeCommon.PointName, frmAttributeCommon.Fixed, frmAttributeCommon.CoordinateFixed)
+
+
+            Cursor = Cursors.Default;
+
+
+            EditAttributeCommon = true;
+            return EditAttributeCommon;
+
+        }
+
+        //1==========================================================================================
+        /*[VB]
+            '観測点の属性の編集を行なう。
+            '
+            '引き数：
+            'clsObservationPoint 対象とする観測点(代表観測点)。
+            'bAnalysis 解析済フラグ。True=解析済。False=未解析。
+            '
+            '戻り値：
+            '正常終了の場合 True を返す。
+            'キャンセルの場合 False を返す。
+            Private Function EditAttribute(ByVal clsObservationPoint As ObservationPoint, ByVal bAnalysis As Boolean) As Boolean
+
+                EditAttribute = False
+    
+                '既存の値。
+                frmAttribute.Session = clsObservationPoint.Session
+                frmAttribute.RecType = clsObservationPoint.RecType
+                frmAttribute.RecNumber = clsObservationPoint.RecNumber
+                frmAttribute.AntType = clsObservationPoint.AntType
+                frmAttribute.AntNumber = clsObservationPoint.AntNumber
+                frmAttribute.AntMeasurement = clsObservationPoint.AntMeasurement
+                frmAttribute.AntHeight = clsObservationPoint.AntHeight
+                frmAttribute.Analysis = bAnalysis
+                frmAttribute.ElevationMask = clsObservationPoint.ElevationMask
+                frmAttribute.ElevationMaskHand = clsObservationPoint.Attributes.ElevationMaskHand
+                frmAttribute.NumberOfMinSV = IIf(m_clsDocument.NumberOfMinSV > 0, m_clsDocument.NumberOfMinSV, clsObservationPoint.NumberOfMinSV)
+                frmAttribute.NumberOfMinSVHand = clsObservationPoint.Attributes.NumberOfMinSVHand
+                Set frmAttribute.ObservationPoint = clsObservationPoint
+    
+                '編集ダイアログ。
+                Call frmAttribute.Show(1)
+                If frmAttribute.Result<> vbOK Then Exit Function
+    
+                '再描画。
+                If RedrawWindow(Me.hWnd, 0, 0, RDW_UPDATENOW) = 0 Then Call Err.Raise(ERR_FATAL, , GetLastErrorMessage())
+    
+                '砂時計。
+                Dim clsWaitCursor As New WaitCursor
+                Set clsWaitCursor.Object = Me
+    
+                '設定。
+                Dim objElements As New Collection
+                Call objElements.Add(clsObservationPoint)
+                Call m_clsDocument.SetSession(objElements, frmAttribute.Session)
+                If frmAttribute.Extend Then Call m_clsDocument.SetSessionExtend(objElements, frmAttribute.Session)
+                Call m_clsDocument.SetAttribute(clsObservationPoint, frmAttribute.RecType, frmAttribute.RecNumber, frmAttribute.AntType, frmAttribute.AntNumber, frmAttribute.AntMeasurement, frmAttribute.AntHeight, frmAttribute.ElevationMaskHand, frmAttribute.NumberOfMinSVHand)
+
+
+                Call clsWaitCursor.Back
+
+
+                EditAttribute = True
+
+
+            End Function
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        private bool EditAttribute(ObservationPoint clsObservationPoint, bool bAnalysis)
+        {
+            bool EditAttribute = false;
+
+            frmAttribute frmAttribute = new frmAttribute();
+
+            //'既存の値。
+#if false
+            frmAttribute.Session = clsObservationPoint.Session
+            frmAttribute.RecType = clsObservationPoint.RecType
+            frmAttribute.RecNumber = clsObservationPoint.RecNumber
+            frmAttribute.AntType = clsObservationPoint.AntType
+            frmAttribute.AntNumber = clsObservationPoint.AntNumber
+            frmAttribute.AntMeasurement = clsObservationPoint.AntMeasurement
+            frmAttribute.AntHeight = clsObservationPoint.AntHeight
+            frmAttribute.Analysis = bAnalysis
+            frmAttribute.ElevationMask = clsObservationPoint.ElevationMask
+            frmAttribute.ElevationMaskHand = clsObservationPoint.Attributes.ElevationMaskHand
+            frmAttribute.NumberOfMinSV = IIf(m_clsDocument.NumberOfMinSV > 0, m_clsDocument.NumberOfMinSV, clsObservationPoint.NumberOfMinSV)
+            frmAttribute.NumberOfMinSVHand = clsObservationPoint.Attributes.NumberOfMinSVHand
+            Set frmAttribute.ObservationPoint = clsObservationPoint
+#endif
+
+            //'編集ダイアログ。
+            frmAttribute.ShowDialog();
+            if (frmAttribute.Result != vbOK)
+            {
+                return EditAttribute;
+            }
+
+
+            //'再描画。
+            if (RedrawWindow(Handle, IntPtr.Zero, IntPtr.Zero, (int)RDW_UPDATENOW) == false)
+            {
+                //Then Call Err.Raise(ERR_FATAL, , GetLastErrorMessage())
+                return EditAttribute;
+            }
+
+
+            //'砂時計。
+            Cursor = Cursors.WaitCursor;
+
+#if false
+            //'設定。
+            Dim objElements As New Collection
+            Call objElements.Add(clsObservationPoint)
+            Call m_clsDocument.SetSession(objElements, frmAttribute.Session)
+            If frmAttribute.Extend Then Call m_clsDocument.SetSessionExtend(objElements, frmAttribute.Session)
+            Call m_clsDocument.SetAttribute(clsObservationPoint, frmAttribute.RecType, frmAttribute.RecNumber, frmAttribute.AntType, frmAttribute.AntNumber, frmAttribute.AntMeasurement, frmAttribute.AntHeight, frmAttribute.ElevationMaskHand, frmAttribute.NumberOfMinSVHand)
+
+#endif
+
+            Cursor = Cursors.Default;
+
+
+
+            EditAttribute = true;
+            return EditAttribute;
+        }
+
+
+        //1==========================================================================================
+        /*[VB]
+            'セッションの変更を行なう。
+            '
+            'セッション名を変更する。
+            '
+            '引き数：
+            'objElements 対象とするオブジェクト。要素はオブジェクト。キーは任意。
+            '
+            '戻り値：
+            '正常終了の場合 True を返す。
+            'キャンセルの場合 False を返す。
+            Private Function EditSession(ByVal objElements As Collection) As Boolean
+
+                EditSession = False
+    
+                '既存の値。
+                Set frmSession.Elements = objElements
+    
+                'セッションの変更ダイアログ。
+                Call frmSession.Show(1)
+                If frmSession.Result<> vbOK Then Exit Function
+    
+                '再描画。
+                If RedrawWindow(Me.hWnd, 0, 0, RDW_UPDATENOW) = 0 Then Call Err.Raise(ERR_FATAL, , GetLastErrorMessage())
+    
+                '砂時計。
+                Dim clsWaitCursor As New WaitCursor
+                Set clsWaitCursor.Object = Me
+    
+                '設定。
+                Call m_clsDocument.SetSession(objElements, frmSession.Session)
+                If frmSession.Extend Then Call m_clsDocument.SetSessionExtend(objElements, frmSession.Session)
+
+                Call clsWaitCursor.Back
+
+                EditSession = True
+
+
+            End Function
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        private bool EditSession(Collection objElements)
+        {
+            bool EditSession = false;
+
+            frmSession frmSession = new frmSession();
+
+            //'既存の値。
+            //  frmSession.Elements = objElements;
+
+
+            //'セッションの変更ダイアログ。
+            _ = frmSession.ShowDialog();
+            if (frmSession.Result != vbOK)
+            {
+                return EditSession;
+            }
+
+            //'再描画。
+            if (RedrawWindow(Handle, IntPtr.Zero, IntPtr.Zero, (int)RDW_UPDATENOW) == false)
+            {
+                //Then Call Err.Raise(ERR_FATAL, , GetLastErrorMessage())
+                return EditSession;
+            }
+
+            //'砂時計。
+            Cursor = Cursors.WaitCursor;
+
+#if false
+            '設定。
+            Call m_clsDocument.SetSession(objElements, frmSession.Session)
+            If frmSession.Extend Then Call m_clsDocument.SetSessionExtend(objElements, frmSession.Session)
+#endif
+
+            EditSession = true;
+            return EditSession;
+
+        }
+
+
+        //1==========================================================================================
+        /*[VB]
+            '偏心補正設定を行なう。
+            '
+            '引き数：
+            'clsObservationPoint 対象とする観測点(HeadPoint)。
+            '
+            '戻り値：
+            '正常終了の場合 True を返す。
+            'キャンセルの場合 False を返す。
+            Private Function EditEccentric(ByVal clsObservationPoint As ObservationPoint) As Boolean
+
+                EditEccentric = False
+    
+                '既存の値。
+                Let frmEccentricCorrection.GenuineNumber = clsObservationPoint.GenuineNumber
+                Let frmEccentricCorrection.GenuineName = clsObservationPoint.GenuineName
+                Let frmEccentricCorrection.EccentricCorrectionParam = clsObservationPoint.EccentricCorrectionParam
+                Set frmEccentricCorrection.ObservationPoint = clsObservationPoint
+    
+                '偏心設定ダイアログ。
+                Call frmEccentricCorrection.Show(1)
+                If frmEccentricCorrection.Result<> vbOK Then Exit Function
+    
+                '再描画。
+                If RedrawWindow(Me.hWnd, 0, 0, RDW_UPDATENOW) = 0 Then Call Err.Raise(ERR_FATAL, , GetLastErrorMessage())
+    
+                '偏心補正。
+                Call m_clsDocument.CorrectEccentric(clsObservationPoint, frmEccentricCorrection.EccentricCorrectionParam, frmEccentricCorrection.GenuineNumber, frmEccentricCorrection.GenuineName)
+    
+                '再描画。
+                If RedrawWindow(Me.hWnd, 0, 0, RDW_UPDATENOW) = 0 Then Call Err.Raise(ERR_FATAL, , GetLastErrorMessage())
+    
+                EditEccentric = True
+
+            End Function
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        private bool EditEccentric(ObservationPoint clsObservationPoint)
+        {
+
+            bool EditEccentric = false;
+
+            frmEccentricCorrection frmEccentricCorrection = new frmEccentricCorrection();
+
+
+#if false
+            '既存の値。
+            Let frmEccentricCorrection.GenuineNumber = clsObservationPoint.GenuineNumber
+            Let frmEccentricCorrection.GenuineName = clsObservationPoint.GenuineName
+            Let frmEccentricCorrection.EccentricCorrectionParam = clsObservationPoint.EccentricCorrectionParam
+            Set frmEccentricCorrection.ObservationPoint = clsObservationPoint
+#endif
+
+            //'偏心設定ダイアログ。
+            _ = frmEccentricCorrection.ShowDialog();
+            if (frmEccentricCorrection.Result != vbOK)
+            {
+                return EditEccentric;
+            }
+
+            //'再描画。
+            if (RedrawWindow(Handle, IntPtr.Zero, IntPtr.Zero, (int)RDW_UPDATENOW) == false)
+            {
+                //Then Call Err.Raise(ERR_FATAL, , GetLastErrorMessage())
+                return EditEccentric;
+            }
+
+
+            //'偏心補正。
+            //Call m_clsDocument.CorrectEccentric(clsObservationPoint, frmEccentricCorrection.EccentricCorrectionParam, frmEccentricCorrection.GenuineNumber, frmEccentricCorrection.GenuineName)
+
+
+            //'再描画。
+            if (RedrawWindow(Handle, IntPtr.Zero, IntPtr.Zero, (int)RDW_UPDATENOW) == false)
+            {
+                //Then Call Err.Raise(ERR_FATAL, , GetLastErrorMessage())
+                return EditEccentric;
+            }
+
+
+            EditEccentric = true;
+            return EditEccentric;
+
+        }
+
+
 
 
 

@@ -552,42 +552,49 @@
             this.mnuEditAttributeCommon.Name = "mnuEditAttributeCommon";
             this.mnuEditAttributeCommon.Size = new System.Drawing.Size(250, 22);
             this.mnuEditAttributeCommon.Text = "観測点情報の編集(&I)...";
+            this.mnuEditAttributeCommon.Click += new System.EventHandler(this.mnuEditAttributeCommon_Click);
             // 
             // mnuEditAttribute
             // 
             this.mnuEditAttribute.Name = "mnuEditAttribute";
             this.mnuEditAttribute.Size = new System.Drawing.Size(250, 22);
             this.mnuEditAttribute.Text = "観測データの編集(&D)...";
+            this.mnuEditAttribute.Click += new System.EventHandler(this.mnuEditAttribute_Click);
             // 
             // mnuEditBaseLine
             // 
             this.mnuEditBaseLine.Name = "mnuEditBaseLine";
             this.mnuEditBaseLine.Size = new System.Drawing.Size(250, 22);
             this.mnuEditBaseLine.Text = "基線ベクトルの編集(&L)...";
+            this.mnuEditBaseLine.Click += new System.EventHandler(this.mnuEditBaseLine_Click);
             // 
             // mnuEditSession
             // 
             this.mnuEditSession.Name = "mnuEditSession";
             this.mnuEditSession.Size = new System.Drawing.Size(250, 22);
             this.mnuEditSession.Text = "セッション名の変更(&S)...";
+            this.mnuEditSession.Click += new System.EventHandler(this.mnuEditSession_Click);
             // 
             // mnuEditEccentric
             // 
             this.mnuEditEccentric.Name = "mnuEditEccentric";
             this.mnuEditEccentric.Size = new System.Drawing.Size(250, 22);
             this.mnuEditEccentric.Text = "偏心設定(&C)...";
+            this.mnuEditEccentric.Click += new System.EventHandler(this.mnuEditEccentric_Click);
             // 
             // mnuEditCombination
             // 
             this.mnuEditCombination.Name = "mnuEditCombination";
             this.mnuEditCombination.Size = new System.Drawing.Size(250, 22);
             this.mnuEditCombination.Text = "結合(&J)...";
+            this.mnuEditCombination.Click += new System.EventHandler(this.mnuEditCombination_Click);
             // 
             // mnuEditSeparation
             // 
             this.mnuEditSeparation.Name = "mnuEditSeparation";
             this.mnuEditSeparation.Size = new System.Drawing.Size(250, 22);
             this.mnuEditSeparation.Text = "分離...";
+            this.mnuEditSeparation.Click += new System.EventHandler(this.mnuEditSeparation_Click);
             // 
             // toolStripMenuItem6
             // 
@@ -599,12 +606,14 @@
             this.mnuEditValidOn.Name = "mnuEditValidOn";
             this.mnuEditValidOn.Size = new System.Drawing.Size(250, 22);
             this.mnuEditValidOn.Text = "有効(&V)";
+            this.mnuEditValidOn.Click += new System.EventHandler(this.mnuEditValidOn_Click);
             // 
             // mnuEditValidOff
             // 
             this.mnuEditValidOff.Name = "mnuEditValidOff";
             this.mnuEditValidOff.Size = new System.Drawing.Size(250, 22);
             this.mnuEditValidOff.Text = "無効(&M)";
+            this.mnuEditValidOff.Click += new System.EventHandler(this.mnuEditValidOff_Click);
             // 
             // toolStripMenuItem7
             // 
@@ -616,30 +625,35 @@
             this.mnuEditAdopt.Name = "mnuEditAdopt";
             this.mnuEditAdopt.Size = new System.Drawing.Size(250, 22);
             this.mnuEditAdopt.Text = "採用(&A)";
+            this.mnuEditAdopt.Click += new System.EventHandler(this.mnuEditAdopt_Click);
             // 
             // mnuEditCheck
             // 
             this.mnuEditCheck.Name = "mnuEditCheck";
             this.mnuEditCheck.Size = new System.Drawing.Size(250, 22);
             this.mnuEditCheck.Text = "点検(&H)";
+            this.mnuEditCheck.Click += new System.EventHandler(this.mnuEditCheck_Click);
             // 
             // mnuEditDuplicate
             // 
             this.mnuEditDuplicate.Name = "mnuEditDuplicate";
             this.mnuEditDuplicate.Size = new System.Drawing.Size(250, 22);
             this.mnuEditDuplicate.Text = "重複(&F)";
+            this.mnuEditDuplicate.Click += new System.EventHandler(this.mnuEditDuplicate_Click);
             // 
             // mnuEditHalfFst
             // 
             this.mnuEditHalfFst.Name = "mnuEditHalfFst";
             this.mnuEditHalfFst.Size = new System.Drawing.Size(250, 22);
             this.mnuEditHalfFst.Text = "前半(&B)";
+            this.mnuEditHalfFst.Click += new System.EventHandler(this.mnuEditHalfFst_Click);
             // 
             // mnuEditHalfLst
             // 
             this.mnuEditHalfLst.Name = "mnuEditHalfLst";
             this.mnuEditHalfLst.Size = new System.Drawing.Size(250, 22);
             this.mnuEditHalfLst.Text = "後半(&K)";
+            this.mnuEditHalfLst.Click += new System.EventHandler(this.mnuEditHalfLst_Click);
             // 
             // toolStripMenuItem8
             // 
@@ -651,6 +665,7 @@
             this.mnuEditReverse.Name = "mnuEditReverse";
             this.mnuEditReverse.Size = new System.Drawing.Size(250, 22);
             this.mnuEditReverse.Text = "反転(&R)";
+            this.mnuEditReverse.Click += new System.EventHandler(this.mnuEditReverse_Click);
             // 
             // toolStripMenuItem9
             // 
@@ -662,12 +677,14 @@
             this.mnuEditRemove.Name = "mnuEditRemove";
             this.mnuEditRemove.Size = new System.Drawing.Size(250, 22);
             this.mnuEditRemove.Text = "削除(&E)";
+            this.mnuEditRemove.Click += new System.EventHandler(this.mnuEditRemove_Click);
             // 
             // mnuEditAutoOrder
             // 
             this.mnuEditAutoOrder.Name = "mnuEditAutoOrder";
             this.mnuEditAutoOrder.Size = new System.Drawing.Size(250, 22);
             this.mnuEditAutoOrder.Text = "基線ベクトルの向きの自動整列(&O)...";
+            this.mnuEditAutoOrder.Click += new System.EventHandler(this.mnuEditAutoOrder_Click);
             // 
             // mnuView
             // 

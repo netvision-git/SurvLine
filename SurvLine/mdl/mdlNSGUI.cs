@@ -5,7 +5,12 @@ using System.Data.SqlTypes;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using static SurvLine.mdl.MdlUtility;
+using static SurvLine.mdl.MdlNSUtility;
+using static SurvLine.mdl.MdlNSDefine;
+using System.Xml.Linq;
+
 
 namespace SurvLine.mdl
 {
@@ -96,7 +101,76 @@ namespace SurvLine.mdl
         End Function
         [VB]*/
         //------------------------------------------------------------------------------------------
-        //[C#]
+        //[C#] k.s
+        /// <summary>
+        /// 入力値の緯度経度の範囲を検査する。
+        /// '
+        /// 引き数：
+        /// txtLatH 検査対象コントロール、緯度度。
+        /// txtLatM 検査対象コントロール、緯度分。
+        /// txtLatS 検査対象コントロール、緯度秒。
+        /// txtLonH 検査対象コントロール、経度度。
+        /// txtLonM 検査対象コントロール、経度分。
+        /// txtLonS 検査対象コントロール、経度秒。
+        /// sLabel 対象コントロールの名称。
+        /// bFocus 検査に引っかかった場合フォーカスを移すか？
+        /// 
+        /// </summary>
+        /// <param name="txtLatH"></param>
+        /// <param name="txtLatM"></param>
+        /// <param name="txtLatS"></param>
+        /// <param name="txtLonH"></param>
+        /// <param name="txtLonM"></param>
+        /// <param name="txtLonS"></param>
+        /// <param name="sLabel"></param>
+        /// <param name="bFocus"></param>
+        /// <returns>
+        /// 戻り値：
+        /// 入力値が正常である場合 True を返す。
+        /// それ以外の場合 False を返す。
+        /// </returns>
+        public static bool CheckCoordRangeDMS(object txtLatH, object txtLatM, object txtLatS, object txtLonH, object txtLonM, object txtLonS, string sLabel, bool bFocus = true)
+        {
+            bool CheckCoordRangeDMS = false;
+
+            double nLat;
+            double nLon;
+
+            TextBox txtLatH2 = txtLatH as TextBox;
+            TextBox txtLatM2 = txtLatM as TextBox;
+            TextBox txtLatS2 = txtLatS as TextBox;
+
+            nLat = dms_to_d(int.Parse(txtLatH2.Text), int.Parse(txtLatM2.Text), int.Parse(txtLatS2.Text));
+
+            TextBox txtLonH2 = txtLonH as TextBox;
+            TextBox txtLonM2 = txtLonM as TextBox;
+            TextBox txtLonS2 = txtLonS as TextBox;
+
+            nLon = dms_to_d(int.Parse(txtLonH2.Text), int.Parse(txtLonM2.Text), int.Parse(txtLonS2.Text));
+
+            if (!CheckCoordDMS(nLat, nLon, 0))
+            {
+                //Call MsgBox(sLabel &GUI_MSG_COORDRANGE, vbCritical)
+                if (bFocus)
+                {
+                    //Then Call txtLatH.SetFocus
+                    return CheckCoordRangeDMS;
+                }
+
+            }
+
+
+            CheckCoordRangeDMS = true;
+            return CheckCoordRangeDMS;
+        }
+
+
+
+
+
+
+
+
         //==========================================================================================
 
         //==========================================================================================
@@ -127,7 +201,30 @@ namespace SurvLine.mdl
         End Function
         [VB]*/
         //------------------------------------------------------------------------------------------
-        //[C#]
+        //[C#] k.s
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="txtX"></param>
+        /// <param name="txtY"></param>
+        /// <param name="sLabel"></param>
+        /// <param name="bFocus"></param>
+        /// <returns></returns>
+        public static bool CheckCoordRangeJGD(object txtX, object txtY, string sLabel, bool bFocus = true)
+        {
+            bool CheckCoordRangeJGD = false;
+#if false
+            If Not CheckCoordJGD(Val(txtX.Text), Val(txtY.Text), 0, GetDocument().CoordNum) Then
+                Call MsgBox(sLabel & GUI_MSG_COORDRANGE, vbCritical)
+                If bFocus Then Call txtX.SetFocus
+                Exit Function
+            End If
+#endif
+
+            CheckCoordRangeJGD = true;
+            return CheckCoordRangeJGD;
+
+        }
         //==========================================================================================
 
         //==========================================================================================
@@ -160,6 +257,39 @@ namespace SurvLine.mdl
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        public static bool CheckCoordRangeXYZ(Object txtWGSX, Object txtWGSY, Object txtWGSZ, string sLabel, bool bFocus = true)
+        {
+
+            bool CheckCoordRangeXYZ = false;
+
+            TextBox txtWGSX2 = new TextBox();
+            txtWGSX2 = (TextBox)txtWGSX;
+            TextBox txtWGSY2 = new TextBox();
+            txtWGSY2 = (TextBox)txtWGSY;
+            TextBox txtWGSZ2 = new TextBox();
+            txtWGSZ2 = (TextBox)txtWGSZ;
+
+
+            if (!CheckCoordXYZ(double.Parse(txtWGSX2.Text), double.Parse(txtWGSY2.Text), double.Parse(txtWGSZ2.Text)))
+            {
+                //  Call MsgBox(sLabel &GUI_MSG_COORDRANGE, vbCritical)
+                MessageBox.Show(sLabel + GUI_MSG_COORDRANGE, "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                if (bFocus)
+                {
+                    //Then Call txtWGSX.SetFocus
+                    return CheckCoordRangeXYZ;
+                }
+            }
+
+            CheckCoordRangeXYZ = true;
+            return CheckCoordRangeXYZ;
+
+
+        }
+
+
+
         //==========================================================================================
 
         //==========================================================================================

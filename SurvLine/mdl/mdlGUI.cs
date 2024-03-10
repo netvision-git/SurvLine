@@ -1,9 +1,13 @@
-﻿using System;
+﻿using Microsoft.VisualBasic.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static SurvLine.mdl.DEFINE;
+using static SurvLine.mdl.MdiVBfunctions;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace SurvLine.mdl
 {
@@ -124,6 +128,16 @@ namespace SurvLine.mdl
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        public static bool CheckInteger(string sValue)
+        {
+            bool CheckInteger = false;
+
+
+
+            CheckInteger = true;
+            return CheckInteger;
+
+        }
         //==========================================================================================
 
         //==========================================================================================
@@ -172,7 +186,56 @@ namespace SurvLine.mdl
         End Function
         [VB]*/
         //------------------------------------------------------------------------------------------
-        //[C#]
+        //[C#] k.s
+        /// <summary>
+        /// 文字列が実数であるか検査する。
+        /// 
+        ///引き数：
+        ///sValue 文字列。
+        /// 
+        /// </summary>
+        /// <param name="sValue"></param>
+        /// <returns>
+        /// 戻り値：
+        /// 文字列が実数である場合 True を返す。
+        /// それ以外の場合 False を返す。
+        /// </returns>
+        public static bool CheckFloat(string sValue)
+        {
+            bool CheckFloat = false;
+
+            byte[] nCode;
+            bool bDot;
+            int i;
+#if false
+            'ASCIIコード。
+            nCode = StrConv(sValue, vbFromUnicode)
+            bDot = False
+
+
+            '１文字ずつ検査。
+            For i = 0 To UBound(nCode)
+                '0～9以外？
+                If nCode(i) < &H30 & Or & H39 & < nCode(i) Then
+                    'マイナス？
+                    If nCode(i) = &H2D & Then
+                        '最初の文字？
+                        If i<> 0 Then Exit Function
+                    'ドット？
+                    ElseIf nCode(i) = &H2E & Then
+                        '２個目のドットは許可しない。
+                        If bDot Then Exit Function
+                        bDot = True
+                    Else
+                        Exit Function
+                    End If
+                End If
+            Next
+#endif
+            CheckFloat = true;
+            return CheckFloat;
+
+        }
         //==========================================================================================
 
         //==========================================================================================
@@ -338,7 +401,14 @@ namespace SurvLine.mdl
         End Function
         [VB]*/
         //------------------------------------------------------------------------------------------
-        //[C#]
+        //[C#]k.s
+        public static string MakeRangeMessage(string sMin, string sMax, string sLabel)
+        {
+            string MakeRangeMessage = sLabel + "の入力値が範囲外です。" + vbCrLf + sMin + "以上" + sMax + "未満の値を入力してください。";
+
+            return MakeRangeMessage;
+        }
+
         //==========================================================================================
 
         //==========================================================================================
@@ -369,7 +439,7 @@ namespace SurvLine.mdl
             End Function
         [VB]*/
         //------------------------------------------------------------------------------------------
-        //[C#]
+        //[C#] k.s
         /// <summary>
         /// 入力値が空であるか検査する。
         ///
@@ -383,7 +453,7 @@ namespace SurvLine.mdl
         /// <param name="sLabel"></param>
         /// <param name="bFocus"></param>
         /// <returns></returns>
-        public bool CheckInputEmpty(string txtTextBox, string sLabel, bool bFocus)
+        public static bool CheckInputEmpty(string txtTextBox, string sLabel, bool bFocus)
         {
 
             bool CheckInputEmpty = false;
@@ -485,7 +555,75 @@ namespace SurvLine.mdl
         End Function
         [VB]*/
         //------------------------------------------------------------------------------------------
-        //[C#]
+        //[C#] k.s
+        /// <summary>
+        /// 整数入力値を検査する。
+        /// '
+        /// 引き数：
+        /// txtTextBox 検査対象コントロール。
+        /// sLabel 対象コントロールの名称。
+        /// bFocus 検査に引っかかった場合フォーカスを移すか？
+        /// 
+        /// </summary>
+        /// <param name="txtTextBox"></param>
+        /// <param name="sLabel"></param>
+        /// <param name="bFocus"></param>
+        /// <returns>
+        /// 戻り値：
+        /// 入力値が正常である場合 True を返す。
+        /// それ以外の場合 False を返す。
+        /// </returns>
+        public static bool CheckIntegerInput(object txtTextBox, string sLabel, bool bFocus = true)
+        {
+            bool CheckIntegerInput = false;
+
+            System.Windows.Forms.TextBox txtTextBox2 = new System.Windows.Forms.TextBox();
+            txtTextBox2 = (System.Windows.Forms.TextBox)txtTextBox;
+
+            try
+            {
+                //'空であるか？
+                if (!CheckInputEmpty(txtTextBox2.Text, sLabel, bFocus))
+                {
+                    return CheckIntegerInput;
+                }
+
+
+                //'数字であるか？
+                if (!CheckInteger(txtTextBox2.Text)){
+                    //  Call MsgBox(sLabel &GUI_MSG_INTEGER, vbCritical)
+                    MessageBox.Show(sLabel + GUI_MSG_INTEGER, "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                    if (bFocus)
+                    {
+                        //Then Call txtTextBox.SetFocus
+                        return CheckIntegerInput;
+                    }
+                }
+
+                long nTest;
+                nTest = long.Parse(txtTextBox2.Text);
+
+                CheckIntegerInput = true;
+
+            }
+            catch (Exception ex)
+            {
+                //If Err.Number = 6 Then
+                //    Call MsgBox(sLabel & GUI_MSG_OVERFLOW, vbCritical)
+                //    If bFocus Then Call txtTextBox.SetFocus
+                //Else
+                //    Call Err.Raise(Err.Number, Err.Source, Err.Description, Err.HelpFile, Err.HelpContext)
+                //End If
+                MessageBox.Show(ex.Message, "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
+            return CheckIntegerInput;
+
+        }
+
+
+
         //==========================================================================================
 
         //==========================================================================================
@@ -525,7 +663,63 @@ namespace SurvLine.mdl
         End Function
         [VB]*/
         //------------------------------------------------------------------------------------------
-        //[C#]
+        //[C#] k.s
+        /// <summary>
+        /// 範囲付きで整数入力値を検査する。
+        /// 
+        /// nMin以上、nMax未満を許可。
+        /// 
+        /// 引き数：
+        /// txtTextBox 検査対象コントロール。
+        /// sLabel 対象コントロールの名称。
+        /// nMin 最小値。
+        /// nMax 最大値。
+        /// bFocus 検査に引っかかった場合フォーカスを移すか？
+        /// 
+        /// </summary>
+        /// <param name="txtTextBox"></param>
+        /// <param name="sLabel"></param>
+        /// <param name="nMin"></param>
+        /// <param name="nMax"></param>
+        /// <param name="bFocus"></param>
+        /// <returns>
+        /// 戻り値：
+        /// 入力値が正常である場合 True を返す。
+        /// それ以外の場合 False を返す。
+        /// </returns>
+        public static bool CheckIntegerInputRange(object txtTextBox, string sLabel, long nMin, long nMax, bool bFocus = true)
+        {
+            bool CheckIntegerInputRange = false;
+
+
+            //'整数入力であるか？
+            if (!CheckIntegerInput(txtTextBox, sLabel, bFocus))
+            {
+                return CheckIntegerInputRange;
+            }
+
+            //'範囲内か？
+            System.Windows.Forms.TextBox txtTextBox2 = new System.Windows.Forms.TextBox();
+            txtTextBox2 = (System.Windows.Forms.TextBox)txtTextBox;
+
+            long nValue;
+            nValue = long.Parse(txtTextBox2.Text);
+            if (nValue < nMin || nMax <= nValue)
+            {
+                //Call MsgBox(MakeRangeMessage(CStr(nMin), CStr(nMax), sLabel), vbCritical)
+                MessageBox.Show(MakeRangeMessage(nMin.ToString(), nMax.ToString(), sLabel), "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                if (bFocus)
+                {
+                    //Then Call txtTextBox.SetFocus
+                    return CheckIntegerInputRange;
+                }
+            }
+
+            CheckIntegerInputRange = true;
+            return CheckIntegerInputRange;
+
+        }
+
         //==========================================================================================
 
         //==========================================================================================
@@ -572,7 +766,79 @@ namespace SurvLine.mdl
         End Function
         [VB]*/
         //------------------------------------------------------------------------------------------
-        //[C#]
+        //[C#] k.s
+        /// <summary>
+        /// 実数入力値を検査する。
+        /// '
+        /// 引き数：
+        /// txtTextBox 検査対象コントロール。
+        /// sLabel 対象コントロールの名称。
+        /// bFocus 検査に引っかかった場合フォーカスを移すか？
+        /// 
+        /// </summary>
+        /// <param name="txtTextBox"></param>
+        /// <param name="sLabel"></param>
+        /// <param name="bFocus"></param>
+        /// <returns>
+        /// 戻り値：
+        /// 入力値が正常である場合 True を返す。
+        /// それ以外の場合 False を返す。
+        /// </returns>
+        public static bool CheckFloatInput(object txtTextBox, string sLabel, bool bFocus = true)
+        {
+            bool CheckFloatInput = false;
+
+            System.Windows.Forms.TextBox txtBox = new System.Windows.Forms.TextBox();
+            txtBox = (System.Windows.Forms.TextBox)txtTextBox;
+
+            try
+            {
+                //'空であるか？
+                if (!CheckInputEmpty(txtBox.Text, sLabel, bFocus))
+                {
+                    return CheckFloatInput;
+                }
+
+                //'数字であるか？
+                if (!CheckFloat(txtBox.Text))
+                {
+                    //  Call MsgBox(sLabel &GUI_MSG_DISHONESTY, vbCritical)
+                    MessageBox.Show(sLabel + GUI_MSG_DISHONESTY, "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                    if (bFocus)
+                    {
+                        //Then Call txtTextBox.SetFocus
+                        return CheckFloatInput;
+                    }
+                }
+
+                string nTest;
+                nTest = txtTextBox.ToString();
+
+
+                CheckFloatInput = true;
+
+            }
+            catch (Exception ex)
+            {
+                //ErrorHandler:
+                //    If Err.Number = 6 Then
+                //        Call MsgBox(sLabel & GUI_MSG_OVERFLOW, vbCritical)
+                //    If bFocus Then Call txtTextBox.SetFocus
+                //Else
+                //    Call Err.Raise(Err.Number, Err.Source, Err.Description, Err.HelpFile, Err.HelpContext)
+                //End If
+                _ = MessageBox.Show(ex.Message, "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+            }
+
+
+            CheckFloatInput = true;
+            return CheckFloatInput;
+
+
+
+        }
         //==========================================================================================
 
         //==========================================================================================
@@ -612,7 +878,70 @@ namespace SurvLine.mdl
         End Function
         [VB]*/
         //------------------------------------------------------------------------------------------
-        //[C#]
+        //[C#]  K.S
+        /// <summary>
+        /// 範囲付きで実数入力値を検査する。
+        /// 
+        /// nMin以上、nMax未満を許可。
+        /// 
+        /// 引き数：
+        /// txtTextBox 検査対象コントロール。
+        /// sLabel 対象コントロールの名称。
+        /// nMin 最小値。
+        /// nMax 最大値。
+        /// bFocus 検査に引っかかった場合フォーカスを移すか？
+        /// 
+        /// </summary>
+        /// <param name="txtTextBox"></param>
+        /// <param name="sLabel"></param>
+        /// <param name="nMin"></param>
+        /// <param name="nMax"></param>
+        /// <param name="bFocus"></param>
+        /// <returns>
+        /// 戻り値：
+        /// 入力値が正常である場合 True を返す。
+        /// それ以外の場合 False を返す。
+        /// </returns>
+        public static bool CheckFloatInputRange(object txtTextBox, string sLabel, double nMin, double nMax, bool bFocus = true)
+        {
+            return CheckFloatInputRange(txtTextBox, sLabel, nMin, nMax);
+        }
+        public static bool CheckFloatInputRange(object txtTextBox, string sLabel, double nMin, double nMax)
+        {
+            bool CheckFloatInputRange = false;
+            bool bFocus = true;
+
+            System.Windows.Forms.TextBox txtBox = new System.Windows.Forms.TextBox();
+            txtBox = (System.Windows.Forms.TextBox)txtTextBox;
+
+
+            //'実数入力であるか？
+            if (!CheckFloatInput(txtBox.Text, sLabel, bFocus))
+            {
+                return CheckFloatInputRange;
+            }
+
+            //'範囲内か？
+            double nValue;
+            nValue = double.Parse(txtBox.Text);
+
+            if (nValue < nMin || nMax <= nValue)
+            {
+                //MsgBox(MakeRangeMessage(CStr(nMin), CStr(nMax), sLabel), vbCritical)
+                _ = MessageBox.Show(MakeRangeMessage(nMin.ToString(), nMax.ToString(), sLabel), "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                if (bFocus)
+                {
+                    //   txtTextBox.SetFocus
+                    return CheckFloatInputRange;
+                }
+            }
+
+            CheckFloatInputRange = true;
+            return CheckFloatInputRange;
+        }
+
+
+
         //==========================================================================================
 
         //==========================================================================================

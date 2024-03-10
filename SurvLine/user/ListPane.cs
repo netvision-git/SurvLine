@@ -314,6 +314,15 @@ namespace SurvLine
         public object SelectedElement(long nList = -1)
         {
             DataGridView DG = GetDataGridView(nList);
+
+            object SelectedElement = null;
+
+            SelectedElement = m_clsmdilistPane.SelectedElement(nList, DG, ref m_objMap[nList]);
+
+            return SelectedElement;
+
+#if false   //24/03/07(--)編集メニュー K.setoguchi@NV---------->>>>>>>>>>
+
             if (nList < 0 | nList == objTab.SelectedIndex)
             {
                 //'要素が一つもない場合、HighLight が flexHighlightNever に設定されている。
@@ -344,6 +353,7 @@ namespace SurvLine
                 return null;
 #endif
             }
+#endif      //<<<<<<<<<-----------24/03/07(--)編集メニュー K.setoguchi@NV
         }
         //==========================================================================================
 

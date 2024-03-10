@@ -43,31 +43,13 @@ namespace SurvLine.mdl
             return pot == -1 ? 0 : pot;
 
         }
-#if false
-        public string StrConv(string sExt, int vbtype)
-        {
-            string StrConv = "";
-
-            switch (vbtype)
-            {
-                case DEFINE.vbUpperCase:       //文字列を大文字に変換します。
-                    StrConv = sExt.ToUpper();
-                    break;
-                default:
-                    break;
-
-            }
-
-            return StrConv;
-        }
-#endif
         /// <summary>
         /// 
         /// </summary>
         /// <param name="data"></param>
         /// <param name="code"></param>
         /// <returns></returns>
-        public byte[] StrConv(string data, int code)
+        public static byte[] StrConv(string data, int code)
         {
             byte[] bytes = new byte[data.Length];
             string sGetData = "";
