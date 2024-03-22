@@ -186,9 +186,9 @@
             this.groupBox3.Controls.Add(this.groupBox2);
             this.groupBox3.Controls.Add(this.fraDMS);
             this.groupBox3.Font = new System.Drawing.Font("ＭＳ Ｐゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.groupBox3.Location = new System.Drawing.Point(4, 132);
+            this.groupBox3.Location = new System.Drawing.Point(4, 118);
             this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(609, 238);
+            this.groupBox3.Size = new System.Drawing.Size(609, 218);
             this.groupBox3.TabIndex = 13;
             this.groupBox3.TabStop = false;
             // 
@@ -274,6 +274,7 @@
             this.cmdChange.TabIndex = 14;
             this.cmdChange.Text = "＞";
             this.cmdChange.UseVisualStyleBackColor = true;
+            this.cmdChange.Click += new System.EventHandler(this.cmdChange_Click);
             // 
             // lblTo1
             // 
@@ -632,7 +633,7 @@
             this.Frame1.Controls.Add(this.optHeight);
             this.Frame1.Controls.Add(this.lblHeightUnit);
             this.Frame1.Controls.Add(this.txtHeight);
-            this.Frame1.Location = new System.Drawing.Point(33, 376);
+            this.Frame1.Location = new System.Drawing.Point(33, 342);
             this.Frame1.Name = "Frame1";
             this.Frame1.Size = new System.Drawing.Size(216, 61);
             this.Frame1.TabIndex = 14;

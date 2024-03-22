@@ -21,6 +21,7 @@ using static SurvLine.mdl.MdlAccountMakeNSS;
 using static SurvLine.mdl.MdlOutputFile;
 using Microsoft.VisualBasic;
 using System.Xml.Linq;
+using Microsoft.VisualBasic.Logging;
 
 //namespace SurvLine.mdl
 namespace SurvLine.mdl
@@ -1045,6 +1046,8 @@ namespace SurvLine.mdl
                         Cmp = nCompare < 0 ? -1 : 0;
                         if (Cmp != 0) { rtn = -1; }
                         break;
+                    default:
+                        break;
                 }
             }
 
@@ -1939,7 +1942,7 @@ namespace SurvLine.mdl
         */
         public void UpdateRowObsPnt(DataGridView grdFlexGrid, long nRow, ObservationPoint clsObservationPoint)
         {
-            grdFlexGrid.Rows[(int)nRow].Cells[(int)COL_NUM_OBSPNT.COL_NUM_OBSPNT_ENABLE].Value = clsObservationPoint.Enable() ? "〆" : "";
+            grdFlexGrid.Rows[(int)nRow].Cells[(int)COL_NUM_OBSPNT.COL_NUM_OBSPNT_ENABLE].Value = clsObservationPoint.Enable() ? "〆" : "　";
             grdFlexGrid.Rows[(int)nRow].Cells[(int)COL_NUM_OBSPNT.COL_NUM_OBSPNT_TYPE].Value = clsObservationPoint.Fixed() ? "固定" : clsObservationPoint.Genuine() ? "偏心" : "";
             grdFlexGrid.Rows[(int)nRow].Cells[(int)COL_NUM_OBSPNT.COL_NUM_OBSPNT_NUMBER].Value = clsObservationPoint.DispNumber();
             grdFlexGrid.Rows[(int)nRow].Cells[(int)COL_NUM_OBSPNT.COL_NUM_OBSPNT_NAME].Value = clsObservationPoint.Name();
@@ -2409,11 +2412,10 @@ namespace SurvLine.mdl
         }
         //==========================================================================================
 
-
         //24/03/07(--)編集メニュー K.setoguchi@NV---------->>>>>>>>>>
         //新規
         /// <summary>
-        ///  編集＞観測点情報の編集
+        ///  編集＞観測点/ベクトル情報の編集
         /// 
         /// nList 0=観測点データ
         /// リストの行を設定する。
@@ -2427,6 +2429,10 @@ namespace SurvLine.mdl
         /// <param name="nList"></param>
         /// <param name="grdFlexGrid"></param>
         /// <param name="objMap"></param>
+        /// <returns>
+        /// 戻り値：
+        /// 観測点情報の編集
+        /// </returns>
         public object SelectedElement(long nList, DataGridView grdFlexGrid, ref Dictionary<string, object> objMap)
         {
 
@@ -2441,7 +2447,7 @@ namespace SurvLine.mdl
             else if (nList == (long)LIST_NUM_PANE.LIST_NUM_VECTOR)
             {
                 //'ベクトル。
-                m_clsMdlListProc.RemakeListVector(nList, grdFlexGrid, ref objMap);
+                SelectedElement = m_clsMdlListProc.SelectedElement_Vector(nList, grdFlexGrid, ref objMap);
             }
             else
             {
@@ -2454,6 +2460,128 @@ namespace SurvLine.mdl
         }
         //<<<<<<<<<-----------24/03/07(--)編集メニュー K.setoguchi@NV
 
+        //***********************************************************************************************************
+        //新規    //2
+        /// <summary>
+        /// 選択行の要素取得を開始する。
+        /// '
+        /// 選択行の位置を示す整数値が取得される。
+        /// このメソッドで取得される整数値を GetNextAssoc メソッドに渡すことにより選択行のオブジェクトが取得できる。
+        /// GetNextAssoc で 0 が返るまで、繰り返し GetNextAssoc を呼ぶことによりすべての選択行のオブジェクトが取得できる。
+        /// '
+        /// 引き数：
+        /// nList 対象とするリストの番号。省略するとカレントリストが対象になる。
+        /// 
+        /// </summary>
+        /// <param name="nList"></param>
+        /// <param name="grdFlexGrid"></param>
+        /// <param name="objMap"></param>
+        /// <param name="nPos"></param>
+        /// <returns>
+        /// 戻り値：
+        ///     選択行の位置を示す整数値を返す。<--( 0) から XX
+        ///     選択行が無い場合は 0 を返す。<----- --(-1)に訂正
+        /// </returns>
+        public long StartSelectedAssoc(long nList, DataGridView grdFlexGrid, ref Dictionary<string, object> objMap)
+        {
+            long StartSelectedAssoc = 0;
+
+            if (nList == (long)LIST_NUM_PANE.LIST_NUM_OBSPNT)
+            {
+                //'観測点。
+                StartSelectedAssoc = m_clsMdlListProc.StartSelectedAssoc_ObsPnt(nList, grdFlexGrid, ref objMap);
+
+            }
+            else if (nList == (long)LIST_NUM_PANE.LIST_NUM_VECTOR)
+            {
+                //'ベクトル。
+                StartSelectedAssoc = m_clsMdlListProc.StartSelectedAssoc_Vector(nList, grdFlexGrid, ref objMap);
+            }
+            else
+            {
+                //'座標。
+
+            }
+            return StartSelectedAssoc;
+
+        }
+        //===================================================================================================
+        //新規    //2
+        /// <summary>
+        ///  指示れてたｎ行目の観測点/ベクトル情報
+        /// 
+        /// nList 0=観測点データ
+        /// リストの行を設定する。
+        /// リストの初期化は MakeList 関係のメソッド。
+        ///'
+        /// 引き数：
+        ///  nList 観測点種別。
+        ///  grdFlexGrid リストコントロール。
+        ///  objMap 要素マップ。要素はオブジェクト。キーは要素のポインタ(リストの RowData に設定されている)。
+        ///  nPos 指示れてた行(0行目---)
+        /// </summary>
+        /// <param name="nList"></param>
+        /// <param name="grdFlexGrid"></param>
+        /// <param name="objMap"></param>
+        /// <param name="nPos"></param>
+        /// <returns>
+        /// 戻り値：
+        /// 観測点/ベクトル情報
+        /// </returns>
+        public object GetNextAssoc(long nList, DataGridView grdFlexGrid, ref Dictionary<string, object> objMap, ref long nPos)
+        {
+            object GetNextAssoc = null;
+
+            if (nList == (long)LIST_NUM_PANE.LIST_NUM_OBSPNT)
+            {
+                //'観測点。
+                GetNextAssoc = m_clsMdlListProc.GetNextAssoc_ObsPnt(nList, grdFlexGrid, ref objMap, ref nPos);
+
+            }
+            else if (nList == (long)LIST_NUM_PANE.LIST_NUM_VECTOR)
+            {
+                //'ベクトル。
+                GetNextAssoc = m_clsMdlListProc.GetNextAssoc_Vector(nList, grdFlexGrid, ref objMap, ref nPos);
+            }
+            else
+            {
+                //'座標。
+            }
+
+            return GetNextAssoc;
+        }
+
+
+
+
+
+
+        //新規    //2
+        public object EditValid(long nList, DataGridView grdFlexGrid, ref Dictionary<string, object> objMap)
+        {
+
+            object EditValid = null;
+
+            if (nList == (long)LIST_NUM_PANE.LIST_NUM_OBSPNT)
+            {
+                //'観測点。
+                EditValid = m_clsMdlListProc.Element_ObsPnt(nList, grdFlexGrid, ref objMap);
+
+            }
+            else if (nList == (long)LIST_NUM_PANE.LIST_NUM_VECTOR)
+            {
+                //'ベクトル。
+                EditValid = m_clsMdlListProc.Element_Vector(nList, grdFlexGrid, ref objMap);
+            }
+            else
+            {
+                //'座標。
+
+            }
+            return EditValid;
+
+
+        }
 
     }
 }

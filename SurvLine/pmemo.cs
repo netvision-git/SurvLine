@@ -18,25 +18,49 @@ namespace SurvLine
         //***************************************************************************
         //***************************************************************************
         //プログラム＜プロジェクト＞
-        //Git管理：コメント＞(ブランチ:B240306-0)24/03/07(01)編集メニュー
+        //Git管理：コメント＞(ブランチ:B240311-0)24/03/22(終)編集:セクション名の変更
         //
         //＜コメント＞
-        //修正要 saka -> K.Setoguchi(2)
+        //修正要 saka -> K.Setoguchi(3)
+        //ここは、重要では無い為、後で対応（瀬戸口）
         //24/03/07(--)編集メニュー K.setoguchi@NV---------->>>>>>>>>>
         //<<<<<<<<<-----------24/03/07(--)編集メニュー K.setoguchi@NV
         //***************************************************************************
         //***************************************************************************
 
-        //1==========================================================================================
+        //3==========================================================================================
         /*[VB]
             [VB]*/
         //------------------------------------------------------------------------------------------
-        //[C#]
+        //[C#] //3
 
 
 
+        /*
+        #if false
+                //BUG
+                    Genba_S.OP_ObjectType = br.ReadInt32(); //BUG:240317_0517 K.S
+        #else
+                //change
+                Genba_S.OP_ObjectType = br.ReadInt64(); //BUG:240317_0517 K.S
+        #endif
+        */
 #if false
+                //'砂時計。
+                Cursor = Cursors.WaitCursor;
+                Cursor = Cursors.Default;
+
+
+                using TextBox = System.Windows.Forms.TextBox;
+                using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+
+                TextBox txtLatH2 = txtLatH as TextBox;
+
+                string AppPath = System.IO.Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath);
+
 MdlNSGUI
+            _ = new System.Windows.Forms.TextBox();
+            System.Windows.Forms.TextBox txtTextBox2 = (System.Windows.Forms.TextBox)txtTextBox;
 
         using static SurvLine.mdl.DEFINE;
         using static SurvLine.mdl.MdlNSDefine;
@@ -45,9 +69,7 @@ MdlNSGUI
         using static SurvLine.mdl.MdlNSGUI;
         using static SurvLine.mdl.MdlNSSDefine;
         using static SurvLine.mdl.MdiVBfunctions;
-
         using static SurvLine.mdl.MdlMain;
-        
         using static SurvLine.mdl.MdlGUI;
         using static SurvLine.mdl.MdlNSUtility
 
@@ -70,6 +92,8 @@ MdlNSGUI
         //  MessageBox.Show(ex.Message, "エラー発生");
         -------------------------------------------------------------------------------------------
         MessageBox.Show(ex.Message,"エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        _ = MessageBox.Show(ex.Message, "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
         -------------------------------------------------------------------------------------------
         DialogResult r8 = MessageBox.Show (this, "Message with Help file and keyword.", 
                                            "Help Caption", MessageBoxButtons.OK, 
@@ -110,8 +134,122 @@ MdlNSGUI
 
             Yes	6	
             The dialog box return value is Yes(usually sent from a button labeled Yes).
+
+
+
+private void button1_Click(object sender, EventArgs e)
+{
+  string text = "文字列";
+
+  //ASCII エンコード
+  byte[] data = System.Text.Encoding.ASCII.GetBytes(text);
+  
+  //データがShift-JISの場合
+  //byte[] data = System.Text.Encoding.GetEncoding("shift_jis").GetBytes(text);
+
+  //データがEUCの場合
+  //byte[] data = System.Text.Encoding.GetEncoding("euc-jp").GetBytes(text);
+
+  //データがunicodeの場合
+  //byte[] data = System.Text.Encoding.Unicode.GetBytes(text);
+
+  //データがutf-8の場合
+  //byte[] data = System.Text.Encoding.UTF8.GetBytes(text);
+
+  //何かしらの処理
+  WirteBinaryData(data);
+}
+
+                /*[VB]
+                'リストの作成。
+                Call objListPane.SelectElement(Nothing)
+                Call objListPane.RemakeList(False)
+                [VB] */
+                /*[C#]*/
+#if true
+                objListPane.SelectElement(null);
+                objListPane.RemakeList(false);
 #endif
 
+                /*[VB]
+                'プロットの再描画。
+                Call objPlotPane.UpdateLogicalDrawArea(True)
+                Call objPlotPane.Redraw
+                Call objPlotPane.Refresh
+                [VB] */
+                /*[C#]*/
+                //objPlotPane.PlotPane_Initialize();
+                Bitmap btmp = objPlotPane.Dis_Get_btmp();
+                objPlotPane.List_Genba_set(m_List_Genba_S);
+                objPlotPane.UpdateLogicalDrawArea(true);
+                objPlotPane.Redraw();
+                objPlotPane.Refresh();
+
+
+                /*[VB]
+                'ステータスバーの更新。
+                Call UpdateStatusBarAll
+                [VB]*/
+
+
+                /*[VB]
+                'ドキュメントのOpen/Closeによるメニューの更新。
+                Call UpdateDocumentMenu
+                [VB]*/
+
+
+
+
+//*************************************************************************
+    Private Sub Form1_Load(ByVal sender As Object, _
+            ByVal e As System.EventArgs) Handles MyBase.Load
+        'TextBox1のLostFocusイベントハンドラを追加する
+        AddHandler TextBox1.LostFocus, AddressOf TextBox1_LostFocus
+    End Sub
+
+    'LostFocusイベントハンドラ
+    Private Sub TextBox1_LostFocus(ByVal sender As Object, _
+            ByVal e As EventArgs)
+        Console.WriteLine("LostFocusイベントが発生しました。")
+    End Sub
+--------------------------------------------------------
+  ↓ ↓  ↓  ↓  ↓  ↓ ↓  ↓  ↓  ↓
+  ↓ ↓  ↓  ↓  ↓  ↓ ↓  ↓  ↓  ↓
+--------------------------------------------------------
+    private void Form1_Load(object sender, System.EventArgs e)
+    {
+         //TextBox1のLostFocusイベントハンドラを追加する
+         TextBox1.LostFocus += new EventHandler(TextBox1_LostFocus);
+    }
+
+    //LostFocusイベントハンドラ
+    private void TextBox1_LostFocus(object sender, EventArgs e)
+    {
+         Console.WriteLine("LostFocusイベントが発生しました。");
+    }
+//*************************************************************************
+//*************************************************************************
+
+#endif
+
+        //***************************************************************************
+        //***************************************************************************
+        //プログラム＜プロジェクト＞
+        //Git管理：コメント＞(ブランチ:B240306-0)24/03/07(01)編集メニュー
+        //
+        //＜コメント＞
+        //修正要 saka -> K.Setoguchi(2)
+        //ここは、重要では無い為、後で対応（瀬戸口）
+        //24/03/07(--)編集メニュー K.setoguchi@NV---------->>>>>>>>>>
+        //<<<<<<<<<-----------24/03/07(--)編集メニュー K.setoguchi@NV
+        //***************************************************************************
+        //***************************************************************************
+
+        //2==========================================================================================
+        /*[VB]
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#] 2
 
 
         //***************************************************************************

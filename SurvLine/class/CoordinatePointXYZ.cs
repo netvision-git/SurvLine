@@ -494,7 +494,8 @@ namespace SurvLine
         public override void GetDMS(ref long nLatH, ref long nLatM, ref double nLatS, ref long nLonH, ref long nLonM, ref double nLonS, ref double nHeight,
             ref double vAlt, long nDecimal, string sGeoidoPath)
         {
-            CoordinatePoint_GetDMS(nLatH, nLatM, nLatS, nLonH, nLonM, nLonS, nHeight, vAlt, nDecimal, sGeoidoPath);
+            //2 CoordinatePoint_GetDMS(nLatH, nLatM, nLatS, nLonH, nLonM, nLonS, nHeight, vAlt, nDecimal, sGeoidoPath);
+            CoordinatePoint_GetDMS(ref nLatH, ref nLatM, ref nLatS, ref nLonH, ref nLonM, ref nLonS, ref nHeight, ref vAlt, nDecimal, sGeoidoPath);     //2
         }
         //==========================================================================================
 
@@ -941,13 +942,12 @@ namespace SurvLine
         //------------------------------------------------------------------------------------------
         //[C#]
         //'緯度経度(度分秒)を取得する。
-        private void CoordinatePoint_GetDMS(long nLatH, long nLatM, double nLatS, long nLonH, long nLonM, double nLonS, double nHeight, double vAlt, long nDecimal, string sGeoidoPath)
+        //2 private void CoordinatePoint_GetDMS(long nLatH, long nLatM, double nLatS, long nLonH, long nLonM, double nLonS, double nHeight, double vAlt, long nDecimal, string sGeoidoPath)
+        private void CoordinatePoint_GetDMS(ref long nLatH, ref long nLatM, ref double nLatS, ref long nLonH, ref long nLonM, ref double nLonS, ref double nHeight, ref double vAlt, long nDecimal, string sGeoidoPath)     //2
         {
             double nLat = 0;
             double nLon = 0;
             WGS84xyz_to_WGS84dms(m_nRoundX, m_nRoundY, m_nRoundZ, ref nLat, ref nLon, ref nHeight);
-            //d_to_dms_decimal(nLat, ref nLatH, ref nLatM, ref nLatS, nDecimal);
-            //d_to_dms_decimal(nLon, ref nLonH, ref nLonM, ref nLonS, nDecimal);
             D_to_Dms_decimal(nLat, ref nLatH, ref nLatM, ref nLatS, nDecimal);
             D_to_Dms_decimal(nLon, ref nLonH, ref nLonM, ref nLonS, nDecimal);
             GetAlt(nLat, nLon, nHeight, ref vAlt, sGeoidoPath);

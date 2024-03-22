@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SurvLine.mdl;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -9,6 +10,21 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Linq;
 using static SurvLine.mdl.DEFINE;
+using static SurvLine.mdl.MdlNSDefine;
+using static SurvLine.mdl.MdlUtility;
+using static SurvLine.mdl.MdlAccountMake;
+using static SurvLine.mdl.MdlNSGUI;
+using static SurvLine.mdl.MdlGUI;
+using static SurvLine.mdl.MdlNSSDefine;
+using static SurvLine.mdl.MdiVBfunctions;
+using static SurvLine.mdl.MdlMain;
+using static SurvLine.mdl.MdlNSUtility;
+using static System.Net.Mime.MediaTypeNames;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using Microsoft.VisualBasic.Logging;
+using System.Reflection;
+using static SurvLine.frmAttribute;
+using System.Runtime.Remoting;
 
 
 namespace SurvLine
@@ -80,10 +96,10 @@ namespace SurvLine
 
         public struct DEFTYPEINFO_MANUFACTURER   //'メーカー別定義情報
         {
-            string Manufacturer;                //'メーカー名。
-            List<DEFTYPEINFO> DefTypeInfos;     //'定義情報。
-            long ListIndex;                     //'定義情報のカレントのリストインデックス。
-            long SortIndex;                     //'並び順番号。
+            public  string Manufacturer;                //'メーカー名。
+            public List<DEFTYPEINFO> DefTypeInfos;     //'定義情報。
+            public long ListIndex;                     //'定義情報のカレントのリストインデックス。
+            public long SortIndex;                     //'並び順番号。
         }
 
         //1==========================================================================================
@@ -136,11 +152,27 @@ namespace SurvLine
         //------------------------------------------------------------------------------------------
         //[C#]
         //'インプリメンテーション
-        private Collection m_objElements;       //'編集の対象とする観測点。コレクションであるが実質は一つのオブジェクトしか設定しない。要素は ObservationPoint オブジェクト(代表観測点)。キーは任意。
-        private List<DEFTYPEINFO_MANUFACTURER> m_tRecInfos;     //'受信機定義情報。配列の要素は(-1 To ...)、要素 -1 は未使用。
-        private List<DEFTYPEINFO_MANUFACTURER> m_tAntInfos;     //'アンテナ定義情報。配列の要素は(-1 To ...)、要素 -1 は未使用。
-        private List<DEFTYPEINFO_MANUFACTURER> m_tInfos;        //'定義情報。配列の要素は(-1 To ...)、要素 -1 は未使用。
+        //private Collection m_objElements;       //'編集の対象とする観測点。コレクションであるが実質は一つのオブジェクトしか設定しない。要素は ObservationPoint オブジェクト(代表観測点)。キーは任意。
+        public Dictionary<string, object> m_objElements;
 
+        private List<DEFTYPEINFO_MANUFACTURER> m_tRecInfos = new List<DEFTYPEINFO_MANUFACTURER>();  //'受信機定義情報。配列の要素は(-1 To ...)、要素 -1 は未使用。
+        private List<DEFTYPEINFO_MANUFACTURER> m_tAntInfos = new List<DEFTYPEINFO_MANUFACTURER>();  //'アンテナ定義情報。配列の要素は(-1 To ...)、要素 -1 は未使用。
+        public List<DEFTYPEINFO_MANUFACTURER> m_tInfos = new List<DEFTYPEINFO_MANUFACTURER>();     //'定義情報。配列の要素は(-1 To ...)、要素 -1 は未使用。
+
+
+
+        //------------------------------------------------------------------------------------------
+        //[C#]
+        //==========================================================================================
+        //[C#]
+        private MdlMain m_clsMdlMain;                                   //MdlMainインスタンス
+
+        public frmAttribute(MdlMain clsMdlMain)
+        {
+            InitializeComponent();
+            Load += Form_Load;
+        }
+        //------------------------------------------------------------------------------------------
 
 
         //'*******************************************************************************
@@ -158,10 +190,10 @@ namespace SurvLine
             [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
-        public void ObservationPoint(ObservationPoint clsObservationPoint)
+        public static void ObservationPoint(ObservationPoint clsObservationPoint)
         {
-            m_objElements = new Collection();
-            //  m_objElements.Add(clsObservationPoint);
+            object m_objElements = new Dictionary<string, object>();
+            //  m_objElements(clsObservationPoint);
         }
 
 
@@ -170,14 +202,6 @@ namespace SurvLine
         //'イベント
         //'*******************************************************************************
 
-        //------------------------------------------------------------------------------------------
-        //[C#]
-        public frmAttribute()
-        {
-            InitializeComponent();
-            Load += Form_Load;
-        }
-        //------------------------------------------------------------------------------------------
 
         //1==========================================================================================
         /*[VB]
@@ -252,8 +276,114 @@ namespace SurvLine
             [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        private void fraTab(int Index)
+        {
+            fraTab1.FlatStyle = FlatStyle.Standard;
+
+        }
+
         private void Form_Load(object sender, EventArgs e)
         {
+
+            try
+            {
+
+                //'変数初期化。
+                Result = vbCancel;
+                fraCtrls0.FlatStyle = FlatStyle.Standard;
+                fraCtrls0.FlatStyle = FlatStyle.Standard;
+
+                //'タブ初期化。
+                object objTab;
+
+                fraTab0.FlatStyle = FlatStyle.Standard;
+                fraTab1.FlatStyle = FlatStyle.Standard;
+                fraTab2.FlatStyle = FlatStyle.Standard;
+
+                ChangeTab(tsTab, fraTab0);
+                ChangeTab(tsTab, fraTab1);
+                ChangeTab(tsTab, fraTab2);
+
+
+
+                //'最少衛星数。
+                long i;
+                for (i = 0; i < 36; i++)
+                {
+                    cmbNumberOfMinSV.Items.Add(i);
+                }
+
+                //'値の設定。
+                txtRecNumber.Text = RecNumber;
+                txtAntNumber.Text = AntNumber;
+                txtAntHeight.Text = FormatRound0Trim(AntHeight, GUI_ANTHEIGHT_DECIMAL);
+
+                if (ElevationMaskHand < 0)
+                {
+                    txtElevationMask.Text = "15";       //'optElevationMaskObsData より先に設定。
+                    optElevationMaskObsData.Checked = true;
+                }
+                else
+                {
+                    txtElevationMask.Text = ElevationMaskHand.ToString();     //'optElevationMaskInput より先に設定。
+                    optElevationMaskInput.Checked = true;
+                }
+
+                //'セッションリスト。
+                //MakeSessionList(cmbSession);
+                cmbSession.Items.Add(Session);
+
+                if (NumberOfMinSVHand > 0)
+                {
+                    cmbNumberOfMinSV.SelectedIndex = (int)NumberOfMinSVHand - 1;
+                    optNumberOfMinSVStatic.Checked = true;
+                }
+                else
+                {
+                    //'2023/07/24 Hitz H.Nakamura **************************************************
+                    //  '観測データの衛星数がリストボックスの相手無数を超える場合があった。
+                    //  'そのような場合はリストボックスを未選択状態にしておく。
+                    //  'cmbNumberOfMinSV.ListIndex = NumberOfMinSV - 1 'こっちが先。
+                    //'*****************************************************************************
+                    if (cmbNumberOfMinSV.Items.Count < NumberOfMinSV)
+                    {
+                        cmbNumberOfMinSV.SelectedIndex = -1;
+                    }
+                    else
+                    {
+                        cmbNumberOfMinSV.SelectedIndex = (int)(NumberOfMinSV - 1);     //'こっちが先。
+                    }
+                    optNumberOfMinSVObsData.Checked = true;     //'こっちが後。
+
+                }
+
+                //'定義情報の初期化。
+                InitDefTypeInfo();
+    
+            }
+            catch (Exception ex)
+            {
+                //ErrorHandler:
+                //    Call mdlMain.ErrorExit
+                _ = MessageBox.Show(ex.Message + "frmAttribute Form_Load", "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+            }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         }
 
@@ -662,6 +792,10 @@ namespace SurvLine
             [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        private void SortInfos(List<DEFTYPEINFO_MANUFACTURER> tInfos, ref long nListIndex)
+        {
+
+        }
 
 
         //1==========================================================================================
@@ -833,6 +967,163 @@ namespace SurvLine
             [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        private void InitDefTypeInfo()
+        {
+            string App_Path = @"C:\Develop\NetSurv\Src\NS-App\NS-Survey";
+
+            /*
+                '受信機情報。
+                Dim sPath As String
+                sPath = App.Path & "\" & PROFILE_RCV_FILE
+                Dim nUnknown As Long
+                nUnknown = GetPrivateProfileString(PROFILE_RCV_SEC_LIST, PROFILE_RCV_KEY_UNKNOWN, "0", sPath)
+                Dim nCount As Long
+                nCount = GetPrivateProfileInt(PROFILE_RCV_SEC_LIST, PROFILE_RCV_KEY_COUNT, 0, sPath) '受信機数。
+                //ReDim m_tInfos(-1 To nCount - 1) '十分な配列数。
+                Dim objKeyToIndex As New Collection
+                Dim vIndex As Variant
+                Dim nListIndex As Long
+                Dim i As Long
+                nCount = 0
+                nListIndex = -1
+             */
+
+            //'受信機情報。
+            string sPath;
+            sPath = App_Path + "\\" + PROFILE_RCV_FILE;
+            long nUnknown;
+            nUnknown = long.Parse(GetPrivateProfileString(PROFILE_RCV_SEC_LIST, PROFILE_RCV_KEY_UNKNOWN, "0", sPath));
+            long nCount;
+            nCount = GetPrivateProfileInt(PROFILE_RCV_SEC_LIST, PROFILE_RCV_KEY_COUNT, 0, sPath);   //'受信機数。
+            Dictionary<string, object> objKeyToIndex = new Dictionary<string, object>();
+            string vIndex = "";
+            long nListIndex;
+            long i;
+            nCount = 0;
+            nListIndex = -1;
+
+
+            /*
+                List<DEFTYPEINFO_MANUFACTURER> m_tInfos = new List<DEFTYPEINFO_MANUFACTURER>();     //'定義情報。配列の要素は(-1 To ...)、要素 -1 は未使用。
+                public struct DEFTYPEINFO_MANUFACTURER   //'メーカー別定義情報
+                {
+                    string Manufacturer;                //'メーカー名。
+                    List<DEFTYPEINFO> DefTypeInfos;     //'定義情報。
+                    long ListIndex;                     //'定義情報のカレントのリストインデックス。
+                    long SortIndex;                     //'並び順番号。
+                }
+             */
+
+            DEFTYPEINFO_MANUFACTURER m_tInfosA = new DEFTYPEINFO_MANUFACTURER();
+            DEFTYPEINFO DefTypeInfosA = new DEFTYPEINFO();
+
+            for (i = 0; i < m_tInfos.Count;)
+            {
+                //'Unknown はスキップ。
+                if (i == nUnknown)
+                {
+                    i = i + 1;
+                    if (i > m_tInfos.Count) {
+                        break;
+                    }
+                }
+                string sRcv;
+                sRcv = GetPrivateProfileString(PROFILE_RCV_SEC_LIST, PROFILE_RCV_KEY_RCV + i.ToString(), "", sPath);
+                string sManufacturer;
+                sManufacturer = GetPrivateProfileString(sRcv, PROFILE_RCV_KEY_MANUFACTURE, "", sPath);
+
+
+
+                if (!LookupCollectionVariant(objKeyToIndex, ref vIndex, sManufacturer))
+                {
+                    //'メーカー別定義情報の追加。
+                    vIndex = nCount.ToString();
+                    nCount = nCount + 1;
+
+                    objKeyToIndex.Add(vIndex, sManufacturer);
+
+                    //メーカー別定義情報
+                    m_tInfosA.Manufacturer = sManufacturer;             //'メーカー名。
+                    m_tInfosA.ListIndex = -1;                           //'定義情報のカレントのリストインデックス。
+                    m_tInfosA.SortIndex = GetManufacturerSortIndex(sManufacturer);          //'並び順番号。
+                    m_tInfosA.DefTypeInfos = new List<DEFTYPEINFO>();   //'定義情報。
+                    m_tInfos.Add(m_tInfosA);
+
+
+                    //'定義情報の追加。
+                    /*
+                        Dim nUBound As Long
+                        nUBound = UBound(m_tInfos(vIndex).DefTypeInfos) + 1
+                        ReDim Preserve m_tInfos(vIndex).DefTypeInfos(-1 To nUBound)
+                        m_tInfos(vIndex).DefTypeInfos(nUBound).DefType = sRcv
+                        m_tInfos(vIndex).DefTypeInfos(nUBound).Name = GetPrivateProfileString(sRcv, PROFILE_RCV_KEY_TYPE, sRcv, sPath)
+                     */
+                    long nUBound;
+
+                    DefTypeInfosA.DefType = sRcv;
+                    DefTypeInfosA.Name = GetPrivateProfileString(sRcv, PROFILE_RCV_KEY_TYPE, sRcv, sPath);
+                    m_tInfos[int.Parse(vIndex)].DefTypeInfos.Add(DefTypeInfosA);
+
+                    nUBound = m_tInfos[int.Parse(vIndex)].DefTypeInfos.Count + 1;
+
+
+                    //'カレントインデックス。
+                    /*
+                        If m_tInfos(vIndex).DefTypeInfos(nUBound).DefType = RecType Then
+                            nListIndex = vIndex
+                            m_tInfos(vIndex).ListIndex = nUBound
+                        End If
+                     */
+                    if (m_tInfos[int.Parse(vIndex)].DefTypeInfos[(int)nUBound].DefType == RecType)
+                    {
+                        nListIndex = long.Parse(vIndex);
+                        //  m_tInfos[0].ListIndex = nUBound;
+                    }
+
+                    //ReDim Preserve m_tInfos(-1 To nCount - 1)
+                    SortInfos(m_tRecInfos, ref nListIndex);
+
+#if false
+    
+                '受信機メーカーリスト。
+                For i = 0 To UBound(m_tRecInfos)
+                    Dim sItem As String
+                    sItem = GetManufacturerDispJ(m_tRecInfos(i).Manufacturer)
+                    If sItem = "" Then sItem = "不明"
+                    Call cmbRecManufacturer.AddItem(sItem)
+                Next
+                '初期値。
+                If cmbRecManufacturer.ListCount > 0 Then
+                    If nListIndex < 0 Then
+                        cmbRecManufacturer.ListIndex = 0
+                        optRecName.Value = True
+                    Else
+                        cmbRecManufacturer.ListIndex = nListIndex
+                        optRecList.Value = True
+                    End If
+                Else
+                    Call MakeRecTypeList(-1)
+                    optRecName.Value = True
+                End If
+    
+                '受信機名。
+
+
+#endif
+
+
+                }//if (!LookupCollectionVariant(objKeyToIndex, ref vIndex, sManufacturer))
+
+
+            }//for (i = 0; i < m_tInfos.Count)
+
+
+
+#if false
+
+
+#endif
+        }
 
 
 

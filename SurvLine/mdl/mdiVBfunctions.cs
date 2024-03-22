@@ -35,7 +35,6 @@ namespace SurvLine.mdl
             return pot == -1 ? 0 : pot;
         }
         //====================================================================
-
         public static long InStr(int stpot, string target, string search)
         {
             int pot;
@@ -49,7 +48,7 @@ namespace SurvLine.mdl
         /// <param name="data"></param>
         /// <param name="code"></param>
         /// <returns></returns>
-        public static byte[] StrConv(string data, int code)
+        public static byte[] StrConv(string data, int code)     //2 変更
         {
             byte[] bytes = new byte[data.Length];
             string sGetData = "";
@@ -59,6 +58,7 @@ namespace SurvLine.mdl
             {
                 case DEFINE.vbUpperCase:        //文字列を大文字に変換します。
                     sGetData = data.ToUpper();
+                    bytes = Encoding.UTF8.GetBytes(sGetData);
                     break;
                 case DEFINE.vbLowerCase:        //文字列を小文字に変換します。
                     sGetData = data.ToLower();
@@ -75,19 +75,27 @@ namespace SurvLine.mdl
                     break;
                 case DEFINE.vbUnicode:          //システムの既定のコード ページを使用して、文字列を Unicode に変換します。 (Macintosh では使用できません。
                     sGetData = Encoding.Unicode.GetString(bytes);
+                    //----------------------------------------------
+                    bytes = Encoding.Unicode.GetBytes(data);
+                    //----------------------------------------------
                     break;
                 case DEFINE.vbFromUnicode:      //文字列を Unicode からシステムの既定のコード ページに変換します。 (Macintosh では使用できません。
+                    //----------------------------------------------
                     //  sGetData = Encoding.GetEncoding("shift_jis").GetString(bytes);
                     sGetData = Encoding.UTF8.GetString(bytes);
+                    //----------------------------------------------
+                    bytes = Encoding.UTF8.GetBytes(data);
+                    //----------------------------------------------
+
+
                     break;
                 default:
                     sGetData = data;
+                    bytes = Encoding.UTF8.GetBytes(data);
                     break;
             }
 
-            byte[] bytes2 = new byte[sGetData.Length];
-
-            return bytes2;
+            return bytes;
         }
 
         /// <summary>

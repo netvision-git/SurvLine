@@ -41,6 +41,12 @@ namespace SurvLine.mdl
         private Random rnd;
 
         private MdlMain mdlMain;
+
+
+        public long PaneSelectedTab;    //PaneのTab（観測点/座標／ベクトル      //2
+        public long PaneSelcttedNo;     //Paneの選択行(0～）                    //2
+
+
         //==========================================================================================
 
         //==========================================================================================

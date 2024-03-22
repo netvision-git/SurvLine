@@ -400,7 +400,14 @@ namespace SurvLine
         //[VB] Public Sub Load(ByVal nFile As Integer, ByVal nVersion As Long)
         public void Load(BinaryReader br, long nVersion, ref GENBA_STRUCT_S Genba_S)
         {
-            MdlUtility mdlUtility = new MdlUtility();   //Add K.setoguchi
+
+#if false
+            //Old
+            MdlUtility mdlUtility = new MdlUtility();       //Add K.setoguchi   //2
+#else
+            //change
+            //  MdlUtility mdlUtility = new MdlUtility();   //Add K.setoguchi   //2
+#endif
             //MdlUtility mdlUtility = new MdlUtility();
             ////Document document = new Document();
             //MdlNSDefine mdlNSDefine

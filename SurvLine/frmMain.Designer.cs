@@ -2947,7 +2947,7 @@
         private System.Windows.Forms.ToolStripStatusLabel sts4_toolStripStatusLabel;
         private System.Windows.Forms.ToolStripStatusLabel sts5_toolStripStatusLabel;
         private PlotPane objPlotPane;
-        private ListPane objListPane;
+        internal ListPane objListPane;
     }
 }
 

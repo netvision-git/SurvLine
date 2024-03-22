@@ -747,7 +747,50 @@ namespace SurvLine.mdl
         End Function
         [VB]*/
         //------------------------------------------------------------------------------------------
-        //[C#]
+        //[C#]  //2
+        /// <summary>
+        /// 文字列の先頭から、任意の文字を省く。
+        /// '
+        /// 引き数：
+        /// sValue 文字列。
+        /// sTarget 省く文字。
+        /// 
+        /// </summary>
+        /// <param name="sValue"></param>
+        /// <param name="sTarget"></param>
+        /// <returns>
+        /// 戻り値：結果文字列。
+        /// </returns>
+        public static string LTrimEx(string sValue, string sTarget)
+        {
+            string LTrimEx;
+
+            int i = 0;
+            int set = 0;
+
+            //ASCII エンコード
+            //  byte[] nValue = new byte[sValue.Length];
+            //  byte[] nTarget = new byte[sTarget.Length];
+            byte[] nValue = Encoding.ASCII.GetBytes(sValue);
+            byte[] nTarget = Encoding.ASCII.GetBytes(sTarget);
+
+            for (i = 0; i < nValue.Length; i += 2)
+            {
+                // If nValue(i) <> nTarget(0) Or nValue(i +1) <> nTarget(1) Then Exit For
+
+                if (nValue[i] != nTarget[0] || nValue[i + 1] != nTarget[1])
+                {
+                    break;
+                }
+
+            }
+
+            LTrimEx = Mid(sValue, i + 1, sValue.Length);
+
+            return LTrimEx;
+        }
+
+#if false   //2
         /*
         '文字列の先頭から、任意の文字を省く。
         '
@@ -757,10 +800,30 @@ namespace SurvLine.mdl
         '
         '戻り値：結果文字列。
         */
-        public static string LTrimEx(string sValue, string sTarget)
+        public static string sss LTrimEx(string sValue, string sTarget)     //2 
         {
-            return "";
+            int size = sValue.Length;
+            if (size > 0)   //データ無し
+            {
+                return sValue;
+            }
+
+            //省く文字の有無
+            int sts = 0;
+            do
+            {
+                sts = sValue.IndexOf(sTarget, size - 1);
+                if (sts >= 0)
+                {
+                    sValue = Mid(sValue, sts - 1, 1);
+                }
+                sts--;
+
+            } while (sts >= 0);
+
+            return sValue;
         }
+#endif  //2
         //==========================================================================================
 
         //==========================================================================================
@@ -2224,80 +2287,111 @@ namespace SurvLine.mdl
         //***************************************************************************
 
 
-        //***************************************************************************
-        //***************************************************************************
-        /// <summary>
-        /// 文字列の末尾から、任意の文字を省く。
-        /// （VB RTrimEx関数をVC用に変更）
-        ///  引き数：
-        ///     sValue 文字列。
-        ///     sTarget 省く文字。
-        //      bRaise Err.Raise の有無。
-        /// </summary>
-        /// <param name="sSrcPath">
-        /// <param name="sDstPath">
-        /// <param name="bRaiser">
-        /// </param>
-        /// <returns>
-        /// 戻り値:returns = 文字列
-        /// </returns>
-        //***************************************************************************
-        //[VB]  Public Function RTrimEx(ByVal sValue As String, ByVal sTarget As String) As String
+
+        //2==========================================================================================
+        /*[VB]
+        '文字列の末尾から、任意の文字を省く。
+        '
+        '引き数：
+        'sValue 文字列。
+        'sTarget 省く文字。
+        '
+        '戻り値：結果文字列。
+        Public Function RTrimEx(ByVal sValue As String, ByVal sTarget As String) As String
+            Dim nValue() As Byte
+            Dim nTarget() As Byte
+            Dim i As Long
+            nValue = sValue
+            nTarget = Left$(sTarget, 1)
+            For i = UBound(nValue) To 0 Step -2
+            If nValue(i) <> nTarget(1) Or nValue(i - 1) <> nTarget(0) Then Exit For
+            Next
+            RTrimEx = LeftB$(sValue, i + 1)
+        End Function
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#] 2
         public static string RTrimEx(string sValue, string sTarget)
         {
+            string RTrimEx = sValue;
+
+
+            //ASCII エンコード
+            byte[] nValue = Encoding.ASCII.GetBytes(sValue);
+            byte[] nTarget = Encoding.ASCII.GetBytes(sTarget);
+
+
             //文字末尾が"\"の場合は、文字から削除する
-            if (sValue.EndsWith(sTarget))
+            if (sTarget.Contains("\\"))
             {
-                sValue = sValue.Remove(sValue.Length - 1);
+                if (sValue.EndsWith(sTarget))
+                {
+                    RTrimEx = sValue.Remove(sValue.Length - 1);
+                    return RTrimEx;
+                }
+                else
+                {
+                    return RTrimEx;
+                }
 
             }
-            return sValue;
+
+            //右から数字の指定文字を削除する
+            int i;
+            for (i = nValue.Length - 1; i <= 0; i -= 2)
+            {
+                // If nValue(i) <> nTarget(1) Or nValue(i -1) <> nTarget(0) Then Exit For
+                if (nValue[i] != nTarget[1] || nValue[i - 1] != nTarget[0])
+                {
+                    break;
+                }
+
+            }
+            //  RTrimEx = LeftB$(sValue, i + 1)
+            RTrimEx = sValue.Substring(0, i + 1);
+
+
+            return RTrimEx;
+
         }
-        //----------------------------------------------
-        //[VB]  '文字列の末尾から、任意の文字を省く。
-        //[VB]  '
-        //[VB]  '引き数：
-        //[VB]  'sValue 文字列。
-        //[VB]  'sTarget 省く文字。
-        //[VB]  '
-        //[VB]  '戻り値：結果文字列。
-        //[VB]  Public Function RTrimEx(ByVal sValue As String, ByVal sTarget As String) As String
-        //[VB]      Dim nValue() As Byte
-        //[VB]      Dim nTarget() As Byte
-        //[VB]      Dim i As Long
-        //[VB]      nValue = sValue
-        //[VB]      nTarget = Left$(sTarget, 1)
-        //[VB]      For i = UBound(nValue) To 0 Step -2
-        //[VB]          If nValue(i) <> nTarget(1) Or nValue(i - 1) <> nTarget(0) Then Exit For
-        //[VB]      Next
-        //[VB]      RTrimEx = LeftB$(sValue, i + 1)
-        //[VB]  End Function
-        //***************************************************************************
-        //***************************************************************************
+#if false
+                public static string RTrimEx(string sValue, string sTarget)
+                {
+                    //文字末尾が"\"の場合は、文字から削除する
+                    if (sValue.EndsWith(sTarget))
+                    {
+                        sValue = sValue.Remove(sValue.Length - 1);
+
+                    }
+                    return sValue;
+                }
+#endif
+            //***************************************************************************
+            //***************************************************************************
 
 
-        //***************************************************************************
-        //***************************************************************************
-        /// <summary>
-        //[VB]  'ディレクトリをコピーする。
-        /// （VB CopyDir関数をVC用に変更）
-        ///  '引き数：
-        //  'sSrcPath コピー元ディレクトリのパス。
-        //  'sDstPath コピー先ディレクトリのパス。
-        //  'bRaise Err.Raise の有無。
-        /// </summary>
-        /// <param name="sSrcPath">
-        /// <param name="sDstPath">
-        /// <param name="bRaiser">
-        /// </param>
-        /// <returns>
-        /// 戻り値:returns = 
-        ///         '正常終了の場合 True を返す。
-        ///         'それ以外の場合 False を返す。
-        /// </returns>
-        //***************************************************************************
-        //[VB]  Public Function CopyDir(ByVal sSrcPath As String, ByVal sDstPath As String, Optional ByVal bRaise As Boolean = False) As Boolean
-        public static bool CopyDir(string sSrcPath, string sDstPath, bool bRaise = false)
+            //***************************************************************************
+            //***************************************************************************
+            /// <summary>
+            //[VB]  'ディレクトリをコピーする。
+            /// （VB CopyDir関数をVC用に変更）
+            ///  '引き数：
+            //  'sSrcPath コピー元ディレクトリのパス。
+            //  'sDstPath コピー先ディレクトリのパス。
+            //  'bRaise Err.Raise の有無。
+            /// </summary>
+            /// <param name="sSrcPath">
+            /// <param name="sDstPath">
+            /// <param name="bRaiser">
+            /// </param>
+            /// <returns>
+            /// 戻り値:returns = 
+            ///         '正常終了の場合 True を返す。
+            ///         'それ以外の場合 False を返す。
+            /// </returns>
+            //***************************************************************************
+            //[VB]  Public Function CopyDir(ByVal sSrcPath As String, ByVal sDstPath As String, Optional ByVal bRaise As Boolean = False) As Boolean
+            public static bool CopyDir(string sSrcPath, string sDstPath, bool bRaise = false)
         {
             bool sts = false;
 

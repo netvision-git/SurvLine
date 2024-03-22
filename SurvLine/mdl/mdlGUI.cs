@@ -7,6 +7,12 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using static SurvLine.mdl.DEFINE;
 using static SurvLine.mdl.MdiVBfunctions;
+using static SurvLine.mdl.MdlNSGUI;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Runtime.CompilerServices;
+using TextBox = System.Windows.Forms.TextBox;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace SurvLine.mdl
@@ -64,6 +70,11 @@ namespace SurvLine.mdl
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        public static void SelectText(object txtTextBox)    //2
+        {
+            //不要
+        }
+
         //==========================================================================================
 
         //==========================================================================================
@@ -127,12 +138,28 @@ namespace SurvLine.mdl
         End Function
         [VB]*/
         //------------------------------------------------------------------------------------------
-        //[C#]
+        //[C#]  2
+        /// <summary>
+        /// 文字列が整数であるか検査する。
+        /// '
+        /// 引き数：
+        /// sValue 文字列。
+        /// 
+        /// </summary>
+        /// <param name="sValue"></param>
+        /// <returns>
+        /// 戻り値：
+        /// 文字列が整数である場合 True を返す。
+        /// それ以外の場合 False を返す。
+        /// </returns>
         public static bool CheckInteger(string sValue)
         {
             bool CheckInteger = false;
 
-
+            if (!long.TryParse(sValue, out _))
+            {
+                return CheckInteger;
+            }
 
             CheckInteger = true;
             return CheckInteger;
@@ -186,7 +213,7 @@ namespace SurvLine.mdl
         End Function
         [VB]*/
         //------------------------------------------------------------------------------------------
-        //[C#] k.s
+        //[C#] k.s  //2
         /// <summary>
         /// 文字列が実数であるか検査する。
         /// 
@@ -204,34 +231,12 @@ namespace SurvLine.mdl
         {
             bool CheckFloat = false;
 
-            byte[] nCode;
-            bool bDot;
-            int i;
-#if false
-            'ASCIIコード。
-            nCode = StrConv(sValue, vbFromUnicode)
-            bDot = False
+            double ret;
+            if (!double.TryParse(sValue, out ret))
+            {
+                return CheckFloat;
+            }
 
-
-            '１文字ずつ検査。
-            For i = 0 To UBound(nCode)
-                '0～9以外？
-                If nCode(i) < &H30 & Or & H39 & < nCode(i) Then
-                    'マイナス？
-                    If nCode(i) = &H2D & Then
-                        '最初の文字？
-                        If i<> 0 Then Exit Function
-                    'ドット？
-                    ElseIf nCode(i) = &H2E & Then
-                        '２個目のドットは許可しない。
-                        If bDot Then Exit Function
-                        bDot = True
-                    Else
-                        Exit Function
-                    End If
-                End If
-            Next
-#endif
             CheckFloat = true;
             return CheckFloat;
 
@@ -267,8 +272,21 @@ namespace SurvLine.mdl
         End Function
         [VB]*/
         //------------------------------------------------------------------------------------------
-        //[C#]
-        public bool CheckString(string sValue)
+        //[C#]  2
+        /// <summary>
+        /// 文字列に無効な文字が含まれているか検査する。
+        /// '
+        /// 引き数：
+        /// sValue 文字列。
+        /// 
+        /// </summary>
+        /// <param name="sValue"></param>
+        /// <returns>
+        /// 戻り値：
+        /// 文字列に無効な文字が含まれていない場合 True を返す。
+        /// それ以外の場合 False を返す。
+        /// </returns>
+        public static bool CheckString(string sValue)   //
         {
 
             bool CheckString = false;
@@ -296,58 +314,6 @@ namespace SurvLine.mdl
 
         //==========================================================================================
 
-        //==========================================================================================
-        /*[VB]
-        '文字列にファイル名として無効な文字が含まれているか検査する。
-        '
-        '引き数：
-        'sValue 文字列。
-        '
-        '戻り値：
-        '文字列にファイル名として無効な文字が含まれていない場合 True を返す。
-        'それ以外の場合 False を返す。
-        Public Function CheckFileName(ByVal sValue As String) As Boolean
-
-            CheckFileName = False
-    
-            Dim i As Long
-            For i = 1 To Len(sValue)
-                Dim nChar As Long
-                nChar = Asc(Mid(sValue, i))
-                If &H0& <= nChar And nChar < &H20& Then Exit Function '制御コード。
-                Select Case nChar
-                Case &H22& '”
-                    Exit Function
-                Case &H2A& '＊
-                    Exit Function
-                Case &H2C& '，
-                    Exit Function
-                Case &H2F& '／
-                    Exit Function
-                Case &H3A& '：
-                    Exit Function
-                Case &H3C& '＜
-                    Exit Function
-                Case &H3E& '＞
-                    Exit Function
-                Case &H3F& '？
-                    Exit Function
-                Case &H5C& '￥
-                    Exit Function
-                Case &H7C& '｜
-                    Exit Function
-                Case &H7F& 'DEL
-                    Exit Function
-                End Select
-            Next
-    
-            CheckFileName = True
-    
-        End Function
-        [VB]*/
-        //------------------------------------------------------------------------------------------
-        //[C#]
-        //==========================================================================================
 
         //==========================================================================================
         /*[VB]
@@ -381,7 +347,48 @@ namespace SurvLine.mdl
         End Function
         [VB]*/
         //------------------------------------------------------------------------------------------
-        //[C#]
+        //[C#]  //2
+        /// <summary>
+        /// 文字数を検査する。
+        /// '
+        /// バイト数を評価する。
+        /// nMin以上、nMax以下で許可。
+        /// '
+        /// 引き数：
+        /// sValue 文字列。
+        /// nMax 最大文字数。
+        /// nMin 最小文字数。
+        /// 
+        /// </summary>
+        /// <param name="sValue"></param>
+        /// <param name="nMax"></param>
+        /// <param name="nMin"></param>
+        /// <returns>
+        /// 戻り値：
+        /// 文字数が範囲内の場合 True を返す。
+        /// それ以外の場合 False を返す。
+        /// </returns>
+        public static bool CheckLength(string sValue, long nMax, long nMin = 0)
+        {
+            bool CheckLength = false;
+
+            byte[] nCode;
+
+            //'ASCIIコード。
+            nCode = StrConv(sValue, vbFromUnicode);
+
+            if (nCode.Length > nMax)
+            {
+                return CheckLength;
+            }
+            if (nCode.Length < nMin)
+            {
+                return CheckLength;
+            }
+
+            CheckLength = true;
+            return CheckLength;
+        }
         //==========================================================================================
 
         //==========================================================================================
@@ -453,24 +460,32 @@ namespace SurvLine.mdl
         /// <param name="sLabel"></param>
         /// <param name="bFocus"></param>
         /// <returns></returns>
-        public static bool CheckInputEmpty(string txtTextBox, string sLabel, bool bFocus)
+        public static bool CheckInputEmpty(object txtTextBox, string sLabel, bool bFocus)
         {
 
             bool CheckInputEmpty = false;
 
-            //    '空であるか？
-            //    If Len(txtTextBox.Text) <= 0 Then
-            //        Call MsgBox(sLabel & GUI_MSG_EMPTY, vbCritical)
-            //        If bFocus Then Call txtTextBox.SetFocus
-            //        Exit Function
-            //    End If
-            if (txtTextBox.Length <= 0)
+#if false
+            TextBox txtBox = (TextBox)txtTextBox;
+
+            TextBox txtBox = new TextBox();
+            txtTextBox.
+            txtBox = txtTextBox as TextBox;
+#endif
+            string txtBox = txtTextBox.ToString().Trim();
+
+            //'空であるか？
+            //  if (txtBox.Text.Length <= 0)
+            if (txtBox.Length <= 0)
             {
-                MessageBox.Show($"{sLabel}{GUI_MSG_EMPTY}");
+                _ = MessageBox.Show($" {sLabel} {GUI_MSG_EMPTY}", "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error); //2
+                if (bFocus)
+                {
+                    //  _ = txtBox.Focus(); //2
+                }
                 return CheckInputEmpty;
             }
 
-            //    CheckInputEmpty = True
             CheckInputEmpty = true;
             return CheckInputEmpty;
         }
@@ -508,7 +523,50 @@ namespace SurvLine.mdl
         End Function
         [VB]*/
         //------------------------------------------------------------------------------------------
-        //[C#]
+        //[C#]  //2
+        /// <summary>
+        /// 入力値の文字数を検査する。
+        /// '
+        /// バイト数を評価する。
+        /// nMax以下を許可。
+        /// '
+        /// 引き数：
+        /// txtTextBox 検査対象コントロール。
+        /// sLabel 対象コントロールの名称。
+        /// nMax 最大文字数。
+        /// bFocus 検査に引っかかった場合フォーカスを移すか？
+        /// 
+        /// </summary>
+        /// <param name="txtTextBox"></param>
+        /// <param name="sLabel"></param>
+        /// <param name="nMax"></param>
+        /// <param name="bFocus"></param>
+        /// <returns>
+        /// 戻り値：
+        /// 入力値が正常である場合 True を返す。
+        /// それ以外の場合 False を返す。
+        /// </returns>
+        public static bool CheckInputLength(object txtTextBox, string sLabel, long nMax, bool bFocus = true)
+        {
+            bool CheckInputLength = false;
+
+            _ = new System.Windows.Forms.TextBox();
+            System.Windows.Forms.TextBox txtTextBox2 = (System.Windows.Forms.TextBox)txtTextBox;
+
+            //'文字数検査。
+            if (CheckLength(txtTextBox2.Text, nMax))
+            {
+                _ = MessageBox.Show($" {sLabel} に {nMax + 1} {GUI_MSG_LENGTH}", "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                if (bFocus)
+                {
+                    _ = txtTextBox2.Focus();
+                    return CheckInputLength;
+                }
+            }
+
+            CheckInputLength = true;
+            return CheckInputLength;
+        }
         //==========================================================================================
 
         //==========================================================================================
@@ -576,27 +634,26 @@ namespace SurvLine.mdl
         public static bool CheckIntegerInput(object txtTextBox, string sLabel, bool bFocus = true)
         {
             bool CheckIntegerInput = false;
-
-            System.Windows.Forms.TextBox txtTextBox2 = new System.Windows.Forms.TextBox();
-            txtTextBox2 = (System.Windows.Forms.TextBox)txtTextBox;
+            _ = new System.Windows.Forms.TextBox();
+            System.Windows.Forms.TextBox txtTextBox2 = (System.Windows.Forms.TextBox)txtTextBox;
 
             try
             {
                 //'空であるか？
-                if (!CheckInputEmpty(txtTextBox2.Text, sLabel, bFocus))
+                if (!CheckInputEmpty(txtTextBox2, sLabel, bFocus))
                 {
                     return CheckIntegerInput;
                 }
 
 
                 //'数字であるか？
-                if (!CheckInteger(txtTextBox2.Text)){
-                    //  Call MsgBox(sLabel &GUI_MSG_INTEGER, vbCritical)
-                    MessageBox.Show(sLabel + GUI_MSG_INTEGER, "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                if (!CheckInteger(txtTextBox2.Text))
+                {
+                    _ = MessageBox.Show($" {sLabel} {GUI_MSG_INTEGER}", "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error); //2
 
                     if (bFocus)
                     {
-                        //Then Call txtTextBox.SetFocus
+                        _ = txtTextBox2.Focus();
                         return CheckIntegerInput;
                     }
                 }
@@ -615,7 +672,7 @@ namespace SurvLine.mdl
                 //Else
                 //    Call Err.Raise(Err.Number, Err.Source, Err.Description, Err.HelpFile, Err.HelpContext)
                 //End If
-                MessageBox.Show(ex.Message, "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                _ = MessageBox.Show(ex.Message, "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
             return CheckIntegerInput;
@@ -699,18 +756,17 @@ namespace SurvLine.mdl
             }
 
             //'範囲内か？
-            System.Windows.Forms.TextBox txtTextBox2 = new System.Windows.Forms.TextBox();
-            txtTextBox2 = (System.Windows.Forms.TextBox)txtTextBox;
+            _ = new System.Windows.Forms.TextBox();
+            System.Windows.Forms.TextBox txtTextBox2 = (System.Windows.Forms.TextBox)txtTextBox;
 
             long nValue;
             nValue = long.Parse(txtTextBox2.Text);
             if (nValue < nMin || nMax <= nValue)
             {
-                //Call MsgBox(MakeRangeMessage(CStr(nMin), CStr(nMax), sLabel), vbCritical)
-                MessageBox.Show(MakeRangeMessage(nMin.ToString(), nMax.ToString(), sLabel), "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                _ = MessageBox.Show(MakeRangeMessage(nMin.ToString(), nMax.ToString(), sLabel), "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 if (bFocus)
                 {
-                    //Then Call txtTextBox.SetFocus
+                    _ = txtTextBox2.Focus();
                     return CheckIntegerInputRange;
                 }
             }
@@ -794,7 +850,7 @@ namespace SurvLine.mdl
             try
             {
                 //'空であるか？
-                if (!CheckInputEmpty(txtBox.Text, sLabel, bFocus))
+                if (!CheckInputEmpty(txtBox, sLabel, bFocus))
                 {
                     return CheckFloatInput;
                 }
@@ -802,19 +858,17 @@ namespace SurvLine.mdl
                 //'数字であるか？
                 if (!CheckFloat(txtBox.Text))
                 {
-                    //  Call MsgBox(sLabel &GUI_MSG_DISHONESTY, vbCritical)
-                    MessageBox.Show(sLabel + GUI_MSG_DISHONESTY, "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    _ = MessageBox.Show($" {sLabel} {GUI_MSG_DISHONESTY}", "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
                     if (bFocus)
                     {
-                        //Then Call txtTextBox.SetFocus
+                        _ = txtBox.Focus();
                         return CheckFloatInput;
                     }
                 }
 
-                string nTest;
-                nTest = txtTextBox.ToString();
-
+                float nTest;
+                nTest = float.Parse(txtBox.Text);
 
                 CheckFloatInput = true;
 
@@ -832,11 +886,7 @@ namespace SurvLine.mdl
 
             }
 
-
-            CheckFloatInput = true;
             return CheckFloatInput;
-
-
 
         }
         //==========================================================================================
@@ -910,13 +960,12 @@ namespace SurvLine.mdl
         {
             bool CheckFloatInputRange = false;
             bool bFocus = true;
-
-            System.Windows.Forms.TextBox txtBox = new System.Windows.Forms.TextBox();
-            txtBox = (System.Windows.Forms.TextBox)txtTextBox;
+            _ = new System.Windows.Forms.TextBox();
+            System.Windows.Forms.TextBox txtBox = (System.Windows.Forms.TextBox)txtTextBox;
 
 
             //'実数入力であるか？
-            if (!CheckFloatInput(txtBox.Text, sLabel, bFocus))
+            if (!CheckFloatInput(txtBox, sLabel, bFocus))   //2
             {
                 return CheckFloatInputRange;
             }
@@ -927,11 +976,10 @@ namespace SurvLine.mdl
 
             if (nValue < nMin || nMax <= nValue)
             {
-                //MsgBox(MakeRangeMessage(CStr(nMin), CStr(nMax), sLabel), vbCritical)
                 _ = MessageBox.Show(MakeRangeMessage(nMin.ToString(), nMax.ToString(), sLabel), "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 if (bFocus)
                 {
-                    //   txtTextBox.SetFocus
+                    _ = txtBox.Focus();
                     return CheckFloatInputRange;
                 }
             }
@@ -989,21 +1037,21 @@ namespace SurvLine.mdl
         ///     入力値が正常である場合 True を返す。
         ///     それ以外の場合 False を返す。
         /// </returns>
-        public bool CheckStringInputInvalid(string txtTextBox, string sLabe, bool bFocus)
+        public static bool CheckStringInputInvalid(object txtTextBox, string sLabe, bool bFocus)
         {
             bool CheckStringInputInvalid = false;
 
 
-            //    '無効な文字は含まれているか？
-            //    If Not CheckString(txtTextBox.Text) Then
-            //        Call MsgBox(sLabel & GUI_MSG_DISHONESTY, vbCritical)
-            //        If bFocus Then Call txtTextBox.SetFocus
-            //        Exit Function
-            //    End If
-            if (!CheckString(txtTextBox))
+            //無効な文字は含まれているか？
+            if (!CheckString(txtTextBox.ToString()))
             {
+                _ =MessageBox.Show($" {sLabe} {GUI_MSG_EMPTY}", "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
-                MessageBox.Show($"{sLabe}{GUI_MSG_EMPTY}");
+                if (bFocus)
+                {
+                    //  _ = txtBox.Focus();     //2
+                    return CheckStringInputInvalid;
+                }
                 return CheckStringInputInvalid;
 
             }
@@ -1066,7 +1114,7 @@ namespace SurvLine.mdl
                 End Function
             [VB]*/
         //------------------------------------------------------------------------------------------
-        //[C#]
+        //[C#]  //2
         /// <summary>
         /// '文字列にファイル名として無効な文字が含まれているか検査する。
         /// '
@@ -1079,9 +1127,8 @@ namespace SurvLine.mdl
         ///     文字列にファイル名として無効な文字が含まれていない場合 True を返す。
         ///     それ以外の場合 False を返す。
         /// </returns>
-        public bool CheckFileName(string sValue)
+        public static bool CheckFileName(string sValue)
         {
-
 
             bool CheckFileName = false;
 
@@ -1119,61 +1166,7 @@ namespace SurvLine.mdl
             CheckFileName = true;
             return CheckFileName;
 
-#if false   ////////////////////////////////////////////////////////////////////////////////////
-
-            long nChar;
-            //    Dim i As Long
-            //    For i = 1 To Len(sValue)
-            for (int i = 0; i < sValue.Length; i++)
-            {
-                //        Dim nChar As Long
-                //        nChar = Asc(Mid(sValue, i))
-                //        If &H0& <= nChar And nChar< &H20& Then Exit Function '制御コード。
-                string sWork = sValue.Substring(i, 1);
-                // nChar = long.Parse(sWork);
-                byte[] data;
-                data = System.Text.Encoding.GetEncoding("ascii").GetBytes(sWork);
-
-                nChar = (long)data[0];
-
-
-                if (0x00 <= nChar && nChar < 0x20) { return CheckFileName; }    //'制御コード。
-
-                switch (nChar)
-                {
-                    case 0x22:      //”
-                        return CheckFileName;
-                    case 0x2A:      //'＊
-                        return CheckFileName;
-                    case 0x2C:      //'，
-                        return CheckFileName;
-                    case 0x2F:      //'／
-                        return CheckFileName;
-                    case 0x3A:      //'：
-                        return CheckFileName;
-                    case 0x3C:      //'＜
-                        return CheckFileName;
-                    case 0x3E:      //'＞
-                        return CheckFileName;
-                    case 0x3F:      //'？
-                        return CheckFileName;
-                    case 0x5C:      //'￥
-                        return CheckFileName;
-                    case 0x7C:      //'｜
-                        return CheckFileName;
-                    case 0x7F:      //'DEL
-                        return CheckFileName;
-                }
-
-            }
-            CheckFileName = true;
-            return CheckFileName;
-#endif  //#if false   ////////////////////////////////////////////////////////////////////////////////////
-
         }
-
-
-
 
         //==========================================================================================
         /*[VB]
@@ -1217,54 +1210,87 @@ namespace SurvLine.mdl
         /// <param name="sLabel"></param>
         /// <param name="bFocus"></param>
         /// <returns></returns>
-        public bool CheckFileNameInputInvalid(string txtTextBox, string sLabel, bool bFocus)
+        public static bool CheckFileNameInputInvalid(object txtTextBox, string sLabel, bool bFocus)
         {
-            //    CheckFileNameInputInvalid = False
             bool CheckFileNameInputInvalid = false;
 
 
-            //    '無効な文字は含まれているか？
-            //    If Not CheckFileName(txtTextBox.Text) Then
-            //        Call MsgBox(sLabel & GUI_MSG_DISHONESTY, vbCritical)
-            //        If bFocus Then Call txtTextBox.SetFocus
-            //        Exit Function
-            //    End If
-            if (!CheckFileName(txtTextBox))
+            string txtTextBox2 = txtTextBox.ToString();
+
+            //無効な文字は含まれているか？
+            //2     if (!CheckFileName(txtTextBox2.Text))
+            if (!CheckFileName(txtTextBox2))
             {
+                _ = MessageBox.Show($" {sLabel} {GUI_MSG_DISHONESTY}", "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                if (bFocus)
+                {
+                    //2  _ = txtTextBox2.Focus();
+                }
                 return CheckFileNameInputInvalid;
             }
 
-
-            //    CheckFileNameInputInvalid = True
             CheckFileNameInputInvalid = true;
             return CheckFileNameInputInvalid;
 
 
         }
 
+        //2==========================================================================================
+        /*[VB]
+            'ファイル名入力値を検査する。
+            '
+            '引き数：
+            'txtTextBox 検査対象コントロール。
+            'sLabel 対象コントロールの名称。
+            'bFocus 検査に引っかかった場合フォーカスを移すか？
+            '
+            '戻り値：
+            '入力値が正常である場合 True を返す。
+            'それ以外の場合 False を返す。
+            Public Function CheckFileNameInput(ByVal txtTextBox As Object, ByVal sLabel As String, Optional ByVal bFocus As Boolean = True) As Boolean
 
-
-
-
-
-
-
-
-        public bool CheckFileNameInput(string txtTextBox, string sLabel, bool bFocus)
+                CheckFileNameInput = False
+    
+                '空であるか？
+                If Not CheckInputEmpty(txtTextBox, sLabel, bFocus) Then Exit Function
+    
+                '無効な文字は含まれているか？
+                If Not CheckFileNameInputInvalid(txtTextBox, sLabel, bFocus) Then Exit Function
+    
+                CheckFileNameInput = True
+    
+            End Function
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#] 2
+        /// <summary>
+        /// 'ファイル名入力値を検査する。
+        /// '
+        /// '引き数：
+        /// 'txtTextBox 検査対象コントロール。
+        /// 'sLabel 対象コントロールの名称。
+        /// 'bFocus 検査に引っかかった場合フォーカスを移すか？
+        /// 
+        /// </summary>
+        /// <param name="txtTextBox"></param>
+        /// <param name="sLabel"></param>
+        /// <param name="bFocus"></param>
+        /// <returns>
+        /// 戻り値：
+        /// 入力値が正常である場合 True を返す。
+        /// それ以外の場合 False を返す。
+        /// </returns>
+        public static bool CheckFileNameInput(string txtTextBox, string sLabel, bool bFocus = true)
         {
             bool CheckFileNameInput = false;
 
             //    '空であるか？
-            //    If Not CheckInputEmpty(txtTextBox, sLabel, bFocus) Then Exit Function
             if (!CheckInputEmpty(txtTextBox, sLabel, bFocus)) { return CheckFileNameInput; }
 
             //    '無効な文字は含まれているか？
-            //    If Not CheckFileNameInputInvalid(txtTextBox, sLabel, bFocus) Then Exit Function
             if (!CheckFileNameInputInvalid(txtTextBox, sLabel, bFocus)) { return CheckFileNameInput; }
 
-
-
-            //    CheckFileNameInput = True
             CheckFileNameInput = true;
             return CheckFileNameInput;
 
@@ -1397,8 +1423,57 @@ namespace SurvLine.mdl
         End Function
         [VB]*/
         //------------------------------------------------------------------------------------------
-        //[C#]
+        //[C#]  //2
+        /// <summary>
+        /// 文字数制限付きでファイル名入力値を検査する。
+        /// '
+        /// バイト数を評価する。
+        /// nMax以下を許可。
+        /// '
+        /// 引き数：
+        /// txtTextBox 検査対象コントロール。
+        /// sLabel 対象コントロールの名称。
+        /// nMax 最大文字数。
+        /// bFocus 検査に引っかかった場合フォーカスを移すか？
+        /// 
+        /// </summary>
+        /// <param name="txtTextBox"></param>
+        /// <param name="sLabel"></param>
+        /// <param name="nMax"></param>
+        /// <param name="bFocus"></param>
+        /// <returns>
+        /// 戻り値：
+        /// 入力値が正常である場合 True を返す。
+        /// それ以外の場合 False を返す。
+        /// </returns>
+        public static bool CheckFileNameInputLength(object txtTextBox, string sLabel, long nMax, bool bFocus = true)
+        {
+            bool CheckFileNameInputLength = false;
+
+            _ = new System.Windows.Forms.TextBox();
+            System.Windows.Forms.TextBox txtTextBox2 = (System.Windows.Forms.TextBox)txtTextBox;
+
+            //'文字数検査。
+            if (!CheckInputLength(txtTextBox2, sLabel, nMax, bFocus))
+            {
+                return CheckFileNameInputLength;
+
+            }
+
+            //'ファイル名入力値検査。
+            if (!CheckFileNameInput(txtTextBox2.Text, sLabel, bFocus))
+            {
+                return CheckFileNameInputLength;
+            }
+
+            CheckFileNameInputLength = true;
+            return CheckFileNameInputLength;
+
+        }
         //==========================================================================================
+
+
+
 
         //==========================================================================================
         /*[VB]
@@ -1560,7 +1635,13 @@ namespace SurvLine.mdl
         End Sub
         [VB]*/
         //------------------------------------------------------------------------------------------
-        //[C#]
+        //[C#]  //2
+        public static void ChangeTab(TabControl tsTab, GroupBox objContainers)
+        {
+            objContainers.Visible = true;
+        }
+
+
         //==========================================================================================
     }
 }
