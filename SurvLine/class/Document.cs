@@ -2846,7 +2846,7 @@ namespace SurvLine
         End Sub
         [VB]*/
         //------------------------------------------------------------------------------------------
-        //[C#]
+        //[C#]          //修正要 saka -> K.Setoguchi(3)
         /*
         '指定された観測点の有効/無効を設定する。
         '
@@ -2858,60 +2858,66 @@ namespace SurvLine
         */
         public void EnableObservationPoint(ObservationPoint clsObservationPoint, bool bEnable)
         {
-            if (clsObservationPoint.Eccentric())
-            {
-                Dictionary<string, object> objEccentricPoints = new Dictionary<string, object>();
-                SetAtCollectionObject(objEccentricPoints, clsObservationPoint.HeadPoint(), clsObservationPoint.Number());
-            }
-        }
-#if false
-        /*
-         *************************** 修正要 sakai
-         */
-        public void EnableObservationPoint(ObservationPoint clsObservationPoint, bool bEnable)
-        {
+            /*---------------------------------------------------------------------------------------------------------------
+                '接続している基線ベクトルを取得する。
+                Dim clsBaseLineVectors() As BaseLineVector
+                ReDim clsBaseLineVectors(-1 To - 1)
+                Call m_clsNetworkModel.GetConnectBaseLineVectors(clsObservationPoint, clsBaseLineVectors)
+            */
 
-            //'接続している基線ベクトルを取得する。
-            //Dim clsBaseLineVectors() As BaseLineVector
-            //ReDim clsBaseLineVectors(-1 To - 1)
-            BaseLineVector clsBaseLineVectors;
-            m_clsNetworkModel.GetConnectBaseLineVectors(clsObservationPoint, clsBaseLineVectors);
+            List<BaseLineVector> clsBaseLineVectors = new List<BaseLineVector>();
+            //  m_clsNetworkModel.GetConnectBaseLineVectors(clsObservationPoint, ref clsBaseLineVectors);
+            Sessoin_GetConnectBaseLineVectors(clsObservationPoint, ref clsBaseLineVectors);
+
+            /*---------------------------------------------------------------------------------------------------------------
+                '偏心補正の再計算が必要な偏心点。
+                Dim objEccentricPoints As New Collection
+                If clsObservationPoint.Eccentric Then Call SetAtCollectionObject(objEccentricPoints, clsObservationPoint.HeadPoint, clsObservationPoint.Number)
+                Dim i As Long
+                For i = 0 To UBound(clsBaseLineVectors)
+                    If clsBaseLineVectors(i).StrPoint.Eccentric Then Call SetAtCollectionObject(objEccentricPoints, clsBaseLineVectors(i).StrPoint.HeadPoint, clsBaseLineVectors(i).StrPoint.Number)
+                    If clsBaseLineVectors(i).EndPoint.Eccentric Then Call SetAtCollectionObject(objEccentricPoints, clsBaseLineVectors(i).EndPoint.HeadPoint, clsBaseLineVectors(i).EndPoint.Number)
+                Next
+            -----------------------------------------------------------------------------------------------------------------*/
             //'偏心補正の再計算が必要な偏心点。
-            Collection objEccentricPoints = new Collection();
-            //MdlUtility clsMdlUtility = new MdlUtility();
+            //      Dim objEccentricPoints As New Collection
+            Dictionary<string, object> objEccentricPoints = new Dictionary<string, object>();
             if (clsObservationPoint.Eccentric())
             {
-                clsMdlUtility.SetAtCollectionObject(objEccentricPoints, clsObservationPoint.HeadPoint, clsObservationPoint.Number);
-            }
-            long i;
-            for (i = 0, i++, clsBaseLineVectors.Length)
-            {
-                if (clsBaseLineVectors[i].StrPoint.Eccentric)
+                SetAtCollectionObject(objEccentricPoints, clsObservationPoint.HeadPoint(), clsObservationPoint.Number());
+
+                for (int i = 0; i < clsBaseLineVectors.Count; i++)
                 {
-                    SetAtCollectionObject(objEccentricPoints, clsBaseLineVectors[i].StrPoint.HeadPoint, clsBaseLineVectors[i].StrPoint.Number);
-                }
-                if (clsBaseLineVectors[i].EndPoint.Eccentric)
-                {
-                    SetAtCollectionObject(objEccentricPoints, clsBaseLineVectors[i].EndPoint.HeadPoint, clsBaseLineVectors[i].EndPoint.Number);
+                    if (clsBaseLineVectors[i].StrPoint().Eccentric())
+                    {
+                        SetAtCollectionObject(objEccentricPoints, clsBaseLineVectors[i].StrPoint().HeadPoint(), clsBaseLineVectors[i].StrPoint().Number());
+                    }
+
+                    if (clsBaseLineVectors[i].EndPoint().Eccentric())
+                    {
+                        SetAtCollectionObject(objEccentricPoints, clsBaseLineVectors[i].EndPoint().HeadPoint(), clsBaseLineVectors[i].EndPoint().Number());
+                    }
                 }
             }
 
-            //'有効/無効の設定。
+            //有効/無効の設定。
             m_clsNetworkModel.EnableObservationPoint(clsObservationPoint, bEnable);
 
             //'偏心補正の再計算。
             ObservationPoint clsEccentricPoint;
-            For Each clsEccentricPoint In objEccentricPoints
+            foreach (object Point in objEccentricPoints)
+            {
+                clsEccentricPoint = (ObservationPoint)Point;
                 m_clsNetworkModel.CorrectEccentric(clsEccentricPoint);
                 m_clsNetworkModel.EnableGenuinePoint(clsEccentricPoint);
                 m_clsNetworkModel.SetConnectBaseLineVectorsIsListEx(clsEccentricPoint);
-            Next
+            }
 
             m_bModifyed = true;
-            return;
+
 
         }
-#endif
+
         //==========================================================================================
 
         //==========================================================================================
