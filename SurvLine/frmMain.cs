@@ -4726,11 +4726,10 @@ namespace SurvLine
         private void EditValid(bool bEnable)
         {
 
-#if true    // DEBUG 画面レイアウト確認------------------------------------
+#if false   // DEBUG 画面レイアウト確認------------------------------------
             _ = bEnable
                 ? MessageBox.Show("有効", "DEBUG", MessageBoxButtons.OK, MessageBoxIcon.Asterisk)
                 : MessageBox.Show("無効", "DEBUG", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
 #endif      // DEBUG 画面レイアウト確認------------------------------------
 
 
@@ -4738,21 +4737,9 @@ namespace SurvLine
             Cursor = Cursors.WaitCursor;
 
 
-            //  ObservationPoint clsObservationPoint;
-            //  clsObservationPoint = (ObservationPoint)objListPane.EditValid((long)LIST_NUM_PANE.LIST_NUM_OBSPNT);
-
             ObservationPoint clsObservationPoint;
             clsObservationPoint = (ObservationPoint)objListPane.SelectedElement((long)LIST_NUM_PANE.LIST_NUM_OBSPNT);
 
-
-#if true    // DEBUG 画面レイアウト確認------------------------------------
-            _ = bEnable
-                ? MessageBox.Show("有効＞実行・・・", "DEBUG", MessageBoxButtons.OK, MessageBoxIcon.Asterisk)
-                : MessageBox.Show("無効＞実行・・・", "DEBUG", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-#endif      // DEBUG 画面レイアウト確認------------------------------------
-
-            //  frmAttributeCommon
 
 
             //'再描画抑制。
@@ -4770,8 +4757,7 @@ namespace SurvLine
              */
 
 
-            //'設定。
-            /*
+            /*---------------------------------------------------------------------------
                 //'設定。
                 m_clsDocument.SetAttributeCommon(clsObservationPoint, frmAttributeCommon.PointNumber, frmAttributeCommon.PointName, frmAttributeCommon.Fixed, frmAttributeCommon.CoordinateFixed());
 
@@ -4788,8 +4774,40 @@ namespace SurvLine
                     Set objElement = objListPane.GetNextAssoc(nPos)
                     Call m_clsDocument.EnableBaseLineVector(objElement, bEnable)
                 Loop
-             */
-            m_clsDocument.EnableObservationPoint(clsObservationPoint, bEnable);
+             ----------------------------------------------------------------------------*/
+            //'設定。
+            object objElement = new object();
+            Dictionary<string, object> objElements = new Dictionary<string, object>();
+            long nPos;
+            long SelectLine = -1;
+
+            //観測点、基線ベクトルのどちらかのみ選択されているはず。
+            nPos = objListPane.StartSelectedAssoc((long)LIST_NUM_PANE.LIST_NUM_OBSPNT);
+            while (nPos >= 0)
+            {
+                SelectLine = nPos;
+                m_clsMdlMain.PaneSelectedTab = (long)LIST_NUM_PANE.LIST_NUM_OBSPNT;      //PaneのTab（観測点/座標／ベクトル      //2
+                m_clsMdlMain.PaneSelcttedNo = nPos;                                      //Paneの選択行(0～）                    //2
+                objElement = objListPane.GetNextAssoc(ref nPos, (long)LIST_NUM_PANE.LIST_NUM_OBSPNT);
+                objElements.Add(nPos.ToString(), objElement);
+                //観測点(有効／無効）
+                m_clsDocument.EnableObservationPoint((ObservationPoint)objElement, bEnable);
+
+                break;
+            }
+            nPos = objListPane.StartSelectedAssoc((long)LIST_NUM_PANE.LIST_NUM_VECTOR);
+            while (nPos >= 0)
+            {
+                SelectLine = nPos;
+                m_clsMdlMain.PaneSelectedTab = (long)LIST_NUM_PANE.LIST_NUM_VECTOR;      //PaneのTab（観測点/座標／ベクトル      //2
+                m_clsMdlMain.PaneSelcttedNo = nPos;                                      //Paneの選択行(0～）                    //2
+                objElement = objListPane.GetNextAssoc(ref nPos, (long)LIST_NUM_PANE.LIST_NUM_VECTOR);
+                objElements.Add(nPos.ToString(), objElement);
+                //基線ベクトル(有効／無効）
+                m_clsDocument.EnableBaseLineVector((BaseLineVector)objElement, bEnable);
+
+                break;
+            }
 
 
             //'スクロールはしないようにする。

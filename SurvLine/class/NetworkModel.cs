@@ -66,15 +66,19 @@ using Microsoft.VisualBasic;
 using System.Globalization;
 using System.Drawing;
 using System.Security.Cryptography;
+using static System.Net.Mime.MediaTypeNames;
+using System.Net;
 
 namespace SurvLine
 {
     public class NetworkModel
     {
-
+        private MdlMain m_clsMdlMain;   //3
         public NetworkModel(MdlMain mdlMain)
         {
             this.mdlMain = mdlMain;
+
+            m_clsMdlMain = mdlMain;     //3
         }
 
         /*
@@ -442,14 +446,15 @@ namespace SurvLine
         {
             if (m_clsRepresentPointHead.NextList() == null)
             {
-                string AppPath = Path.GetDirectoryName(Application.ExecutablePath);
+                //  string AppPath = Path.GetDirectoryName(Application.ExecutablePath);
 #if true
                 /*
                  ****************** 修正要 sakai
                 */
                 string AppTitle = "SurvLine";
 #endif
-                return GetPrivateProfileInt(PROFILE_SAVE_SEC_BASELINE, PROFILE_SAVE_KEY_DEFLEAPSEC, (int)DEF_LEAP_SEC, AppPath + "\\" + AppTitle + PROFILE_SAVE_EXT);
+                //  return GetPrivateProfileInt(PROFILE_SAVE_SEC_BASELINE, PROFILE_SAVE_KEY_DEFLEAPSEC, (int)DEF_LEAP_SEC, AppPath + "\\" + AppTitle + PROFILE_SAVE_EXT);
+                return 0;
             }
             else
             {
@@ -1802,85 +1807,130 @@ namespace SurvLine
 
         //==========================================================================================
         /*[VB]
-        '指定された基線ベクトルの有効/無効を設定する。
-        '
-        '設定が変更されたオブジェクトの IsList をONに設定する。
-        '
-        '引き数：
-        'clsBaseLineVector 対象とする基線ベクトル。
-        'bEnable 有効フラグ。
-        Public Sub EnableBaseLineVector(ByVal clsBaseLineVector As BaseLineVector, ByVal bEnable As Boolean)
-            '設定。
-            clsBaseLineVector.Enable = bEnable
-            clsBaseLineVector.IsList = True
-            clsBaseLineVector.StrPoint.TopParentPoint.IsList = True
-            clsBaseLineVector.EndPoint.TopParentPoint.IsList = True
-            '本点。
-            If clsBaseLineVector.StrPoint.Eccentric Then clsBaseLineVector.StrPoint.CorrectPoint.TopParentPoint.IsList = True
-            If clsBaseLineVector.EndPoint.Eccentric Then clsBaseLineVector.EndPoint.CorrectPoint.TopParentPoint.IsList = True
-        End Sub
+            '指定された基線ベクトルの有効/無効を設定する。
+            '
+            '設定が変更されたオブジェクトの IsList をONに設定する。
+            '
+            '引き数：
+            'clsBaseLineVector 対象とする基線ベクトル。
+            'bEnable 有効フラグ。
+            Public Sub EnableBaseLineVector(ByVal clsBaseLineVector As BaseLineVector, ByVal bEnable As Boolean)
+                '設定。
+                clsBaseLineVector.Enable = bEnable
+                clsBaseLineVector.IsList = True
+                clsBaseLineVector.StrPoint.TopParentPoint.IsList = True
+                clsBaseLineVector.EndPoint.TopParentPoint.IsList = True
+                '本点。
+                If clsBaseLineVector.StrPoint.Eccentric Then clsBaseLineVector.StrPoint.CorrectPoint.TopParentPoint.IsList = True
+                If clsBaseLineVector.EndPoint.Eccentric Then clsBaseLineVector.EndPoint.CorrectPoint.TopParentPoint.IsList = True
+            End Sub
         [VB]*/
         //------------------------------------------------------------------------------------------
-        //[C#]
-        /*
-        '指定された基線ベクトルの有効/無効を設定する。
-        '
-        '設定が変更されたオブジェクトの IsList をONに設定する。
-        '
-        '引き数：
-        'clsBaseLineVector 対象とする基線ベクトル。
-        'bEnable 有効フラグ。
-        */
-        public void EnableBaseLineVector(BaseLineVector clsBaseLineVector, bool bEnable)
+        //[C#]  //3
+        /// <summary>
+        /// 指定された基線ベクトルの有効/無効を設定する。
+        /// '
+        /// 設定が変更されたオブジェクトの IsList をONに設定する。
+        /// '
+        /// 引き数：
+        /// clsBaseLineVector 対象とする基線ベクトル。
+        /// bEnable 有効フラグ。
+        /// 
+        /// </summary>
+        /// <param name="clsBaseLineVector"></param>
+        /// <param name="bEnable"></param>
+        public void EnableBaseLineVector(BaseLineVector clsBaseLineVector, bool bEnable)    //3
         {
+
+            clsBaseLineVector.Enable(bEnable);
+            clsBaseLineVector.IsList = true;
+            clsBaseLineVector.StrPoint().TopParentPoint().IsList(true);
+            clsBaseLineVector.EndPoint().TopParentPoint().IsList(true);
+
+            //'本点。
+            if (clsBaseLineVector.StrPoint().Eccentric())
+            {
+                clsBaseLineVector.StrPoint().CorrectPoint().TopParentPoint().IsList(true);
+                clsBaseLineVector.EndPoint().CorrectPoint().TopParentPoint().IsList(true);
+            }
+
+
             return;
         }
         //==========================================================================================
 
         //==========================================================================================
         /*[VB]
-        '指定された観測点の有効/無効を設定する。
-        '
-        '設定が変更されたオブジェクトの IsList をONに設定する。
-        '
-        '引き数：
-        'clsObservationPoint 対象とする観測点(代表観測点)。
-        'bEnable 有効フラグ。
-        Public Sub EnableObservationPoint(ByVal clsObservationPoint As ObservationPoint, ByVal bEnable As Boolean)
+            '指定された観測点の有効/無効を設定する。
+            '
+            '設定が変更されたオブジェクトの IsList をONに設定する。
+            '
+            '引き数：
+            'clsObservationPoint 対象とする観測点(代表観測点)。
+            'bEnable 有効フラグ。
+            Public Sub EnableObservationPoint(ByVal clsObservationPoint As ObservationPoint, ByVal bEnable As Boolean)
 
-            '接続している基線ベクトルを取得する。
-            Dim clsBaseLineVectors() As BaseLineVector
-            ReDim clsBaseLineVectors(-1 To -1)
-            Call GetConnectBaseLineVectors(clsObservationPoint, clsBaseLineVectors)
+                '接続している基線ベクトルを取得する。
+                Dim clsBaseLineVectors() As BaseLineVector
+                ReDim clsBaseLineVectors(-1 To -1)
+                Call GetConnectBaseLineVectors(clsObservationPoint, clsBaseLineVectors)
     
-            If UBound(clsBaseLineVectors) < 0 Then
-                clsObservationPoint.Enable = bEnable
-                clsObservationPoint.IsList = True
-                '本点。
-                If clsObservationPoint.Eccentric Then clsObservationPoint.CorrectPoint.TopParentPoint.IsList = True
-            Else
-                '基線ベクトルを有効/無効化。
-                Dim i As Long
-                For i = 0 To UBound(clsBaseLineVectors)
-                    Call EnableBaseLineVector(clsBaseLineVectors(i), bEnable)
-                Next
-            End If
+                If UBound(clsBaseLineVectors) < 0 Then
+                    clsObservationPoint.Enable = bEnable
+                    clsObservationPoint.IsList = True
+                    '本点。
+                    If clsObservationPoint.Eccentric Then clsObservationPoint.CorrectPoint.TopParentPoint.IsList = True
+                Else
+                    '基線ベクトルを有効/無効化。
+                    Dim i As Long
+                    For i = 0 To UBound(clsBaseLineVectors)
+                        Call EnableBaseLineVector(clsBaseLineVectors(i), bEnable)
+                    Next
+                End If
     
-        End Sub
+            End Sub
         [VB]*/
         //------------------------------------------------------------------------------------------
-        //[C#]
-        /*
-        '指定された観測点の有効/無効を設定する。
-        '
-        '設定が変更されたオブジェクトの IsList をONに設定する。
-        '
-        '引き数：
-        'clsObservationPoint 対象とする観測点(代表観測点)。
-        'bEnable 有効フラグ。
-        */
-        public void EnableObservationPoint(ObservationPoint clsObservationPoint, bool bEnable)
+        //[C#]  //3
+        /// <summary>
+        /// 指定された観測点の有効/無効を設定する。
+        /// '
+        /// 設定が変更されたオブジェクトの IsList をONに設定する。
+        /// '
+        /// 引き数：
+        /// clsObservationPoint 対象とする観測点(代表観測点)。
+        /// bEnable 有効フラグ。
+        /// 
+        /// </summary>
+        /// <param name="clsObservationPoint"></param>
+        /// <param name="bEnable"></param>
+        public void EnableObservationPoint(ObservationPoint clsObservationPoint, bool bEnable)  //3
         {
+            //'接続している基線ベクトルを取得する。
+            List<BaseLineVector> clsBaseLineVectors = new List<BaseLineVector>();
+            //  GetConnectBaseLineVectors(clsObservationPoint, ref clsBaseLineVectors);
+            m_clsMdlMain.GetDocument().Sessoin_GetConnectBaseLineVectors(clsObservationPoint, ref clsBaseLineVectors);
+
+            if (clsBaseLineVectors.Count < 0)
+            {
+                clsObservationPoint.Enable(bEnable);
+                clsObservationPoint.IsList(true);
+                //'本点。
+                if (clsObservationPoint.Eccentric())
+                {
+                    clsObservationPoint.CorrectPoint().TopParentPoint().IsList(true);
+                }
+            }
+            else
+            {
+                //'基線ベクトルを有効/無効化。
+                for (int i = 0; i < clsBaseLineVectors.Count; i++)
+                {
+                    EnableBaseLineVector(clsBaseLineVectors[i], bEnable);
+                }
+
+            }
+
             return;
         }
         //==========================================================================================
@@ -1955,28 +2005,37 @@ namespace SurvLine
         End Function
         [VB]*/
         //------------------------------------------------------------------------------------------
-        //[C#]
-        /*
-        '平面直角座標系における表示観測点の範囲を取得する。
-        '
-        '描画に使う論理エリアを取得する。
-        '観測点群に外接する長方形を取得する。余白は無し。
-        'nSwitch は評価に含める観測点を決定するためのスイッチ。NS-Survey では使用しない。
-        'bIsEnable も NS-Survey では使用しない。言いかえれば常に False である。
-        '
-        '引き数：
-        'nCoordNum 座標系番号(1～19)。
-        'nMinX 最小X座標(ｍ)。
-        'nMinY 最小Y座標(ｍ)。
-        'nMaxX 最大X座標(ｍ)。
-        'nMaxY 最大Y座標(ｍ)。
-        'bIsEnable 有効フラグ。True=有効な観測点のみ対象とする。False=全ての観測点を対象とする。
-        'nSwitch 評価スイッチ。
-        '
-        '戻り値：
-        '範囲が取得できた場合 True を返す。
-        '観測点が１つもない場合 False を返す。
-        */
+        //[C#]  //3
+        /// <summary>
+        /// 平面直角座標系における表示観測点の範囲を取得する。
+        /// '
+        /// 描画に使う論理エリアを取得する。
+        /// 観測点群に外接する長方形を取得する。余白は無し。
+        /// nSwitch は評価に含める観測点を決定するためのスイッチ。NS-Survey では使用しない。
+        /// bIsEnable も NS-Survey では使用しない。言いかえれば常に False である。
+        /// '
+        /// 引き数：
+        /// nCoordNum 座標系番号(1～19)。
+        /// nMinX 最小X座標(ｍ)。
+        /// nMinY 最小Y座標(ｍ)。
+        /// nMaxX 最大X座標(ｍ)。
+        /// nMaxY 最大Y座標(ｍ)。
+        /// bIsEnable 有効フラグ。True=有効な観測点のみ対象とする。False=全ての観測点を対象とする。
+        /// nSwitch 評価スイッチ。
+        /// 
+        /// </summary>
+        /// <param name="nCoordNum"></param>
+        /// <param name="nMinX"></param>
+        /// <param name="nMinY"></param>
+        /// <param name="nMaxX"></param>
+        /// <param name="nMaxY"></param>
+        /// <param name="bIsEnable"></param>
+        /// <param name="nSwitch"></param>
+        /// <returns>
+        /// 戻り値：
+        /// 範囲が取得できた場合 True を返す。
+        /// 観測点が１つもない場合 False を返す。
+        /// </returns>
         public bool GetObservationPointArea(long nCoordNum, ref double nMinX, ref double nMinY, ref double nMaxX, ref double nMaxY, bool bIsEnable, long nSwitch)
         {
             //'代表観測点の極座標を取得する。
