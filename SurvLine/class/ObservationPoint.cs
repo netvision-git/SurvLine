@@ -2406,7 +2406,8 @@ namespace SurvLine
             }
             else
             {
-                m_clsAttributes.Common().ObjectType = m_clsAttributes.Common().ObjectType & (~OBS_TYPE_FIXED);  //反転
+                long wk = ~OBS_TYPE_FIXED;  //2
+                m_clsAttributes.Common().ObjectType = m_clsAttributes.Common().ObjectType & wk;  //反転   //2
             }
         }
         //==========================================================================================
@@ -3010,7 +3011,11 @@ namespace SurvLine
             m_bEnable = Genba_S.m_bEnable;
 
             //[VB]  Get #nFile, , ObjectType    public long OP_ObjectType;      //As Long 'オブジェクト種別。                        //-2147483520
-            Genba_S.OP_ObjectType = br.ReadInt32();
+#if true   
+            Genba_S.OP_ObjectType = br.ReadInt32(); //BUG:240317_0517 K.S
+            //  Genba_S.OP_ObjectType = br.ReadInt64(); //BUG:240317_0517 K.S
+#endif
+
             ObjectType = Genba_S.OP_ObjectType;
 
             //----------------------------------------------------------------    
@@ -3538,11 +3543,18 @@ namespace SurvLine
             }
             string sFileTitle;
             sFileTitle = Key();
-            Name(sSrcDirPath + FileTitle() + "." + RinexExt() + RNX_OBS_EXTENSION + sDstDirPath + sFileTitle + "." + RinexExt() + RNX_OBS_EXTENSION);
+
+            //2            Name(sSrcDirPath + FileTitle() + "." + RinexExt() + RNX_OBS_EXTENSION + sDstDirPath + sFileTitle + "." + RinexExt() + RNX_OBS_EXTENSION);    //2
+            System.IO.File.Move(sSrcDirPath + FileTitle() + "." + RinexExt() + RNX_OBS_EXTENSION, sDstDirPath + sFileTitle + "." + RinexExt() + RNX_OBS_EXTENSION);     //2
+
             //'2017/07/05 NS6000対応。'''''''''''''''''''''''''''''''''''''''''''''''''''''''
             //'Name sSrcDirPath & FileTitle & "." & RinexExt & RNX_NAV_EXTENSION As sDstDirPath & sFileTitle & "." & RinexExt & RNX_NAV_EXTENSION
             //'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-            Name(sSrcDirPath + FileTitle() + "." + RNX_SV_EXTENSION + sDstDirPath + sFileTitle + "." + RNX_SV_EXTENSION);
+            //[VB]Name sSrcDirPath &FileTitle & "." & RNX_SV_EXTENSION As sDstDirPath &sFileTitle & "." & RNX_SV_EXTENSION          
+            //2     Name(sSrcDirPath + FileTitle() + "." + RNX_SV_EXTENSION + sDstDirPath + sFileTitle + "." + RNX_SV_EXTENSION);       //2
+            System.IO.File.Move(sSrcDirPath + FileTitle() + "." + RNX_SV_EXTENSION, sDstDirPath + sFileTitle + "." + RNX_SV_EXTENSION); //2
+
+
             //'2017/07/05 NS6000対応。'''''''''''''''''''''''''''''''''''''''''''''''''''''''
             //'If m_clsAttributes.GlonassFlag Then
             //'    Name sSrcDirPath & FileTitle & "." & RinexExt & RNX_GLO_EXTENSION As sDstDirPath & sFileTitle & "." & RinexExt & RNX_GLO_EXTENSION
@@ -3550,26 +3562,33 @@ namespace SurvLine
             //'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
             if (m_clsAttributes.MixedNav)
             {
-                Name(sSrcDirPath + FileTitle() + "." + RinexExt() + RNX_MIX_EXTENSION + sDstDirPath + sFileTitle + "." + RinexExt() + RNX_MIX_EXTENSION);
+                //2            Name(sSrcDirPath + FileTitle() + "." + RinexExt() + RNX_MIX_EXTENSION + sDstDirPath + sFileTitle + "." + RinexExt() + RNX_MIX_EXTENSION);    //2
+                System.IO.File.Move(sSrcDirPath + FileTitle() + "." + RinexExt() + RNX_MIX_EXTENSION, sDstDirPath + sFileTitle + "." + RinexExt() + RNX_MIX_EXTENSION);     //2
             }
             else
             {
-                Name(sSrcDirPath + FileTitle() + "." + RinexExt() + RNX_NAV_EXTENSION + sDstDirPath + sFileTitle + "." + RinexExt() + RNX_NAV_EXTENSION);
+                //2     Name(sSrcDirPath + FileTitle() + "." + RinexExt() + RNX_NAV_EXTENSION + sDstDirPath + sFileTitle + "." + RinexExt() + RNX_NAV_EXTENSION);           //2
+                System.IO.File.Move(sSrcDirPath + FileTitle() + "." + RinexExt() + RNX_NAV_EXTENSION, sDstDirPath + sFileTitle + "." + RinexExt() + RNX_NAV_EXTENSION);     //2
+
                 if (m_clsAttributes.GlonassFlag)
                 {
-                    Name(sSrcDirPath + FileTitle() + "." + RinexExt() + RNX_GLO_EXTENSION + sDstDirPath + sFileTitle + "." + RinexExt() + RNX_GLO_EXTENSION);
+                    //2            Name(sSrcDirPath + FileTitle() + "." + RinexExt() + RNX_GLO_EXTENSION + sDstDirPath + sFileTitle + "." + RinexExt() + RNX_GLO_EXTENSION);//2
+                    System.IO.File.Move(sSrcDirPath + FileTitle() + "." + RinexExt() + RNX_GLO_EXTENSION, sDstDirPath + sFileTitle + "." + RinexExt() + RNX_GLO_EXTENSION); //2
                 }
                 if (m_clsAttributes.QZSSFlag)
                 {
-                    Name(sSrcDirPath + FileTitle() + "." + RinexExt() + RNX_QZS_EXTENSION + sDstDirPath + sFileTitle + "." + RinexExt() + RNX_QZS_EXTENSION);
+                    //2            Name(sSrcDirPath + FileTitle() + "." + RinexExt() + RNX_QZS_EXTENSION + sDstDirPath + sFileTitle + "." + RinexExt() + RNX_QZS_EXTENSION);//2
+                    System.IO.File.Move(sSrcDirPath + FileTitle() + "." + RinexExt() + RNX_QZS_EXTENSION, sDstDirPath + sFileTitle + "." + RinexExt() + RNX_QZS_EXTENSION); //2
                 }
                 if (m_clsAttributes.GalileoFlag)
                 {
-                    Name(sSrcDirPath + FileTitle() + "." + RinexExt() + RNX_GAL_EXTENSION + sDstDirPath + sFileTitle + "." + RinexExt() + RNX_GAL_EXTENSION);
+                    //2            Name(sSrcDirPath + FileTitle() + "." + RinexExt() + RNX_GAL_EXTENSION + sDstDirPath + sFileTitle + "." + RinexExt() + RNX_GAL_EXTENSION);//2
+                    System.IO.File.Move(sSrcDirPath + FileTitle() + "." + RinexExt() + RNX_GAL_EXTENSION, sDstDirPath + sFileTitle + "." + RinexExt() + RNX_GAL_EXTENSION); //2
                 }
                 if (m_clsAttributes.BeiDouFlag)
                 {
-                    Name(sSrcDirPath + FileTitle() + "." + RinexExt() + RNX_BEI_EXTENSION + sDstDirPath + sFileTitle + "." + RinexExt() + RNX_BEI_EXTENSION);
+                    //2            Name(sSrcDirPath + FileTitle() + "." + RinexExt() + RNX_BEI_EXTENSION + sDstDirPath + sFileTitle + "." + RinexExt() + RNX_BEI_EXTENSION);//2
+                    System.IO.File.Move(sSrcDirPath + FileTitle() + "." + RinexExt() + RNX_BEI_EXTENSION, sDstDirPath + sFileTitle + "." + RinexExt() + RNX_BEI_EXTENSION); //2
                 }
             }
             //'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

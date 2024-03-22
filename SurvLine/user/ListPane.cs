@@ -311,8 +311,22 @@ namespace SurvLine
         //------------------------------------------------------------------------------------------
         //[C#]
         //'選択要素を取得する。
-        public object SelectedElement(long nList = -1)
+        public object SelectedElement(long nList = -1)  //2
         {
+            object[] SelectedElement = new object[(int)LIST_NUM_PANE.LIST_NUM_COUNT];
+
+            long i;
+            for (i = 0; i < (long)LIST_NUM_PANE.LIST_NUM_COUNT; i++)
+            {
+                SelectedElement[i] = SelectedElement2(i);
+            }
+
+            return SelectedElement[nList];
+        }
+        //------------------------------------------------------------------------------------------
+        public object SelectedElement2(long nList = -1) //2
+        {
+
             DataGridView DG = GetDataGridView(nList);
 
             object SelectedElement = null;
@@ -332,30 +346,57 @@ namespace SurvLine
                     return null;
                 }
 #if false
-                long nData;
-                nData = grdFlexGrid(objTab.Tab).RowData(nRow);
-                return m_objMap(objTab.Tab).Item(Hex$(nData));
+                    long nData;
+                    nData = grdFlexGrid(objTab.Tab).RowData(nRow);
+                    return m_objMap(objTab.Tab).Item(Hex$(nData));
 #else
-                return null;
-#endif
-            }
-            else
-            {
-#if false
-                Dictionary<string, object> objSelected;
-                objSelected = m_objHideSelected(m_clsmdilistPane.LIST_OBJ_TYPE_INDEX(nList));
-                if (objSelected.Count <= 0)
-                {
                     return null;
+#endif
                 }
-                return objSelected.Item(1);
+                else
+                {
+#if false
+                    Dictionary<string, object> objSelected;
+                    objSelected = m_objHideSelected(m_clsmdilistPane.LIST_OBJ_TYPE_INDEX(nList));
+                    if (objSelected.Count <= 0)
+                    {
+                        return null;
+                    }
+                    return objSelected.Item(1);
 #else
-                return null;
+                    return null;
 #endif
             }
 #endif      //<<<<<<<<<-----------24/03/07(--)編集メニュー K.setoguchi@NV
         }
         //==========================================================================================
+
+
+        public object EditValid(long nList = -1)  //2
+        {
+            object[] Elements = new object[(int)LIST_NUM_PANE.LIST_NUM_COUNT];
+
+            long i;
+            //for (i = 0; i < (long)LIST_NUM_PANE.LIST_NUM_COUNT; i++)
+            for (i = 0; i < 1; i++)
+            {
+                Elements[i] = EditValid2(i);
+            }
+
+            return Elements[nList];
+        }
+
+        public object EditValid2(long nList = -1) //2
+        {
+
+            DataGridView DG = GetDataGridView(nList);
+
+            object Element = null;
+
+            Element = m_clsmdilistPane.EditValid(nList, DG, ref m_objMap[nList]);
+
+            return Element;
+        }
 
         //==========================================================================================
         /*[VB]
@@ -1483,47 +1524,35 @@ namespace SurvLine
         End Function
         [VB]*/
         //------------------------------------------------------------------------------------------
-        //[C#]
-        /*
-        '選択行の要素取得を開始する。
-        '
-        '選択行の位置を示す整数値が取得される。
-        'このメソッドで取得される整数値を GetNextAssoc メソッドに渡すことにより選択行のオブジェクトが取得できる。
-        'GetNextAssoc で 0 が返るまで、繰り返し GetNextAssoc を呼ぶことによりすべての選択行のオブジェクトが取得できる。
-        '
-        '引き数：
-        'nList 対象とするリストの番号。省略するとカレントリストが対象になる。
-        '
-        '戻り値：
-        '選択行の位置を示す整数値を返す。
-        '選択行が無い場合は 0 を返す。
-        */
-        public long StartSelectedAssoc(long nList = -1)
+        //[C#]  //2
+        /// <summary>
+        /// 選択行の要素取得を開始する。
+        /// '
+        /// 選択行の位置を示す整数値が取得される。
+        /// このメソッドで取得される整数値を GetNextAssoc メソッドに渡すことにより選択行のオブジェクトが取得できる。
+        /// GetNextAssoc で 0 が返るまで、繰り返し GetNextAssoc を呼ぶことによりすべての選択行のオブジェクトが取得できる。
+        /// '
+        /// 引き数：
+        /// nList 対象とするリストの番号。省略するとカレントリストが対象になる。
+        /// 
+        /// </summary>
+        /// <param name="nList"></param>
+        /// <returns>
+        /// 戻り値：
+        ///     選択行の位置を示す整数値を返す。<--( 0) から XX
+        ///     選択行が無い場合は 0 を返す。<----- --(-1)に訂正
+        /// </returns>
+        public long StartSelectedAssoc(long nList = -1)  //2
         {
-#if false
-            if (nList < 0 | nList == objTab.SelectedIndex)
-            {
-                m_nSelectedList = objTab.Tab;
-                //'要素が一つもない場合、HighLight が flexHighlightNever に設定されている。
-                if (grdFlexGrid(objTab.Tab).HighLight != flexHighlightAlways)
-                {
-                    return 0;
-                }
-                else
-                {
-                    m_nSelectedRows = grdFlexGrid(objTab.Tab).SelectedRows();
-                    return m_nSelectedRows.Length + 1;  //'選択行無しが0なので一つずらす。
-                }
-            }
-            else
-            {
-                m_nSelectedList = nList;
-                //'インデックス＋１を設定。
-                return m_objHideSelected(LIST_OBJ_TYPE_INDEX(nList)).Count;
-            }
-#else
-            return 0;
-#endif
+
+            long StartSelectedAssoc = 0;
+
+            DataGridView DG = GetDataGridView(nList);
+
+            StartSelectedAssoc = m_clsmdilistPane.StartSelectedAssoc(nList, DG, ref m_objMap[nList]);
+
+            return StartSelectedAssoc;
+
         }
         //==========================================================================================
 
@@ -1539,7 +1568,7 @@ namespace SurvLine
         '
         '戻り値：
         '次の選択行の位置を示す整数値を返す。
-        '選択行が無い場合は 0 を返す。
+        '選択行が無い場合は 0 を返す。   <----- --(-1)に訂正
         Public Function GetNextAssoc(ByRef nPos As Long) As Object
             If m_nSelectedList = objTab.Tab Then
                 Dim nData As Long
@@ -1554,6 +1583,32 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        public object GetNextAssoc(ref long nPos, long nList = -1)   //2
+        {
+            DataGridView DG = GetDataGridView(nList);
+
+            object StartSelectedAssoc;
+
+            StartSelectedAssoc = m_clsmdilistPane.GetNextAssoc(nList, DG, ref m_objMap[nList], ref nPos);
+
+            return StartSelectedAssoc;
+
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         /*
         '選択行の次の要素を取得する。
         '
@@ -2373,17 +2428,17 @@ namespace SurvLine
 
 
 
-//**************************************************************************************
-//**************************************************************************************
-/// <summary>
-/// '初期化 ListPane
-/// 引き数：
-//  ListPane：観測点＆ベクトル表示
-/// </summary>
-/// <param name="ListPane"></param>
-/// <returns>
-/// </returns>
-//**************************************************************************************
+        //**************************************************************************************
+        //**************************************************************************************
+        /// <summary>
+        /// '初期化 ListPane
+        /// 引き数：
+        //  ListPane：観測点＆ベクトル表示
+        /// </summary>
+        /// <param name="ListPane"></param>
+        /// <returns>
+        /// </returns>
+        //**************************************************************************************
 #if false
         public void UserControl_Initialize(ListPane listPane)
         {
@@ -2502,6 +2557,11 @@ namespace SurvLine
         private void grdFlexGrid1_SelectedIndexChanged(object sender, EventArgs e)
         {
 
+        }
+
+        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+            return;
         }
 
 #if false

@@ -26,16 +26,21 @@ using static SurvLine.mdl.MdlNSDefine;
 using static SurvLine.mdl.MdlNSSDefine;
 using static SurvLine.mdl.MdlUtility;
 using static SurvLine.mdl.DEFINE;
+using static SurvLine.mdl.MdlSession;   //2
 using System.IO;
+using static SurvLine.mdl.MdlListPane;
 
 namespace SurvLine
 {
     public class Document
     {
+        MdlMain m_clsMdlMain;   //2
 
         public Document(MdlMain mdlMain)
         {
             this.mdlMain = mdlMain;
+
+            m_clsMdlMain = mdlMain;   //2
 
             OutputParam oOutputParam = new OutputParam();
 
@@ -307,6 +312,7 @@ namespace SurvLine
         private AngleDiffParam m_clsAngleDiffParamBetween;              //'電子基準点間の閉合差パラメータ。
         private AngleDiffParam m_clsAngleDiffParamHeight;               //'楕円体高の閉合差パラメータ。'2023/05/19 Hitz H.Nakamura 楕円体高の閉合差を追加。
 
+
         //K.S
         private AccountMaker m_clsAccountMaker;                     // As AccountMaker '帳票作成。
         private AccountParam m_clsAccountParamHand;                 // As AccountParam '観測手簿パラメータ。
@@ -317,6 +323,9 @@ namespace SurvLine
         private AccountParam m_clsAccountParamSemiDyna;             // As AccountParam 'セミ・ダイナミック補正表パラメータ。'2009/11 H.Nakamura
         private AccountCadastralParam m_clsAccountCadastralParam;   // As AccountCadastralParam '地籍図根三角測量精度管理表パラメータ。
         private AccountParam m_clsAccountParamResultBase;           // As AccountParam '座標一覧表パラメータ。2007/7/18 NGS Yamada
+
+        private MdlSession m_clsMdlSession; //2
+
         //---------------------------------------------------------
         //private List<OutputParam> m_clsOutputParam;                 //private OutputParam m_clsOutputParam[OUTPUT_TYPE_COUNT - 1];    // As OutputParam '外部出力ファイル出力パラメータ。
         List<OutputParam> m_clsOutputParam = new List<OutputParam>((int)MdlNSSDefine.OUTPUT_TYPE.OUTPUT_TYPE_COUNT - 1);
@@ -1368,6 +1377,9 @@ namespace SurvLine
             m_clsAngleDiffParamRing = new AngleDiffParam();
             m_clsAngleDiffParamBetween = new AngleDiffParam();
             m_clsAngleDiffParamHeight = new AngleDiffParam();    //'2023/05/19 Hitz H.Nakamura 楕円体高の閉合差を追加。
+
+            MdlSession m_clsMdlSession = new MdlSession(mdlMain);
+
 #if false
             /*
              *************************** 修正要 sakai
@@ -1521,7 +1533,17 @@ namespace SurvLine
         End Sub
         [VB]*/
         //------------------------------------------------------------------------------------------
-        //[C#]
+        //[C#]  //0304  //2
+        /// <summary>
+        /// 保存。
+        /// '
+        /// sPath で指定されたファイルに保存する。
+        /// '
+        /// 引き数：
+        /// sPath 保存ファイルのパス。
+        /// 
+        /// </summary>
+        /// <param name="sPath"></param>
         /*
         '保存。
         '
@@ -1530,17 +1552,182 @@ namespace SurvLine
         '引き数：
         'sPath 保存ファイルのパス。
         */
-        public void Save(string sPath)
+        public void Save(string sPath)      //0304  //2
         {
-            return;
+            MdlUtility mdiUtility = new MdlUtility();
+
+            //---------------------------------------------------------------
+            //    'テンポラリファイル。
+            //    Dim sTemp As String
+            //    sTemp = App.Path & TEMPORARY_PATH & TEMP_FILE_NAME
+            //    On Error Resume Next
+            //    Call RemoveFile(sTemp)
+            //    On Error GoTo 0
+
+            string App_Path = @"C:\Develop\NetSurv\Src\NS-App\NS-Survey";
+
+            string sTemp;
+            sTemp = $"{App_Path}{MdlNSDefine.TEMPORARY_PATH}{TEMP_FILE_NAME}";      //(Ex.)Temp  (Ex.)Document.tmp   (Ex.)"C:\Develop\NetSurv\Src\NS-App\NS-Survey\Temp\Document.tmp"
+
+            if (mdiUtility.RemoveFile(sTemp, false))
+            {
+                //結果は、無視すること
+            }
+
+            //---------------------------------------------------------------
+            //    'テンポラリファイルに書き込み。
+            //    Dim clsFile As New FileNumber
+            //    Open sTemp For Binary Access Write Lock Read Write As #clsFile.Number
+            //    
+            using (var fs = System.IO.File.OpenWrite(sTemp))
+            {
+                using (var bw = new BinaryWriter(fs))
+                {
+
+#if false   //2 ********************************************************************************
+
+                    //-------------------------------------------------------
+                    //    Put #clsFile.Number, , DOCUMENT_FILE_VERSION
+                    //    Call PutString(clsFile.Number, m_sJobName)
+                    //    Call PutString(clsFile.Number, m_sDistrictName)
+                    //    '↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑↑
+                    //    '地区名より前の領域は ProjectFileManager 関係に影響するので注意。
+                    bw.Write((uint)MdlNSDefine.DOCUMENT_FILE_VERSION);
+
+#if false   //--------------------------------------------------------------------        
+                    string shiftJisString = "こんにちは、世界！";
+                    byte[] shiftJisBytes = Encoding.GetEncoding("Shift-JIS").GetBytes(shiftJisString);
+                    bw.Write(shiftJisBytes);
+#endif      //--------------------------------------------------------------------
+                    FileWrite_PutString(bw, m_sJobName);
+                    FileWrite_PutString(bw, m_sDistrictName);
+
+                    //-------------------------------------------------------
+                    //    Call PutString(clsFile.Number, m_sSupervisor)
+                    //    Put #clsFile.Number, , m_nCoordNum
+                    //    Put #clsFile.Number, , m_bGeoidoEnable
+                    //    Call PutString(clsFile.Number, m_sGeoidoPath)
+                    //    Put #clsFile.Number, , m_bTkyEnable
+                    //    Call PutString(clsFile.Number, m_sTkyPath)
+                    FileWrite_PutString(bw, m_sSupervisor);      //Version対応で""です。
+                    bw.Write((uint)m_nCoordNum);                            //nCoordNum = br.ReadInt32();
+                    PutFileBool(bw, m_bGeoidoEnable);            //bGeoidoEnable = GetFileBool(br);
+                    FileWrite_PutString(bw, m_sGeoidoPath);      //sGeoidoPath = mdiUtility.FileRead_GetString(br); 
+                    PutFileBool(bw, m_bTkyEnable);               //bTkyEnable = GetFileBool(br);
+                    FileWrite_PutString(bw, m_sTkyPath);         //sTkyPath = mdiUtility.FileRead_GetString(br);
+
+                    //-------------------------------------------------------
+                    //    'セミ・ダイナミック対応。'2009/11 H.Nakamura
+                    //    Put #clsFile.Number, , m_bSemiDynaEnable
+                    //    Call PutString(clsFile.Number, m_sSemiDynaPath)
+                    PutFileBool(bw, m_bSemiDynaEnable);          //bSemiDynaEnable = GetFileBool(br);
+                    FileWrite_PutString(bw, m_sSemiDynaPath);    //sSemiDynaPath = mdiUtility.FileRead_GetString(br);
+
+
+#if false
+                    //-------------------------------------------------------
+                    //    Call m_clsNetworkModel.Save(clsFile.Number)
+                    m_clsNetworkModel.Save(bw);
+
+                    //    Call m_clsBaseLineAnalysisParam.Save(clsFile.Number)
+                    m_clsBaseLineAnalysisParam.Save(bw);
+
+                    //    Call m_clsAngleDiffParamRing.Save(clsFile.Number)
+                    m_clsAngleDiffParamRing.Save(bw);
+
+                    //    Call m_clsAngleDiffParamBetween.Save(clsFile.Number)
+                    m_clsAngleDiffParamBetween.Save(bw);
+
+                    //    Call m_clsAngleDiffParamHeight.Save(clsFile.Number) '2023/05/19 Hitz H.Nakamura 楕円体高の閉合差を追加。
+                    m_clsAngleDiffParamHeight.Save(bw);
+
+                    //    Call m_clsAccountParamHand.Save(clsFile.Number)
+                    m_clsAccountParamHand.Save(bw);
+
+                    //    Call m_clsAccountParamWrite.Save(clsFile.Number)
+
+                    //    Call m_clsAccountParamCoordinate.Save(clsFile.Number)
+
+                    //    Call m_clsAccountOverlapParam.Save(clsFile.Number)
+
+                    //    Call m_clsAccountParamEccentricCorrect.Save(clsFile.Number)
+
+                    //    Call m_clsAccountParamSemiDyna.Save(clsFile.Number) 'セミ・ダイナミック対応。'2009/11 H.Nakamura
+
+                    //    Call m_clsAccountCadastralParam.Save(clsFile.Number)
+
+                    //    Call m_clsAutoOrderVectorParam.Save(clsFile.Number)
+
+                    //    Call m_clsAccountParamResultBase.Save(clsFile.Number)   '2007/7/18 NGS Yamada
+
+#endif
+
+                    //--------------------------------------------------------
+                    //    Dim i As Long
+                    //    For i = 0 To OUTPUT_TYPE_COUNT - 1
+                    //        Call m_clsOutputParam(i).Save(clsFile.Number)
+                    //    Next
+                    //    For i = 0 To DXF_TYPE_COUNT - 1
+                    //        Call m_clsDXFParam(i).Save(clsFile.Number)
+                    //    Next
+
+
+                    //--------------------------------------------------------
+                    //    'チェックサム。
+                    //    Dim nSize As Long
+                    //    nSize = Loc(clsFile.Number)
+                    //    Put #clsFile.Number, , nSize
+                    //
+                    long nSize = 0;
+                    //        nSize = Loc(bw);
+                    bw.Write(nSize);
+
+#endif               //2 ********************************************************************************
+
+
+                    //--------------------------------------------------------
+                    //    Call clsFile.CloseFile
+                    fs.Close();
+
+#if false           //2 ********************************************************************************
+
+                    //--------------------------------------------------------
+                    //    'テンポラリファイルと置き換える。
+                    //    Call ReplaceFile(sTemp, sPath & DATA_FILE_NAME)       //sTemp = "C:\Develop\NetSurv\Src\NS-App\NS-Survey\Temp\Document.tmp"
+                    //                                                          //sPath = "C:\Develop\NetSurv\Src\NS-App\NS-Survey\UserData\0275\"  // data
+                    mdiUtility.ReplaceFile(sTemp, $"{sPath}{GENBA_CONST.DATA_FILE_NAME}");
+
+#endif               //2 ********************************************************************************
+
+
+                    //--------------------------------------------------------
+                    //    '観測点ファイルのコピー。
+                    //    Dim sSrcObsPointPath As String
+                    //    Dim sDstObsPointPath As String
+                    //    sSrcObsPointPath = App.Path & TEMPORARY_PATH & "." & OBSPOINT_PATH
+                    //    sDstObsPointPath = sPath & "." & OBSPOINT_PATH
+                    //    Call DeleteDir(sDstObsPointPath, True)
+                    //    Call CopyDir(sSrcObsPointPath, sDstObsPointPath, True)
+                    //
+                    //
+                    string sSrcObsPointPath;
+                    string sDstObsPointPath;
+                    sSrcObsPointPath = $"{App_Path}{MdlNSDefine.TEMPORARY_PATH}.{MdlNSSDefine.OBSPOINT_PATH}";  //"C:\Develop\NetSurv\Src\NS-App\NS-Survey\Temp\.\ObsPoint\"
+                    sDstObsPointPath = $"{sPath}.{MdlNSSDefine.OBSPOINT_PATH}";                                 //"C:\Develop\NetSurv\Src\NS-App\NS-Survey\UserData\0275\.\ObsPoint\"    
+                    bool dmy1 = DeleteDir(sDstObsPointPath, true);
+                    bool dmy2 = CopyDir(sSrcObsPointPath, sDstObsPointPath, true);
+
+                    //--------------------------------------------------------
+                    //    m_sPath = sPath 'パスを更新。
+                    //    m_bModifyed = False
+                    m_sPath = sPath;        //'パスを更新。
+                    m_bModifyed = false;
+
+                }
+
+            }
         }
         //==========================================================================================
-
-
-
-
-
-
 
 
 
@@ -2669,6 +2856,14 @@ namespace SurvLine
         'clsObservationPoint 対象とする観測点(代表観測点)。
         'bEnable 有効フラグ。
         */
+        public void EnableObservationPoint(ObservationPoint clsObservationPoint, bool bEnable)
+        {
+            if (clsObservationPoint.Eccentric())
+            {
+                Dictionary<string, object> objEccentricPoints = new Dictionary<string, object>();
+                SetAtCollectionObject(objEccentricPoints, clsObservationPoint.HeadPoint(), clsObservationPoint.Number());
+            }
+        }
 #if false
         /*
          *************************** 修正要 sakai
@@ -2730,7 +2925,7 @@ namespace SurvLine
 
             '結合元が偏心点である場合、偏心補正をOFFにする。
             If clsSrcObservationPoint.Eccentric Then Call RemoveGenuinePoint(clsSrcObservationPoint.CorrectPoint)
-    
+
             '接続基線ベクトルが方位標である観測点を取得する。
             Dim clsBaseLineVectors() As BaseLineVector
             ReDim clsBaseLineVectors(-1 To -1)
@@ -2740,7 +2935,7 @@ namespace SurvLine
 
 
             Call m_clsNetworkModel.CombinationObservationPoint(clsSrcObservationPoint, clsDstObservationPoint)
-    
+
             '方位標を反映させる。
             Dim clsEccentricPoint As ObservationPoint
             For Each clsEccentricPoint In objEccentricPoints
@@ -2752,7 +2947,7 @@ namespace SurvLine
                     clsEccentricPoint.EccentricCorrectionParam.UsePoint = clsEccentricPoint.Owner.Key
                 End If
             Next
-    
+
             '結合先が偏心点である場合、偏心補正を再計算する。
             If clsDstObservationPoint.Eccentric Then
                 Call m_clsNetworkModel.CorrectEccentric(clsDstObservationPoint)
@@ -2838,7 +3033,7 @@ namespace SurvLine
         End Sub
         [VB]*/
         //------------------------------------------------------------------------------------------
-        //[C#]
+        //[C#]      //2
         /*
         '観測点の共通属性を設定する。
         '
@@ -2849,9 +3044,73 @@ namespace SurvLine
         'bFixed 固定点フラグ。
         'clsCoordinatePointFix 固定座標。
         */
-        public void SetAttributeCommon(ObservationPoint clsObservationPoin, string sNumber, string sName, bool bFixed, CoordinatePointFix clsCoordinatePointFix)
+        public void SetAttributeCommon(ObservationPoint clsObservationPoint, string sNumber, string sName, bool bFixed, CoordinatePointFix clsCoordinatePointFix)
         {
-            return;
+
+            //'接続基線ベクトルが方位標である観測点を取得する。
+            List<BaseLineVector> clsBaseLineVectors = new List<BaseLineVector>();
+            clsBaseLineVectors.Clear();
+            m_clsNetworkModel.GetConnectBaseLineVectorsEx(clsObservationPoint, clsBaseLineVectors);
+            List<ObservationPoint> objEccentricPoints = new List<ObservationPoint>();
+            objEccentricPoints = (List<ObservationPoint>)m_clsNetworkModel.GetMarkedEccentricPoints(clsBaseLineVectors);
+
+            //'設定。
+            clsObservationPoint.Number(sNumber);
+            clsObservationPoint.Name(sName);
+            clsObservationPoint.Fixed(bFixed);
+            if(clsObservationPoint.Fixed())
+            {
+                clsObservationPoint.CoordinateFixed(clsCoordinatePointFix);
+            }
+            //'偏心点なら本点の情報も更新する。
+            if (clsObservationPoint.Eccentric())
+            {
+                clsObservationPoint.CorrectPoint().UpdateGenuineInfo();
+
+            }
+
+#if false
+            //'方位標を反映させる。
+            foreach (ObservationPoint clsEccentricPoint in objEccentricPoints)
+            {
+                //  '2009/11 H.Nakamura
+                //  'clsEccentricPoint.EccentricCorrectionParam.Marker = clsEccentricPoint.Owner.Key
+                if (clsEccentricPoint.EccentricCorrectionParam().AngleType() == ANGLETYPE_HORIZONTAL)
+                {
+                    clsEccentricPoint.EccentricCorrectionParam().Marker = clsEccentricPoint.Owner().Key();
+                }
+                else
+                {
+                    clsEccentricPoint.EccentricCorrectionParam().UsePoint = clsEccentricPoint.Owner().Key()
+                }
+            }
+#endif
+
+            //'観測点ファイル名の更新。
+            //2     string AppPath = System.IO.Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath);
+            string App_Path = @"C:\Develop\NetSurv\Src\NS-App\NS-Survey";   //2
+
+            string sDirPath;
+            //2 sDirPath = AppPath + TEMPORARY_PATH + "." + OBSPOINT_PATH;
+            sDirPath = App_Path + TEMPORARY_PATH + "." + OBSPOINT_PATH;
+
+            ObservationPoint clsRepresentPoint;
+            clsRepresentPoint = clsObservationPoint.HeadPoint();
+
+            while (clsRepresentPoint != null)
+            {
+                clsRepresentPoint.UpdateFileName(sDirPath);
+                clsRepresentPoint = clsRepresentPoint.NextPoint();
+            }
+
+            //'偏心補正の再計算。
+            if (clsObservationPoint.Eccentric())
+            {
+                m_clsNetworkModel.CorrectEccentric(clsObservationPoint);
+            }
+
+            m_bModifyed = true;
+
         }
         //==========================================================================================
 
@@ -2979,19 +3238,33 @@ namespace SurvLine
         End Sub
         [VB]*/
         //------------------------------------------------------------------------------------------
-        //[C#]
-        /*
-        'セッションを変更する。
-        '
-        'sSession で指定されるセッション名を objElements で指定されるオブジェクトと、その関連するオブジェクトに設定する。
-        '関連するオブジェクトとは、
-        'objElements が基線ベクトルであった場合はその両端の観測点(代表観測点)。
-        'objElements が観測点(代表観測点)であった場合はその接続基線ベクトル。
-        '
-        '引き数：
-        'objElements 対象とするオブジェクト。要素はオブジェクト。キーは任意。
-        'sSession セッション名。
-        */
+        //[C#]  //2
+        /// <summary>
+        /// セッションを変更する。
+        /// '
+        /// sSession で指定されるセッション名を objElements で指定されるオブジェクトと、その関連するオブジェクトに設定する。
+        /// 関連するオブジェクトとは、
+        /// objElements が基線ベクトルであった場合はその両端の観測点(代表観測点)。
+        /// objElements が観測点(代表観測点)であった場合はその接続基線ベクトル。
+        /// '
+        /// 引き数：
+        /// objElements 対象とするオブジェクト。要素はオブジェクト。キーは任意。
+        /// sSession セッション名。
+        /// 
+        /// </summary>
+        /// <param name="objElements"></param>
+        /// <param name="sSession"></param>
+        public void SetSessionExtend(Dictionary<string, object> objElements, string sSession)   //2
+        {
+
+            //'拡張設定対象オブジェクト。
+            //  Dictionary<string, object> objExtends = new Dictionary<string, object>();
+            //  objExtends = GetSessionExtend(objElements);
+
+            //'設定。
+            SetSession_Extends(objElements, sSession);  //2　新規
+
+        }
 #if false
         /*
          *************************** 修正要 sakai
@@ -3060,26 +3333,397 @@ namespace SurvLine
         End Sub
         [VB]*/
         //------------------------------------------------------------------------------------------
-        //[C#]
-        /*
-        'セッションを変更する。
-        '
-        'sSession で指定されるセッション名を objElements で指定されるオブジェクトに設定する。
-        '
-        '引き数：
-        'objElements 対象とするオブジェクト。要素はオブジェクト。キーは任意。
-        'sSession セッション名。
-        */
-#if false
-        /*
-         *************************** 修正要 sakai
-         */
-        public void SetSession(ICollection objElements, string sSession)
+        //[C#]  //2
+        /// <summary>
+        /// セッションを変更する。
+        /// '
+        /// sSession で指定されるセッション名を objElements で指定されるオブジェクトに設定する。
+        /// 
+        /// 引き数：
+        /// objElements 対象とするオブジェクト。要素はオブジェクト。キーは任意。
+        /// sSession セッション名。
+        /// 
+        /// </summary>
+        /// <param name="objElements"></param>
+        /// <param name="sSession"></param>
+        public void SetSession(Dictionary<string, object> objElements, string sSession)
         {
-            return;
-        }
+            string sDirPath;
+#if false
+            string AppPath = System.IO.Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath);
+            sDirPath = AppPath + TEMPORARY_PATH + "." + OBSPOINT_PATH;      //"C:\Develop\NetSurv\Src\NS-App\NS-Survey\Temp\.\ObsPoint\"
+#else
+            string App_Path = @"C:\Develop\NetSurv\Src\NS-App\NS-Survey";
+            sDirPath = App_Path + TEMPORARY_PATH + "." + OBSPOINT_PATH;      //"C:\Develop\NetSurv\Src\NS-App\NS-Survey\Temp\.\ObsPoint\"
 #endif
-        //==========================================================================================
+
+            long SelectLine = m_clsMdlMain.PaneSelcttedNo;
+
+
+            ChainList clsChainList;
+
+            //===========================================================================
+            if (m_clsMdlMain.PaneSelectedTab == (long)LIST_NUM_PANE.LIST_NUM_OBSPNT)
+            //===========================================================================
+            {
+                //***************************
+                //TAB：観測点　選択の場合
+                //***************************
+
+                clsChainList = m_clsMdlMain.GetDocument().NetworkModel().RepresentPointHead();
+                long nRows = 0;
+                ObservationPoint clsObservationPoint;
+                while (clsChainList != null)
+                {
+                    clsObservationPoint = (ObservationPoint)clsChainList.Element;
+
+                    if (nRows == SelectLine)
+                    {
+                        break;
+                    }
+                    nRows++;
+                    clsChainList = clsChainList.NextList();
+
+                }
+                clsObservationPoint = (ObservationPoint)clsChainList.Element;
+
+
+                foreach (object objElement in objElements)
+                {
+                    //'観測点の場合、偏心補正の方位標を評価する。
+                    if ((clsObservationPoint.ObjectType & OBJ_TYPE_OBSERVATIONPOINT) == 0)
+                    {
+                        //'接続基線ベクトルが方位標である観測点を取得する。
+                        object objEccentricPoints = new object();
+                        m_clsNetworkModel.GetMarkedEccentricPoints2((BaseLineVector)objElement, objEccentricPoints);
+                    }
+
+                    clsObservationPoint.Session(sSession);       //Ex)objElement.Session( S001 <- 134F)
+
+                    if ((clsObservationPoint.ObjectType & OBJ_TYPE_OBSERVATIONPOINT) == 0)       //objElement.ObjectType = -2147483631
+                    {
+                        //  // 方位標を反映させる。
+                        //  ObservationPoint clsEccentricPoint; 
+                        //  foreach ( clsEccentricPoint in objEccentricPoints)
+                        //  {
+                        //      //'2009/11 H.Nakamura
+                        //      //    'clsEccentricPoint.EccentricCorrectionParam.Marker = clsEccentricPoint.Owner.Key
+                        //      if (clsEccentricPoint.EccentricCorrectionParam.AngleType == ANGLETYPE_HORIZONTAL)
+                        //      {
+                        //          clsEccentricPoint.EccentricCorrectionParam.Marker = clsEccentricPoint.Owner.Key;
+                        //      }
+                        //      else
+                        //      {
+                        //        clsEccentricPoint.EccentricCorrectionParam.UsePoint = clsEccentricPoint.Owner.Key;
+                        //    }
+                        //  }   //foreach ( clsEccentricPoint in objEccentricPoints)
+                    }
+                    else
+                    {
+                        //'観測点の場合。仮のセッションをOFF。
+                        clsObservationPoint.ProvisionalSession(false);
+                        //'観測点ファイル名の更新。
+                        clsObservationPoint.UpdateFileName(sDirPath);
+                    }
+                }
+
+            }
+            //===========================================================================
+            else
+            //===========================================================================
+            {
+
+                //***************************
+                //TAB：ベクトル　選択の場合
+                //***************************
+
+                //******************************************************************************
+                clsChainList = m_clsMdlMain.GetDocument().NetworkModel().RepresentPointHead();
+                long nRows = 0;
+                ObservationPoint clsObservationPoint;
+                while (clsChainList != null)
+                {
+                    clsObservationPoint = (ObservationPoint)clsChainList.Element;
+
+                    if (nRows == SelectLine)
+                    {
+                        break;
+                    }
+                    nRows++;
+                    clsChainList = clsChainList.NextList();
+
+                }
+                clsObservationPoint = (ObservationPoint)clsChainList.Element;
+
+                //******************************************************************************
+
+                clsChainList = m_clsMdlMain.GetDocument().NetworkModel().BaseLineVectorHead();
+                nRows = 0;
+                BaseLineVector clsBaseLineVector;
+                while (clsChainList != null)
+                {
+                    clsBaseLineVector = (BaseLineVector)clsChainList.Element;
+
+                    if (nRows == SelectLine)
+                    {
+                        break;
+                    }
+                    nRows++;
+                    clsChainList = clsChainList.NextList();
+
+                }
+                clsBaseLineVector = (BaseLineVector)clsChainList.Element;
+
+
+                foreach (object objElement in objElements)
+                {
+                    //  //'観測点の場合、偏心補正の方位標を評価する。
+                    //  if ((clsBaseLineVector.ObjectType & OBJ_TYPE_OBSERVATIONPOINT) == 0)
+                    //  {
+                    //      //'接続基線ベクトルが方位標である観測点を取得する。
+                    //      object objEccentricPoints = new object();
+                    //      m_clsNetworkModel.GetMarkedEccentricPoints2((BaseLineVector)objElement, objEccentricPoints);
+                    //  }
+
+                    clsBaseLineVector.Session = sSession;       //Ex)objElement.Session( S001 <- 134F)
+
+                    if ((clsBaseLineVector.ObjectType & OBJ_TYPE_OBSERVATIONPOINT) == 0)       //objElement.ObjectType = -2147483631
+                    {
+                        //  // 方位標を反映させる。
+                        //  ObservationPoint clsEccentricPoint; 
+                        //  foreach ( clsEccentricPoint in objEccentricPoints)
+                        //  {
+                        //      //'2009/11 H.Nakamura
+                        //      //    'clsEccentricPoint.EccentricCorrectionParam.Marker = clsEccentricPoint.Owner.Key
+                        //      if (clsEccentricPoint.EccentricCorrectionParam.AngleType == ANGLETYPE_HORIZONTAL)
+                        //      {
+                        //          clsEccentricPoint.EccentricCorrectionParam.Marker = clsEccentricPoint.Owner.Key;
+                        //      }
+                        //      else
+                        //      {
+                        //        clsEccentricPoint.EccentricCorrectionParam.UsePoint = clsEccentricPoint.Owner.Key;
+                        //    }
+                        //  }   //foreach ( clsEccentricPoint in objEccentricPoints)
+                    }
+                    else
+                    {
+                        //'観測点の場合。仮のセッションをOFF。
+                        clsObservationPoint.ProvisionalSession(false);
+                        //'観測点ファイル名の更新。
+                        clsObservationPoint.UpdateFileName(sDirPath);
+                    }
+                }
+
+                //===========================================================================
+            }
+            //===========================================================================
+
+        }
+        //------------------------------------------------------------------------------------------
+        //[C#] 2
+        /// <summary>
+        /// セッションを変更する。
+        /// '
+        /// sSession で指定されるセッション名を objElements で指定されるオブジェクトに設定する。
+        /// '
+        /// 引き数：
+        /// objElements 対象とするオブジェクト。要素はオブジェクト。キーは任意。
+        /// sSession セッション名。
+        /// 
+        /// </summary>
+        /// <param name="objElements"></param>
+        /// <param name="sSession"></param>
+        public void SetSession_Extends(Dictionary<string, object> objElements, string sSession)
+        {
+            string sDirPath;
+#if false
+            string AppPath = System.IO.Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath);
+            sDirPath = AppPath + TEMPORARY_PATH + "." + OBSPOINT_PATH;      //"C:\Develop\NetSurv\Src\NS-App\NS-Survey\Temp\.\ObsPoint\"
+#else
+            string App_Path = @"C:\Develop\NetSurv\Src\NS-App\NS-Survey";
+            sDirPath = App_Path + TEMPORARY_PATH + "." + OBSPOINT_PATH;      //"C:\Develop\NetSurv\Src\NS-App\NS-Survey\Temp\.\ObsPoint\"
+#endif
+
+            long SelectLine = m_clsMdlMain.PaneSelcttedNo;
+
+
+            //-------------------------------------------------------------------
+            ChainList clsChainList;
+            //===========================================================================
+            if (m_clsMdlMain.PaneSelectedTab == (long)LIST_NUM_PANE.LIST_NUM_OBSPNT)
+            //===========================================================================
+            {
+                //**************************
+                //TAB：観測点   選択の場合
+                //**************************
+
+                clsChainList = m_clsMdlMain.GetDocument().NetworkModel().RepresentPointHead();
+                long nRows = 0;
+                ObservationPoint clsObservationPoint;
+                //-------------------------------------------------------------------
+                while (clsChainList != null)
+                {
+                    clsObservationPoint = (ObservationPoint)clsChainList.Element;
+
+                    if (nRows == SelectLine)
+                    {
+                        break;
+                    }
+                    nRows++;
+                    clsChainList = clsChainList.NextList();
+
+                }
+                //-------------------------------------------------------------------
+                clsObservationPoint = (ObservationPoint)clsChainList.Element;
+
+                foreach (object objElement in objElements)
+                {
+                    //'観測点の場合、偏心補正の方位標を評価する。
+                    if ((clsObservationPoint.ObjectType & OBJ_TYPE_OBSERVATIONPOINT) == 0)
+                    {
+                        //'接続基線ベクトルが方位標である観測点を取得する。
+                        object objEccentricPoints = new object();
+                        m_clsNetworkModel.GetMarkedEccentricPoints2((BaseLineVector)objElement, objEccentricPoints);
+                    }
+
+                    List<BaseLineVector> clsBaseLineVectors = new List<BaseLineVector>();
+
+                    Sessoin_GetConnectBaseLineVectors(clsObservationPoint, ref clsBaseLineVectors);     //2)
+                    int v = 0;
+                    foreach (object obj in clsBaseLineVectors)
+                    {
+                        clsBaseLineVectors[v].Session = sSession;
+                        v++;
+                    }
+
+
+                    if ((clsObservationPoint.ObjectType & OBJ_TYPE_OBSERVATIONPOINT) == 0)       //objElement.ObjectType = -2147483631
+                    {
+                        //  // 方位標を反映させる。
+                        //  ObservationPoint clsEccentricPoint; 
+                        //  foreach ( clsEccentricPoint in objEccentricPoints)
+                        //  {
+                        //      //'2009/11 H.Nakamura
+                        //      //    'clsEccentricPoint.EccentricCorrectionParam.Marker = clsEccentricPoint.Owner.Key
+                        //      if (clsEccentricPoint.EccentricCorrectionParam.AngleType == ANGLETYPE_HORIZONTAL)
+                        //      {
+                        //          clsEccentricPoint.EccentricCorrectionParam.Marker = clsEccentricPoint.Owner.Key;
+                        //      }
+                        //      else
+                        //      {
+                        //        clsEccentricPoint.EccentricCorrectionParam.UsePoint = clsEccentricPoint.Owner.Key;
+                        //    }
+                        //  }   //foreach ( clsEccentricPoint in objEccentricPoints)
+                    }
+                    else
+                    {
+                        //'観測点の場合。仮のセッションをOFF。
+                        clsObservationPoint.ProvisionalSession(false);
+                        //'観測点ファイル名の更新。
+                        clsObservationPoint.UpdateFileName(sDirPath);
+                    }
+                }
+            }
+            //===========================================================================
+            else  //if (m_clsMdlMain.PaneSelectedTab != (long)LIST_NUM_PANE.LIST_NUM_OBSPNT)
+            //===========================================================================
+            {
+
+                //**************************
+                //TAB：ベクトル選択の場合
+                //**************************
+
+                long nRows = 0;
+
+                clsChainList = m_clsMdlMain.GetDocument().NetworkModel().BaseLineVectorHead();
+                BaseLineVector clsBaseLineVector;
+
+                //-------------------------------------------------------------------
+                while (clsChainList != null)
+                {
+                    clsBaseLineVector = (BaseLineVector)clsChainList.Element;
+
+                    if (nRows == SelectLine)
+                    {
+                        break;
+                    }
+                    nRows++;
+                    clsChainList = clsChainList.NextList();
+
+                }
+                //-------------------------------------------------------------------
+                clsBaseLineVector = (BaseLineVector)clsChainList.Element;
+
+                //-------------------------------------------------------------------
+                //TABベクトル選択された、開始点と終点の情報を取得
+                string Str = clsBaseLineVector.StrPoint().TopParentPoint().Number();
+                string End = clsBaseLineVector.EndPoint().TopParentPoint().Number();
+
+                //-------------------------------------------------------------------
+                //観測点側の更新
+                clsChainList = m_clsMdlMain.GetDocument().NetworkModel().RepresentPointHead();
+                long Rows = 0;
+                ObservationPoint clsObservationPoint;
+                //-------------------------------------------------------------------
+                while (clsChainList != null)
+                {
+                    clsObservationPoint = (ObservationPoint)clsChainList.Element;
+
+                    string sCheck = clsObservationPoint.DispNumber();   //観測点No.
+
+                    if (Str == sCheck || End == sCheck)                 //ベクトル選択の始点と終点＝観測点No.
+                    {
+                        clsObservationPoint.Session(sSession);
+                    }
+
+                    nRows++;
+                    clsChainList = clsChainList.NextList();
+
+                }
+                //-------------------------------------------------------------------
+
+
+
+
+
+                //===========================================================================
+            }
+            //===========================================================================
+
+
+
+
+
+
+
+
+
+        }
+        //---------------------------------------------------------------------------------------------------------------------------------------------
+        public void Sessoin_GetConnectBaseLineVectors(ObservationPoint clsObservationPoint, ref List<BaseLineVector> clsBaseLineVectors)   //2)
+        {
+            ChainList clsChainList;
+            clsChainList = m_clsMdlMain.GetDocument().NetworkModel().BaseLineVectorHead();
+            BaseLineVector dataBaseLineVector;
+
+            string sCheck = clsObservationPoint.DispNumber();
+
+            while (clsChainList != null)
+            {
+                dataBaseLineVector = (BaseLineVector)clsChainList.Element;
+
+                if (dataBaseLineVector.StrPoint().TopParentPoint().Number() == sCheck || dataBaseLineVector.EndPoint().TopParentPoint().Number() == sCheck)
+                {
+                    clsBaseLineVectors.Add(dataBaseLineVector);
+                }
+
+                clsChainList = clsChainList.NextList();
+            }
+
+        }
+
+        //===========================================================================================
+        //===========================================================================================
 
         //==========================================================================================
         /*[VB]
@@ -3102,10 +3746,10 @@ namespace SurvLine
                     Call SetAtCollectionObject(objEccentricPoints, clsEccentricPoint.HeadPoint, clsEccentricPoint.Number)
                 Next
             End If
-    
+
             '反転。
             Call m_clsNetworkModel.ReplaceBaseLineVector(clsBaseLineVector)
-    
+
             '偏心補正の再計算。
             For Each clsEccentricPoint In objEccentricPoints
                 Call m_clsNetworkModel.CorrectEccentric(clsEccentricPoint)

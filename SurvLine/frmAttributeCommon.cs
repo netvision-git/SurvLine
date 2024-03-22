@@ -289,6 +289,11 @@ namespace SurvLine
             [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        /// <summary>
+        ///     初期化。
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Form_Load(object sender, EventArgs e)
         {
 
@@ -324,6 +329,7 @@ namespace SurvLine
                 {
 
                     //m_clsCoordinateDisplay.GetDMS(ref nLatH, nLatM, nLatS, nLonH, nLonM, nLonS, nHeight, ref vAlt, GUI_SEC_DECIMAL, m_clsMdlMain.GetDocument().GeoidoEnable, m_clsMdlMain.GetDocument().GeoidoPath, "");
+                    _ = m_clsMdlMain.GetDocument().GeoidoEnable();  //2
                     m_clsCoordinateDisplay.GetDMS(ref nLatH, ref nLatM, ref nLatS, ref nLonH, ref nLonM, ref nLonS, ref nHeight, ref vAlt, GUI_SEC_DECIMAL, m_clsMdlMain.GetDocument().GeoidoPath());
                     sLatH = nLatH.ToString();
                     sLatM = nLatM.ToString();
@@ -493,12 +499,20 @@ namespace SurvLine
 
                 m_bOptionBtn = false;
 
-
                 //  'コントロール初期化。
                 //  '2012/05/30 H.Nakamura セミ・ダイナミックがONの場合は固定座標は標高で入力できない。''''''''''''''''''''''''''''''
                 //  'optAlt.Enabled = GetDocument().GeoidoEnable
                 //'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-                optAlt.Enabled = m_clsMdlMain.GetDocument().GeoidoEnable() & (!m_clsMdlMain.GetDocument().SemiDynaEnable());
+                //2     optAlt.Enabled = m_clsMdlMain.GetDocument().GeoidoEnable() & (!m_clsMdlMain.GetDocument().SemiDynaEnable());
+                optAlt.Enabled = false;
+                if (m_clsMdlMain.GetDocument().GeoidoEnable())
+                {
+                    if (!m_clsMdlMain.GetDocument().SemiDynaEnable())
+                    {
+                        optAlt.Enabled = true;
+                    }
+                }
+
                 //'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
                 //chkFixed_Click();
@@ -514,7 +528,11 @@ namespace SurvLine
 
         }
 
-
+        //==========================================================================================
+        public static void SelectText(TextBox txtTextBox)    //2
+        {
+            _ = txtTextBox.Focus();
+        }
         //==========================================================================================
         /*[VB]
             'テキストをすべて選択する。
@@ -533,7 +551,21 @@ namespace SurvLine
             [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
-
+        ///2
+        /// <summary>
+        /// テキストをすべて選択する。
+        /// </summary>
+        private void txtNumber_GotFocus()
+        {
+            try
+            {
+                SelectText(txtNumber);
+            }
+            catch (Exception ex) 
+            {
+                _ = MessageBox.Show(ex.Message, "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
 
         //==========================================================================================
         /*[VB]
@@ -553,6 +585,21 @@ namespace SurvLine
             [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        //2
+        /// <summary>
+        /// テキストをすべて選択する。
+        /// </summary>
+        private void txtName_GotFocus()
+        {
+            try
+            {
+                SelectText(txtName);
+            }
+            catch (Exception ex)
+            {
+                _ = MessageBox.Show(ex.Message, "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
 
         //==========================================================================================
         /*[VB]
@@ -572,6 +619,21 @@ namespace SurvLine
             [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        //2
+        /// <summary>
+        /// テキストをすべて選択する。
+        /// </summary>
+        private void txtLatH_GotFocus()
+        {
+            try
+            {
+                SelectText(txtLatH);
+            }
+            catch (Exception ex)
+            {
+                _ = MessageBox.Show(ex.Message, "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
 
         //==========================================================================================
         /*[VB]
@@ -591,6 +653,21 @@ namespace SurvLine
             [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        //2
+        /// <summary>
+        /// テキストをすべて選択する。
+        /// </summary>
+        private void txtLatM_GotFocus()
+        {
+            try
+            {
+                SelectText(txtLatM);
+            }
+            catch (Exception ex)
+            {
+                _ = MessageBox.Show(ex.Message, "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
 
         //==========================================================================================
         /*[VB]
@@ -610,6 +687,21 @@ namespace SurvLine
             [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        //2
+        /// <summary>
+        /// テキストをすべて選択する。
+        /// </summary>
+        private void txtLatS_GotFocus()
+        {
+            try
+            {
+                SelectText(txtLatS);
+            }
+            catch (Exception ex)
+            {
+                _ = MessageBox.Show(ex.Message, "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
 
         //==========================================================================================
         /*[VB]
@@ -629,6 +721,21 @@ namespace SurvLine
             [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        //2
+        /// <summary>
+        /// テキストをすべて選択する。
+        /// </summary>
+        private void txtLonH_GotFocus()
+        {
+            try
+            {
+                SelectText(txtLonH);
+            }
+            catch (Exception ex)
+            {
+                _ = MessageBox.Show(ex.Message, "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
 
         //==========================================================================================
         /*[VB]
@@ -648,6 +755,21 @@ namespace SurvLine
             [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        //2
+        /// <summary>
+        /// テキストをすべて選択する。
+        /// </summary>
+        private void txtLonM_GotFocus()
+        {
+            try
+            {
+                SelectText(txtLonM);
+            }
+            catch (Exception ex)
+            {
+                _ = MessageBox.Show(ex.Message, "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
 
         //==========================================================================================
         /*[VB]
@@ -667,6 +789,21 @@ namespace SurvLine
             [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        //2
+        /// <summary>
+        /// テキストをすべて選択する。
+        /// </summary>
+        private void txtLonS_GotFocus()
+        {
+            try
+            {
+                SelectText(txtLonS);
+            }
+            catch (Exception ex)
+            {
+                _ = MessageBox.Show(ex.Message, "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
 
         //==========================================================================================
         /*[VB]
@@ -686,6 +823,21 @@ namespace SurvLine
             [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        //2
+        /// <summary>
+        /// テキストをすべて選択する。
+        /// </summary>
+        private void txtX_GotFocus()
+        {
+            try
+            {
+                SelectText(txtX);
+            }
+            catch (Exception ex)
+            {
+                _ = MessageBox.Show(ex.Message, "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
 
         //==========================================================================================
         /*[VB]
@@ -705,6 +857,21 @@ namespace SurvLine
             [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        //2
+        /// <summary>
+        /// テキストをすべて選択する。
+        /// </summary>
+        private void txtY_GotFocus()
+        {
+            try
+            {
+                SelectText(txtY);
+            }
+            catch (Exception ex)
+            {
+                _ = MessageBox.Show(ex.Message, "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
 
         //==========================================================================================
         /*[VB]
@@ -724,6 +891,21 @@ namespace SurvLine
             [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        //2
+        /// <summary>
+        /// テキストをすべて選択する。
+        /// </summary>
+        private void txtHeight_GotFocus()
+        {
+            try
+            {
+                SelectText(txtHeight);
+            }
+            catch (Exception ex)
+            {
+                _ = MessageBox.Show(ex.Message, "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
 
         //==========================================================================================
         /*[VB]
@@ -743,6 +925,21 @@ namespace SurvLine
             [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        //2
+        /// <summary>
+        /// テキストをすべて選択する。
+        /// </summary>
+        private void txtWGSX_GotFocus()
+        {
+            try
+            {
+                SelectText(txtWGSX);
+            }
+            catch (Exception ex)
+            {
+                _ = MessageBox.Show(ex.Message, "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
 
         //==========================================================================================
         /*[VB]
@@ -762,6 +959,21 @@ namespace SurvLine
             [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        //2
+        /// <summary>
+        /// テキストをすべて選択する。
+        /// </summary>
+        private void txtWGSY_GotFocus()
+        {
+            try
+            {
+                SelectText(txtWGSY);
+            }
+            catch (Exception ex)
+            {
+                _ = MessageBox.Show(ex.Message, "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
 
         //==========================================================================================
         /*[VB]
@@ -781,6 +993,21 @@ namespace SurvLine
             [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        //2
+        /// <summary>
+        /// テキストをすべて選択する。
+        /// </summary>
+        private void txtWGSZ_GotFocus()
+        {
+            try
+            {
+                SelectText(txtWGSZ);
+            }
+            catch (Exception ex)
+            {
+                _ = MessageBox.Show(ex.Message, "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
 
 
         //==========================================================================================
@@ -985,7 +1212,7 @@ namespace SurvLine
         //------------------------------------------------------------------------------------------
         //[C#]
         /// <summary>
-        ///  '座標変換。
+        ///  '座標変換。[＞]ボタン
         ///  
         /// </summary>
         /// <param name="sender"></param>
@@ -1065,16 +1292,24 @@ namespace SurvLine
                         }
                     }
                     //'XYH→DMS。
+                    /*
+                        Dim nHeight As Double
+                        Call JGDxyz_to_WGS84dms(GetDocument().CoordNum, Val(txtX.Text), Val(txtY.Text), 0, nLat, nLon, nHeight)
+                    */
                     double nHeight = 0;
                     double nLat = 0;
                     double nLon = 0;
                     JGDxyz_to_WGS84dms((int)m_clsMdlMain.GetDocument().CoordNum(), double.Parse(txtX.Text), double.Parse(txtY.Text), 0, ref nLat, ref nLon, ref nHeight);
                     //------------------------------------------------------------------------
-                    double nX = 0;
-                    double nY = 0;
-                    double nZ = 0;
-                    WGS84dms_to_JGDxyz((int)m_clsMdlMain.GetDocument().CoordNum(), nLat, nLon, 0, ref nX, ref nY, ref nZ);
-                    //------------------------------------------------------------------------
+                    /*
+                        Dim nH As Long
+                        Dim nM As Long
+                        Dim nS As Double
+                        Call d_to_dms_decimal(nLat, nH, nM, nS, GUI_SEC_DECIMAL)
+                        txtLatH.Text = CStr(nH)
+                        txtLatM.Text = CStr(nM)
+                        txtLatS.Text = FormatRound0Trim(nS, GUI_SEC_DECIMAL)
+                    */
                     double nH = 0;
                     double nM = 0;
                     double nS = 0;
@@ -1083,40 +1318,34 @@ namespace SurvLine
                     d_to_dms_decimal(nLat, ref nH2, ref nM2, ref nS, (int)GUI_SEC_DECIMAL);
                     nH = nH2;
                     nM = nM2;
-                    //------------------------------------------------------------------------
-
                     txtLatH.Text = nH.ToString();
                     txtLatM.Text = nM.ToString();
                     txtLatS.Text = FormatRound0Trim(nS, GUI_SEC_DECIMAL);
-                    //------------------------------------------------------------------------
+                    /*
+                        Call d_to_dms_decimal(nLon, nH, nM, nS, GUI_SEC_DECIMAL)
+                        txtLonH.Text = CStr(nH)
+                        txtLonM.Text = CStr(nM)
+                        txtLonS.Text = FormatRound0Trim(nS, GUI_SEC_DECIMAL)
+                    */
                     nH2 = (int)nH;
                     nM2 = (int)nM;
                     d_to_dms_decimal(nLon, ref nH2, ref nM2, ref nS, (int)GUI_SEC_DECIMAL);
                     nH = nH2;
                     nM = nM2;
-                    //------------------------------------------------------------------------
                     txtLonH.Text = nH.ToString();
                     txtLonM.Text = nM.ToString();
                     txtLonS.Text = FormatRound0Trim(nS, GUI_SEC_DECIMAL);
-                    //------------------------------------------------------------------------
-                    txtLatH.Text = nH.ToString();
-                    txtLatM.Text = nM.ToString();
-                    txtLatS.Text = FormatRound0Trim(nS, GUI_SEC_DECIMAL);
-                    //------------------------------------------------------------------------
-                    nH2 = (int)nH;
-                    nM2 = (int)nM;
-                    d_to_dms_decimal(nLon, ref nH2, ref nM2, ref nS, (int)GUI_SEC_DECIMAL);
-                    nH = nH2;
-                    nM = nM2;
-                    //------------------------------------------------------------------------
-                    txtLonH.Text = nH.ToString();
-                    txtLonM.Text = nM.ToString();
-                    txtLonS.Text = FormatRound0Trim(nS, GUI_SEC_DECIMAL);
-
+                    /*
+                        'XYH→XYZ。
+                        Call JGDxyz_to_WGS84xyz(GetDocument().CoordNum, Val(txtX.Text), Val(txtY.Text), GetHeight(), nX, nY, nZ)
+                        txtWGSX.Text = FormatRound0Trim(nX, GUI_XYZ_DECIMAL)
+                        txtWGSY.Text = FormatRound0Trim(nY, GUI_XYZ_DECIMAL)
+                        txtWGSZ.Text = FormatRound0Trim(nZ, GUI_XYZ_DECIMAL)
+                    */
                     //'XYH→XYZ。
-                    nX = 0;
-                    nY = 0;
-                    nZ = 0;
+                    double nX = 0;
+                    double nY = 0;
+                    double nZ = 0;
                     JGDxyz_to_WGS84xyz(m_clsMdlMain.GetDocument().CoordNum(), double.Parse(txtX.Text), double.Parse(txtY.Text), GetHeight(), ref nX, ref nY, ref nZ);
                     txtWGSX.Text = FormatRound0Trim(nX, GUI_XYZ_DECIMAL);
                     txtWGSY.Text = FormatRound0Trim(nY, GUI_XYZ_DECIMAL);
@@ -1132,11 +1361,20 @@ namespace SurvLine
                     }
 
                     //'XYZ→DMS。
+                    //------------------------------------------------------------------------
+                    /*
+                        Call WGS84xyz_to_WGS84dms(Val(txtWGSX.Text), Val(txtWGSY.Text), Val(txtWGSZ.Text), nLat, nLon, nHeight)
+                    */
                     double nHeight = 0;
                     double nLat = 0;
                     double nLon = 0;
                     WGS84xyz_to_WGS84dms(double.Parse(txtWGSX.Text), double.Parse(txtWGSY.Text), double.Parse(txtWGSZ.Text), ref nLat, ref nLon, ref nHeight);
-                    //------------------------------------------------------------------------
+                    /*
+                        Call d_to_dms_decimal(nLat, nH, nM, nS, GUI_SEC_DECIMAL)
+                        txtLatH.Text = CStr(nH)
+                        txtLatM.Text = CStr(nM)
+                        txtLatS.Text = FormatRound0Trim(nS, GUI_SEC_DECIMAL)
+                    */
                     double nH = 0;
                     double nM = 0;
                     double nS = 0;
@@ -1145,22 +1383,31 @@ namespace SurvLine
                     d_to_dms_decimal(nLat, ref nH2, ref nM2, ref nS, (int)GUI_SEC_DECIMAL);
                     nH = nH2;
                     nM = nM2;
-                    //------------------------------------------------------------------------
                     txtLatH.Text = nH.ToString();
                     txtLatM.Text = nM.ToString();
                     txtLatS.Text = FormatRound0Trim(nS, GUI_SEC_DECIMAL);
-                    //------------------------------------------------------------------------
+
+                    /*
+                        Call d_to_dms_decimal(nLon, nH, nM, nS, GUI_SEC_DECIMAL)
+                        txtLonH.Text = CStr(nH)
+                        txtLonM.Text = CStr(nM)
+                        txtLonS.Text = FormatRound0Trim(nS, GUI_SEC_DECIMAL)
+                    */
                     nH2 = (int)nH;
                     nM2 = (int)nM;
                     d_to_dms_decimal(nLon, ref nH2, ref nM2, ref nS, (int)GUI_SEC_DECIMAL);
                     nH = nH2;
                     nM = nM2;
-                    //------------------------------------------------------------------------
                     txtLonH.Text = nH.ToString();
                     txtLonM.Text = nM.ToString();
                     txtLonS.Text = FormatRound0Trim(nS, GUI_SEC_DECIMAL);
 
-
+                    /*
+                        'XYZ→XYH。
+                        Call WGS84xyz_to_JGDxyz(GetDocument().CoordNum, Val(txtWGSX.Text), Val(txtWGSY.Text), Val(txtWGSZ.Text), nX, nY, nZ)
+                        txtX.Text = FormatRound0Trim(nX, GUI_JGD_DECIMAL)
+                        txtY.Text = FormatRound0Trim(nY, GUI_JGD_DECIMAL)
+                    */
                     //'XYZ→XYH。
                     double nX = 0;
                     double nY = 0;
@@ -1169,6 +1416,14 @@ namespace SurvLine
                     txtX.Text = FormatRound0Trim(nX, GUI_JGD_DECIMAL);
                     txtY.Text = FormatRound0Trim(nY, GUI_JGD_DECIMAL);
 
+                    /*
+                        '高さ。
+                        If optAlt.Value Then
+                            txtHeight.Text = FormatRound0Trim(nHeight - GetGeoidoHeight(), GUI_HEIGHT_DECIMAL)
+                        Else
+                            txtHeight.Text = FormatRound0Trim(nHeight, GUI_HEIGHT_DECIMAL)
+                        End If
+                    */
                     //'高さ。
                     if (optAlt.Checked)
                     {
@@ -1217,16 +1472,16 @@ namespace SurvLine
     
             End Sub
             [VB]*/
-        //------------------------------------------------------------------------------------------
-        //[C#]
-        /// <summary>
-        /// 緯度経度
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        /// 
-        private void optDMS_CheckedChanged(object sender, EventArgs e)
+                    //------------------------------------------------------------------------------------------
+                    //[C#]
+                    /// <summary>
+                    /// 緯度経度
+                    /// 
+                    /// </summary>
+                    /// <param name="sender"></param>
+                    /// <param name="e"></param>
+                    /// 
+                    private void optDMS_CheckedChanged(object sender, EventArgs e)
         {
             try
             {
@@ -1237,11 +1492,6 @@ namespace SurvLine
                 EnableDMS(true);
                 EnableJGD(false);
                 EnableWGSXYZ(false);
-#if false
-                optDMS.Checked = true;   //緯度経度
-                optJGD.Checked = false;     //平面直角
-                optWGSXYZ.Checked = false;  //地心直交
-#endif
             }
             catch (Exception ex)
             {
@@ -1250,12 +1500,6 @@ namespace SurvLine
                 _ = MessageBox.Show(ex.Message, "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-#if false
-        private void optDMS_CheckedChanged_1(object sender, EventArgs e)
-        {
-            optDMS_CheckedChanged(sender, e);
-        }
-#endif
 
         //==========================================================================================
         /*[VB]
@@ -1298,11 +1542,6 @@ namespace SurvLine
                 EnableDMS(false);
                 EnableJGD(true);
                 EnableWGSXYZ(false);
-#if false
-                optDMS.Checked = false;     //緯度経度
-                optJGD.Checked = true;      //平面直角
-                optWGSXYZ.Checked = false;  //地心直交
-#endif
             }
             catch (Exception ex)
             {
@@ -1354,11 +1593,6 @@ namespace SurvLine
                 EnableDMS(false);
                 EnableJGD(false);
                 EnableWGSXYZ(true);
-#if false
-                optDMS.Checked = false;   //緯度経度
-                optJGD.Checked = false;   //平面直角
-                //optWGSXYZ.Checked = true; //地心直交
-#endif
             }
             catch (Exception ex)
             {
@@ -1729,7 +1963,36 @@ namespace SurvLine
         {
             bool CheckData = false;
 
+#if false
+            //'観測点番号。
+            if (!CheckFileNameInputLength(txtNumber, "観測点No", RINEX_STR_OBSNUMBER - 1))
+            {
+                return CheckData;
+            }
+#endif
 
+#if false
+                '観測点番号。
+                If Not CheckFileNameInputLength(txtNumber, "観測点No", RINEX_STR_OBSNUMBER - 1) Then Exit Function
+                '値が変化していた場合、既存の観測点番号と重複しないようにする。
+                If txtNumber.Text <> PointNumber Then
+                    Dim clsChainList As ChainList
+                    Set clsChainList = GetDocument().NetworkModel.RepresentPointHead
+                    Do While Not clsChainList Is Nothing
+                        Dim clsObservationPoint As ObservationPoint
+                        Set clsObservationPoint = clsChainList.Element
+                        If clsObservationPoint.PrevPoint Is Nothing And Not clsObservationPoint.Genuine Then
+                            If clsObservationPoint.Number = txtNumber.Text Then
+                                Call MsgBox("この観測点Noはすでに使用されています。", vbCritical)
+                                Call txtNumber.SetFocus
+                                Exit Function
+                            End If
+                        End If
+                        Set clsChainList = clsChainList.NextList
+                    Loop
+                End If
+
+#endif
             // BBBBBBBBBBBBBBBBBBBBBBBBBBBB
 
             CheckData = true;
@@ -2199,6 +2462,7 @@ namespace SurvLine
         /// <param name="nLon"></param>
         private void GetLatLon(ref double nLat, ref double nLon)
         {
+
             if (optDMS.Checked)
             {
                 nLat = dms_to_d(int.Parse(txtLatH.Text), int.Parse(txtLatM.Text), double.Parse(txtLatS.Text));
@@ -2444,6 +2708,9 @@ namespace SurvLine
         /// <param name="optButton"></param>
         private void CancelOptionBtn(RadioButton optButton)
         {
+            m_bOptionBtn = true;
+            optButton.Checked = true;
+            m_bOptionBtn = false;
 
         }
 

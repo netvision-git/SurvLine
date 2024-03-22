@@ -106,7 +106,27 @@ namespace SurvLine
         End Sub
         [VB]*/
         //------------------------------------------------------------------------------------------
-        //[C#]
+        //[C#]      //0304  //2
+        /// <summary>
+        //'メソッド
+        //
+        //'保存。
+        //'
+        //'引き数：
+        /// BinaryWriter bw バイナリファイル
+        /// </summary>
+        /// <param name="bw"></param>
+        public void Save(BinaryWriter bw)
+        {
+
+            bw.Write(XX);
+            bw.Write(XY);
+            bw.Write(YY);
+            bw.Write(XZ);
+            bw.Write(YZ);
+            bw.Write(ZZ);
+        }
+
         //==========================================================================================
 
 

@@ -1870,7 +1870,7 @@ namespace SurvLine.mdl
         '
         '戻り値：並び順番号。
         */
-        public long GetManufacturerSortIndex(string sManufacturer)
+        public static long GetManufacturerSortIndex(string sManufacturer)
         {
             StringTokenizer clsStringTokenizer = new StringTokenizer();
             _ = clsStringTokenizer.Source = GetPrivateProfileString(PROFILE_SUB_SEC_MANUCODETOMANUNAME, sManufacturer, "", AppPath + "\\" + PROFILE_SUB_FILE);

@@ -697,6 +697,67 @@ namespace SurvLine
             return;
         }
         //==========================================================================================
+        public void Save(BinaryWriter bw)       //0304 //2
+        {
+            //---------------------------------------------------
+            //    Call m_clsDispersion.Save(nFile)
+            Dispersion m_clsDispersion = new Dispersion();
+            m_clsDispersion.Save(bw);
+
+
+            //---------------------------------------------------
+            //    '汎用作業キーを結合キーとして使用する。
+            //    Call ClearWorkKey(-1)
+            ClearWorkKey(-1);
+
+            //---------------------------------------------------
+            //    '結合キー。各ObservationPointの結合部分に番号付けをする。
+            //    Dim nJointKey As Long
+            //    nJointKey = 0
+            long nJointKey = 0;
+
+
+            //---------------------------------------------------
+            //    '基線ベクトル保存。
+            //    Put #nFile, , m_clsBaseLineVectorHead.FollowingCount
+            //    Dim clsChainList As ChainList
+            //    Set clsChainList = m_clsBaseLineVectorHead.NextList
+            //    Do While Not clsChainList Is Nothing
+            //        Call clsChainList.Element.Save(nFile, nJointKey)
+            //        Set clsChainList = clsChainList.NextList
+            //    Loop
+
+#if false
+            bw.Write(m_clsBaseLineVectorHead.FollowingCount);
+#else
+            long FollowingCount = 0;
+            bw.Write(FollowingCount);
+#endif
+
+            //---------------------------------------------------
+            //'孤立観測点保存。
+            //Put #nFile, , m_clsIsolatePointHead.FollowingCount
+            //Set clsChainList = m_clsIsolatePointHead.NextList
+            //Do While Not clsChainList Is Nothing
+            //    Call clsChainList.Element.Save(nFile, nJointKey)
+            //    Set clsChainList = clsChainList.NextList
+            //Loop
+
+#if false
+            bw.Write(m_clsIsolatePointHead.FollowingCount);
+#else
+            FollowingCount = 0;
+            bw.Write(FollowingCount);
+#endif
+
+        }
+
+
+
+
+
+
+
 
 
         //**************************************************************************************
@@ -2102,7 +2163,7 @@ namespace SurvLine
         'clsObservationPoint 対象とする観測点。
         'clsBaseLineVectors clsObservationPoint と連結している基線ベクトルが設定される。配列の要素は(-1 To ...)、要素 -1 は未使用。
         */
-        public void GetConnectBaseLineVectorsEx(ObservationPoint clsObservationPoint, BaseLineVector clsBaseLineVectors)
+        public void GetConnectBaseLineVectorsEx(ObservationPoint clsObservationPoint, List<BaseLineVector> clsBaseLineVectors)
         {
             return;
         }
@@ -2139,19 +2200,65 @@ namespace SurvLine
         End Sub
         [VB]*/
         //------------------------------------------------------------------------------------------
-        //[C#]
-        /*
-        '指定された観測点と連結している基線ベクトルを取得する。
-        '
-        'clsObservationPoint を始点、または終点としている基線ベクトルを取得する。
-        'clsBaseLineVectors は最初に Redim clsBaseLineVectors(-1 to -1) で初期化していること。
-        '
-        '引き数：
-        'clsObservationPoint 対象とする観測点。
-        'clsBaseLineVectors clsObservationPoint と連結している基線ベクトルが設定される。配列の要素は(-1 To ...)、要素 -1 は未使用。
-        */
-        public void GetConnectBaseLineVectors(ObservationPoint clsObservationPoint, BaseLineVector clsBaseLineVectors)
+        //[C#]  //2
+        /// <summary>
+        /// 指定された観測点と連結している基線ベクトルを取得する。
+        /// '
+        /// clsObservationPoint を始点、または終点としている基線ベクトルを取得する。
+        /// clsBaseLineVectors は最初に Redim clsBaseLineVectors(-1 to -1) で初期化していること。
+        /// '
+        /// 引き数：
+        /// clsObservationPoint 対象とする観測点。
+        /// clsBaseLineVectors clsObservationPoint と連結している基線ベクトルが設定される。配列の要素は(-1 To ...)、要素 -1 は未使用。
+        /// 
+        /// </summary>
+        /// <param name="clsObservationPoint"></param>
+        /// <param name="clsBaseLineVectors"></param>
+        public void GetConnectBaseLineVectors(ObservationPoint clsObservationPoint, ref List<BaseLineVector> clsBaseLineVectors)    //2
         {
+            ObservationPoint clsChildPoint;
+            clsChildPoint = clsObservationPoint.ChildPoint();
+
+
+            if (clsChildPoint == null)
+            {
+                /*----------------------------------------------------------------------
+                    '接合観測点の場合、基線ベクトルを追加する。
+                    If (clsObservationPoint.ObjectType And OBS_TYPE_CONNECT) <> 0 Then
+                        Dim nUBound As Long
+                        nUBound = UBound(clsBaseLineVectors) + 1
+                        ReDim Preserve clsBaseLineVectors(-1 To nUBound)
+                        Set clsBaseLineVectors(nUBound) = clsObservationPoint.Owner
+                    End If
+                 ---------------------------------------------------------------------*/
+                //接合観測点の場合、基線ベクトルを追加する。
+                if ((clsObservationPoint.ObjectType & OBS_TYPE_CONNECT) != 0)
+                {
+                    //  long nUBound = 0;
+                    //  nUBound = clsBaseLineVectors.GetLength(0) + 1;
+                    //  clsBaseLineVectors = new BaseLineVector[nUBound];
+                    clsBaseLineVectors.Add((BaseLineVector)clsObservationPoint.Owner);
+                }
+            }
+            else
+            {
+                /*----------------------------------------------------------------------
+                '子観測点すべてを巡回する。
+                Do While Not clsChildPoint Is Nothing
+                    Call GetConnectBaseLineVectors(clsChildPoint, clsBaseLineVectors)
+                    Set clsChildPoint = clsChildPoint.NextPoint
+                Loop
+                 ---------------------------------------------------------------------*/
+                while (!(clsChildPoint == null))
+                {
+                    GetConnectBaseLineVectors(clsChildPoint, ref clsBaseLineVectors);
+                    clsChildPoint = clsChildPoint.NextPoint();
+                }
+
+            }
+
+
+
             return;
         }
         //==========================================================================================
@@ -2683,8 +2790,15 @@ namespace SurvLine
         '
         '戻り値：偏心点(接合観測点)を返す。
         */
-        public ICollection GetMarkedEccentricPoints(BaseLineVector clsBaseLineVectors)
+        public object GetMarkedEccentricPoints(List<BaseLineVector> clsBaseLineVectors)
         {
+            object objEccentricPoints;
+
+            int i = 0;
+            //  GetMarkedEccentricPoints2(clsBaseLineVectors[i], objEccentricPoints);
+
+
+
             return null;
         }
         //==========================================================================================
@@ -2732,7 +2846,7 @@ namespace SurvLine
         'clsBaseLineVector 方位標ベクトル。
         'objEccentricPoints 取得された偏心点(接合観測点)が設定される。
         */
-        public void GetMarkedEccentricPoints2(BaseLineVector clsBaseLineVector, ICollection objEccentricPoints)
+        public void GetMarkedEccentricPoints2(BaseLineVector clsBaseLineVector, object objEccentricPoints)
         {
             return;
         }

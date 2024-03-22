@@ -21,6 +21,9 @@ using static SurvLine.mdl.MdlNSDefine;
 using static SurvLine.mdl.MdlAccountMakeNSS;
 using static SurvLine.mdl.MdlListPane;
 using static SurvLine.mdl.MdlBaseLineAnalyser;
+using static SurvLine.mdl.MdlUtility;
+using static SurvLine.mdl.MdlSession;   //2
+
 using Microsoft.VisualBasic.Logging;
 using System.Xml.Linq;
 
@@ -1170,8 +1173,108 @@ namespace SurvLine
         }
         //**************************************************************************************
         //**************************************************************************************
+        //2==========================================================================================
+        /*[VB]
+            'プロジェクトを開く。
+            '
+            '戻り値：
+            '正常終了の場合 True を返す。
+            'キャンセルの場合 False を返す。
+            Private Function OpenProject() As Boolean
+
+                OpenProject = False
+    
+                Call frmJobOpen.Show(1)
+                If frmJobOpen.Result <> vbOK Then Exit Function
+    
+                '再描画。
+                If RedrawWindow(Me.hWnd, 0, 0, RDW_UPDATENOW) = 0 Then Call Err.Raise(ERR_FATAL, , GetLastErrorMessage())
+    
+                '保存ファイルのパス。
+                Dim sPath As String
+                Dim clsProjectFileManager As New ProjectFileManager
+                sPath = clsProjectFileManager.GetSaveFilePath(frmJobOpen.FolderName)
+    
+                '閉じてから開く。
+                Call CloseProject
+                Call Load(sPath)
+    
+                'ジオイドモデルのパスの評価。
+                If m_clsDocument.GeoidoEnable Then
+                    'ファイルの存在を確認。
+                    Dim clsFind As New FileFind
+                    If clsFind.FindFile(m_clsDocument.GeoidoPath) Then
+                        Select Case AltitudeSupport_EstimateFile(m_clsDocument.GeoidoPath)
+                        Case 0
+                        Case 1
+                            Call MsgBox("ジオイドモデルで指定されたファイルが不正です。" & vbCrLf & "ジオイド補正をOFFにします。", vbCritical)
+                            m_clsDocument.GeoidoEnable = False
+                        Case Else
+                            Call Err.Raise(ERR_FATAL, , MESSAGE_GEOIDO_ESTIMATE)
+                        End Select
+                    Else
+                        If m_clsDocument.GeoidoPathDef <> "" Then
+                            If MsgBox("ジオイドモデルで指定されたファイルが見つかりません。" & vbCrLf & "「デフォルトで使用するジオイドモデルファイル」に変更しますか？", vbQuestion Or vbYesNo) = vbYes Then
+                                m_clsDocument.GeoidoPath = m_clsDocument.GeoidoPathDef
+                            Else
+                                m_clsDocument.GeoidoEnable = False
+                            End If
+                        Else
+                            Call MsgBox("ジオイドモデルで指定されたファイルが見つかりません。" & vbCrLf & "ジオイド補正をOFFにします。", vbCritical)
+                            m_clsDocument.GeoidoEnable = False
+                        End If
+                    End If
+                End If
+    
+                '2009/11 H.Nakamura
+                'セミ・ダイナミックパラメータファイルのパスの評価。
+                If m_clsDocument.SemiDynaEnable Then
+                    'ファイルの存在を確認。
+                    If clsFind.FindFile(m_clsDocument.SemiDynaPath) Then
+                        If Not mdlSemiDyna.EstimateFile(m_clsDocument.SemiDynaPath) Then
+                            Call MsgBox("セミ・ダイナミック補正で指定されたファイルが不正です。" & vbCrLf & "セミ・ダイナミック補正をOFFにします。", vbCritical)
+                            m_clsDocument.SemiDynaEnable = False
+                        End If
+                    Else
+                        If m_clsDocument.SemiDynaPathDef <> "" Then
+                            If MsgBox("セミ・ダイナミック補正で指定されたファイルが見つかりません。" & vbCrLf & "「デフォルトで使用するセミ・ダイナミック補正パラメータファイル」に変更しますか？", vbQuestion Or vbYesNo) = vbYes Then
+                                If clsFind.FindFile(m_clsDocument.SemiDynaPathDef) Then
+                                    If Not mdlSemiDyna.EstimateFile(m_clsDocument.SemiDynaPathDef) Then
+                                        Call MsgBox("デフォルトのセミ・ダイナミック補正で指定されたファイルが不正です。" & vbCrLf & "セミ・ダイナミック補正をOFFにします。", vbCritical)
+                                        m_clsDocument.SemiDynaEnable = False
+                                    Else
+                                        m_clsDocument.SemiDynaPath = m_clsDocument.SemiDynaPathDef
+                                    End If
+                                Else
+                                    Call MsgBox("デフォルトのセミ・ダイナミック補正で指定されたファイルが見つかりません。" & vbCrLf & "セミ・ダイナミック補正をOFFにします。", vbCritical)
+                                    m_clsDocument.SemiDynaEnable = False
+                                End If
+                            Else
+                                m_clsDocument.SemiDynaEnable = False
+                            End If
+                        Else
+                            Call MsgBox("セミ・ダイナミック補正で指定されたファイルが見つかりません。" & vbCrLf & "セミ・ダイナミック補正をOFFにします。", vbCritical)
+                            m_clsDocument.SemiDynaEnable = False
+                        End If
+                    End If
+                End If
+    
+                '2009/11 H.Nakamura
+                'セミ・ダイナミックの初期化。
+                Call mdlSemiDyna.Initialize(m_clsDocument.SemiDynaEnable, m_clsDocument.SemiDynaPath)
+    
+                '座標系番号を更新する。
+                Call SetListIndexManual(cmbZone, m_clsDocument.CoordNum - 1)
+    
+                OpenProject = True
+    
+            End Function
+
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#] 2
         /// <summary>
-        //'プロジェクトを開く。
+        //'プロジェクトを開く。   メニュー＞現場を選択
         /// 引き数：
         //  frmListPane：現場の詳細データ表示フォーム。
         /// </summary>
@@ -1182,7 +1285,6 @@ namespace SurvLine
         //  'キャンセルの場合 False を返す。
         /// </returns>
         //**************************************************************************************
-        //[VB]  Private Function OpenProject() As Boolean
         private bool OpenProject(ListPane fListPane)
         {
 
@@ -1263,32 +1365,6 @@ namespace SurvLine
 
             return true;
         }
-        //***************************************
-        //'プロジェクトを開く。
-        //'
-        //'戻り値：
-        //'正常終了の場合 True を返す。
-        //'キャンセルの場合 False を返す。
-        //[VB]  Private Function OpenProject() As Boolean
-        //[VB]  
-        //[VB]      OpenProject = False
-        //[VB]  
-        //[VB]      Call frmJobOpen.Show(1)
-        //[VB]      If frmJobOpen.Result<> vbOK Then Exit Function
-        //[VB]      
-        //[VB]      '再描画。
-        //[VB]      If RedrawWindow(Me.hWnd, 0, 0, RDW_UPDATENOW) = 0 Then Call Err.Raise(ERR_FATAL, , GetLastErrorMessage())
-        //[VB]      
-        //[VB]      '保存ファイルのパス。
-        //[VB]      Dim sPath As String
-        //[VB]      Dim clsProjectFileManager As New ProjectFileManager
-        //[VB]      sPath = clsProjectFileManager.GetSaveFilePath(frmJobOpen.FolderName)
-        //[VB]      
-        //[VB]      '閉じてから開く。
-        //[VB]      Call CloseProject
-        //[VB]      Call Load(sPath)
-        //*********************************************************************************
-        //**************************************************************************************
 
         //**************************************************************************************
         //**************************************************************************************
@@ -1420,6 +1496,116 @@ namespace SurvLine
 
         //**************************************************************************************
         //**************************************************************************************
+        //2==========================================================================================
+        /*[VB]
+            'プロジェクトを開く。
+            '
+            '戻り値：
+            '正常終了の場合 True を返す。
+            'キャンセルの場合 False を返す。
+            Private Function OpenProject() As Boolean
+
+                OpenProject = False
+    
+                Call frmJobOpen.Show(1)
+                If frmJobOpen.Result <> vbOK Then Exit Function
+    
+                '再描画。
+                If RedrawWindow(Me.hWnd, 0, 0, RDW_UPDATENOW) = 0 Then Call Err.Raise(ERR_FATAL, , GetLastErrorMessage())
+    
+                '保存ファイルのパス。
+                Dim sPath As String
+                Dim clsProjectFileManager As New ProjectFileManager
+                sPath = clsProjectFileManager.GetSaveFilePath(frmJobOpen.FolderName)
+    
+                '閉じてから開く。
+                Call CloseProject
+                Call Load(sPath)
+    
+                'ジオイドモデルのパスの評価。
+                If m_clsDocument.GeoidoEnable Then
+                    'ファイルの存在を確認。
+                    Dim clsFind As New FileFind
+                    If clsFind.FindFile(m_clsDocument.GeoidoPath) Then
+                        Select Case AltitudeSupport_EstimateFile(m_clsDocument.GeoidoPath)
+                        Case 0
+                        Case 1
+                            Call MsgBox("ジオイドモデルで指定されたファイルが不正です。" & vbCrLf & "ジオイド補正をOFFにします。", vbCritical)
+                            m_clsDocument.GeoidoEnable = False
+                        Case Else
+                            Call Err.Raise(ERR_FATAL, , MESSAGE_GEOIDO_ESTIMATE)
+                        End Select
+                    Else
+                        If m_clsDocument.GeoidoPathDef <> "" Then
+                            If MsgBox("ジオイドモデルで指定されたファイルが見つかりません。" & vbCrLf & "「デフォルトで使用するジオイドモデルファイル」に変更しますか？", vbQuestion Or vbYesNo) = vbYes Then
+                                m_clsDocument.GeoidoPath = m_clsDocument.GeoidoPathDef
+                            Else
+                                m_clsDocument.GeoidoEnable = False
+                            End If
+                        Else
+                            Call MsgBox("ジオイドモデルで指定されたファイルが見つかりません。" & vbCrLf & "ジオイド補正をOFFにします。", vbCritical)
+                            m_clsDocument.GeoidoEnable = False
+                        End If
+                    End If
+                End If
+    
+                '2009/11 H.Nakamura
+                'セミ・ダイナミックパラメータファイルのパスの評価。
+                If m_clsDocument.SemiDynaEnable Then
+                    'ファイルの存在を確認。
+                    If clsFind.FindFile(m_clsDocument.SemiDynaPath) Then
+                        If Not mdlSemiDyna.EstimateFile(m_clsDocument.SemiDynaPath) Then
+                            Call MsgBox("セミ・ダイナミック補正で指定されたファイルが不正です。" & vbCrLf & "セミ・ダイナミック補正をOFFにします。", vbCritical)
+                            m_clsDocument.SemiDynaEnable = False
+                        End If
+                    Else
+                        If m_clsDocument.SemiDynaPathDef <> "" Then
+                            If MsgBox("セミ・ダイナミック補正で指定されたファイルが見つかりません。" & vbCrLf & "「デフォルトで使用するセミ・ダイナミック補正パラメータファイル」に変更しますか？", vbQuestion Or vbYesNo) = vbYes Then
+                                If clsFind.FindFile(m_clsDocument.SemiDynaPathDef) Then
+                                    If Not mdlSemiDyna.EstimateFile(m_clsDocument.SemiDynaPathDef) Then
+                                        Call MsgBox("デフォルトのセミ・ダイナミック補正で指定されたファイルが不正です。" & vbCrLf & "セミ・ダイナミック補正をOFFにします。", vbCritical)
+                                        m_clsDocument.SemiDynaEnable = False
+                                    Else
+                                        m_clsDocument.SemiDynaPath = m_clsDocument.SemiDynaPathDef
+                                    End If
+                                Else
+                                    Call MsgBox("デフォルトのセミ・ダイナミック補正で指定されたファイルが見つかりません。" & vbCrLf & "セミ・ダイナミック補正をOFFにします。", vbCritical)
+                                    m_clsDocument.SemiDynaEnable = False
+                                End If
+                            Else
+                                m_clsDocument.SemiDynaEnable = False
+                            End If
+                        Else
+                            Call MsgBox("セミ・ダイナミック補正で指定されたファイルが見つかりません。" & vbCrLf & "セミ・ダイナミック補正をOFFにします。", vbCritical)
+                            m_clsDocument.SemiDynaEnable = False
+                        End If
+                    End If
+                End If
+    
+                '2009/11 H.Nakamura
+                'セミ・ダイナミックの初期化。
+                Call mdlSemiDyna.Initialize(m_clsDocument.SemiDynaEnable, m_clsDocument.SemiDynaPath)
+    
+                '座標系番号を更新する。
+                Call SetListIndexManual(cmbZone, m_clsDocument.CoordNum - 1)
+    
+                OpenProject = True
+    
+            End Function
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#] 2
+        /// <summary>
+        /// 'プロジェクトを開く。 
+        /// '
+        /// </summary>
+        /// <param name="sRecvData"></param>
+        /// <param name="nIndex"></param>
+        /// <returns>
+        /// '戻り値：
+        /// '正常終了の場合 True を返す。
+        /// 'キャンセルの場合 False を返す。
+        /// </returns>
         private bool OpenProject_Check(string sRecvData, int nIndex)
         {
             //---------------------------------------------------
@@ -1427,7 +1613,6 @@ namespace SurvLine
             //---------------------------------------------------
             if (sRecvData == "OK")
             {
-
                 try
                 {
                     int itemxsle2 = nIndex;
@@ -1466,9 +1651,100 @@ namespace SurvLine
 
         }
 
-        private void mnuFileSave_Click(object sender, EventArgs e)
+
+        //==========================================================================================
+        /*[VB]
+        'プロジェクトを上書き保存する。
+        Private Sub mnuFileSave_Click()
+
+            On Error GoTo ErrorHandler
+    
+            'プロジェクトの上書き保存。
+            If Not SaveProject() Then Exit Sub
+    
+            Exit Sub
+    
+        ErrorHandler:
+            Call mdlMain.ErrorExit
+    
+        End Sub
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]  //2
+        /// <summary>
+        /// プロジェクトを上書き保存する。
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void mnuFileSave_Click(object sender, EventArgs e)  //2
         {
-            MessageBox.Show(mnuFileSave.Text);
+            //2     MessageBox.Show(mnuFileSave.Text);
+            try
+            {
+                //'プロジェクトの上書き保存。
+                if (!SaveProject())             //2
+                {
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                //ErrorHandler:
+                //    Call mdlMain.ErrorExit
+                _ = MessageBox.Show(ex.Message, "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
+        }
+        //==========================================================================================
+        /*[VB]
+        'プロジェクトを上書き保存する。
+        '
+        '戻り値：
+        '正常終了の場合 True を返す。
+        'キャンセルの場合 False を返す。
+        Private Function SaveProject() As Boolean
+
+            SaveProject = False
+    
+            If m_clsDocument.Path = "" Then
+                'If Not SaveAsProject() Then Exit Function
+            Else
+                Call Save(m_clsDocument.Path)
+            End If
+    
+            SaveProject = True
+    
+        End Function            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#]  //2
+        /// <summary>
+        ///'プロジェクトを上書き保存する。
+        ///'
+        /// </summary>
+        /// <returns>
+        ///'戻り値：
+        ///'正常終了の場合 True を返す。
+        ///'キャンセルの場合 False を返す。
+        /// </returns>
+        private bool SaveProject()      //2
+        {
+            bool SaveProject = false;
+
+            if (m_clsDocument.Path() == "")
+            {
+                if (!SaveAsProject())
+                {
+                    return SaveProject;
+                }
+            }
+            else
+            {
+                Save(m_clsDocument.Path());
+            }
+
+            SaveProject = true;
+            return SaveProject;
 
         }
 
@@ -3631,15 +3907,29 @@ namespace SurvLine
                 Loop
 #endif
 
+#if false       //コメント（瀬戸口）：リスト更新が正しいが、リスト作成で対応する
+
+
                 //'リストの更新。
-                //  Call objListPane.UpdateRowIsList
+                objListPane.UpdateRowIsList();          //2
+
+
                 //'スクロールを元に戻す。
-                //  objListPane.RowLock = False
+                objListPane.RowLock(false);             //2
+#else
+                //'リストの作成。
+                objListPane.SelectElement(null);        //2
+                objListPane.RemakeList(false);          //2
+#endif
 
-
-                //'プロットの再描画。
-                //  Call objPlotPane.UpdateLogicalDrawArea(False)
+                //'プロットの再描画。                             
+                //  Call objPlotPane.UpdateLogicalDrawArea(False)    
                 //  Call objPlotPane.Redraw
+                Bitmap btmp = objPlotPane.Dis_Get_btmp();       //2
+                objPlotPane.List_Genba_set(m_List_Genba_S);     //2
+                objPlotPane.UpdateLogicalDrawArea(true);        //2
+                objPlotPane.Redraw();                           //2
+                objPlotPane.Refresh();                          //2
 
 
                 //'メニューの更新。
@@ -3647,7 +3937,7 @@ namespace SurvLine
                 //  Call objListPane_ChangeSelRow(objListPane.List)
 
 
-                Cursor = Cursors.Default;
+               Cursor = Cursors.Default;
 
 
             }
@@ -3742,6 +4032,11 @@ namespace SurvLine
         {
             try
             {
+
+#if false   // DEBUG 画面レイアウト確認------------------------------------
+                frmAttribute frmAttribute = new frmAttribute();
+                frmAttribute.ShowDialog();  //編集＞観測点データの編集
+#endif      // DEBUG 画面レイアウト確認------------------------------------
 
                 ObservationPoint clsObservationPoint;
 
@@ -3955,34 +4250,59 @@ namespace SurvLine
         {
             try
             {
+#if false       // DEBUG 画面レイアウト確認------------------------------------
+                MessageBox.Show("mnuEditSession_Click", "エラー発生", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
+#endif          // DEBUG 画面レイアウト確認------------------------------------
 
+                /*------------------------------------------------------------------------
+                    '選択オブジェクト。
+                    Dim objElements As New Collection
+                    Dim objElement As Object
+                    Dim nPos As Long
+                 */
                 //'選択オブジェクト。
-                Collection objElements = new Collection();
-#if false
-                Dim objElement As Object
-                Dim nPos As Long
-                '観測点、基線ベクトルのどちらかのみ選択されているはず。
-                nPos = objListPane.StartSelectedAssoc(LIST_NUM_OBSPNT)
-                Do While(nPos > 0)
-                    Set objElement = objListPane.GetNextAssoc(nPos)
-                    '観測点の場合、本点は除外する。
-                    If objElement.Genuine Then GoTo ContinueHandler
-                    Call objElements.Add(objElement, Hex$(GetPointer(objElement)))
-            ContinueHandler:
-                Loop
-                nPos = objListPane.StartSelectedAssoc(LIST_NUM_VECTOR)
-                Do While(nPos > 0)
-                    Set objElement = objListPane.GetNextAssoc(nPos)
-                    Call objElements.Add(objElement, Hex$(GetPointer(objElement)))
-                Loop
+
+                object objElement = new object();
+                Dictionary<string, object> objElements = new Dictionary<string, object>();
+                long nPos;
+                long SelectLine = -1;
+
+                //'観測点、基線ベクトルのどちらかのみ選択されているはず。
+                nPos = objListPane.StartSelectedAssoc((long)LIST_NUM_PANE.LIST_NUM_OBSPNT);
+                while (nPos >= 0)
+                {
+                    SelectLine = nPos;
+                    m_clsMdlMain.PaneSelectedTab = (long)LIST_NUM_PANE.LIST_NUM_OBSPNT;      //PaneのTab（観測点/座標／ベクトル      //2
+                    m_clsMdlMain.PaneSelcttedNo = nPos;                                      //Paneの選択行(0～）                    //2
+                    objElement = objListPane.GetNextAssoc(ref nPos, (long)LIST_NUM_PANE.LIST_NUM_OBSPNT);
+                    objElements.Add(nPos.ToString(), objElement);
+                    break;
+                }
+                nPos = objListPane.StartSelectedAssoc((long)LIST_NUM_PANE.LIST_NUM_VECTOR);
+                while (nPos >= 0)
+                {
+                    SelectLine = nPos;
+                    m_clsMdlMain.PaneSelectedTab = (long)LIST_NUM_PANE.LIST_NUM_VECTOR;      //PaneのTab（観測点/座標／ベクトル      //2
+                    m_clsMdlMain.PaneSelcttedNo = nPos;                                      //Paneの選択行(0～）                    //2
+                    objElement = objListPane.GetNextAssoc(ref nPos, (long)LIST_NUM_PANE.LIST_NUM_VECTOR);
+                    objElements.Add(nPos.ToString(), objElement);
+                    break;
+                }
 
 
-                '同じ観測点番号が選択されていたら許可しない。
-                If Not CheckSessionObsName(objElements, "同じ観測点Noの観測点が選択されています。" & vbCrLf & "同じ観測点Noの観測点を同じセッションに変更することは出来ません｡ ", "始点と終点で同じ観測点Noの基線ベクトルが選択されています。" & vbCrLf & "同じ観測点Noを始点終点に持つ基線ベクトルを同じセッションに変更することは出来ません｡ ") Then Exit Sub
-#endif
+
+#if true        // DEBUG -----------------------------------------------------------------------------
+                //      <<< 選択されていない場合は、無いが、現在は開発途中の為、入れておく。
+                if ( SelectLine == -1)
+                {
+                    MessageBox.Show("観測点／ベクトルのいずれかを選択して下さい！", "エラー発生", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
+                    return;
+                }
+#endif          //-------------------------------------------------------------------------------
+
 
                 //'セッションの変更。
-                if (!EditSession(objElements))
+                if (!EditSession(objElements, SelectLine))
                 {
                     Cursor = Cursors.Default;
                     return;
@@ -4015,18 +4335,42 @@ namespace SurvLine
                         objElement.EndPoint.TopParentPoint.IsList = True
                     End If
                 Next
-                'リストの更新。
-                Call objListPane.UpdateRowIsList
-                 'スクロールを元に戻す。
-                objListPane.RowLock = False
 
-
-                'メニューの更新。
-                Call clsCtrlValue.Back
-                Call objListPane_ChangeSelRow(objListPane.List)
 #endif
 
+                //'リストの更新。
+                //  Call objListPane.UpdateRowIsList
+#if true
+                objListPane.SelectElement(null);        //2
+                objListPane.RemakeList(false);          //2
+#endif
+                /* 新規追加--------------   //2
+                'プロットの再描画。
+                Call objPlotPane.UpdateLogicalDrawArea(True)
+                Call objPlotPane.Redraw
+                Call objPlotPane.Refresh
+                [VB] */
+                /*[C#]*/
+                //objPlotPane.PlotPane_Initialize();
+                Bitmap btmp = objPlotPane.Dis_Get_btmp();
+                objPlotPane.List_Genba_set(m_List_Genba_S);
+                objPlotPane.UpdateLogicalDrawArea(true);
+                objPlotPane.Redraw();
+                objPlotPane.Refresh();
+
+
+                //'スクロールを元に戻す。
+                //  objListPane.RowLock = False
+
+
+                //'メニューの更新。
+                //  Call clsCtrlValue.Back
+                //  Call objListPane_ChangeSelRow(objListPane.List)
+
+
+
                 Cursor = Cursors.Default;
+
 
             }
             catch (Exception ex)
@@ -4109,6 +4453,14 @@ namespace SurvLine
         {
             try
             {
+#if true    // DEBUG 画面レイアウト確認------------------------------------
+                frmEccentricCorrection frmEccentricCorrection = new frmEccentricCorrection();
+                frmEccentricCorrection.ShowDialog();  //編集＞偏心設定
+#endif      // DEBUG 画面レイアウト確認------------------------------------
+
+
+
+
                 ObservationPoint clsObservationPoint;
                 clsObservationPoint = (ObservationPoint)objListPane.SelectedElement((long)LIST_NUM_PANE.LIST_NUM_OBSPNT);
 #if false
@@ -4215,6 +4567,10 @@ namespace SurvLine
         //編集＞結合
         private void mnuEditCombination_Click(object sender, EventArgs e)
         {
+#if true    // DEBUG 画面レイアウト確認------------------------------------
+            frmCombination frmCombination = new frmCombination();
+            frmCombination.ShowDialog();  //編集＞偏心設定
+#endif      // DEBUG 画面レイアウト確認------------------------------------
 
         }
         //1==========================================================================================
@@ -4255,11 +4611,24 @@ namespace SurvLine
             End Sub
             [VB]*/
         //------------------------------------------------------------------------------------------
-        //[C#]
-        //編集＞有効
-        private void mnuEditValidOn_Click(object sender, EventArgs e)
+        //[C#]  //2
+        //  編集＞有効
+        /// <summary>
+        /// 観測点または基線ベクトルの有効/無効を設定する。
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void mnuEditValidOn_Click(object sender, EventArgs e)   //2
         {
-
+            try
+            {
+                EditValid(true);
+            }
+            catch (Exception ex)
+            {
+                _ = MessageBox.Show(ex.Message, "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
         //1==========================================================================================
         /*[VB]
@@ -4280,10 +4649,197 @@ namespace SurvLine
         //------------------------------------------------------------------------------------------
         //[C#]
         //編集＞無効
+        //[C#]  //2
+        /// <summary>
+        /// 観測点または基線ベクトルの有効/無効を設定する。
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void mnuEditValidOff_Click(object sender, EventArgs e)
         {
+            try
+            {
+                EditValid(false);
+            }
+            catch (Exception ex)
+            {
+                _ = MessageBox.Show(ex.Message, "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+
+        //2==========================================================================================
+        /*[VB]
+            '観測点または基線ベクトルの有効/無効を設定する。
+            '
+            '引き数：
+            'bEnable 有効フラグ。
+            Private Sub EditValid(ByVal bEnable As Boolean)
+
+                '砂時計。
+                Dim clsWaitCursor As New WaitCursor
+                Set clsWaitCursor.Object = Me
+    
+                '再描画抑制。
+                Dim clsCtrlValue As New CtrlValue
+                Call clsCtrlValue.SetObject(m_clsChangeSelRow, False)
+    
+                '汎用作業キーを利用して、設定が変更された観測点を記憶する。
+                Call m_clsDocument.NetworkModel.ClearIsList
+    
+                '設定。
+                Dim objElement As Object
+                Dim nPos As Long
+                nPos = objListPane.StartSelectedAssoc(LIST_NUM_OBSPNT)
+                Do While (nPos > 0)
+                    Set objElement = objListPane.GetNextAssoc(nPos)
+                    If Not objElement.Genuine Then Call m_clsDocument.EnableObservationPoint(objElement, bEnable)
+                Loop
+                nPos = objListPane.StartSelectedAssoc(LIST_NUM_VECTOR)
+                Do While (nPos > 0)
+                    Set objElement = objListPane.GetNextAssoc(nPos)
+                    Call m_clsDocument.EnableBaseLineVector(objElement, bEnable)
+                Loop
+    
+                'スクロールはしないようにする。
+                objListPane.RowLock = True
+                'リストの更新。
+                Call objListPane.UpdateRowIsList
+                'スクロールを元に戻す。
+                objListPane.RowLock = False
+    
+                'プロットの再描画。
+                Call objPlotPane.UpdateLogicalDrawArea(False)
+                Call objPlotPane.Redraw
+    
+                'メニューの更新。
+                Call clsCtrlValue.Back
+                Call objListPane_ChangeSelRow(objListPane.List)
+    
+                Call clsWaitCursor.Back
+    
+            End Sub
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#] 2
+        private void EditValid(bool bEnable)
+        {
+
+#if true    // DEBUG 画面レイアウト確認------------------------------------
+            _ = bEnable
+                ? MessageBox.Show("有効", "DEBUG", MessageBoxButtons.OK, MessageBoxIcon.Asterisk)
+                : MessageBox.Show("無効", "DEBUG", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+#endif      // DEBUG 画面レイアウト確認------------------------------------
+
+
+            //'砂時計。
+            Cursor = Cursors.WaitCursor;
+
+
+            //  ObservationPoint clsObservationPoint;
+            //  clsObservationPoint = (ObservationPoint)objListPane.EditValid((long)LIST_NUM_PANE.LIST_NUM_OBSPNT);
+
+            ObservationPoint clsObservationPoint;
+            clsObservationPoint = (ObservationPoint)objListPane.SelectedElement((long)LIST_NUM_PANE.LIST_NUM_OBSPNT);
+
+
+#if true    // DEBUG 画面レイアウト確認------------------------------------
+            _ = bEnable
+                ? MessageBox.Show("有効＞実行・・・", "DEBUG", MessageBoxButtons.OK, MessageBoxIcon.Asterisk)
+                : MessageBox.Show("無効＞実行・・・", "DEBUG", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+#endif      // DEBUG 画面レイアウト確認------------------------------------
+
+            //  frmAttributeCommon
+
+
+            //'再描画抑制。
+            /*
+                Dim clsCtrlValue As New CtrlValue
+                Call clsCtrlValue.SetObject(m_clsChangeSelRow, False)
+             */
+            CtrlValue clsCtrlValue = new CtrlValue();
+            clsCtrlValue.SetObject(m_clsChangeSelRow, false);
+
+
+            //'汎用作業キーを利用して、設定が変更された観測点を記憶する。
+            /*
+                Call m_clsDocument.NetworkModel.ClearIsList
+             */
+
+
+            //'設定。
+            /*
+                //'設定。
+                m_clsDocument.SetAttributeCommon(clsObservationPoint, frmAttributeCommon.PointNumber, frmAttributeCommon.PointName, frmAttributeCommon.Fixed, frmAttributeCommon.CoordinateFixed());
+
+
+                Dim objElement As Object
+                Dim nPos As Long
+                nPos = objListPane.StartSelectedAssoc(LIST_NUM_OBSPNT)
+                Do While(nPos > 0)
+                    Set objElement = objListPane.GetNextAssoc(nPos)
+                    If Not objElement.Genuine Then Call m_clsDocument.EnableObservationPoint(objElement, bEnable)
+                Loop
+                nPos = objListPane.StartSelectedAssoc(LIST_NUM_VECTOR)
+                Do While(nPos > 0)
+                    Set objElement = objListPane.GetNextAssoc(nPos)
+                    Call m_clsDocument.EnableBaseLineVector(objElement, bEnable)
+                Loop
+             */
+            m_clsDocument.EnableObservationPoint(clsObservationPoint, bEnable);
+
+
+            //'スクロールはしないようにする。
+            /*
+                objListPane.RowLock = True
+             */
+
+
+            //'リストの更新。
+            /*
+                Call objListPane.UpdateRowIsList
+             */
+#if true
+            objListPane.SelectElement(null);
+            objListPane.RemakeList(false);
+#endif
+
+
+            //'スクロールを元に戻す。
+            /*
+                objListPane.RowLock = False
+             */
+
+
+            //'プロットの再描画。
+            /*
+                Call objPlotPane.UpdateLogicalDrawArea(False)
+                Call objPlotPane.Redraw
+             */
+            //objPlotPane.PlotPane_Initialize();
+            Bitmap btmp = objPlotPane.Dis_Get_btmp();
+            objPlotPane.List_Genba_set(m_List_Genba_S);
+            objPlotPane.UpdateLogicalDrawArea(true);
+            objPlotPane.Redraw();
+            objPlotPane.Refresh();
+
+
+            //'メニューの更新。
+            /*
+                Call clsCtrlValue.Back
+                Call objListPane_ChangeSelRow(objListPane.List)
+             */
+
+            Cursor = Cursors.Default;
 
         }
+
+
+
+
         //1==========================================================================================
         /*[VB]
             'オブジェクトに採用を設定する。
@@ -4654,10 +5210,17 @@ namespace SurvLine
         //------------------------------------------------------------------------------------------
         //[C#]
         /// <summary>
+        /// 観測点の共通属性の編集を行なう。    メニュー＞現場を選択＞
+        /// '
+        /// 引き数：
+        /// clsObservationPoint 対象とする観測点(代表観測点)。
         /// 
         /// </summary>
         /// <param name="clsObservationPoint"></param>
         /// <returns>
+        /// 戻り値：
+        /// 正常終了の場合 True を返す。
+        /// キャンセルの場合 False を返す。
         /// </returns>
         private bool EditAttributeCommon(ObservationPoint clsObservationPoint)
         {
@@ -4668,11 +5231,12 @@ namespace SurvLine
 
 
             //'既存の値。
-            frmAttributeCommon.PointNumber = clsObservationPoint.Number();
-            frmAttributeCommon.PointName = clsObservationPoint.Name();
+            frmAttributeCommon.PointNumber = clsObservationPoint.Number();                  //2
+            frmAttributeCommon.PointName = clsObservationPoint.Name();                      //2
             frmAttributeCommon.Fixed = clsObservationPoint.Fixed();
+            frmAttributeCommon.CoordinateDisplay(clsObservationPoint.CoordinateDisplay());  //2
             frmAttributeCommon.CoordinateFixed(clsObservationPoint.CoordinateFixed());
-            frmAttributeCommon.OldEditCode = (int)clsObservationPoint.Attributes().Common().OldEditCode;
+            frmAttributeCommon.OldEditCode = (int)clsObservationPoint.Attributes().Common().OldEditCode;    //2
 
 
             //'編集ダイアログ。
@@ -4691,11 +5255,11 @@ namespace SurvLine
 
 
             //'砂時計。
+            Cursor = Cursors.WaitCursor;
 
 
             //'設定。
-            //Call m_clsDocument.SetAttributeCommon(clsObservationPoint, frmAttributeCommon.PointNumber, frmAttributeCommon.PointName, frmAttributeCommon.Fixed, frmAttributeCommon.CoordinateFixed)
-
+            m_clsDocument.SetAttributeCommon(clsObservationPoint, frmAttributeCommon.PointNumber, frmAttributeCommon.PointName, frmAttributeCommon.Fixed, frmAttributeCommon.CoordinateFixed());
 
             Cursor = Cursors.Default;
 
@@ -4768,24 +5332,30 @@ namespace SurvLine
         {
             bool EditAttribute = false;
 
-            frmAttribute frmAttribute = new frmAttribute();
+            frmAttribute frmAttribute = new frmAttribute(m_clsMdlMain);
 
             //'既存の値。
-#if false
-            frmAttribute.Session = clsObservationPoint.Session
-            frmAttribute.RecType = clsObservationPoint.RecType
-            frmAttribute.RecNumber = clsObservationPoint.RecNumber
-            frmAttribute.AntType = clsObservationPoint.AntType
-            frmAttribute.AntNumber = clsObservationPoint.AntNumber
-            frmAttribute.AntMeasurement = clsObservationPoint.AntMeasurement
-            frmAttribute.AntHeight = clsObservationPoint.AntHeight
-            frmAttribute.Analysis = bAnalysis
-            frmAttribute.ElevationMask = clsObservationPoint.ElevationMask
-            frmAttribute.ElevationMaskHand = clsObservationPoint.Attributes.ElevationMaskHand
-            frmAttribute.NumberOfMinSV = IIf(m_clsDocument.NumberOfMinSV > 0, m_clsDocument.NumberOfMinSV, clsObservationPoint.NumberOfMinSV)
-            frmAttribute.NumberOfMinSVHand = clsObservationPoint.Attributes.NumberOfMinSVHand
-            Set frmAttribute.ObservationPoint = clsObservationPoint
-#endif
+            frmAttribute.Session = clsObservationPoint.Session();
+            frmAttribute.RecType = clsObservationPoint.RecType();
+            frmAttribute.RecNumber = clsObservationPoint.RecNumber();
+            frmAttribute.AntType = clsObservationPoint.AntType();
+            frmAttribute.AntNumber = clsObservationPoint.AntNumber();
+            frmAttribute.AntMeasurement = clsObservationPoint.AntMeasurement();
+            frmAttribute.AntHeight = clsObservationPoint.AntHeight();
+            frmAttribute.Analysis = bAnalysis;
+            frmAttribute.ElevationMask = (long)clsObservationPoint.ElevationMask();
+            frmAttribute.ElevationMaskHand = clsObservationPoint.Attributes().ElevationMaskHand;
+
+            if (m_clsDocument.NumberOfMinSV > 0)
+            {
+                frmAttribute.NumberOfMinSV = m_clsDocument.NumberOfMinSV;
+
+            } else {
+                frmAttribute.NumberOfMinSV = clsObservationPoint.NumberOfMinSV();
+            }
+
+            frmAttribute.NumberOfMinSVHand = clsObservationPoint.Attributes().NumberOfMinSVHand;
+            frmAttribute.ObservationPoint(clsObservationPoint);
 
             //'編集ダイアログ。
             frmAttribute.ShowDialog();
@@ -4867,15 +5437,34 @@ namespace SurvLine
             End Function
             [VB]*/
         //------------------------------------------------------------------------------------------
-        //[C#]
-        private bool EditSession(Collection objElements)
+        //[C#]  //2
+        /// <summary>
+        /// セッションの変更を行なう。
+        /// '
+        /// セッション名を変更する。
+        /// '
+        /// 引き数：
+        /// objElements 対象とするオブジェクト。要素はオブジェクト。キーは任意。
+        /// 
+        /// </summary>
+        /// <param name="objElements"></param>
+        /// <param name="nPos"></param>
+        /// <returns>
+        /// 戻り値：
+        /// 正常終了の場合 True を返す。
+        /// キャンセルの場合 False を返す。
+        /// </returns>
+        private bool EditSession(Dictionary<string, object> objElements, long nPos) //2
         {
             bool EditSession = false;
 
-            frmSession frmSession = new frmSession();
+            frmSession frmSession = new frmSession(m_clsMdlMain);
+
 
             //'既存の値。
-            //  frmSession.Elements = objElements;
+            frmSession.Elements(objElements);
+            frmSession.SelectLine = nPos;
+
 
 
             //'セッションの変更ダイアログ。
@@ -4889,18 +5478,21 @@ namespace SurvLine
             if (RedrawWindow(Handle, IntPtr.Zero, IntPtr.Zero, (int)RDW_UPDATENOW) == false)
             {
                 //Then Call Err.Raise(ERR_FATAL, , GetLastErrorMessage())
+                _ = MessageBox.Show(GetLastErrorMessage(), "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
                 return EditSession;
             }
 
             //'砂時計。
             Cursor = Cursors.WaitCursor;
 
-#if false
-            '設定。
-            Call m_clsDocument.SetSession(objElements, frmSession.Session)
-            If frmSession.Extend Then Call m_clsDocument.SetSessionExtend(objElements, frmSession.Session)
-#endif
+            //'設定。
+            m_clsDocument.SetSession(objElements, frmSession.Session);      //Ex.)objElements>item1 = S001(元) --->　(変)frmSession.Session = 134F      
 
+            if (frmSession.Extend)
+            {
+                m_clsDocument.SetSessionExtend(objElements, frmSession.Session);
+            }
             EditSession = true;
             return EditSession;
 

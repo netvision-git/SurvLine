@@ -11,6 +11,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
+using static SurvLine.mdl.MdlGUI;   //2
+
 
 namespace SurvLine
 {
@@ -72,8 +74,8 @@ namespace SurvLine
             //        Call txtJobName.SetFocus
             //        Exit Function
             //    End If
-            MdlGUI mdlGUI = new MdlGUI();
-            if (!mdlGUI.CheckFileNameInput(txtJobName.Text, "現場名", true))
+            //MdlGUI mdlGUI = new MdlGUI(); //2
+            if (!CheckFileNameInput(txtJobName.Text, "現場名", true))  //2
             {
                 return bCheckData;
             }
@@ -87,7 +89,7 @@ namespace SurvLine
 
             //    '地区名。
             //    If Not CheckStringInputInvalid(txtDistrictName, "地区名") Then Exit Function
-            if (!mdlGUI.CheckStringInputInvalid(txtDistrictName.Text, "地区名", true))
+            if (!CheckStringInputInvalid(txtDistrictName.Text, "地区名", true))    //2
             {
                 return bCheckData;
             }

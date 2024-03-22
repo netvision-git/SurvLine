@@ -10,6 +10,7 @@ using System.Xml.Linq;
 using static System.Net.Mime.MediaTypeNames;
 using System.Windows.Forms;
 using static SurvLine.ObservationPointKey_NSO;
+using Microsoft.VisualBasic.Logging;
 
 namespace SurvLine.mdl
 {
@@ -298,16 +299,21 @@ namespace SurvLine.mdl
 
         }
         //==========================================================================================
-        /*
-        '観測点リストを再作成する。
-        '
-        'リストの行を設定する。
-        '
-        '引き数：
-        'nList リスト種別。
-        'grdFlexGrid リストコントロール。
-        'objMap 要素マップ。要素はオブジェクト。キーは要素のポインタ(リストの RowData に設定する)。
-        */
+        //==========================================================================================
+        /// <summary>
+        /// 観測点 情報取得（リストの行の情報）
+        /// 引き数：
+        /// nList リスト種別。
+        /// grdFlexGrid リストコントロール。
+        /// objMap 要素マップ。要素はオブジェクト。キーは要素のポインタ(リストの RowData に設定する)。
+        /// </summary>
+        /// <param name="nList"></param>
+        /// <param name="grdFlexGrid"></param>
+        /// <param name="objMap"></param>
+        /// <returns>
+        /// 戻り値：
+        ///     観測点 情報取得
+        /// </returns>
         public object SelectedElement_ObsPnt(long nList, DataGridView grdFlexGrid, ref Dictionary<string, object> objMap)
         {
             object[] objElements = new object[m_clsMdlMain.GetDocument().NetworkModel().RepresentPointCount()];
@@ -317,14 +323,22 @@ namespace SurvLine.mdl
             ChainList clsChainList;
             clsChainList = m_clsMdlMain.GetDocument().NetworkModel().RepresentPointHead();
 
+
+            //'選択行を取得する。    //2
+            long select = 0;
+            foreach (DataGridViewRow row in grdFlexGrid.SelectedRows)
+            {
+                select = row.Index;
+            }
+
+
             while (clsChainList != null)
             {
                 if (grdFlexGrid.CurrentRow != null)         //選択の有無
                 {
                     objElements[nRows] = clsChainList.Element;
 
-                    //if (nRows == grdFlexGrid.Rows[nRows].Index)
-                    if (nRows == 0)
+                    if (nRows == select)
                     {
                         return objElements[nRows];
                     }
@@ -333,6 +347,338 @@ namespace SurvLine.mdl
                 }
             }
             return objElements[nRows];
+
+        }
+        //==========================================================================================
+        //==========================================================================================
+        public object SelectedElement_Vector(long nList, DataGridView grdFlexGrid, ref Dictionary<string, object> objMap)
+        {
+
+            object[] objElements = new object[m_clsMdlMain.GetDocument().NetworkModel().BaseLineVectorCount()];
+
+            long nRows;
+            nRows = 0;
+            ChainList clsChainList;
+            clsChainList = m_clsMdlMain.GetDocument().NetworkModel().BaseLineVectorHead();
+
+
+            //'選択行を取得する。    //2
+            long select = 0;
+            foreach (DataGridViewRow row in grdFlexGrid.SelectedRows)
+            {
+                select = row.Index;
+            }
+
+
+            while (clsChainList != null)
+            {
+                objElements[nRows] = clsChainList.Element;
+
+                if (nRows == select)
+                {
+                    return objElements[nRows];
+                }
+                nRows++;
+                clsChainList = clsChainList.NextList();
+            }
+            return objElements[nRows];
+
+        }
+
+        //==========================================================================================
+        //---新規---  //2
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="nList"></param>
+        /// <param name="grdFlexGrid"></param>
+        /// <param name="objMap"></param>
+        /// <returns></returns>
+        public object Element_ObsPnt(long nList, DataGridView grdFlexGrid, ref Dictionary<string, object> objMap)
+        {
+            object[] objElements = new object[m_clsMdlMain.GetDocument().NetworkModel().RepresentPointCount()];
+
+            int nRows;
+            ChainList clsChainList;
+            //clsChainList = m_clsMdlMain.GetDocument().NetworkModel().RepresentPointHead();
+
+
+            //'選択行を取得する。    //2
+            long select;
+            int i = 0;
+            foreach (DataGridViewRow row in grdFlexGrid.SelectedRows)
+            {
+                select = row.Index;
+                nRows = 0;
+
+                clsChainList = m_clsMdlMain.GetDocument().NetworkModel().RepresentPointHead();
+
+                while (clsChainList != null)
+                {
+                    if (grdFlexGrid.CurrentRow != null)         //選択の有無
+                    {
+                        if (nRows == select)
+                        {
+                            objElements[i] = clsChainList.Element;
+                            i++;
+                        }
+                        nRows++;
+                        clsChainList = clsChainList.NextList();
+                    }
+                }
+
+            }
+
+            return objElements;
+
+        }
+        //==========================================================================================
+        //---新規---  //2
+        public object[] Element_Vector(long nList, DataGridView grdFlexGrid, ref Dictionary<string, object> objMap)
+        {
+
+            object[] objElements = new object[m_clsMdlMain.GetDocument().NetworkModel().BaseLineVectorCount()];
+
+            long nRows;
+            nRows = 0;
+            ChainList clsChainList;
+            clsChainList = m_clsMdlMain.GetDocument().NetworkModel().BaseLineVectorHead();
+
+
+            //'選択行を取得する。    //2
+            long select = 0;
+            foreach (DataGridViewRow row in grdFlexGrid.SelectedRows)
+            {
+                select = row.Index;
+            }
+
+
+            while (clsChainList != null)
+            {
+                if (nRows == select)
+                {
+                    objElements[nRows] = clsChainList.Element;
+                    nRows++;
+                }
+                clsChainList = clsChainList.NextList();
+            }
+            return objElements;
+
+        }
+
+        //==========================================================================================
+        //---新規---  //2
+        /// <summary>
+        /// 選択された観測点の情報 ：  セクション名の変更対応：
+        /// 
+        /// </summary>
+        /// <param name="nList"></param>
+        /// <param name="grdFlexGrid"></param>
+        /// <param name="objMap"></param>
+        /// <returns>
+        /// 戻り値：
+        ///     選択行の位置を示す整数値を返す。<--( 0) から XX
+        ///     選択行が無い場合は 0 を返す。<----- --(-1)に訂正
+        /// </returns>
+        public long StartSelectedAssoc_ObsPnt(long nList, DataGridView grdFlexGrid, ref Dictionary<string, object> objMap)
+        {
+            object[] objElements = new object[m_clsMdlMain.GetDocument().NetworkModel().RepresentPointCount()];
+
+            ChainList clsChainList;
+            clsChainList = m_clsMdlMain.GetDocument().NetworkModel().RepresentPointHead();
+
+
+            //'選択行を取得する。    //2
+            long select = -1;
+            foreach (DataGridViewRow row in grdFlexGrid.SelectedRows)
+            {
+                select = row.Index;
+            }
+            return select;
+        }
+        //==========================================================================================
+        //---新規---  //2
+        /// <summary>
+        /// 選択されたベクトルの情報 ：  セクション名の変更対応：
+        /// 
+        /// </summary>
+        /// <param name="nList"></param>
+        /// <param name="grdFlexGrid"></param>
+        /// <param name="objMap"></param>
+        /// <returns>
+        /// 戻り値：
+        ///     選択行の位置を示す整数値を返す。<--( 0) から XX
+        ///     選択行が無い場合は 0 を返す。<----- --(-1)に訂正
+        /// </returns>
+        public long StartSelectedAssoc_Vector(long nList, DataGridView grdFlexGrid, ref Dictionary<string, object> objMap)
+        {
+            object[] objElements = new object[m_clsMdlMain.GetDocument().NetworkModel().BaseLineVectorCount()];
+
+            ChainList clsChainList;
+            clsChainList = m_clsMdlMain.GetDocument().NetworkModel().BaseLineVectorHead();
+
+
+            //'選択行を取得する。    //2
+            long select = -1;
+            foreach (DataGridViewRow row in grdFlexGrid.SelectedRows)
+            {
+                select = row.Index;
+            }
+            return select;
+        }
+
+        //==========================================================================================
+        //---新規---  //2
+        /// <summary>
+        ///  指示れてたｎ行目の 観測点情報
+        /// 
+        /// nList 0=観測点データ
+        /// リストの行を設定する。
+        /// リストの初期化は MakeList 関係のメソッド。
+        ///'
+        /// 引き数：
+        ///  nList 観測点種別。
+        ///  grdFlexGrid リストコントロール。
+        ///  objMap 要素マップ。要素はオブジェクト。キーは要素のポインタ(リストの RowData に設定されている)。
+        ///  nPos 指示れてた行(0行目---)
+        /// </summary>
+        /// <param name="nList"></param>
+        /// <param name="grdFlexGrid"></param>
+        /// <param name="objMap"></param>
+        /// <param name="nPos"></param>
+        /// <returns>
+        /// 戻り値：
+        /// 観測点情報
+        /// </returns>
+        public object GetNextAssoc_ObsPnt(long nList, DataGridView grdFlexGrid, ref Dictionary<string, object> objMap, ref long nPos)
+        {
+
+            object[] objElements = new object[m_clsMdlMain.GetDocument().NetworkModel().RepresentPointCount()];
+
+            int nRows;
+            nRows = 0;
+            ChainList clsChainList;
+            clsChainList = m_clsMdlMain.GetDocument().NetworkModel().RepresentPointHead();
+
+
+            long nNext = -1;
+            long set = nPos;
+            while (clsChainList != null)
+            {
+                if (nNext >= 0)
+                {
+                    if (grdFlexGrid.CurrentRow != null)         //選択の有無
+                    {
+                        objElements[nRows] = clsChainList.Element;
+
+                        if (nRows == nNext)
+                        {
+                            nPos = nNext;
+                            return objElements[nNext - 1];
+                        }
+                        else
+                        {
+                            nPos = -1;
+                            return objElements[nNext - 1];
+                        }
+                    }
+                }
+                else
+                {
+                    if (grdFlexGrid.CurrentRow != null)         //選択の有無
+                    {
+                        objElements[nRows] = clsChainList.Element;
+
+                        if (nRows == nPos)
+                        {
+                            set = nPos;
+                            nNext = nPos + 1;
+                        }
+                        nRows++;
+                        clsChainList = clsChainList.NextList();
+                    }
+                }
+
+            }
+            nPos = -1;
+            return objElements[set];
+
+        }
+        //==========================================================================================
+        //---新規---  //2
+        /// <summary>
+        ///  指示れてたｎ行目の ベクトル情報
+        /// 
+        /// nList 0=観測点データ
+        /// リストの行を設定する。
+        /// リストの初期化は MakeList 関係のメソッド。
+        ///'
+        /// 引き数：
+        ///  nList 観測点種別。
+        ///  grdFlexGrid リストコントロール。
+        ///  objMap 要素マップ。要素はオブジェクト。キーは要素のポインタ(リストの RowData に設定されている)。
+        ///  nPos 指示れてた行(0行目---)
+        /// </summary>
+        /// <param name="nList"></param>
+        /// <param name="grdFlexGrid"></param>
+        /// <param name="objMap"></param>
+        /// <param name="nPos"></param>
+        /// <returns>
+        /// 戻り値：
+        /// ベクトル情報
+        /// </returns>
+        public object GetNextAssoc_Vector(long nList, DataGridView grdFlexGrid, ref Dictionary<string, object> objMap, ref long nPos)
+        {
+
+            object[] objElements = new object[m_clsMdlMain.GetDocument().NetworkModel().BaseLineVectorCount()];
+
+            int nRows;
+            nRows = 0;
+            ChainList clsChainList;
+            clsChainList = m_clsMdlMain.GetDocument().NetworkModel().BaseLineVectorHead();
+
+
+            long nNext = -1;
+            long set = nPos;
+            while (clsChainList != null)
+            {
+                if (nNext >= 0)
+                {
+                    if (grdFlexGrid.CurrentRow != null)         //選択の有無
+                    {
+                        objElements[nRows] = clsChainList.Element;
+
+                        if (nRows == nNext)
+                        {
+                            nPos = nNext;
+                            return objElements[nNext - 1];
+                        }
+                        else
+                        {
+                            nPos = -1;
+                            return objElements[nNext - 1];
+                        }
+                    }
+                }
+                else
+                {
+                    if (grdFlexGrid.CurrentRow != null)         //選択の有無
+                    {
+                        objElements[nRows] = clsChainList.Element;
+
+                        if (nRows == nPos)
+                        {
+                            set = nPos;
+                            nNext = nPos + 1;
+                        }
+                        nRows++;
+                        clsChainList = clsChainList.NextList();
+                    }
+                }
+
+            }
+            nPos = -1;
+            return objElements[set];
 
         }
 

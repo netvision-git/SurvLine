@@ -10,7 +10,8 @@ using static SurvLine.mdl.MdlUtility;
 using static SurvLine.mdl.MdlNSUtility;
 using static SurvLine.mdl.MdlNSDefine;
 using System.Xml.Linq;
-
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using TextBox = System.Windows.Forms.TextBox;
 
 namespace SurvLine.mdl
 {
@@ -140,25 +141,25 @@ namespace SurvLine.mdl
             TextBox txtLatM2 = txtLatM as TextBox;
             TextBox txtLatS2 = txtLatS as TextBox;
 
-            nLat = dms_to_d(int.Parse(txtLatH2.Text), int.Parse(txtLatM2.Text), int.Parse(txtLatS2.Text));
+            nLat = dms_to_d(int.Parse(txtLatH2.Text), int.Parse(txtLatM2.Text), double.Parse(txtLatS2.Text));
 
             TextBox txtLonH2 = txtLonH as TextBox;
             TextBox txtLonM2 = txtLonM as TextBox;
             TextBox txtLonS2 = txtLonS as TextBox;
 
-            nLon = dms_to_d(int.Parse(txtLonH2.Text), int.Parse(txtLonM2.Text), int.Parse(txtLonS2.Text));
+            nLon = dms_to_d(int.Parse(txtLonH2.Text), int.Parse(txtLonM2.Text), double.Parse(txtLonS2.Text));
 
             if (!CheckCoordDMS(nLat, nLon, 0))
             {
-                //Call MsgBox(sLabel &GUI_MSG_COORDRANGE, vbCritical)
+                _ = MessageBox.Show($" {sLabel} {GUI_MSG_COORDRANGE} ", "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
                 if (bFocus)
                 {
-                    //Then Call txtLatH.SetFocus
+                    _ = txtLatH2.Focus();
                     return CheckCoordRangeDMS;
                 }
 
             }
-
 
             CheckCoordRangeDMS = true;
             return CheckCoordRangeDMS;
@@ -262,18 +263,15 @@ namespace SurvLine.mdl
 
             bool CheckCoordRangeXYZ = false;
 
-            TextBox txtWGSX2 = new TextBox();
-            txtWGSX2 = (TextBox)txtWGSX;
-            TextBox txtWGSY2 = new TextBox();
-            txtWGSY2 = (TextBox)txtWGSY;
-            TextBox txtWGSZ2 = new TextBox();
-            txtWGSZ2 = (TextBox)txtWGSZ;
+            TextBox txtWGSX2 = txtWGSX as TextBox;
+            TextBox txtWGSY2 = txtWGSY as TextBox;
+            TextBox txtWGSZ2 = txtWGSZ as TextBox;
 
 
             if (!CheckCoordXYZ(double.Parse(txtWGSX2.Text), double.Parse(txtWGSY2.Text), double.Parse(txtWGSZ2.Text)))
             {
                 //  Call MsgBox(sLabel &GUI_MSG_COORDRANGE, vbCritical)
-                MessageBox.Show(sLabel + GUI_MSG_COORDRANGE, "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                _ = MessageBox.Show(sLabel + GUI_MSG_COORDRANGE, "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
                 if (bFocus)
                 {
@@ -324,7 +322,6 @@ namespace SurvLine.mdl
         {
             string w_FormatRound0Trim = "";
             w_FormatRound0Trim = FormatRound(nValue, nDecimal, sFormat);
-            //w_FormatRound0Trim = mdlUtility.RTrimEx((w_FormatRound0Trim, "0");  //RTrimEx(w_FormatRound0Trim, "0");
             w_FormatRound0Trim = RTrimEx(w_FormatRound0Trim, "0");
             w_FormatRound0Trim = RTrimEx(w_FormatRound0Trim, ".");
             return w_FormatRound0Trim;
@@ -404,5 +401,38 @@ namespace SurvLine.mdl
             return Strings.Format(JpnRound(nValue, nDecimal), sFormat);
         }
         //==========================================================================================
+
+
+        public static TextBox ObjectToText(object objText)
+        {
+            TextBox txt = objText as TextBox;
+            return txt;
+
+        }
+        public static bool mdl_CheckInputEmpty(object txtTextBox, string sLabel, bool bFocus)
+        {
+            TextBox txtBox = txtTextBox as TextBox;
+
+            bool mdl_CheckInputEmpty = false;
+
+
+            //'空であるか？
+            if (txtBox.Text.Length <= 0)
+            {
+                _ = MessageBox.Show($" {sLabel} {txtBox.Text}", "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error); //2
+                if (bFocus)
+                {
+                    _ = txtBox.Focus(); //2
+                }
+                return mdl_CheckInputEmpty;
+            }
+
+
+            mdl_CheckInputEmpty = true;
+            return mdl_CheckInputEmpty;
+
+        }
+ 
+
     }
 }
