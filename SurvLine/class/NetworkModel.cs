@@ -1909,7 +1909,7 @@ namespace SurvLine
             //'接続している基線ベクトルを取得する。
             List<BaseLineVector> clsBaseLineVectors = new List<BaseLineVector>();
             //  GetConnectBaseLineVectors(clsObservationPoint, ref clsBaseLineVectors);
-            m_clsMdlMain.GetDocument().Sessoin_GetConnectBaseLineVectors(clsObservationPoint, ref clsBaseLineVectors);
+            m_clsMdlMain.GetDocument().Session_GetConnectBaseLineVectors(clsObservationPoint, ref clsBaseLineVectors);
 
             if (clsBaseLineVectors.Count < 0)
             {
@@ -2419,7 +2419,7 @@ namespace SurvLine
         End Sub
         [VB]*/
         //------------------------------------------------------------------------------------------
-        //[C#]
+        //[C#]  //3
         /*
         '指定された観測点と連結している基線ベクトルの IsList を設定する。
         '
@@ -2429,10 +2429,39 @@ namespace SurvLine
         '引き数：
         'clsObservationPoint 対象とする観測点。
         */
-        public void SetConnectBaseLineVectorsIsListEx(ObservationPoint clsObservationPoint)
+        public void SetConnectBaseLineVectorsIsListEx(ObservationPoint clsObservationPoint)   //2)
         {
+            ChainList clsChainList;
+            clsChainList = m_clsMdlMain.GetDocument().NetworkModel().BaseLineVectorHead();
+            List<BaseLineVector> clsBaseLineVectors = new List<BaseLineVector>();
+
+
+            while (clsChainList != null)
+            {
+                GetConnectBaseLineVectorsIsList(clsObservationPoint);
+                m_clsMdlMain.GetDocument().Session_GetConnectBaseLineVectors(clsObservationPoint, ref clsBaseLineVectors);
+
+                clsChainList = clsChainList.NextList();
+            }
+
+        }
+        /*
+        public void SetConnectBaseLineVectorsIsListEx(ObservationPoint pclsObservationPoint)
+        {
+            ObservationPoint clsObservationPoint;
+
+            clsObservationPoint = pclsObservationPoint.HeadPoint();
+
+            while (clsObservationPoint == null)
+            {
+                GetConnectBaseLineVectorsIsList(clsObservationPoint);
+                clsObservationPoint = clsObservationPoint.NextPoint();
+            }
+
+ 
             return;
         }
+        */
         //==========================================================================================
 
         //==========================================================================================
@@ -2470,10 +2499,65 @@ namespace SurvLine
         '引き数：
         'clsObservationPoint 対象とする観測点。
         */
+#if true
         public void GetConnectBaseLineVectorsIsList(ObservationPoint clsObservationPoint)
         {
+            ChainList clsChainList;
+            clsChainList = m_clsMdlMain.GetDocument().NetworkModel().BaseLineVectorHead();
+            List<BaseLineVector> clsBaseLineVectors = new List<BaseLineVector>();
+
+            ObservationPoint clsChildPoint;
+            clsChildPoint = clsObservationPoint.ChildPoint();
+
+
+            if (clsChildPoint == null)
+            {
+                //'接合観測点の場合、基線ベクトルに設定する。
+                if ((clsObservationPoint.ObjectType & OBS_TYPE_CONNECT) != 0)
+                {
+                    //  clsObservationPoint.Owner.IsList(true);
+                    clsObservationPoint.IsList(true);
+                }
+
+            }
+            else
+            {
+                m_clsMdlMain.GetDocument().Session_GetConnectBaseLineVectors(clsObservationPoint, ref clsBaseLineVectors);
+                while (clsObservationPoint != null)
+                {
+                    clsChainList = clsChainList.NextList();
+                }
+            }
+
+
+        }
+#else
+        public void GetConnectBaseLineVectorsIsList(ObservationPoint clsObservationPoint)
+        {
+            ObservationPoint clsChildPoint;
+            clsChildPoint = clsObservationPoint.ChildPoint();
+            if (clsChildPoint == null)
+            {
+                //'接合観測点の場合、基線ベクトルに設定する。
+                if ((clsObservationPoint.ObjectType & OBS_TYPE_CONNECT) != 0)
+                {
+                    //  clsObservationPoint.Owner.IsList(true);
+                    clsObservationPoint.IsList(true);
+                }
+            }
+            else
+            {
+                //'子観測点すべてを巡回する。
+                while (clsChildPoint != null)
+                {
+                    GetConnectBaseLineVectorsIsList(clsChildPoint);
+                    clsChildPoint = clsChildPoint.NextPoint();
+                }
+            }
+
             return;
         }
+#endif
         //==========================================================================================
 
         //==========================================================================================
@@ -3789,7 +3873,7 @@ namespace SurvLine
         End Sub
         [VB]*/
         //------------------------------------------------------------------------------------------
-        //[C#]
+        //[C#]  //4
         /*
         '指定された観測点のモードを設定する。
         '
@@ -3799,6 +3883,9 @@ namespace SurvLine
         */
         public void SetObsPntMode(ObservationPoint clsObservationPoint, OBJ_MODE nMode)
         {
+            //'設定。
+            clsObservationPoint.Mode(nMode);
+            clsObservationPoint.IsList(true);
             return;
         }
         //==========================================================================================
@@ -3827,6 +3914,8 @@ namespace SurvLine
         */
         public void SetLineType(BaseLineVector clsBaseLineVector, OBJ_MODE nLineType)
         {
+            clsBaseLineVector.SetLineType(nLineType);
+            clsBaseLineVector.IsList = true;
             return;
         }
         //==========================================================================================

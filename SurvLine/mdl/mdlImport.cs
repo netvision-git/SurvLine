@@ -623,7 +623,9 @@ namespace SurvLine
             bNavFile = new List<bool>();
             //'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
             //Collection objTitles = new Collection();
-            List<string> objTitles = new List<string>();
+            //List<string> objTitles = new List<string>();
+            Dictionary<string, object> objTitles = new Dictionary<string, object>();    //4
+
 
             //'指定されたパスを評価。
             for (int i2 = 0; i2 <= sPath.Count; i2++)
@@ -737,7 +739,7 @@ namespace SurvLine
                     {
                         vItem = sPath[i2];   //'小文字を保持する。
                         //objTitles.Add(vItem: sKey);
-                        objTitles.Add($"{vItem}:{sKey}");
+                        //objTitles.Add($"{vItem}:{sKey}");
                     }
                     else
                     {

@@ -90,7 +90,7 @@
             this.tsTab.Controls.Add(this.tabPage2);
             this.tsTab.Controls.Add(this.tabPage3);
             this.tsTab.Font = new System.Drawing.Font("ＭＳ Ｐゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.tsTab.Location = new System.Drawing.Point(20, 14);
+            this.tsTab.Location = new System.Drawing.Point(20, 12);
             this.tsTab.Name = "tsTab";
             this.tsTab.SelectedIndex = 0;
             this.tsTab.Size = new System.Drawing.Size(505, 241);
@@ -106,6 +106,7 @@
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "観測";
             this.tabPage1.UseVisualStyleBackColor = true;
+            this.tabPage1.Click += new System.EventHandler(this.tabPage1_Click);
             // 
             // fraTab0
             // 
@@ -140,6 +141,7 @@
             this.cmbNumberOfMinSV.Size = new System.Drawing.Size(50, 20);
             this.cmbNumberOfMinSV.TabIndex = 7;
             this.cmbNumberOfMinSV.Text = "cmbNumberOfMinSV";
+            this.cmbNumberOfMinSV.SelectedIndexChanged += new System.EventHandler(this.cmbNumberOfMinSV_SelectedIndexChanged);
             // 
             // label4
             // 
@@ -217,6 +219,7 @@
             this.txtElevationMask.Size = new System.Drawing.Size(33, 19);
             this.txtElevationMask.TabIndex = 4;
             this.txtElevationMask.Text = "1234";
+            this.txtElevationMask.TextChanged += new System.EventHandler(this.txtElevationMask_TextChanged);
             // 
             // optElevationMaskInput
             // 
@@ -276,6 +279,7 @@
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "受信機";
             this.tabPage2.UseVisualStyleBackColor = true;
+            this.tabPage2.Click += new System.EventHandler(this.tabPage2_Click);
             // 
             // fraTab1
             // 
@@ -311,6 +315,7 @@
             this.cmbRecType.Size = new System.Drawing.Size(261, 20);
             this.cmbRecType.TabIndex = 11;
             this.cmbRecType.Text = "cmbRecType";
+            this.cmbRecType.SelectedIndexChanged += new System.EventHandler(this.cmbRecType_SelectedIndexChanged);
             // 
             // txtRecName
             // 
@@ -319,6 +324,7 @@
             this.txtRecName.Size = new System.Drawing.Size(294, 19);
             this.txtRecName.TabIndex = 10;
             this.txtRecName.Text = "12345678901234567890123456789012345678901234567";
+            this.txtRecName.TextChanged += new System.EventHandler(this.txtRecName_TextChanged);
             // 
             // cmbRecManufacturer
             // 
@@ -328,6 +334,7 @@
             this.cmbRecManufacturer.Size = new System.Drawing.Size(261, 20);
             this.cmbRecManufacturer.TabIndex = 9;
             this.cmbRecManufacturer.Text = "cmbRecManufacturer";
+            this.cmbRecManufacturer.SelectedIndexChanged += new System.EventHandler(this.cmbRecManufacturer_SelectedIndexChanged);
             // 
             // label8
             // 
@@ -396,6 +403,7 @@
             this.tabPage3.TabIndex = 2;
             this.tabPage3.Text = "アンテナ";
             this.tabPage3.UseVisualStyleBackColor = true;
+            this.tabPage3.Click += new System.EventHandler(this.tabPage3_Click);
             // 
             // fraTab2
             // 
@@ -442,6 +450,7 @@
             this.cmbAntMeasurement.Size = new System.Drawing.Size(260, 20);
             this.cmbAntMeasurement.TabIndex = 14;
             this.cmbAntMeasurement.Text = "cmbAntMeasurement";
+            this.cmbAntMeasurement.SelectedIndexChanged += new System.EventHandler(this.cmbAntMeasurement_SelectedIndexChanged);
             // 
             // label13
             // 
@@ -468,6 +477,7 @@
             this.cmbAntType.Size = new System.Drawing.Size(336, 20);
             this.cmbAntType.TabIndex = 11;
             this.cmbAntType.Text = "cmbAntType";
+            this.cmbAntType.SelectedIndexChanged += new System.EventHandler(this.cmbAntType_SelectedIndexChanged);
             // 
             // txtAntHeight
             // 
@@ -485,6 +495,7 @@
             this.cmbAntManufacturer.Size = new System.Drawing.Size(260, 20);
             this.cmbAntManufacturer.TabIndex = 9;
             this.cmbAntManufacturer.Text = "cmbAntManufacturer";
+            this.cmbAntManufacturer.SelectedIndexChanged += new System.EventHandler(this.cmbAntManufacturer_SelectedIndexChanged);
             // 
             // label9
             // 

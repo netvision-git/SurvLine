@@ -2867,7 +2867,7 @@ namespace SurvLine
 
             List<BaseLineVector> clsBaseLineVectors = new List<BaseLineVector>();
             //  m_clsNetworkModel.GetConnectBaseLineVectors(clsObservationPoint, ref clsBaseLineVectors);
-            Sessoin_GetConnectBaseLineVectors(clsObservationPoint, ref clsBaseLineVectors);
+            Session_GetConnectBaseLineVectors(clsObservationPoint, ref clsBaseLineVectors);
 
             /*---------------------------------------------------------------------------------------------------------------
                 '偏心補正の再計算が必要な偏心点。
@@ -3594,7 +3594,7 @@ namespace SurvLine
 
                     List<BaseLineVector> clsBaseLineVectors = new List<BaseLineVector>();
 
-                    Sessoin_GetConnectBaseLineVectors(clsObservationPoint, ref clsBaseLineVectors);     //2)
+                    Session_GetConnectBaseLineVectors(clsObservationPoint, ref clsBaseLineVectors);     //2)
                     int v = 0;
                     foreach (object obj in clsBaseLineVectors)
                     {
@@ -3706,7 +3706,7 @@ namespace SurvLine
 
         }
         //---------------------------------------------------------------------------------------------------------------------------------------------
-        public void Sessoin_GetConnectBaseLineVectors(ObservationPoint clsObservationPoint, ref List<BaseLineVector> clsBaseLineVectors)   //2)
+        public void Session_GetConnectBaseLineVectors(ObservationPoint clsObservationPoint, ref List<BaseLineVector> clsBaseLineVectors)   //2)
         {
             ChainList clsChainList;
             clsChainList = m_clsMdlMain.GetDocument().NetworkModel().BaseLineVectorHead();
@@ -5337,6 +5337,12 @@ namespace SurvLine
         'clsObservationPoint 対象とする観測点(代表観測点)。
         'nMode 観測点モード。
         */
+        public void SetObsPntMode(ObservationPoint clsObservationPoint, OBJ_MODE nMode) //4
+        {
+            m_clsNetworkModel.SetObsPntMode(clsObservationPoint, nMode);
+            m_bModifyed = true;
+        }
+
 #if false
         /*
          *************************** 修正要 sakai
@@ -5388,6 +5394,23 @@ namespace SurvLine
         'clsBaseLineVector 対象とする基線ベクトル。
         'nLineType 基線ベクトル種類。
         */
+        public void SetLineType(BaseLineVector clsBaseLineVector, OBJ_MODE nLineType)   //4
+        {
+            m_clsNetworkModel.SetLineType(clsBaseLineVector, nLineType);
+
+            /*
+            '偏心補正の再計算。
+            If clsBaseLineVector.Analysis <= ANALYSIS_STATUS_FIX Then
+                If clsBaseLineVector.AnalysisEndPoint.Eccentric Then
+                    Call m_clsNetworkModel.CorrectEccentric(clsBaseLineVector.AnalysisEndPoint)
+                    Call m_clsNetworkModel.EnableGenuinePoint(clsBaseLineVector.AnalysisEndPoint)
+                    Call m_clsNetworkModel.SetConnectBaseLineVectorsIsListEx(clsBaseLineVector.AnalysisEndPoint)
+                End If
+            End If
+            */
+
+            return;
+        }
 #if false
         /*
          *************************** 修正要 sakai

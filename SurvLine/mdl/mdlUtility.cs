@@ -867,6 +867,18 @@ namespace SurvLine.mdl
         {
             try
             {
+
+#if false
+                foreach ( var kvp in objCollection) //4
+                {
+                    if (sKey == kvp.Key)            //4
+                    {
+                        vItem = kvp.Value;          //4
+                        break;
+                    }
+                }                                   //4
+#endif
+
                 bool rtn = objCollection.TryGetValue(sKey, out vItem);
                 return rtn;
             }
@@ -901,9 +913,32 @@ namespace SurvLine.mdl
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
-        public static bool LookupCollectionVariant(object objCollection, ref string vItem, string sKey)
+        public static bool LookupCollectionVariant(Dictionary<string, object> objKeyToIndex, ref string vItem, string sKey)
         {
-            return true;
+            try
+            {
+                object oItem;
+                bool rtn = objKeyToIndex.TryGetValue(sKey, out oItem);
+                //  vItem = oItem.ToString();          //4
+
+
+                foreach (var kvp in objKeyToIndex) //4
+                {
+                    if (sKey == kvp.Key)            //4
+                    {
+                        vItem = kvp.Value.ToString();          //4
+                        break;
+                    }
+                }                                   //4
+
+                return rtn;
+
+
+            }
+            catch
+            {
+                return false;
+            }
         }
         /// <summary>
         /// コレクションから指定されたキーのアイテムを取得する。

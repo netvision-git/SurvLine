@@ -19,13 +19,16 @@ using static SurvLine.mdl.MdlNSSDefine;
 using static SurvLine.mdl.MdiVBfunctions;
 using static SurvLine.mdl.MdlMain;
 using static SurvLine.mdl.MdlNSUtility;
+using static SurvLine.mdl.MdlSession;
 using static System.Net.Mime.MediaTypeNames;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using Microsoft.VisualBasic.Logging;
 using System.Reflection;
 using static SurvLine.frmAttribute;
 using System.Runtime.Remoting;
-
+using System.Windows.Forms.VisualStyles;
+using System.Runtime.ConstrainedExecution;
+using System.Xml.Schema;
 
 namespace SurvLine
 {
@@ -96,7 +99,7 @@ namespace SurvLine
 
         public struct DEFTYPEINFO_MANUFACTURER   //'メーカー別定義情報
         {
-            public  string Manufacturer;                //'メーカー名。
+            public string Manufacturer;                //'メーカー名。
             public List<DEFTYPEINFO> DefTypeInfos;     //'定義情報。
             public long ListIndex;                     //'定義情報のカレントのリストインデックス。
             public long SortIndex;                     //'並び順番号。
@@ -166,10 +169,15 @@ namespace SurvLine
         //==========================================================================================
         //[C#]
         private MdlMain m_clsMdlMain;                                   //MdlMainインスタンス
-
+        private MdlSession m_clsMdlSession;
         public frmAttribute(MdlMain clsMdlMain)
         {
             InitializeComponent();
+            m_clsMdlMain = clsMdlMain;
+
+            m_clsMdlSession = new MdlSession(m_clsMdlMain);
+
+
             Load += Form_Load;
         }
         //------------------------------------------------------------------------------------------
@@ -278,7 +286,18 @@ namespace SurvLine
         //[C#]
         private void fraTab(int Index)
         {
-            fraTab1.FlatStyle = FlatStyle.Standard;
+            switch (Index)
+            {
+                case 0:
+                    fraTab0.FlatStyle = FlatStyle.Standard;
+                    break;
+                case 1:
+                    fraTab1.FlatStyle = FlatStyle.Standard;
+                    break;
+                default:
+                    fraTab2.FlatStyle = FlatStyle.Standard;
+                    break;
+            }
 
         }
 
@@ -287,6 +306,7 @@ namespace SurvLine
 
             try
             {
+
 
                 //'変数初期化。
                 Result = vbCancel;
@@ -330,8 +350,10 @@ namespace SurvLine
                 }
 
                 //'セッションリスト。
-                //MakeSessionList(cmbSession);
-                cmbSession.Items.Add(Session);
+                m_clsMdlSession.MakeSessionList(cmbSession);
+                cmbSession.Text = Session;
+
+
 
                 if (NumberOfMinSVHand > 0)
                 {
@@ -359,7 +381,7 @@ namespace SurvLine
 
                 //'定義情報の初期化。
                 InitDefTypeInfo();
-    
+
             }
             catch (Exception ex)
             {
@@ -368,22 +390,6 @@ namespace SurvLine
                 _ = MessageBox.Show(ex.Message + "frmAttribute Form_Load", "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
             }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
         }
 
@@ -405,6 +411,27 @@ namespace SurvLine
             [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        /// <summary>
+        /// 終了処理。
+        /// 引き数：
+        //  Cancel キャンセル値
+        /// 
+        /// </summary>
+        /// <param name="Cancel"></param>
+        private void Form_Unload(int Cancel)
+        {
+            try
+            {
+                m_objElements = null;
+                Close();
+            }
+            catch (Exception ex)
+            {
+                //ErrorHandler:
+                //    Call mdlMain.ErrorExit
+                _ = MessageBox.Show(ex.Message, "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
 
 
         //1==========================================================================================
@@ -422,6 +449,25 @@ namespace SurvLine
                 Call mdlMain.ErrorExit
     
             End Sub
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#] //4
+        private void txtRecName_GotFocus()
+        {
+            try
+            {
+                SelectText(txtRecName);
+            }
+            catch (Exception ex)
+            {
+                //ErrorHandler:
+                //    Call mdlMain.ErrorExit
+                _ = MessageBox.Show(ex.Message, "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        //4==========================================================================================
+        /*[VB]
 
             'テキストをすべて選択する。
             Private Sub txtRecNumber_GotFocus()
@@ -436,7 +482,25 @@ namespace SurvLine
                 Call mdlMain.ErrorExit
     
             End Sub
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#] //4
+        private void txtRecNumber_GotFocus()
+        {
+            try
+            {
+                SelectText(txtRecNumber);
+            }
+            catch (Exception ex)
+            {
+                //ErrorHandler:
+                //    Call mdlMain.ErrorExit
+                _ = MessageBox.Show(ex.Message, "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
 
+        //4==========================================================================================
+        /*[VB]
             'テキストをすべて選択する。
             Private Sub txtAntNumber_GotFocus()
 
@@ -450,7 +514,25 @@ namespace SurvLine
                 Call mdlMain.ErrorExit
     
             End Sub
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#] //4
+        private void txtAntNumber_GotFocus()
+        {
+            try
+            {
+                SelectText(txtAntNumber);
+            }
+            catch (Exception ex)
+            {
+                //ErrorHandler:
+                //    Call mdlMain.ErrorExit
+                _ = MessageBox.Show(ex.Message, "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
 
+        //4==========================================================================================
+        /*[VB]
             'テキストをすべて選択する。
             Private Sub txtAntHeight_GotFocus()
 
@@ -464,7 +546,25 @@ namespace SurvLine
                 Call mdlMain.ErrorExit
     
             End Sub
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#] //4
+        private void txtAntHeight_GotFocus()
+        {
+            try
+            {
+                SelectText(txtAntHeight);
+            }
+            catch (Exception ex)
+            {
+                //ErrorHandler:
+                //    Call mdlMain.ErrorExit
+                _ = MessageBox.Show(ex.Message, "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
 
+        //4==========================================================================================
+        /*[VB]
             'テキストをすべて選択する。
             Private Sub txtElevationMask_GotFocus()
 
@@ -481,6 +581,19 @@ namespace SurvLine
             [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        private void txtElevationMask_GotFocus()
+        {
+            try
+            {
+                SelectText(txtElevationMask);
+            }
+            catch (Exception ex)
+            {
+                //ErrorHandler:
+                //    Call mdlMain.ErrorExit
+                _ = MessageBox.Show(ex.Message, "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
 
 
         //1==========================================================================================
@@ -498,21 +611,124 @@ namespace SurvLine
                 Call mdlMain.ErrorExit
     
             End Sub
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#] //4
+        private void tsTab_MouseUp(int Button, int Shift, Single X, Single Y)
+        {
+            try
+            {
+                ChangeTab(tsTab, fraTab0);
+                ChangeTab(tsTab, fraTab1);
+                ChangeTab(tsTab, fraTab2);
+            }
+            catch (Exception ex)
+            {
+                //ErrorHandler:
+                //    Call mdlMain.ErrorExit
+                _ = MessageBox.Show(ex.Message, "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
 
+        //4==========================================================================================
+        /*[VB]
             'タブ変更
             Private Sub tsTab_Click()
 
                 On Error GoTo ErrorHandler
-    
+
                 Call ChangeTab(tsTab, fraTab)
-    
+
                 Exit Sub
-    
+
             ErrorHandler:
                 Call mdlMain.ErrorExit
-    
+
             End Sub
 
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#] //4
+#if false
+        private void tsTab_Click()
+        {
+            try
+            {
+                ChangeTab(tsTab, fraTab1);
+                ChangeTab(tsTab, fraTab2);
+            }
+            catch (Exception ex)
+            {
+                //ErrorHandler:
+                //    Call mdlMain.ErrorExit
+                _ = MessageBox.Show(ex.Message, "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+#endif
+        /// <summary>
+        /// タブ変更 tabPage1
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void tabPage1_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                ChangeTab(tsTab, fraTab0);
+            }
+            catch (Exception ex)
+            {
+                //ErrorHandler:
+                //    Call mdlMain.ErrorExit
+                _ = MessageBox.Show(ex.Message, "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+        //----------------------------------------------------------------------------------
+        /// <summary>
+        /// タブ変更 tabPage2
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void tabPage2_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                ChangeTab(tsTab, fraTab1);
+            }
+            catch (Exception ex)
+            {
+                //ErrorHandler:
+                //    Call mdlMain.ErrorExit
+                _ = MessageBox.Show(ex.Message, "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+        //----------------------------------------------------------------------------------
+        /// <summary>
+        /// タブ変更 tabPage3
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void tabPage3_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                ChangeTab(tsTab, fraTab2);
+            }
+            catch (Exception ex)
+            {
+                //ErrorHandler:
+                //    Call mdlMain.ErrorExit
+                _ = MessageBox.Show(ex.Message, "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+
+
+        //4==========================================================================================
+        /*[VB]
             'リストの選択。
             Private Sub cmbNumberOfMinSV_Click()
 
@@ -527,6 +743,35 @@ namespace SurvLine
     
             End Sub
 
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#] //4
+        /// <summary>
+        /// 'リストの選択。
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void cmbNumberOfMinSV_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            cmbNumberOfMinSV_Click();
+        }
+        private void cmbNumberOfMinSV_Click()
+        {
+            try
+            {
+                optNumberOfMinSVStatic.Checked = true;
+            }
+            catch (Exception ex)
+            {
+                //ErrorHandler:
+                //    Call mdlMain.ErrorExit
+                _ = MessageBox.Show(ex.Message, "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        //4==========================================================================================
+        /*[VB]
             '受信機名称。
             Private Sub txtRecName_Change()
 
@@ -541,6 +786,34 @@ namespace SurvLine
     
             End Sub
 
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#] //4
+        /// <summary>
+        /// 受信機名称。
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void txtRecName_TextChanged(object sender, EventArgs e)
+        {
+            txtRecName_Change();
+        }
+        private void txtRecName_Change()
+        {
+            try
+            {
+                optRecName.Checked = true;
+            }
+            catch (Exception ex)
+            {
+                //ErrorHandler:
+                //    Call mdlMain.ErrorExit
+                _ = MessageBox.Show(ex.Message, "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        //4==========================================================================================
+        /*[VB]
             '受信機メーカー変更イベント。
             Private Sub cmbRecManufacturer_Click()
 
@@ -558,6 +831,33 @@ namespace SurvLine
     
             End Sub
 
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#] //4
+        private void cmbRecManufacturer_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            cmbRecManufacturer_Click();
+        }
+        private void cmbRecManufacturer_Click()
+        {
+            try
+            {
+                //'受信機名称の更新。
+                MakeRecTypeList(cmbRecManufacturer.SelectedIndex);
+
+                optRecList.Checked = true;
+
+            }
+            catch (Exception ex)
+            {
+                //ErrorHandler:
+                //    Call mdlMain.ErrorExit
+                _ = MessageBox.Show(ex.Message, "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        //4==========================================================================================
+        /*[VB]
             '受信機名称ー変更イベント。
             Private Sub cmbRecType_Click()
 
@@ -575,6 +875,45 @@ namespace SurvLine
     
             End Sub
 
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#] //4
+        private void cmbRecType_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            cmbRecType_Click();
+        }
+        private void cmbRecType_Click()
+        {
+            try
+            {
+                //'カレントインデックスの更新。
+                if (cmbRecManufacturer.SelectedIndex >= 0)
+                {
+                    /*
+                     m_tRecInfos(cmbRecManufacturer.ListIndex).ListIndex = cmbRecType.ListIndex
+                     */
+                    DEFTYPEINFO_MANUFACTURER dEFTYPEINFO_MANUFACTURER = new DEFTYPEINFO_MANUFACTURER();   //'メーカー別定義情報
+                    dEFTYPEINFO_MANUFACTURER = m_tRecInfos[cmbRecManufacturer.SelectedIndex];
+                    dEFTYPEINFO_MANUFACTURER.ListIndex = cmbRecType.SelectedIndex;
+                    //リスト上書き
+                    m_tRecInfos.RemoveAt(cmbRecManufacturer.SelectedIndex);
+                    m_tRecInfos.Insert(cmbRecManufacturer.SelectedIndex, dEFTYPEINFO_MANUFACTURER);
+
+                }
+
+                optRecList.Checked = true;
+
+            }
+            catch (Exception ex)
+            {
+                //ErrorHandler:
+                //    Call mdlMain.ErrorExit
+                _ = MessageBox.Show(ex.Message, "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        //4==========================================================================================
+        /*[VB]
             'アンテナメーカー変更イベント。
             Private Sub cmbAntManufacturer_Click()
 
@@ -590,6 +929,34 @@ namespace SurvLine
     
             End Sub
 
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#] //4
+        private void cmbAntManufacturer_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            cmbAntManufacturer_Click();
+        }
+
+        private void cmbAntManufacturer_Click()
+        {
+            try
+            {
+                //'アンテナ名称の更新。
+                MakeAntTypeList(cmbAntManufacturer.SelectedIndex);
+
+                optRecList.Checked = true;
+
+            }
+            catch (Exception ex)
+            {
+                //ErrorHandler:
+                //    Call mdlMain.ErrorExit
+                _ = MessageBox.Show(ex.Message, "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        //4==========================================================================================
+        /*[VB]
             'アンテナ名称変更イベント。
             Private Sub cmbAntType_Click()
 
@@ -608,6 +975,46 @@ namespace SurvLine
     
             End Sub
 
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#] //4
+        private void cmbAntType_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            cmbAntType_Click();
+        }
+        private void cmbAntType_Click()
+        {
+            try
+            {
+                //'カレントインデックスの更新。
+                if (cmbAntManufacturer.SelectedIndex >= 0)
+                {
+                    /*
+                        m_tAntInfos(cmbAntManufacturer.ListIndex).ListIndex = cmbAntType.ListIndex                     
+                    */
+                    DEFTYPEINFO_MANUFACTURER dEFTYPEINFO_MANUFACTURER = new DEFTYPEINFO_MANUFACTURER();   //'メーカー別定義情報
+                    dEFTYPEINFO_MANUFACTURER = m_tAntInfos[cmbAntManufacturer.SelectedIndex];
+                    dEFTYPEINFO_MANUFACTURER.ListIndex = cmbAntType.SelectedIndex;
+                    //リスト上書き
+                    m_tAntInfos.RemoveAt(cmbAntManufacturer.SelectedIndex);
+                    m_tAntInfos.Insert(cmbAntManufacturer.SelectedIndex, dEFTYPEINFO_MANUFACTURER);
+
+                }
+
+                //'測位方法の更新。
+                MakeMeasurementList(cmbAntManufacturer.SelectedIndex, cmbAntType.SelectedIndex);
+
+            }
+            catch (Exception ex)
+            {
+                //ErrorHandler:
+                //    Call mdlMain.ErrorExit
+                _ = MessageBox.Show(ex.Message, "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        //4==========================================================================================
+        /*[VB]
             '測位方法変更イベント。
             Private Sub cmbAntMeasurement_Click()
 
@@ -625,6 +1032,61 @@ namespace SurvLine
     
             End Sub
 
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#] //4
+        private void cmbAntMeasurement_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            cmbAntMeasurement_Click();
+        }
+
+        private void cmbAntMeasurement_Click()
+        {
+            try
+            {
+                //'カレントインデックスの更新。
+                if (cmbAntManufacturer.SelectedIndex >= 0)
+                {
+                    if (cmbAntType.SelectedIndex >= 0)
+                    {
+                        /*
+                            // '構造体
+                            public struct DEFTYPEINFO   //'定義情報
+                            {
+                                public string DefType;                 //'種別。
+                                public string Name;                    //'名称。
+                                public List<string> AntMeasurement;    //'測位方法。
+                                public List<string> DispMeasurement;   //'測位方法表示文字列。
+                                public long ListIndex;                 //'測位方法のカレントのリストインデックス。
+                            }
+
+                            public struct DEFTYPEINFO_MANUFACTURER   //'メーカー別定義情報
+                            {
+                                public string Manufacturer;                //'メーカー名。
+                                public List<DEFTYPEINFO> DefTypeInfos;     //'定義情報。
+                                public long ListIndex;                     //'定義情報のカレントのリストインデックス。
+                                public long SortIndex;                     //'並び順番号。
+                            }
+                            m_tAntInfos(cmbAntManufacturer.SelectedIndex).DefTypeInfos(cmbAntType.SelectedIndex).SelectedIndex = cmbAntMeasurement.SelectedIndex;
+                        */
+
+                        m_tAntInfos[cmbAntManufacturer.SelectedIndex].DefTypeInfos[cmbAntType.SelectedIndex].AntMeasurement.Add(cmbAntMeasurement.SelectedIndex.ToString());
+
+
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                //ErrorHandler:
+                //    Call mdlMain.ErrorExit
+                _ = MessageBox.Show(ex.Message, "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        //4==========================================================================================
+        /*[VB]
             '手簿に出力する最低高度角。
             Private Sub txtElevationMask_Change()
 
@@ -641,8 +1103,24 @@ namespace SurvLine
             [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        private void txtElevationMask_TextChanged(object sender, EventArgs e)
+        {
+            txtElevationMask_Change();
+        }
+        private void txtElevationMask_Change()
+        {
+            try
+            {
+                optElevationMaskInput.Checked = true;
 
-
+            }
+            catch (Exception ex)
+            {
+                //ErrorHandler:
+                //    Call mdlMain.ErrorExit
+                _ = MessageBox.Show(ex.Message, "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
 
         //1==========================================================================================
         /*[VB]
@@ -794,9 +1272,17 @@ namespace SurvLine
         //[C#]
         private void SortInfos(List<DEFTYPEINFO_MANUFACTURER> tInfos, ref long nListIndex)
         {
+            // 'ソート用配列を用意する。
+            int i;
+            //ReDim vArray(-1 To UBound(m_tInfos))
+            string[] vArray = new string[m_tInfos.Count];
+
+            for (i = 0; i < m_tInfos.Count; i++)
+            {
+                vArray[i] = i.ToString();
+            }
 
         }
-
 
         //1==========================================================================================
         /*[VB]
@@ -995,96 +1481,123 @@ namespace SurvLine
             nUnknown = long.Parse(GetPrivateProfileString(PROFILE_RCV_SEC_LIST, PROFILE_RCV_KEY_UNKNOWN, "0", sPath));
             long nCount;
             nCount = GetPrivateProfileInt(PROFILE_RCV_SEC_LIST, PROFILE_RCV_KEY_COUNT, 0, sPath);   //'受信機数。
+            DEFTYPEINFO_MANUFACTURER[] m_tInfos = new DEFTYPEINFO_MANUFACTURER[nCount];
+            //-----------------------------------------------------------------------------------------
             Dictionary<string, object> objKeyToIndex = new Dictionary<string, object>();
-            string vIndex = "";
+            string vIndex = "0";
             long nListIndex;
             long i;
             nCount = 0;
             nListIndex = -1;
 
+            string sManufacturer = "";  //4
 
-            /*
-                List<DEFTYPEINFO_MANUFACTURER> m_tInfos = new List<DEFTYPEINFO_MANUFACTURER>();     //'定義情報。配列の要素は(-1 To ...)、要素 -1 は未使用。
-                public struct DEFTYPEINFO_MANUFACTURER   //'メーカー別定義情報
-                {
-                    string Manufacturer;                //'メーカー名。
-                    List<DEFTYPEINFO> DefTypeInfos;     //'定義情報。
-                    long ListIndex;                     //'定義情報のカレントのリストインデックス。
-                    long SortIndex;                     //'並び順番号。
-                }
-             */
+            //*******************************************************************************
 
             DEFTYPEINFO_MANUFACTURER m_tInfosA = new DEFTYPEINFO_MANUFACTURER();
             DEFTYPEINFO DefTypeInfosA = new DEFTYPEINFO();
 
-            for (i = 0; i < m_tInfos.Count;)
+            for (i = 0; i < m_tInfos.Length; i++)
             {
+#if false
                 //'Unknown はスキップ。
                 if (i == nUnknown)
                 {
                     i = i + 1;
-                    if (i > m_tInfos.Count) {
+                    if (i > m_tInfos.Length)
+                    {
                         break;
                     }
                 }
+#endif
                 string sRcv;
                 sRcv = GetPrivateProfileString(PROFILE_RCV_SEC_LIST, PROFILE_RCV_KEY_RCV + i.ToString(), "", sPath);
-                string sManufacturer;
                 sManufacturer = GetPrivateProfileString(sRcv, PROFILE_RCV_KEY_MANUFACTURE, "", sPath);
 
 
 
+                /*---------------------------------------------------------------------------------------
+                    If Not LookupCollectionVariant(objKeyToIndex, vIndex, sManufacturer) Then
+                        'メーカー別定義情報の追加。
+                        vIndex = nCount
+                        nCount = nCount + 1
+                        Call objKeyToIndex.Add(vIndex, sManufacturer)
+                        m_tInfos(vIndex).Manufacturer = sManufacturer
+                        m_tInfos(vIndex).ListIndex = -1
+                        m_tInfos(vIndex).SortIndex = GetManufacturerSortIndex(sManufacturer)
+                        ReDim m_tInfos(vIndex).DefTypeInfos(-1 To -1)
+                    End If
+                 */
                 if (!LookupCollectionVariant(objKeyToIndex, ref vIndex, sManufacturer))
                 {
+
+
                     //'メーカー別定義情報の追加。
                     vIndex = nCount.ToString();
                     nCount = nCount + 1;
 
                     objKeyToIndex.Add(vIndex, sManufacturer);
 
-                    //メーカー別定義情報
-                    m_tInfosA.Manufacturer = sManufacturer;             //'メーカー名。
-                    m_tInfosA.ListIndex = -1;                           //'定義情報のカレントのリストインデックス。
-                    m_tInfosA.SortIndex = GetManufacturerSortIndex(sManufacturer);          //'並び順番号。
-                    m_tInfosA.DefTypeInfos = new List<DEFTYPEINFO>();   //'定義情報。
-                    m_tInfos.Add(m_tInfosA);
+                    m_tInfos[int.Parse(vIndex)].Manufacturer = sManufacturer;    //'メーカー名
+                    m_tInfos[int.Parse(vIndex)].ListIndex = -1;                  //'定義情報のカレントのリストインデックス。
+                    m_tInfos[int.Parse(vIndex)].SortIndex = GetManufacturerSortIndex(sManufacturer);     //'並び順番号
+                    //----------------------------------------------------
+                    //ReDim m_tInfos(vIndex).DefTypeInfos(-1 To - 1)
+                    //  m_tInfos.Initialize();
+                    //  m_tInfos[int.Parse(vIndex)].DefTypeInfos.Clear();           //'定義情報
+                    m_tInfos[int.Parse(vIndex)].DefTypeInfos = new List<DEFTYPEINFO>();
 
 
-                    //'定義情報の追加。
-                    /*
-                        Dim nUBound As Long
-                        nUBound = UBound(m_tInfos(vIndex).DefTypeInfos) + 1
-                        ReDim Preserve m_tInfos(vIndex).DefTypeInfos(-1 To nUBound)
-                        m_tInfos(vIndex).DefTypeInfos(nUBound).DefType = sRcv
-                        m_tInfos(vIndex).DefTypeInfos(nUBound).Name = GetPrivateProfileString(sRcv, PROFILE_RCV_KEY_TYPE, sRcv, sPath)
-                     */
-                    long nUBound;
+                    //  //メーカー別定義情報
+                    //  m_tInfosA.Manufacturer = sManufacturer;             //'メーカー名。
+                    //  m_tInfosA.ListIndex = -1;                           //'定義情報のカレントのリストインデックス。
+                    //  m_tInfosA.SortIndex = GetManufacturerSortIndex(sManufacturer);          //'並び順番号。
+                    //  m_tInfosA.DefTypeInfos = new List<DEFTYPEINFO>();   //'定義情報。
+                    //  m_tInfos.Add(m_tInfosA);
+                }
 
-                    DefTypeInfosA.DefType = sRcv;
-                    DefTypeInfosA.Name = GetPrivateProfileString(sRcv, PROFILE_RCV_KEY_TYPE, sRcv, sPath);
-                    m_tInfos[int.Parse(vIndex)].DefTypeInfos.Add(DefTypeInfosA);
+                //'定義情報の追加。
+                /*-----------------------------------------------------
+                    Dim nUBound As Long
+                    nUBound = UBound(m_tInfos(vIndex).DefTypeInfos) + 1
+                    ReDim Preserve m_tInfos(vIndex).DefTypeInfos(-1 To nUBound)
+                    m_tInfos(vIndex).DefTypeInfos(nUBound).DefType = sRcv
+                    m_tInfos(vIndex).DefTypeInfos(nUBound).Name = GetPrivateProfileString(sRcv, PROFILE_RCV_KEY_TYPE, sRcv, sPath)
+                */
+                long nUBound;
 
-                    nUBound = m_tInfos[int.Parse(vIndex)].DefTypeInfos.Count + 1;
+                DefTypeInfosA.DefType = sRcv;
+                DefTypeInfosA.Name = GetPrivateProfileString(sRcv, PROFILE_RCV_KEY_TYPE, sRcv, sPath);
+                m_tInfos[int.Parse(vIndex)].DefTypeInfos.Add(DefTypeInfosA);
 
+                nUBound = m_tInfos[int.Parse(vIndex)].DefTypeInfos.Count;
+                if (nUBound > 0)    //4
+                {
+                    nUBound -= 1;
+                }
 
-                    //'カレントインデックス。
-                    /*
-                        If m_tInfos(vIndex).DefTypeInfos(nUBound).DefType = RecType Then
-                            nListIndex = vIndex
-                            m_tInfos(vIndex).ListIndex = nUBound
-                        End If
-                     */
-                    if (m_tInfos[int.Parse(vIndex)].DefTypeInfos[(int)nUBound].DefType == RecType)
-                    {
-                        nListIndex = long.Parse(vIndex);
-                        //  m_tInfos[0].ListIndex = nUBound;
-                    }
+                //'カレントインデックス。
+                /*-----------------------------------------------------
+                    If m_tInfos(vIndex).DefTypeInfos(nUBound).DefType = RecType Then
+                        nListIndex = vIndex
+                        m_tInfos(vIndex).ListIndex = nUBound
+                    End If
+                */
+                if (m_tInfos[int.Parse(vIndex)].DefTypeInfos[(int)nUBound].DefType == RecType)
+                {
+                    nListIndex = long.Parse(vIndex);
+                    m_tInfos[long.Parse(vIndex)].ListIndex = nUBound;
+                }
 
-                    //ReDim Preserve m_tInfos(-1 To nCount - 1)
-                    SortInfos(m_tRecInfos, ref nListIndex);
+            }//for (i = 0; i < m_tInfos.Length;)
 
-#if false
-    
+            //ReDim Preserve m_tInfos(-1 To nCount - 1)
+            m_tInfos.Initialize();
+            //  DEFTYPEINFO_MANUFACTURER[] m_tInfos = new DEFTYPEINFO_MANUFACTURER[nCount];
+
+            SortInfos(m_tRecInfos, ref nListIndex);
+
+            /*-----------------------------------------------------
                 '受信機メーカーリスト。
                 For i = 0 To UBound(m_tRecInfos)
                     Dim sItem As String
@@ -1092,6 +1605,20 @@ namespace SurvLine
                     If sItem = "" Then sItem = "不明"
                     Call cmbRecManufacturer.AddItem(sItem)
                 Next
+            */
+            //受信機メーカーリスト。
+            for (i = 0; i < m_tRecInfos.Count; i++)
+            {
+                string sItem;
+                sItem = GetManufacturerDispJ(m_tRecInfos[(int)i].Manufacturer);
+                if (sItem == "")
+                {
+                    sItem = "不明";
+                }
+                cmbRecManufacturer.Items.Add(sItem);
+            }
+
+            /*-----------------------------------------------------
                 '初期値。
                 If cmbRecManufacturer.ListCount > 0 Then
                     If nListIndex < 0 Then
@@ -1105,28 +1632,173 @@ namespace SurvLine
                     Call MakeRecTypeList(-1)
                     optRecName.Value = True
                 End If
-    
+                */
+            //'初期値。
+            if (cmbRecManufacturer.Items.Count > 0)
+            {
+
+            }
+            else
+            {
+                MakeRecTypeList(-1);
+                optRecName.Checked = true;
+            }
+
+            /*-----------------------------------------------------
                 '受信機名。
+                If optRecName.Value Then txtRecName.Text = RecType
+                */
+            //'受信機名。
+            if (optRecName.Checked)
+            {
+                txtRecName.Text = RecType;
+            }
 
+            /*-----------------------------------------------------
+                'アンテナ情報。
+                sPath = App.Path & "\" & PROFILE_ANT_FILE
+                nUnknown = GetPrivateProfileString(PROFILE_ANT_SEC_LIST, PROFILE_ANT_KEY_UNKNOWN, "0", sPath)
+                nCount = GetPrivateProfileInt(PROFILE_ANT_SEC_LIST, PROFILE_ANT_KEY_COUNT, 0, sPath)
+                ReDim m_tInfos(-1 To nCount - 1)
+                Set objKeyToIndex = New Collection
+                nCount = 0
+                nListIndex = -1
+                */
+            //'アンテナ情報。
+            sPath = App_Path + "\\" + PROFILE_ANT_FILE;
+            nUnknown = long.Parse(GetPrivateProfileString(PROFILE_ANT_SEC_LIST, PROFILE_ANT_KEY_UNKNOWN, "0", sPath));
+            nCount = GetPrivateProfileInt(PROFILE_ANT_SEC_LIST, PROFILE_ANT_KEY_COUNT, 0, sPath);
+            m_tInfos.Initialize();
+            //  ReDim m_tInfos(-1 To nCount -1)
+            objKeyToIndex = new Dictionary<string, object>();
+            nCount = 0;
+            nListIndex = -1;
 
-#endif
+            for (i = 0; i < m_tInfos.Length; i++)
+            {
+                /*
+                    Dim sAnt As String
+                    sAnt = GetPrivateProfileString(PROFILE_ANT_SEC_LIST, PROFILE_ANT_KEY_ANT & CStr(i), "", sPath)
+                    sManufacturer = GetPrivateProfileString(sAnt, PROFILE_ANT_KEY_MANUFACTURE, "", sPath)
+                    */
+                string sAnt;
+                sAnt = GetPrivateProfileString(PROFILE_ANT_SEC_LIST, PROFILE_ANT_KEY_ANT + i.ToString(), "", sPath);
+                sManufacturer = GetPrivateProfileString(sAnt, PROFILE_ANT_KEY_MANUFACTURE, "", sPath);
 
+                if (!LookupCollectionVariant(objKeyToIndex, ref vIndex, sManufacturer))
+                {
+                    //'メーカー別定義情報の追加。
+                    vIndex = nCount.ToString();
+                    nCount = nCount + 1;
+                    objKeyToIndex.Add(vIndex, sManufacturer);
+                    //  m_tInfos(vIndex).Manufacturer = sManufacturer
+                    //  m_tInfos(vIndex).ListIndex = -1
+                    //  m_tInfos(vIndex).SortIndex = GetManufacturerSortIndex(sManufacturer)
+                    //  ReDim m_tInfos(vIndex).DefTypeInfos(-1 To - 1)
 
                 }//if (!LookupCollectionVariant(objKeyToIndex, ref vIndex, sManufacturer))
 
+                /*-----------------------------------------------------------------------------
+                    '定義情報の追加。
+                    nUBound = UBound(m_tInfos(vIndex).DefTypeInfos) + 1
+                    ReDim Preserve m_tInfos(vIndex).DefTypeInfos(-1 To nUBound)
+                    m_tInfos(vIndex).DefTypeInfos(nUBound).DefType = sAnt
+                    m_tInfos(vIndex).DefTypeInfos(nUBound).Name = GetPrivateProfileString(sAnt, PROFILE_ANT_KEY_TYPE, "", sPath) & IIf(i = nUnknown, "", " (" & GetPrivateProfileString(sAnt, PROFILE_ANT_KEY_SUB, "", sPath) & ")")
+                    m_tInfos(vIndex).DefTypeInfos(nUBound).ListIndex = -1
+                    ReDim m_tInfos(vIndex).DefTypeInfos(nUBound).AntMeasurement(-1 To -1)
+                    ReDim m_tInfos(vIndex).DefTypeInfos(nUBound).DispMeasurement(-1 To -1)
+                */
 
-            }//for (i = 0; i < m_tInfos.Count)
+                /*-----------------------------------------------------------------------------
+                    'カレントインデックス。
+                    If m_tInfos(vIndex).DefTypeInfos(nUBound).DefType = AntType Then
+                        nListIndex = vIndex
+                        m_tInfos(vIndex).ListIndex = nUBound
+                    End If
+                */
 
 
+                /*-----------------------------------------------------------------------------
+                '測位方法。
+                Dim nMeasurement As Long
+                nMeasurement = 0
+                Do
+                    Dim clsStringTokenizer As New StringTokenizer
+                    clsStringTokenizer.Source = GetPrivateProfileString(m_tInfos(vIndex).DefTypeInfos(nUBound).DefType, PROFILE_ANT_KEY_MEASUREMENT & CStr(nMeasurement), "", sPath)
+                    If clsStringTokenizer.Source = "" Then Exit Do
+                    ReDim Preserve m_tInfos(vIndex).DefTypeInfos(nUBound).AntMeasurement(-1 To nMeasurement)
+                    ReDim Preserve m_tInfos(vIndex).DefTypeInfos(nUBound).DispMeasurement(-1 To nMeasurement)
+                    Call clsStringTokenizer.Begin
+                    Dim sToken As String
+                    sToken = clsStringTokenizer.NextToken
+                    m_tInfos(vIndex).DefTypeInfos(nUBound).DispMeasurement(nMeasurement) = Mid$(sToken, 2, Len(sToken) - 2)
+                    m_tInfos(vIndex).DefTypeInfos(nUBound).AntMeasurement(nMeasurement) = clsStringTokenizer.NextToken
 
-#if false
+                    'カレントインデックス。
+                    If m_tInfos(vIndex).ListIndex = nUBound Then
+                        If m_tInfos(vIndex).DefTypeInfos(nUBound).AntMeasurement(nMeasurement) = AntMeasurement Then
+                            m_tInfos(vIndex).DefTypeInfos(nUBound).ListIndex = nMeasurement
+                        End If
+                    End If
 
+                    nMeasurement = nMeasurement + 1
+                Loop
+                */
 
-#endif
+            }//if (!LookupCollectionVariant(objKeyToIndex, ref vIndex, sManufacturer))
+
+            m_tInfos.Initialize();
+            //  ReDim Preserve m_tInfos(-1 To nCount - 1)
+            SortInfos(m_tAntInfos, ref nListIndex);
+
+            /*-----------------------------------------------------------------------------
+                For i = 0 To UBound(m_tAntInfos)
+                    sItem = GetManufacturerDispJ(m_tAntInfos(i).Manufacturer)
+                    If sItem = "" Then sItem = "不明"
+                    Call cmbAntManufacturer.AddItem(sItem)
+                Next
+                */
+
+            for (i = 0; i < m_tAntInfos.Count; i++)
+            {
+                string sItem = GetManufacturerDispJ(m_tAntInfos[(int)i].Manufacturer);
+                if (sItem == "")
+                {
+                    sItem = "不明";
+                }
+                cmbAntManufacturer.Items.Add(sItem);
+            }
+
+            /*-----------------------------------------------------------------------------
+                '初期値。
+                If cmbAntManufacturer.ListCount > 0 Then
+                    If nListIndex < 0 Then
+                        cmbAntManufacturer.ListIndex = 0
+                    Else
+                        cmbAntManufacturer.ListIndex = nListIndex
+                    End If
+                Else
+                    Call MakeAntTypeList(-1)
+                End If
+                */
+            //'初期値。
+            if (cmbAntManufacturer.Items.Count > 0)
+            {
+                if (nListIndex < 0)
+                {
+                    cmbAntManufacturer.SelectedIndex = 0;
+                }
+                else
+                {
+                    cmbAntManufacturer.SelectedIndex = (int)nListIndex;
+                }
+
+            }
+            else
+            {
+                MakeAntTypeList(-1);
+            }
         }
-
-
-
 
 
         //1==========================================================================================
@@ -1157,7 +1829,38 @@ namespace SurvLine
             End Sub
             [VB]*/
         //------------------------------------------------------------------------------------------
-        //[C#]
+        //[C#]  //4
+        /// <summary>
+        /// 受信機名称リストを作成する。
+        /// '
+        /// 引き数：
+        /// nManufacturer 受信機メーカー。m_tRecInfos のインデックス。
+        /// 
+        /// </summary>
+        /// <param name="nManufacturer"></param>
+        private void MakeRecTypeList(long nManufacturer)
+        {
+            cmbRecType.Items.Clear();
+
+            if (nManufacturer < 0)
+            {
+                return;
+            }
+
+            int i;
+            for (i = 0; i <m_tAntInfos[(int)nManufacturer].DefTypeInfos.Count; i++)
+            {
+                _ = cmbAntType.Items.Add(m_tAntInfos[(int)nManufacturer].DefTypeInfos[i].Name);
+            }
+
+            if (cmbRecType.Items.Count > 0)
+            {
+                //If m_tRecInfos(nManufacturer).ListIndex < 0 Or cmbRecType.ListCount <= m_tRecInfos(nManufacturer).ListIndex Then
+                cmbRecType.SelectedIndex = m_tRecInfos[(int)nManufacturer].ListIndex < 0 || cmbRecType.Items.Count <= m_tRecInfos[(int)nManufacturer].ListIndex
+                    ? 0
+                    : (int)m_tRecInfos[(int)nManufacturer].ListIndex;
+            }
+        }
 
         //1==========================================================================================
         /*[VB]
@@ -1189,7 +1892,39 @@ namespace SurvLine
             End Sub
             [VB]*/
         //------------------------------------------------------------------------------------------
-        //[C#]
+        //[C#]  //4
+        /// <summary>
+        /// アンテナ名称リストを作成する。
+        /// 
+        /// </summary>
+        /// <param name="nManufacturer"></param>
+        private void MakeAntTypeList(long nManufacturer)
+        {
+            cmbAntType.Items.Clear();
+
+            if (nManufacturer < 0)
+            {
+                return;
+            }
+
+            int i;
+            for (i = 0; i < m_tAntInfos[(int)nManufacturer].DefTypeInfos.Count; i++)
+            {
+                _ = cmbAntType.Items.Add(m_tAntInfos[(int)nManufacturer].DefTypeInfos[i].Name);
+            }
+
+            if (cmbAntType.Items.Count > 0)
+            {
+                cmbAntType.SelectedIndex = m_tAntInfos[(int)nManufacturer].ListIndex < 0 || cmbAntType.Items.Count <= m_tAntInfos[(int)nManufacturer].ListIndex
+                    ? 0
+                    : (int)m_tRecInfos[(int)nManufacturer].ListIndex;
+            }
+            else
+            {
+                MakeMeasurementList(-1, -1);
+            }
+
+        }
 
         //1==========================================================================================
         /*[VB]
@@ -1221,7 +1956,40 @@ namespace SurvLine
             End Sub
             [VB]*/
         //------------------------------------------------------------------------------------------
-        //[C#]
+        //[C#]  //4
+        /// <summary>
+        /// アンテナ測位方法リストを作成する。
+        /// 
+        /// </summary>
+        /// <param name="nManufacturer"></param>
+        /// <param name="nAntType"></param>
+        private void MakeMeasurementList(long nManufacturer, long nAntType)
+        {
+            cmbAntMeasurement.Items.Clear();
+
+            if (nManufacturer < 0)
+            {
+                return;
+            }
+            if (nAntType < 0)
+            {
+                return;
+            }
+
+            int i;
+            for (i = 0; i < m_tAntInfos[(int)nManufacturer].DefTypeInfos[(int)nAntType].AntMeasurement.Count; i++)
+            {
+                _ = cmbAntMeasurement.Items.Add(m_tAntInfos[(int)nManufacturer].DefTypeInfos[(int)nAntType].DispMeasurement[i]);
+            }
+
+            if (cmbAntMeasurement.Items.Count > 0)
+            {
+                cmbAntMeasurement.SelectedIndex = m_tAntInfos[(int)nManufacturer].DefTypeInfos[(int)nAntType].ListIndex < 0 || cmbAntMeasurement.Items.Count <= m_tAntInfos[(int)nManufacturer].DefTypeInfos[(int)nAntType].ListIndex
+                    ? 0
+                    : (int)m_tAntInfos[(int)nManufacturer].DefTypeInfos[(int)nAntType].ListIndex;
+            }
+
+        }
 
         //1==========================================================================================
         /*[VB]
@@ -1371,17 +2139,356 @@ namespace SurvLine
             End Function
             [VB]*/
         //------------------------------------------------------------------------------------------
-        //[C#]
+        //[C#]  //4
+        /// <summary>
+        /// 入力値を検査する。
+        /// '
+        /// </summary>
+        /// <returns>
+        /// 戻り値：
+        /// 入力値が正常である場合 True を返す。
+        /// それ以外の場合 False を返す。
+        /// </returns>
         private bool CheckData()
         {
             bool CheckData = false;
 
+            /*-----------------------------------------------------------------------------------------------
+                'セッション名。
+                If Not CheckSessionInput(cmbSession, m_objElements, fraTab(TAB_OBSERVATION).Visible) Then
+                    tsTab.Tabs(TAB_OBSERVATION + 1).Selected = True
+                    Call cmbSession.SetFocus
+                    Exit Function
+                End If
+             */
+            //'セッション名。
+            if (!m_clsMdlSession.CheckSessionInput(cmbSession, m_objElements, true/* fraTab((int)TAB_NUMBER.TAB_OBSERVATION*/)){
+                ///  tsTab.Tabs(TAB_NUMBER.TAB_OBSERVATION + 1).Selected = true;
+                //  tsTab.Tag = TAB_NUMBER.TAB_OBSERVATION;
+                tsTab.SelectedIndex = (int)TAB_NUMBER.TAB_OBSERVATION;
+                //---------------------------------------------------
+
+                _ = cmbSession.Focus();
+                return CheckData; //Exit Function
+            }
+
+            /*-----------------------------------------------------------------------------------------------
+                '手簿に出力する最低高度角。
+                If optElevationMaskInput.Value Then
+                    If Not CheckIntegerInputRange(txtElevationMask, "手簿に出力する最低高度角", udElevationMask.Min, udElevationMask.Max + 1, fraTab(TAB_OBSERVATION).Visible) Then
+                        tsTab.Tabs(TAB_OBSERVATION + 1).Selected = True
+                        Call txtElevationMask.SetFocus
+                        Exit Function
+                    End If
+                End If
+             */
 
 
+            //受信機名称。
+            if (optRecList.Checked)
+            {
+                if (cmbRecManufacturer.SelectedIndex < 0)
+                {
+                    //  Call MsgBox("受信機メーカーを選択してください。", vbCritical)
+                    _ = MessageBox.Show("受信機メーカーを選択してください。", "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                    //  tsTab.Tabs(TAB_NUMBER.TAB_RECEIVER + 1).Selected = true;
+                    //  tsTab.Tag = TAB_NUMBER.TAB_RECEIVER;
+                    tsTab.SelectedIndex = (int)TAB_NUMBER.TAB_RECEIVER;
+                    //---------------------------------------------------
+                    _ = cmbRecManufacturer.Focus();
+                    return CheckData; //Exit Function
+                }
+
+                if (cmbRecType.SelectedIndex < 0)
+                {
+                    //  Call MsgBox("受信機名称を選択してください。", vbCritical)
+                    _ = MessageBox.Show("受信機名称を選択してください。", "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                    //  tsTab.Tabs(TAB_NUMBER.TAB_RECEIVER + 1).Selected = true;
+                    tsTab.SelectedIndex = (int)TAB_NUMBER.TAB_RECEIVER;
+                    //---------------------------------------------------
+                    cmbRecType.Focus();
+                    return CheckData; //Exit Function
+                }
+
+            }
+            else if (optRecName.Checked)
+            {
+                /*----------------------------------------------------------------------------
+                    If Not CheckInputLength(txtRecName, "受信機名称", RINEX_STR_RECNAME - 1, fraTab(TAB_RECEIVER).Visible) Then
+                        tsTab.Tabs(TAB_RECEIVER + 1).Selected = True
+                        Call txtRecName.SetFocus
+                        Exit Function
+                    End If
+                 */
+                if (!CheckInputLength(txtRecName, "受信機名称", RINEX_STR_RECNAME - 1, FraTab_GetVisiblet((int)TAB_NUMBER.TAB_RECEIVER)))
+                {
+                    //tsTab.SelectedIndex = (int)TAB_NUMBER.TAB_RECEIVER;
+                    tsTab.SelectedIndex = (int)TAB_NUMBER.TAB_RECEIVER;
+                    //---------------------------------------------------
+
+                    txtRecName.Focus();
+                    return CheckData; //Exit Function
+                }
+
+                /*----------------------------------------------------------------------------
+                    If Not CheckStringInputInvalid(txtRecName, "受信機名称", fraTab(TAB_RECEIVER).Visible) Then
+                        tsTab.Tabs(TAB_RECEIVER + 1).Selected = True
+                        Call txtRecName.SetFocus
+                        Exit Function
+                    End If
+                 */
+                if (!CheckStringInputInvalid(txtRecName, "受信機名称", FraTab_GetVisiblet((int)TAB_NUMBER.TAB_RECEIVER)))
+                {
+                    //  tsTab.Tabs(TAB_RECEIVER + 1).Selected = true;
+                    tsTab.SelectedIndex = (int)TAB_NUMBER.TAB_RECEIVER;
+                    //---------------------------------------------------
+                    txtRecName.Focus();
+                    return CheckData; //Exit Function
+                }
+
+            }
+            else
+            {
+                /*----------------------------------------------------------------------------
+                    Call MsgBox("受信機を選択してください。", vbCritical)
+                    tsTab.Tabs(TAB_RECEIVER + 1).Selected = True
+                    Exit Function
+                 */
+                _ = MessageBox.Show("受信機を選択してください。", "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                //tsTab.Tabs(TAB_NUMBER.TAB_RECEIVER + 1).Selected = true;
+                tsTab.SelectedIndex = (int)TAB_NUMBER.TAB_RECEIVER;
+                //---------------------------------------------------
+                return CheckData; //Exit Function
+            }
+
+
+            /*----------------------------------------------------------------------------
+                '受信機シリアル番号。
+                If Not CheckInputLength(txtRecNumber, "受信機シリアル", RINEX_STR_RECNUMBER - 1, fraTab(TAB_RECEIVER).Visible) Then
+                    tsTab.Tabs(TAB_RECEIVER + 1).Selected = True
+                    Call txtRecNumber.SetFocus
+                    Exit Function
+                End If
+                If Not CheckStringInputInvalid(txtRecNumber, "受信機シリアル", fraTab(TAB_RECEIVER).Visible) Then
+                    tsTab.Tabs(TAB_RECEIVER + 1).Selected = True
+                    Call txtRecNumber.SetFocus
+                    Exit Function
+                End If
+             */
+            //受信機シリアル番号。
+            if (!CheckInputLength(txtRecNumber, "受信機シリアル", RINEX_STR_RECNUMBER - 1, FraTab_GetVisiblet((int)TAB_NUMBER.TAB_RECEIVER)))
+            {
+                //tsTab.SelectedIndex = (int)TAB_NUMBER.TAB_RECEIVER;
+                tsTab.SelectedIndex = (int)TAB_NUMBER.TAB_RECEIVER;
+                //---------------------------------------------------
+                _ = txtRecNumber.Focus();
+                return CheckData; //Exit Function
+            }
+            if (!CheckStringInputInvalid(txtRecNumber, "受信機シリアル", FraTab_GetVisiblet((int)TAB_NUMBER.TAB_RECEIVER)))
+            {
+                //  tsTab.SelectedIndex = (int)TAB_NUMBER.TAB_RECEIVER;
+                tsTab.SelectedIndex = (int)TAB_NUMBER.TAB_RECEIVER;
+                //---------------------------------------------------
+                _ = txtRecNumber.Focus();
+                return CheckData; //Exit Function
+            }
+
+            /*----------------------------------------------------------------------------
+                'アンテナ名称。
+                If cmbAntManufacturer.ListIndex < 0 Then
+                    Call MsgBox("アンテナメーカーを選択してください。", vbCritical)
+                    tsTab.Tabs(TAB_ANTENNA + 1).Selected = True
+                    Call cmbAntManufacturer.SetFocus
+                    Exit Function
+                End If
+                If cmbAntType.ListIndex < 0 Then
+                    Call MsgBox("アンテナ名称を選択してください。", vbCritical)
+                    tsTab.Tabs(TAB_ANTENNA + 1).Selected = True
+                    Call cmbAntType.SetFocus
+                    Exit Function
+                End If
+            */
+            //アンテナ名称。
+            if (cmbAntManufacturer.SelectedIndex < 0)
+            {
+                _ = MessageBox.Show("アンテナメーカーを選択してください。", "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                //  tsTab.Tabs(TAB_NUMBER.TAB_ANTENNA + 1).Selected = true;
+                tsTab.SelectedIndex = (int)TAB_NUMBER.TAB_ANTENNA;
+                //---------------------------------------------------
+                _ = cmbAntManufacturer.Focus();
+                return CheckData; //Exit Function
+            }
+            if (cmbAntType.SelectedIndex < 0)
+            {
+                _ = MessageBox.Show("アンテナ名称を選択してください。", "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                tsTab.SelectedIndex = (int)TAB_NUMBER.TAB_ANTENNA;
+                //---------------------------------------------------
+                _ = cmbAntType.Focus();
+                return CheckData; //Exit Function
+            }
+
+            /*----------------------------------------------------------------------------
+            'アンテナシリアル番号。
+            If Not CheckInputLength(txtAntNumber, "アンテナシリアル", RINEX_STR_ANTNUMBER - 1, fraTab(TAB_ANTENNA).Visible) Then
+                tsTab.Tabs(TAB_ANTENNA + 1).Selected = True
+                Call txtAntNumber.SetFocus
+                Exit Function
+            End If
+            If Not CheckStringInputInvalid(txtAntNumber, "アンテナシリアル", fraTab(TAB_ANTENNA).Visible) Then
+                tsTab.Tabs(TAB_ANTENNA + 1).Selected = True
+                Call txtAntNumber.SetFocus
+                Exit Function
+            End If
+             */
+            //アンテナシリアル番号。
+            if (!CheckInputLength(txtAntNumber, "アンテナシリアル", RINEX_STR_ANTNUMBER - 1, FraTab_GetVisiblet((int)TAB_NUMBER.TAB_ANTENNA)))
+            {
+                tsTab.SelectedIndex = (int)TAB_NUMBER.TAB_ANTENNA;
+
+                _ = txtAntNumber.Focus();
+                return CheckData; //Exit Function
+            }
+            if (!CheckStringInputInvalid(txtAntNumber, "アンテナシリアル", FraTab_GetVisiblet((int)TAB_NUMBER.TAB_ANTENNA)))
+            {
+                tsTab.SelectedIndex = (int)TAB_NUMBER.TAB_ANTENNA;
+                _ = txtAntNumber.Focus();
+                return CheckData; //Exit Function
+            }
+
+            /*----------------------------------------------------------------------------
+            '測位方法。
+            If cmbAntMeasurement.ListIndex < 0 Then
+                Call MsgBox("測位方法を選択してください。", vbCritical)
+                tsTab.Tabs(TAB_NUMBER.TAB_ANTENNA + 1).Selected = True
+                Call cmbAntMeasurement.SetFocus
+                Exit Function
+            End If
+            */
+            if (cmbAntMeasurement.SelectedIndex < 0)
+            {
+                _ = MessageBox.Show("測位方法を選択してください。", "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                tsTab.SelectedIndex = (int)TAB_NUMBER.TAB_ANTENNA;
+                _ = cmbAntMeasurement.Focus();
+                return CheckData; //Exit Function
+            }
+
+            /*----------------------------------------------------------------------------
+            'アンテナ高。
+            If Not CheckFloatInputRange(txtAntHeight, "アンテナ高", -32768, 32768, fraTab(TAB_ANTENNA).Visible) Then
+                tsTab.Tabs(TAB_ANTENNA + 1).Selected = True
+                Call txtAntHeight.SetFocus
+                Exit Function
+            End If
+            Dim nHeight As Double
+            If Not GetDocument().NetworkModel.ObservationShared.GetTrueVertical(m_tAntInfos(cmbAntManufacturer.ListIndex).DefTypeInfos(cmbAntType.ListIndex).DefType, m_tAntInfos(cmbAntManufacturer.ListIndex).DefTypeInfos(cmbAntType.ListIndex).AntMeasurement(cmbAntMeasurement.ListIndex), Val(txtAntHeight.Text), nHeight) Then
+                If Not GetDocument().NetworkModel.ObservationShared.GetMountVertical(m_tAntInfos(cmbAntManufacturer.ListIndex).DefTypeInfos(cmbAntType.ListIndex).DefType, m_tAntInfos(cmbAntManufacturer.ListIndex).DefTypeInfos(cmbAntType.ListIndex).AntMeasurement(cmbAntMeasurement.ListIndex), Val(txtAntHeight.Text), nHeight) Then
+                    Call MsgBox("アンテナ高が不正です。", vbCritical)
+                    tsTab.Tabs(TAB_ANTENNA + 1).Selected = True
+                    Call txtAntHeight.SetFocus
+                    Exit Function
+                End If
+            End If
+
+            If Analysis Then
+                Dim bAntChange As Boolean
+                bAntChange = Abs(AntHeight - Val(txtAntHeight.Text)) >= FLT_EPSILON
+
+                If cmbAntManufacturer.ListIndex >= 0 Then
+                    If cmbAntType.ListIndex >= 0 Then
+                        If AntType <> m_tAntInfos(cmbAntManufacturer.ListIndex).DefTypeInfos(cmbAntType.ListIndex).DefType Then
+                            bAntChange = True
+                        ElseIf cmbAntMeasurement.ListIndex >= 0 Then
+                            If AntMeasurement <> m_tAntInfos(cmbAntManufacturer.ListIndex).DefTypeInfos(cmbAntType.ListIndex).AntMeasurement(cmbAntMeasurement.ListIndex) Then
+                                bAntChange = True
+                            End If
+                        End If
+                    End If
+                End If
+
+                If bAntChange Then
+                    If MsgBox("アンテナの情報を変更しますと解析の結果が失われます。よろしいですか?", vbExclamation Or vbOKCancel) <> vbOK Then Exit Function
+                End If
+            End If
+    
+            If Not CheckSessionExtend(cmbSession.Text, m_objElements, Extend) Then Exit Function
+            */
+            //アンテナ高。
+            if (!CheckFloatInputRange(txtAntHeight, "アンテナ高", -32768, 32768, FraTab_GetVisiblet((int)TAB_NUMBER.TAB_ANTENNA)))
+            {
+                tsTab.SelectedIndex = (int)TAB_NUMBER.TAB_ANTENNA;
+                _ = txtAntHeight.Focus();
+                return CheckData; //Exit Function
+            }
+
+            double nHeight = 0;
+            if (!m_clsMdlMain.GetDocument().NetworkModel().ObservationShared().GetTrueVertical(m_tAntInfos[cmbAntManufacturer.SelectedIndex].DefTypeInfos[cmbAntType.SelectedIndex].DefType, m_tAntInfos[cmbAntManufacturer.SelectedIndex].DefTypeInfos[cmbAntType.SelectedIndex].AntMeasurement[cmbAntMeasurement.SelectedIndex], Double.Parse(txtAntHeight.Text), ref nHeight))
+            {
+                if (!m_clsMdlMain.GetDocument().NetworkModel().ObservationShared().GetMountVertical(m_tAntInfos[cmbAntManufacturer.SelectedIndex].DefTypeInfos[cmbAntType.SelectedIndex].DefType, m_tAntInfos[cmbAntManufacturer.SelectedIndex].DefTypeInfos[cmbAntType.SelectedIndex].AntMeasurement[cmbAntMeasurement.SelectedIndex], Double.Parse(txtAntHeight.Text), ref nHeight))
+                {
+                    _ = MessageBox.Show("アンテナ高が不正です。", "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                    tsTab.SelectedIndex = (int)TAB_NUMBER.TAB_ANTENNA;
+                    _ = txtAntHeight.Focus();
+                    return CheckData; //Exit Function
+                }
+            }
+
+            if (Analysis)   //*************************************************************
+            {
+                bool bAntChange;
+
+                //      bAntChange = Abs(AntHeight - Double.Parse(txtAntHeight.Text)) >= FLT_EPSILON;
+                if (Math.Abs(AntHeight - double.Parse(txtAntHeight.Text)) > FLT_EPSILON)
+                {
+                    bAntChange = true;
+                }
+                else
+                {
+                    bAntChange = false;
+                }
+
+                if (cmbAntManufacturer.SelectedIndex >= 0)
+                {
+                    if (cmbAntType.SelectedIndex >= 0)
+                    {
+                        if (AntType != m_tAntInfos[cmbAntManufacturer.SelectedIndex].DefTypeInfos[cmbAntType.SelectedIndex].DefType)
+                        {
+                            bAntChange = true;
+                        }
+                        else if (cmbAntMeasurement.SelectedIndex >= 0)
+                        {
+                            if ( AntMeasurement != m_tAntInfos[cmbAntManufacturer.SelectedIndex].DefTypeInfos[cmbAntType.SelectedIndex].AntMeasurement[cmbAntMeasurement.SelectedIndex])
+                            {
+                                bAntChange = true;
+                            }
+                        }
+                    }//if (cmbAntType.SelectedIndex >= 0)
+                    if (bAntChange)
+                    {
+                        //                        If MsgBox("アンテナの情報を変更しますと解析の結果が失われます。よろしいですか?", vbExclamation Or vbOKCancel) <> vbOK Then Exit Function
+                        DialogResult mans = MessageBox.Show("アンテナの情報を変更しますと解析の結果が失われます。よろしいですか?", "確認", MessageBoxButtons.OKCancel, MessageBoxIcon.Information);
+                        if (mans != DialogResult.OK)
+                        {
+                            return CheckData; //Exit Function
+                        }
+                    }
+                }
+
+            }//if (Analysis)*************************************************************
+
+            if (!m_clsMdlSession.CheckSessionExtend(cmbSession.Text, m_objElements, ref Extend))
+            {
+                return CheckData; //Exit Function
+            }
 
             CheckData = true;
             return CheckData;
-        }
+        }   //================================================
 
 
 
@@ -1423,10 +2530,48 @@ namespace SurvLine
             End Sub
             [VB]*/
         //------------------------------------------------------------------------------------------
-        //[C#]
+        //[C#]  //4
+        /// <summary>
+        /// 値を反映させる。
+        /// 
+        /// </summary>
         private void ReflectData()
         {
+            //'値の取得。
+            Session = cmbSession.Text;
+            RecNumber = txtRecNumber.Text;
+            AntNumber = txtAntNumber.Text;
+            AntHeight = double.Parse(txtAntHeight.Text);
 
+
+
+        }
+
+        //4------------------------------------------------------------------------------------------
+        //新規
+        //[C#]  //4
+        /// <summary>
+        /// タブ状態を取得
+        /// private enum TAB_NUMBER
+        /// {
+        ///     TAB_OBSERVATION = 0,    //'観測。
+        ///     TAB_RECEIVER,           //'受信機。
+        ///     TAB_ANTENNA,            //'アンテナ。
+        ///     }
+        /// </summary>
+        /// <param name="nPage"></param>
+        /// <returns></returns>
+        private bool FraTab_GetVisiblet(long nPage)
+        {
+            switch (nPage)
+            {
+                case (int)TAB_NUMBER.TAB_OBSERVATION:
+                    return fraTab0.Visible;
+                case (int)TAB_NUMBER.TAB_RECEIVER:
+                    return fraTab1.Visible;
+                default:
+                    return fraTab2.Visible;
+            }
         }
 
 
@@ -1434,6 +2579,12 @@ namespace SurvLine
 
 
 
+
+
+        //********************************************************************************************
+        //********************************************************************************************
+        //********************************************************************************************
+        //********************************************************************************************
 
     }
 }
