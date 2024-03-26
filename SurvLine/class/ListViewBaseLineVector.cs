@@ -273,8 +273,7 @@ namespace SurvLine
 
 
 
-            ListViewInterface_IsCheck = LookupCollectionVariant(objCheckObjects, ref vItem, sKey);
-
+            ListViewInterface_IsCheck = true; //<------  ListViewInterface_IsCheck = LookupCollectionVariant(objCheckObjects, ref vItem, sKey);
 
             return ListViewInterface_IsCheck;
         }

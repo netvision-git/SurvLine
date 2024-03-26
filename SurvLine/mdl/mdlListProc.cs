@@ -552,6 +552,56 @@ namespace SurvLine.mdl
         /// </returns>
         public object GetNextAssoc_ObsPnt(long nList, DataGridView grdFlexGrid, ref Dictionary<string, object> objMap, ref long nPos)
         {
+            object[] objElements = new object[m_clsMdlMain.GetDocument().NetworkModel().RepresentPointCount()];
+
+            long set = nPos;
+            int nRows;
+            nRows = 0;
+            ChainList clsChainList;
+            clsChainList = m_clsMdlMain.GetDocument().NetworkModel().RepresentPointHead();
+            List<int> nListSelect = new List<int>();
+
+
+            foreach (DataGridViewRow row in grdFlexGrid.SelectedRows)
+            {
+                nListSelect.Add(row.Index);
+
+            }
+            long nNext = -1;
+            nListSelect.Sort();
+            for (int i = 0; i < nListSelect.Count; i++)
+            {
+                if (nListSelect[i] > nPos)
+                {
+                    nNext = nListSelect[i];
+                    break;
+                }
+            }
+            //------------------------------------------------------
+            while (clsChainList != null)
+            {
+                if (grdFlexGrid.CurrentRow != null)         //選択の有無
+                {
+                    objElements[nRows] = clsChainList.Element;
+
+                    if (nRows == nPos)
+                    {
+                        set = nPos;
+                        break;
+                    }
+                }
+                nRows++;
+                clsChainList = clsChainList.NextList();
+            }
+
+            //------------------------------------------------------
+            nPos = nNext;
+            return objElements[set];
+        }
+
+#if false   //次のリスト行を示す処理がNGのため、上記に変更（下記は削除）
+        public object GetNextAssoc_ObsPnt(long nList, DataGridView grdFlexGrid, ref Dictionary<string, object> objMap, ref long nPos)
+        {
 
             object[] objElements = new object[m_clsMdlMain.GetDocument().NetworkModel().RepresentPointCount()];
 
@@ -565,8 +615,10 @@ namespace SurvLine.mdl
             long set = nPos;
             while (clsChainList != null)
             {
+
                 if (nNext >= 0)
                 {
+                    //if (grdFlexGrid.SelectedRows == true )
                     if (grdFlexGrid.CurrentRow != null)         //選択の有無
                     {
                         objElements[nRows] = clsChainList.Element;
@@ -585,6 +637,7 @@ namespace SurvLine.mdl
                 }
                 else
                 {
+                    //if (grdFlexGrid.CanSelect == true)
                     if (grdFlexGrid.CurrentRow != null)         //選択の有無
                     {
                         objElements[nRows] = clsChainList.Element;
@@ -604,6 +657,8 @@ namespace SurvLine.mdl
             return objElements[set];
 
         }
+#endif  //次のリスト行を示す処理がNGのため、上記に変更（下記は削除）
+
         //==========================================================================================
         //---新規---  //2
         /// <summary>
@@ -627,6 +682,56 @@ namespace SurvLine.mdl
         /// 戻り値：
         /// ベクトル情報
         /// </returns>
+        /// 
+        public object GetNextAssoc_Vector(long nList, DataGridView grdFlexGrid, ref Dictionary<string, object> objMap, ref long nPos)
+        {
+            object[] objElements = new object[m_clsMdlMain.GetDocument().NetworkModel().BaseLineVectorCount()];
+
+            long set = nPos;
+            int nRows;
+            nRows = 0;
+            ChainList clsChainList;
+            clsChainList = m_clsMdlMain.GetDocument().NetworkModel().BaseLineVectorHead();
+            List<int> nListSelect = new List<int>();
+
+
+            foreach (DataGridViewRow row in grdFlexGrid.SelectedRows)
+            {
+                nListSelect.Add(row.Index);
+
+            }
+            long nNext = -1;
+            nListSelect.Sort();
+            for (int i = 0; i < nListSelect.Count; i++)
+            {
+                if (nListSelect[i] > nPos)
+                {
+                    nNext = nListSelect[i];
+                    break;
+                }
+            }
+            //------------------------------------------------------
+            while (clsChainList != null)
+            {
+                if (grdFlexGrid.CurrentRow != null)         //選択の有無
+                {
+                    objElements[nRows] = clsChainList.Element;
+
+                    if (nRows == nPos)
+                    {
+                        set = nPos;
+                        break;
+                    }
+                }
+                nRows++;
+                clsChainList = clsChainList.NextList();
+            }
+
+            //------------------------------------------------------
+            nPos = nNext;
+            return objElements[set];
+        }
+#if false   //次のリスト行を示す処理がNGのため、上記に変更（下記は削除）
         public object GetNextAssoc_Vector(long nList, DataGridView grdFlexGrid, ref Dictionary<string, object> objMap, ref long nPos)
         {
 
@@ -681,6 +786,7 @@ namespace SurvLine.mdl
             return objElements[set];
 
         }
+#endif  //次のリスト行を示す処理がNGのため、上記に変更（下記は削除）
 
 
     }

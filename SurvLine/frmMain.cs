@@ -26,6 +26,7 @@ using static SurvLine.mdl.MdlSession;   //2
 
 using Microsoft.VisualBasic.Logging;
 using System.Xml.Linq;
+using static SurvLine.mdl.MdlNSSDefine;
 
 namespace SurvLine
 {
@@ -4038,44 +4039,61 @@ namespace SurvLine
                 frmAttribute.ShowDialog();  //編集＞観測点データの編集
 #endif      // DEBUG 画面レイアウト確認------------------------------------
 
+                /*
+                Dim clsObservationPoint As ObservationPoint
+                Set clsObservationPoint = objListPane.SelectedElement(LIST_NUM_OBSPNT)
+                */
                 ObservationPoint clsObservationPoint;
-
                 clsObservationPoint = (ObservationPoint)objListPane.SelectedElement((long)LIST_NUM_PANE.LIST_NUM_OBSPNT);
 
-
-#if false
-                //'汎用作業キーを利用して、設定が変更された観測点を記憶する。
-                m_clsDocument.NetworkModel.ClearIsList;
-                clsObservationPoint.IsList(true);
-                List<BaseLineVector> clsBaseLineVectors = new List<BaseLineVector>();
-                clsBaseLineVectors.Clear();
-
-                Call GetDocument().NetworkModel.GetConnectBaseLineVectors(clsObservationPoint, clsBaseLineVectors)
-#endif
+                /*---------------------------------------------------------------------------------------------
+                    Dim clsBaseLineVectors() As BaseLineVector
+                    ReDim clsBaseLineVectors(-1 To -1)
+                    Call GetDocument().NetworkModel.GetConnectBaseLineVectors(clsObservationPoint, clsBaseLineVectors)
+                    Dim bAnalysis As Boolean '解析済か？
+                    Dim i As Long
+                    For i = 0 To UBound(clsBaseLineVectors)
+                        If clsBaseLineVectors(i).Analysis <= ANALYSIS_STATUS_FIX Then
+                            '解析削除あり。
+                            bAnalysis = True
+                            '偏心補正の再計算の有無にかかわらず更新する。方位票の評価にはコストがかかる。
+                            If clsBaseLineVectors(i).StrPoint.Number = clsObservationPoint.Number Then
+                                Call GetDocument().NetworkModel.SetConnectBaseLineVectorsIsListEx(clsBaseLineVectors(i).EndPoint)
+                            Else
+                                Call GetDocument().NetworkModel.SetConnectBaseLineVectorsIsListEx(clsBaseLineVectors(i).StrPoint)
+                            End If
+                        End If
+                    Next
+                    Call GetDocument().NetworkModel.SetConnectBaseLineVectorsIsListEx(clsObservationPoint)
+                 ------------------------------------------------------------------------------------------------*/
+                List< BaseLineVector> clsBaseLineVectors = new List<BaseLineVector>();
+                //  m_clsMdlMain.GetDocument().NetworkModel().GetConnectBaseLineVectors(clsObservationPoint, ref clsBaseLineVectors);
+                m_clsMdlMain.GetDocument().Session_GetConnectBaseLineVectors(clsObservationPoint, ref clsBaseLineVectors);
                 bool bAnalysis = false;     //'解析済か？
 #if false
-                long i;
+                int i;
                 for (i = 0; i < clsBaseLineVectors.Count; i++)
                 {
-                    if (clsBaseLineVectors[(int)i].Analysis <= ANALYSIS_STATUS.ANALYSIS_STATUS_FIX)
+                    if (clsBaseLineVectors[i].Analysis <= ANALYSIS_STATUS.ANALYSIS_STATUS_FIX)
                     {
-                        //'解析削除あり。
+                        //解析削除あり。
                         bAnalysis = true;
-                        //'偏心補正の再計算の有無にかかわらず更新する。方位票の評価にはコストがかかる。
-                        if (clsBaseLineVectors[(int)i].StrPoint.Number = clsObservationPoint.Number)
+                        //偏心補正の再計算の有無にかかわらず更新する。方位票の評価にはコストがかかる。
+                        if (clsBaseLineVectors[i].StrPoint().Number() == clsObservationPoint.Number())
                         {
-                            //  Call GetDocument().NetworkModel.SetConnectBaseLineVectorsIsListEx(clsBaseLineVectors(i).EndPoint)
+                            //指定された観測点と連結している基線ベクトルの IsList を設定する
+                            m_clsMdlMain.GetDocument().NetworkModel().SetConnectBaseLineVectorsIsListEx(clsBaseLineVectors[i].EndPoint());
                         }
                         else
                         {
-                            //Call GetDocument().NetworkModel.SetConnectBaseLineVectorsIsListEx(clsBaseLineVectors(i).StrPoint)
+                            //指定された観測点と連結している基線ベクトルの IsList を設定する
+                            m_clsMdlMain.GetDocument().NetworkModel().SetConnectBaseLineVectorsIsListEx(clsBaseLineVectors[i].StrPoint());
                         }
 
                     }
 
                 }
-
-                Call GetDocument().NetworkModel.SetConnectBaseLineVectorsIsListEx(clsObservationPoint)
+                m_clsMdlMain.GetDocument().NetworkModel().SetConnectBaseLineVectorsIsListEx(clsObservationPoint);
 #endif
 
                 //'属性の編集。
@@ -4883,8 +4901,259 @@ namespace SurvLine
         //編集＞採用
         private void mnuEditAdopt_Click(object sender, EventArgs e)
         {
+            try
+            {
+                if (objListPane.StartSelectedAssoc((long)LIST_NUM_PANE.LIST_NUM_VECTOR) >= 0)
+                {
+                    EditLineType(OBJ_MODE.OBJ_MODE_ADOPT);
+                }
+                else
+                {
+                    EditObsPntMode(OBJ_MODE.OBJ_MODE_ADOPT);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                //ErrorHandler:
+                //    Call mdlMain.ErrorExit
+                _ = MessageBox.Show(ex.Message, "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
 
         }
+
+        //4==========================================================================================
+        /*[VB]
+            '観測点のモードを設定する。
+            '
+            '引き数：
+            'nMode 観測点モード。
+            Private Sub EditObsPntMode(ByVal nMode As OBJ_MODE)
+
+                '砂時計。
+                Dim clsWaitCursor As New WaitCursor
+                Set clsWaitCursor.Object = Me
+    
+                '再描画抑制。
+                Dim clsCtrlValue As New CtrlValue
+                Call clsCtrlValue.SetObject(m_clsChangeSelRow, False)
+    
+                '汎用作業キーを利用して、設定が変更された観測点を記憶する。
+                Call m_clsDocument.NetworkModel.ClearIsList
+    
+                '設定。
+                Dim nPos As Long
+                nPos = objListPane.StartSelectedAssoc(LIST_NUM_OBSPNT)
+                Do While (nPos > 0)
+                    Call m_clsDocument.SetObsPntMode(objListPane.GetNextAssoc(nPos), nMode)
+                Loop
+    
+                'スクロールはしないようにする。
+                objListPane.RowLock = True
+                'リストの更新。
+                Call objListPane.UpdateRowIsList
+                'スクロールを元に戻す。
+                objListPane.RowLock = False
+    
+                'メニューの更新。
+                Call clsCtrlValue.Back
+                Call objListPane_ChangeSelRow(objListPane.List)
+
+                Call clsWaitCursor.Back
+
+            End Sub
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#] //4
+        /// <summary>
+        /// 編集＞採用／点検（観測点）
+        /// 
+        /// 観測点のモードを設定する。
+        /// '
+        /// '引き数：
+        /// nMode 観測点モード。
+        /// 
+        /// 
+        /// </summary>
+        /// <param name="nMode"></param>
+        private void EditObsPntMode(OBJ_MODE nMode)
+        {
+
+            //'砂時計。
+            Cursor = Cursors.WaitCursor;
+
+
+            //'再描画抑制。
+            CtrlValue clsCtrlValue = new CtrlValue();
+            clsCtrlValue.SetObject(m_clsChangeSelRow, false);
+
+
+            //'汎用作業キーを利用して、設定が変更された観測点を記憶する。
+            //  Call m_clsDocument.NetworkModel.ClearIsList
+
+
+            //'設定。
+            /*
+                Dim nPos As Long
+                nPos = objListPane.StartSelectedAssoc(LIST_NUM_OBSPNT)
+                Do While (nPos > 0)
+                    Call m_clsDocument.SetObsPntMode(objListPane.GetNextAssoc(nPos), nMode)
+                Loop
+             */
+            long nPos;
+            nPos = objListPane.StartSelectedAssoc((long)LIST_NUM_PANE.LIST_NUM_OBSPNT);
+            while (nPos >= 0)
+            {
+                m_clsDocument.SetObsPntMode((ObservationPoint)objListPane.GetNextAssoc(ref nPos, (long)LIST_NUM_PANE.LIST_NUM_OBSPNT), nMode);
+            }
+
+            //'スクロールはしないようにする。
+            //objListPane.RowLock = True
+
+            //'リストの更新。
+            //Call objListPane.UpdateRowIsList
+#if true
+            objListPane.SelectElement(null);
+            objListPane.RemakeList(false);
+#endif
+
+            //'プロットの再描画。    //4 追加
+            //objPlotPane.PlotPane_Initialize();
+            Bitmap btmp = objPlotPane.Dis_Get_btmp();
+            objPlotPane.List_Genba_set(m_List_Genba_S);
+            objPlotPane.UpdateLogicalDrawArea(true);
+            objPlotPane.Redraw();
+            objPlotPane.Refresh();
+
+
+            //'スクロールを元に戻す。
+            //objListPane.RowLock = False
+
+
+            //'メニューの更新。
+            //Call clsCtrlValue.Back
+            //Call objListPane_ChangeSelRow(objListPane.List)
+
+
+            Cursor = Cursors.Default;
+
+        }
+
+        //4==========================================================================================
+        /*[VB]
+            '基線ベクトルの種類を設定する。
+            '
+            '引き数：
+            'nLineType 基線ベクトル種類。
+            Private Sub EditLineType(ByVal nLineType As OBJ_MODE)
+
+                '砂時計。
+                Dim clsWaitCursor As New WaitCursor
+                Set clsWaitCursor.Object = Me
+    
+                '再描画抑制。
+                Dim clsCtrlValue As New CtrlValue
+                Call clsCtrlValue.SetObject(m_clsChangeSelRow, False)
+    
+                '汎用作業キーを利用して、設定が変更された観測点を記憶する。
+                Call m_clsDocument.NetworkModel.ClearIsList
+    
+                '設定。
+                Dim nPos As Long
+                nPos = objListPane.StartSelectedAssoc(LIST_NUM_VECTOR)
+                Do While (nPos > 0)
+                    Call m_clsDocument.SetLineType(objListPane.GetNextAssoc(nPos), nLineType)
+                Loop
+    
+                'スクロールはしないようにする。
+                objListPane.RowLock = True
+                'リストの更新。
+                Call objListPane.UpdateRowIsList
+                'スクロールを元に戻す。
+                objListPane.RowLock = False
+    
+                'メニューの更新。
+                Call clsCtrlValue.Back
+                Call objListPane_ChangeSelRow(objListPane.List)
+
+                Call clsWaitCursor.Back
+
+            End Sub
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#] //4
+        /// <summary>
+        /// 編集＞採用／点検（観測点）
+        /// 
+        /// 基線ベクトルの種類を設定する。
+        /// '
+        /// 引き数：
+        /// nLineType 基線ベクトル種類。
+        /// </summary>
+        /// <param name="nLineType"></param>
+        private void EditLineType(OBJ_MODE nLineType)
+        {
+            //'砂時計。
+            Cursor = Cursors.WaitCursor;
+
+
+            //'再描画抑制。
+            CtrlValue clsCtrlValue = new CtrlValue();
+            clsCtrlValue.SetObject(m_clsChangeSelRow, false);
+
+
+            //'汎用作業キーを利用して、設定が変更された観測点を記憶する。
+            //  Call m_clsDocument.NetworkModel.ClearIsList
+
+
+            //'設定。
+            /*
+                Dim nPos As Long
+                nPos = objListPane.StartSelectedAssoc(LIST_NUM_VECTOR)
+                Do While(nPos > 0)
+                    Call m_clsDocument.SetLineType(objListPane.GetNextAssoc(nPos), nLineType)
+                Loop
+            */
+            long nPos;
+            nPos = objListPane.StartSelectedAssoc((long)LIST_NUM_PANE.LIST_NUM_VECTOR);
+            while (nPos >= 0)
+            {
+                m_clsDocument.SetLineType((BaseLineVector)objListPane.GetNextAssoc(ref nPos, (long)LIST_NUM_PANE.LIST_NUM_VECTOR), nLineType);
+            }
+
+
+            //'スクロールはしないようにする。
+            //objListPane.RowLock = True
+
+            //'リストの更新。
+            //Call objListPane.UpdateRowIsList
+#if true
+            objListPane.SelectElement(null);
+            objListPane.RemakeList(false);
+#endif
+
+            //'プロットの再描画。    //4 追加
+            //objPlotPane.PlotPane_Initialize();
+            Bitmap btmp = objPlotPane.Dis_Get_btmp();
+            objPlotPane.List_Genba_set(m_List_Genba_S);
+            objPlotPane.UpdateLogicalDrawArea(true);
+            objPlotPane.Redraw();
+            objPlotPane.Refresh();
+
+            //'スクロールを元に戻す。
+            //objListPane.RowLock = False
+
+
+            //'メニューの更新。
+            //  Call clsCtrlValue.Back
+            //  Call objListPane_ChangeSelRow(objListPane.List)
+
+            Cursor = Cursors.Default;
+
+
+        }
+
+
         //1==========================================================================================
         /*[VB]
             'オブジェクトに点検を設定する。
@@ -4910,7 +5179,24 @@ namespace SurvLine
         //編集＞点検
         private void mnuEditCheck_Click(object sender, EventArgs e)
         {
+            try
+            {
+                if (objListPane.StartSelectedAssoc((long)LIST_NUM_PANE.LIST_NUM_VECTOR) >= 0)
+                {
+                    EditLineType(OBJ_MODE.OBJ_MODE_CHECK);
+                }
+                else
+                {
+                    EditObsPntMode(OBJ_MODE.OBJ_MODE_CHECK);
+                }
 
+            }
+            catch (Exception ex)
+            {
+                //ErrorHandler:
+                //    Call mdlMain.ErrorExit
+                _ = MessageBox.Show(ex.Message, "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
         //1==========================================================================================
         /*[VB]
@@ -5134,6 +5420,94 @@ namespace SurvLine
         //編集＞削除
         private void mnuEditRemove_Click(object sender, EventArgs e)
         {
+
+            try
+            {
+
+
+#if true        //本来選択できないのですが、デバック中の為、チェックを入れました
+                long nPosA;
+                nPosA = objListPane.StartSelectedAssoc((long)LIST_NUM_PANE.LIST_NUM_VECTOR);
+                if (nPosA >= 0)
+                {
+                    _ = MessageBox.Show("ベクトル側の選択では、削除できません", "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+#endif
+
+                /*VB
+                    If MsgBox("選択されている観測点、または偏心補正後の本点を削除します。", vbOKCancel Or vbExclamation) <> vbOK Then Exit Sub
+                */
+                DialogResult result = MessageBox.Show("選択されている観測点、または偏心補正後の本点を削除します。", "確認", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
+                if (result != DialogResult.OK)
+                {
+                    return;
+                }
+
+                //'砂時計。
+                Cursor = Cursors.WaitCursor;
+
+                //'再描画抑制。
+                CtrlValue clsCtrlValue = new CtrlValue();
+                clsCtrlValue.SetObject(m_clsChangeSelRow, false);
+
+
+                /*
+                '選択オブジェクト。
+                Dim objElements As New Collection
+                Dim objElement As Object
+                Dim nPos As Long
+                nPos = objListPane.StartSelectedAssoc(LIST_NUM_OBSPNT)
+                Do While(nPos > 0)
+                    Set objElement = objListPane.GetNextAssoc(nPos)
+                    Call objElements.Add(objElement, Hex$(GetPointer(objElement)))
+                Loop
+                */
+
+                /*'削除。
+                    Call m_clsDocument.RemoveObservationPoint(objElements)
+                */
+
+
+                /*[VB]
+                'リストの作成。
+                Call objListPane.RemakeList(True)
+                [VB] */
+                /*[C#]*/
+#if true
+                objListPane.SelectElement(null);
+                objListPane.RemakeList(false);
+#endif
+
+                /*[VB]
+                'プロットの再描画。
+                Call objPlotPane.UpdateLogicalDrawArea(False)
+                Call objPlotPane.Redraw
+                [VB] */
+                /*[C#]*/
+                //objPlotPane.PlotPane_Initialize();
+                Bitmap btmp = objPlotPane.Dis_Get_btmp();
+                objPlotPane.List_Genba_set(m_List_Genba_S);
+                objPlotPane.UpdateLogicalDrawArea(true);
+                objPlotPane.Redraw();
+                objPlotPane.Refresh();
+
+
+                //'メニューの更新。
+                //  Call clsCtrlValue.Back
+                //  Call objListPane_ChangeSelRow(objListPane.List)
+
+
+                Cursor = Cursors.Default;
+
+            }
+            catch (Exception ex)
+            {
+                //ErrorHandler:
+                //    Call mdlMain.ErrorExit
+                _ = MessageBox.Show(ex.Message, "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
 
         }
         //1==========================================================================================
