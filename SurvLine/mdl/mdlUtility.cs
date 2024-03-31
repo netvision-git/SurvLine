@@ -228,7 +228,7 @@ namespace SurvLine.mdl
         /// <param name="bRaise"></param>
         /// <returns>
         /// </returns>
-        public bool RemoveFile(string sPath, bool bRaise = false)
+        public static bool RemoveFile(string sPath, bool bRaise = false)
         {
             bool RemoveFile = false;
 
@@ -1166,7 +1166,7 @@ namespace SurvLine.mdl
         End Function
         [VB]*/
         //------------------------------------------------------------------------------------------
-        //[C#]
+        //[C#]  //5
         /*
         'オブジェクトのポインタを取得する。
         '
@@ -1175,18 +1175,34 @@ namespace SurvLine.mdl
         '
         '戻り値：オブジェクトのポインタ。
         */
+        /// <summary>
+        /// オブジェクトのポインタを取得する。
+        /// '
+        /// 引き数：
+        /// obj オブジェクト。
+        /// 
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns>
+        /// 戻り値：オブジェクトのポインタ。
+        /// </returns>
         public static long GetPointer(object obj)
         {
-            //IntPtr N = (IntPtr)0;
+#if true    //5
+            long ss = obj.GetHashCode();
+            return ss;
+#else
+
             IntPtr N = new IntPtr();
-            RtlMoveMemory(ref N, ref obj, 4);
+            _ = RtlMoveMemory(ref N, ref obj, 8);
             return (long)N;
+#endif
         }
         public static long GetPPointer(ref object obj)
         {
-            object Obj = new object();
+            //  object Obj = new object();
             IntPtr N = new IntPtr();
-            RtlMoveMemory(ref N, ref Obj, 4);
+            _ = RtlMoveMemory(ref N, ref obj, 4);
             return (long)N;
         }
         //==========================================================================================

@@ -29,6 +29,8 @@ using static SurvLine.mdl.DEFINE;
 using static SurvLine.mdl.MdlSession;   //2
 using System.IO;
 using static SurvLine.mdl.MdlListPane;
+using static SurvLine.mdl.MdlBaseLineAnalyser;
+using static SurvLine.mdl.MdlAutoOrderVector;
 
 namespace SurvLine
 {
@@ -325,6 +327,9 @@ namespace SurvLine
         private AccountParam m_clsAccountParamResultBase;           // As AccountParam '座標一覧表パラメータ。2007/7/18 NGS Yamada
 
         private MdlSession m_clsMdlSession; //2
+
+        private MdlAutoOrderVector m_clsMdlAutoOrderVector; //5
+
 
         //---------------------------------------------------------
         //private List<OutputParam> m_clsOutputParam;                 //private OutputParam m_clsOutputParam[OUTPUT_TYPE_COUNT - 1];    // As OutputParam '外部出力ファイル出力パラメータ。
@@ -1063,7 +1068,7 @@ namespace SurvLine
         /// 
         /// </summary>
         /// <returns></returns>
-        private AutoOrderVectorParam AutoOrderVectorParam()
+        public object AutoOrderVectorParam()
         {
             AutoOrderVectorParam AutoOrderVectorParam = m_clsAutoOrderVectorParam;
             return AutoOrderVectorParam;
@@ -1378,7 +1383,14 @@ namespace SurvLine
             m_clsAngleDiffParamBetween = new AngleDiffParam();
             m_clsAngleDiffParamHeight = new AngleDiffParam();    //'2023/05/19 Hitz H.Nakamura 楕円体高の閉合差を追加。
 
-            MdlSession m_clsMdlSession = new MdlSession(mdlMain);
+            m_clsMdlSession = new MdlSession(mdlMain);
+
+            m_clsMdlAutoOrderVector = new MdlAutoOrderVector(mdlMain);  //5
+
+
+            m_clsAutoOrderVectorParam = new AutoOrderVectorParam();     //5  //基線ベクトルの向きの自動整列パラメータ。
+
+
 
 #if false
             /*
@@ -1396,7 +1408,7 @@ namespace SurvLine
             AccountParam m_clsAccountParamResultBase = new AccountParam();      //'2007/7/18 NGS Yamada
 #endif
 
-            long i;
+        long i;
             long i2 = (long)OUTPUT_TYPE.OUTPUT_TYPE_COUNT;
             for (i = 0; i < i2; i++)
             {
@@ -1569,7 +1581,7 @@ namespace SurvLine
             string sTemp;
             sTemp = $"{App_Path}{MdlNSDefine.TEMPORARY_PATH}{TEMP_FILE_NAME}";      //(Ex.)Temp  (Ex.)Document.tmp   (Ex.)"C:\Develop\NetSurv\Src\NS-App\NS-Survey\Temp\Document.tmp"
 
-            if (mdiUtility.RemoveFile(sTemp, false))
+            if (RemoveFile(sTemp, false))
             {
                 //結果は、無視すること
             }
@@ -2146,7 +2158,9 @@ namespace SurvLine
                     m_clsAccountParamEccentricCorrect = clsAccountParamEccentricCorrect;
                     m_clsAccountParamSemiDyna = clsAccountParamSemiDyna;                //'セミ・ダイナミック対応。'2009 / 11 H.Nakamura
                     m_clsAccountCadastralParam = clsAccountCadastralParam;
+
                     m_clsAutoOrderVectorParam = clsAutoOrderVectorParam;
+
                     m_clsAccountParamResultBase = clsAccountParamResultBase;            //'2007/7/18 NGS Yamada
 #endif
                     /*[VB]
@@ -5156,13 +5170,193 @@ namespace SurvLine
         End Sub
         [VB]*/
         //------------------------------------------------------------------------------------------
-        //[C#]
+        //[C#]  //5
         /*
         '観測点を削除する。
         '
         '引き数：
         'objObservationPoints 対象とする観測点。要素は ObservationPoint オブジェクト(代表観測点)。キーは任意。
         */
+        public void RemoveObservationPoint(Dictionary<string, object> objObservationPoints)
+        {
+
+            //'観測点フォルダ。
+            /*-----------------------------------------------------------------------------------------------------------------------
+                Dim sObsPointPath As String
+                sObsPointPath = App.Path & TEMPORARY_PATH & "." & OBSPOINT_PATH
+
+                Dim objIsolatePointChainCollection As Collection
+                Set objIsolatePointChainCollection = m_clsNetworkModel.MakeIsolatePointChainCollection
+                Dim objBaseLineVectorChainCollection As Collection
+                Set objBaseLineVectorChainCollection = m_clsNetworkModel.MakeBaseLineVectorChainCollection
+             */
+            string App_Path = @"C:\Develop\NetSurv\Src\NS-App\NS-Survey";
+            string sObsPointPath = App_Path + TEMPORARY_PATH + "." + OBSPOINT_PATH;
+
+            Dictionary<string, object> objIsolatePointChainCollection = new Dictionary<string, object>();
+            objIsolatePointChainCollection = m_clsNetworkModel.MakeIsolatePointChainCollection();
+
+            Dictionary<string, object> objBaseLineVectorChainCollection = new Dictionary<string, object>();
+            objBaseLineVectorChainCollection = m_clsNetworkModel.MakeBaseLineVectorChainCollection();
+
+
+            /*-----------------------------------------------------------------------------------------------------------------------
+                Dim objObservationPoints2 As New Collection
+                Dim clsObservationPoint As ObservationPoint
+                '本点の削除。
+                For Each clsObservationPoint In objObservationPoints
+                    m_bModifyed = True
+                    If clsObservationPoint.Genuine Then
+                        '偏心補正をOFFにする。
+                        Call clsObservationPoint.CorrectPoint.UpdateCorrectPoint(Nothing)
+                        '削除。
+                        Call m_clsNetworkModel.RemoveRepresentPoint(clsObservationPoint.TopParentPoint, sObsPointPath, objIsolatePointChainCollection, objBaseLineVectorChainCollection)
+                    Else
+                        Call objObservationPoints2.Add(clsObservationPoint)
+                    End If
+                Next
+             */
+            Dictionary<string, object> objObservationPoints2 = new Dictionary<string, object>();
+            ObservationPoint clsObservationPoint;
+            //'本点の削除。
+            foreach (ObservationPoint obj in objObservationPoints.Values.Cast<ObservationPoint>())
+            //  foreach (object obj in objObservationPoints)
+            {
+
+                clsObservationPoint = (ObservationPoint)obj;
+
+                m_bModifyed = true;
+
+                if (clsObservationPoint.Genuine())
+                {
+                    //'偏心補正をOFFにする。
+                    clsObservationPoint.CorrectPoint().UpdateCorrectPoint(null);
+
+                    //'削除。
+                    m_clsNetworkModel.RemoveRepresentPoint(clsObservationPoint.TopParentPoint(), sObsPointPath, objIsolatePointChainCollection, objBaseLineVectorChainCollection);
+
+                }
+                else
+                {
+                    objObservationPoints2.Add("", clsObservationPoint);
+                }
+
+                /*-----------------------------------------------------------------------------------------------------------------------
+                    '基線ベクトルの反対側の観測点。
+                    Dim clsBaseLineVectors() As BaseLineVector
+                    ReDim clsBaseLineVectors(-1 To -1)
+                    Call m_clsNetworkModel.GetConnectBaseLineVectors(clsObservationPoint.TopParentPoint, clsBaseLineVectors)
+                    Dim clsBuddyPoints() As ObservationPoint
+                    ReDim clsBuddyPoints(-1 To UBound(clsBaseLineVectors))
+                    Dim i As Long
+                    For i = 0 To UBound(clsBaseLineVectors)
+                        '基線ベクトルの反対側の観測点。
+                        If clsBaseLineVectors(i).StrPoint.Number = clsObservationPoint.Number Then
+                            Set clsBuddyPoints(i) = clsBaseLineVectors(i).EndPoint.TopParentPoint
+                        Else
+                            Set clsBuddyPoints(i) = clsBaseLineVectors(i).StrPoint.TopParentPoint
+                        End If
+                        '解析済み基線ベクトルの終点が反対側であり、偏心点である場合、その偏心補正を再計算する。
+                        If clsBaseLineVectors(i).Analysis <= ANALYSIS_STATUS_FIX Then
+                            If clsBaseLineVectors(i).AnalysisStrPoint.Number = clsObservationPoint.Number Then
+                                If clsBaseLineVectors(i).AnalysisEndPoint.Eccentric Then
+                                    Set clsEccentricPoint = clsBaseLineVectors(i).AnalysisEndPoint
+                                    Call SetAtCollectionObject(objGenuinePoints, clsEccentricPoint.CorrectPoint, clsEccentricPoint.Number)
+                                End If
+                            End If
+                        End If
+                    Next
+                 */
+                //基線ベクトルの反対側の観測点。
+                //      BaseLineVector oBaseLineVectors; 
+                //      ReDim clsBaseLineVectors(-1 To - 1)
+                List<BaseLineVector> clsBaseLineVectors = new List<BaseLineVector>();
+
+                //5     m_clsNetworkModel.GetConnectBaseLineVectors(clsObservationPoint.TopParentPoint(), ref clsBaseLineVectors);
+                Session_GetConnectBaseLineVectors(clsObservationPoint, ref clsBaseLineVectors);     //5
+                //---------------------------------------------------
+                //      Dim clsBuddyPoints() As ObservationPoint
+                //      ReDim clsBuddyPoints(-1 To UBound(clsBaseLineVectors))
+                ObservationPoint[] clsBuddyPoints = new ObservationPoint[clsBaseLineVectors.Count];
+                for (int i = 0; i < clsBaseLineVectors.Count; i++)
+                {
+                    //基線ベクトルの反対側の観測点。
+                    if (clsBaseLineVectors[i].StrPoint().Number() == clsObservationPoint.Number())
+                    {
+                        clsBuddyPoints[i] = clsBaseLineVectors[i].EndPoint().TopParentPoint();
+                    }
+                    else
+                    {
+                        clsBuddyPoints[i] = clsBaseLineVectors[i].StrPoint().TopParentPoint();
+                    }
+
+                    /*
+                        '解析済み基線ベクトルの終点が反対側であり、偏心点である場合、その偏心補正を再計算する。
+                        If clsBaseLineVectors(i).Analysis <= ANALYSIS_STATUS_FIX Then
+                            If clsBaseLineVectors(i).AnalysisStrPoint.Number = clsObservationPoint.Number Then
+                                If clsBaseLineVectors(i).AnalysisEndPoint.Eccentric Then
+                                    Set clsEccentricPoint = clsBaseLineVectors(i).AnalysisEndPoint
+                                    Call SetAtCollectionObject(objGenuinePoints, clsEccentricPoint.CorrectPoint, clsEccentricPoint.Number)
+                                End If
+                            End If
+                        End If
+                     */
+                    //'解析済み基線ベクトルの終点が反対側であり、偏心点である場合、その偏心補正を再計算する。
+                    if (clsBaseLineVectors[i].Analysis <= ANALYSIS_STATUS.ANALYSIS_STATUS_FIX)
+                    {
+                        if (clsBaseLineVectors[i].AnalysisStrPoint().Number() == clsObservationPoint.Number())
+                        {
+                            //  if (clsBaseLineVectors[i].AnalysisEndPoint().Eccentric()){
+                            //      clsEccentricPoint = clsBaseLineVectors[i].AnalysisEndPoint;
+                            //    SetAtCollectionObject(objGenuinePoints, clsEccentricPoint.CorrectPoint, clsEccentricPoint.Number);
+                            //  }
+                        }
+                    }
+
+                }//for (int i = 0; i <clsBaseLineVectors.Count; i++)
+
+
+                /*-----------------------------------------------------------------------------------------------------------------------
+                    '削除。
+                    Call m_clsNetworkModel.RemoveRepresentPoint(clsObservationPoint.TopParentPoint, sObsPointPath, objIsolatePointChainCollection, objBaseLineVectorChainCollection)
+                    '本点の有効/無効を更新する。
+                    For i = 0 To UBound(clsBuddyPoints)
+                        If clsBuddyPoints(i).Eccentric Then Call m_clsNetworkModel.EnableGenuinePoint(clsBuddyPoints(i))
+                    Next
+                 */
+                //削除。
+                m_clsNetworkModel.RemoveRepresentPoint(clsObservationPoint.TopParentPoint(), sObsPointPath, objIsolatePointChainCollection, objBaseLineVectorChainCollection);
+
+                //'本点の有効/無効を更新する。
+                for(int i = 0; i < clsBuddyPoints.Length; i++)
+                {
+                    if (clsBuddyPoints[i].Eccentric())
+                    {
+                        m_clsNetworkModel.EnableGenuinePoint(clsBuddyPoints[i]);
+                    }
+                }
+
+
+            }//foreach (object obj in objObservationPoints)
+
+
+            /*--------------------------------------------------------------------------------------------------
+                '偏心補正の再計算。
+                For Each clsEccentricPoint In objGenuinePoints
+                    Set clsEccentricPoint = clsEccentricPoint.CorrectPoint.HeadPoint
+                    Call m_clsNetworkModel.CorrectEccentric(clsEccentricPoint)
+                    Call m_clsNetworkModel.EnableGenuinePoint(clsEccentricPoint)
+                Next
+             */
+
+
+
+
+            return;
+        }
+
+
+
 #if false
         /*
          *************************** 修正要 sakai
@@ -5469,6 +5663,78 @@ namespace SurvLine
         '引き数：
         'clsAutoOrderVectorParam 基線ベクトルの向きの自動整列パラメータ。
         */
+        public void AutoOrderVector(object oAutoOrderVectorParam)
+        {
+
+            AutoOrderVectorParam clsAutoOrderVectorParam = (AutoOrderVectorParam)oAutoOrderVectorParam;
+
+            /*-----------------------------------------------------------------
+                '偏心補正の再計算が必要な偏心点。
+                Dim objEccentricPoints As New Collection
+                '全ての偏心補正を再計算する。
+                Dim clsChainList As ChainList
+                Set clsChainList = m_clsNetworkModel.RepresentPointHead
+                Do While Not clsChainList Is Nothing
+                    Dim clsObservationPoint As ObservationPoint
+                    Set clsObservationPoint = clsChainList.Element
+                    If clsObservationPoint.Eccentric And clsObservationPoint.PrevPoint Is Nothing Then
+                        Call objEccentricPoints.Add(clsObservationPoint)
+                    End If
+                    Set clsChainList = clsChainList.NextList
+                Loop
+             */
+
+            //'偏心補正の再計算が必要な偏心点。
+            Dictionary<string, object> objEccentricPoints = new Dictionary<string, object>();
+
+            //'全ての偏心補正を再計算する。
+            ChainList clsChainList;
+            clsChainList = m_clsNetworkModel.RepresentPointHead();
+            while (clsChainList != null)
+            {
+                ObservationPoint clsObservationPoint;
+                clsObservationPoint = (ObservationPoint)clsChainList.Element;
+                if (clsObservationPoint.Eccentric() && clsObservationPoint.PrevPoint() == null)
+                {
+                    objEccentricPoints.Add( GetPointer(clsObservationPoint).ToString(), clsObservationPoint);
+                }
+                clsChainList = clsChainList.NextList();
+            }
+
+
+            /*-----------------------------------------------------------------
+                '基線ベクトルの向きの自動整列。
+                Call mdlAutoOrderVector.Order(m_clsNetworkModel, clsAutoOrderVectorParam)
+                Let m_clsAutoOrderVectorParam = clsAutoOrderVectorParam
+    
+                '偏心補正の再計算。
+                Dim clsEccentricPoint As ObservationPoint
+                For Each clsEccentricPoint In objEccentricPoints
+                    Call m_clsNetworkModel.CorrectEccentric(clsEccentricPoint)
+                    Call m_clsNetworkModel.EnableGenuinePoint(clsEccentricPoint)
+                Next
+
+                m_bModifyed = True
+             */
+
+            //基線ベクトルの向きの自動整列。
+            m_clsMdlAutoOrderVector.Order(m_clsNetworkModel, clsAutoOrderVectorParam);
+            m_clsAutoOrderVectorParam = clsAutoOrderVectorParam;
+
+            //偏心補正の再計算。
+            ObservationPoint clsEccentricPoint;
+            foreach (object obj in objEccentricPoints)
+            {
+                clsEccentricPoint = (ObservationPoint)obj;
+                m_clsNetworkModel.CorrectEccentric(clsEccentricPoint);
+                m_clsNetworkModel.EnableGenuinePoint(clsEccentricPoint);
+            }
+
+
+            m_bModifyed = true;
+
+            return;
+        }
 #if false
         /*
          *************************** 修正要 sakai

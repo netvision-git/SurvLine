@@ -909,6 +909,11 @@ namespace SurvLine
             //    If RedrawWindow(Me.hWnd, 0, 0, RDW_UPDATENOW) = 0 Then Call Err.Raise(ERR_FATAL, , GetLastErrorMessage())
             //
             //          //＜＜＜　坂井様お願い致します。　＞＞＞           
+            //再描画   //K.S //5
+            if (RedrawWindow(this.Handle, IntPtr.Zero, IntPtr.Zero, (int)DEFINE.RDW_UPDATENOW) == false)
+            {
+                return false;
+            }
 
 
             //--------------------------------------------
@@ -5454,19 +5459,35 @@ namespace SurvLine
 
                 /*
                 '選択オブジェクト。
-                Dim objElements As New Collection
-                Dim objElement As Object
-                Dim nPos As Long
-                nPos = objListPane.StartSelectedAssoc(LIST_NUM_OBSPNT)
-                Do While(nPos > 0)
-                    Set objElement = objListPane.GetNextAssoc(nPos)
-                    Call objElements.Add(objElement, Hex$(GetPointer(objElement)))
-                Loop
+                    Dim objElements As New Collection
+                    Dim objElement As Object
+                    Dim nPos As Long
+                    nPos = objListPane.StartSelectedAssoc(LIST_NUM_OBSPNT)
+                    Do While(nPos > 0)
+                        Set objElement = objListPane.GetNextAssoc(nPos)
+                        Call objElements.Add(objElement, Hex$(GetPointer(objElement)))
+                    Loop
                 */
+                Dictionary<string, object> objElements = new Dictionary<string, object>();
+                object objElement;
+                long nPos;
+                nPos = objListPane.StartSelectedAssoc((long)LIST_NUM_PANE.LIST_NUM_OBSPNT);
+                while (nPos >= 0)
+                {
+                    //  objElement = objListPane.GetNextAssoc(ref nPos);
+                    //  objElements.Add( GetPointer(objElement).ToString(), objElement);
+                    //  SelectLine = nPos;
+                    m_clsMdlMain.PaneSelectedTab = (long)LIST_NUM_PANE.LIST_NUM_OBSPNT;      //PaneのTab（観測点/座標／ベクトル      //2
+                    m_clsMdlMain.PaneSelcttedNo = nPos;                                      //Paneの選択行(0～）                    //2
+                    objElement = objListPane.GetNextAssoc(ref nPos, (long)LIST_NUM_PANE.LIST_NUM_OBSPNT);
+                    objElements.Add(nPos.ToString(), objElement);
+                }
+
 
                 /*'削除。
                     Call m_clsDocument.RemoveObservationPoint(objElements)
                 */
+                m_clsDocument.RemoveObservationPoint(objElements);
 
 
                 /*[VB]
@@ -5546,12 +5567,191 @@ namespace SurvLine
             End Sub
             [VB]*/
         //------------------------------------------------------------------------------------------
-        //[C#]
+        //[C#]  //5
         //編集＞基線ベクトルの向きの自動整列(&O)...
+        /// <summary>
+        /// 
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void mnuEditAutoOrder_Click(object sender, EventArgs e)
         {
+            try
+            {
+                //'基線ベクトルの向きの自動整列。
+                if (!AutoOrderVector())
+                {
+                    return;
+                }
+
+                //'砂時計。
+                Cursor = Cursors.WaitCursor;
+
+                //再描画抑制。
+                CtrlValue clsCtrlValue = new CtrlValue();
+                clsCtrlValue.SetObject(m_clsChangeSelRow, false);
+
+
+#if false
+                //'スクロールはしないようにする。
+                //objListPane.RowLock = True
+
+
+                //'リストの更新。
+                //  objListPane.UpdateAllRow((long)LIST_NUM_PANE.LIST_NUM_VECTOR);
+
+
+                //'スクロールを元に戻す。
+                //objListPane.RowLock = False
+
+#else
+                /*[VB]
+                'リストの作成。
+                Call objListPane.SelectElement(Nothing)
+                Call objListPane.RemakeList(False)
+                [VB] */
+                /*[C#]*/
+                objListPane.SelectElement(null);
+                objListPane.RemakeList(false);
+#endif
+
+
+                /*[VB]
+                    'プロットの再描画。
+                    Call objPlotPane.UpdateLogicalDrawArea(True)
+                    Call objPlotPane.Redraw
+                    Call objPlotPane.Refresh
+                [VB] */
+                /*[C#]*/
+                //objPlotPane.PlotPane_Initialize();
+                Bitmap btmp = objPlotPane.Dis_Get_btmp();
+                objPlotPane.List_Genba_set(m_List_Genba_S);
+                objPlotPane.UpdateLogicalDrawArea(true);
+                objPlotPane.Redraw();
+                objPlotPane.Refresh();
+
+
+                /*[VB]
+                Call clsWaitCursor.Back
+                [VB] */
+                /*[C#]*/
+                Cursor = Cursors.Default;
+
+
+            }
+            catch (Exception ex)
+            {
+                //ErrorHandler:
+                //    Call mdlMain.ErrorExit
+                _ = MessageBox.Show(ex.Message, "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
 
         }
+
+        //5==========================================================================================
+        /*[VB]
+            '基線ベクトルの向きの自動整列。
+            '
+            '戻り値：
+            '正常終了の場合 True を返す。
+            'キャンセルの場合 False を返す。
+            Private Function AutoOrderVector() As Boolean
+
+                AutoOrderVector = False
+    
+                '既存の値。
+                Let frmAutoOrderVector.AutoOrderVectorParam = m_clsDocument.AutoOrderVectorParam
+    
+                '基線ベクトルの向きの自動整列ダイアログ。
+                Call frmAutoOrderVector.Show(1)
+                If frmAutoOrderVector.Result<> vbOK Then Exit Function
+
+
+                If MsgBox("解析済み基線ベクトルの方向を変えますと解析の結果が失われます。よろしいですか?", vbExclamation Or vbOKCancel) <> vbOK Then Exit Function
+    
+                '再描画。
+                If RedrawWindow(Me.hWnd, 0, 0, RDW_UPDATENOW) = 0 Then Call Err.Raise(ERR_FATAL, , GetLastErrorMessage())
+    
+                '基線ベクトルの向きの自動整列。
+                Call m_clsDocument.AutoOrderVector(frmAutoOrderVector.AutoOrderVectorParam)
+
+
+                AutoOrderVector = True
+
+            End Function
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#] //5
+        /// <summary>
+        /// 基線ベクトルの向きの自動整列。
+        /// 
+        /// </summary>
+        /// <returns>
+        /// 戻り値：
+        /// 正常終了の場合 True を返す。
+        /// キャンセルの場合 False を返す。
+        /// </returns>
+        private bool AutoOrderVector()
+        {
+
+            bool AutoOrderVector = false;
+
+
+            frmAutoOrderVector frmAutoOrderVector = new frmAutoOrderVector(m_clsMdlMain);
+
+            //'既存の値。
+            frmAutoOrderVector.AutoOrderVectorParam(m_clsDocument.AutoOrderVectorParam());
+
+
+            //'基線ベクトルの向きの自動整列ダイアログ。
+            _ = frmAutoOrderVector.ShowDialog();
+            if (frmAutoOrderVector.Result != vbOK)
+            {
+                return AutoOrderVector;
+            }
+
+
+            /*[VB]------------------------------------------------------------------
+                If MsgBox("解析済み基線ベクトルの方向を変えますと解析の結果が失われます。よろしいですか?", vbExclamation Or vbOKCancel) <> vbOK Then Exit Function
+            [VB] */
+            /*[C#]*/
+            if (MessageBox.Show("解析済み基線ベクトルの方向を変えますと解析の結果が失われます。" + vbCrLf + "よろしいですか？", "確認", MessageBoxButtons.OKCancel, MessageBoxIcon.Question) != DialogResult.OK)
+            {
+                return AutoOrderVector;
+            }
+
+
+            /*[VB]----------------------------------------------------------------
+                '再描画。
+                If RedrawWindow(Me.hWnd, 0, 0, RDW_UPDATENOW) = 0 Then Call Err.Raise(ERR_FATAL, , GetLastErrorMessage())
+            [VB] */
+            /*[C#]*/
+            //再描画
+            if (RedrawWindow(this.Handle, IntPtr.Zero, IntPtr.Zero, (int)RDW_UPDATENOW) == false)
+            {
+                return AutoOrderVector;
+            }
+
+
+            /*[VB]------------------------------------------------------------------
+                '基線ベクトルの向きの自動整列。
+                Call m_clsDocument.AutoOrderVector(frmAutoOrderVector.AutoOrderVectorParam)
+            [VB] */
+            /*[C#]*/
+            m_clsDocument.AutoOrderVector(frmAutoOrderVector.AutoOrderVectorParam());
+
+
+            AutoOrderVector = true;
+            return AutoOrderVector;
+
+        }
+
+
+
+
+
+
 
         //1==========================================================================================
         //1==========================================================================================
@@ -5570,7 +5770,7 @@ namespace SurvLine
             Private Function EditAttributeCommon(ByVal clsObservationPoint As ObservationPoint) As Boolean
 
                 EditAttributeCommon = False
-    
+
                 '既存の値。
                 frmAttributeCommon.PointNumber = clsObservationPoint.Number
                 frmAttributeCommon.PointName = clsObservationPoint.Name
@@ -5578,25 +5778,25 @@ namespace SurvLine
                 frmAttributeCommon.CoordinateDisplay = clsObservationPoint.CoordinateDisplay
                 frmAttributeCommon.CoordinateFixed = clsObservationPoint.CoordinateFixed
                 frmAttributeCommon.OldEditCode = clsObservationPoint.Attributes.Common.OldEditCode
-    
+
                 '編集ダイアログ。
                 Call frmAttributeCommon.Show(1)
                 If frmAttributeCommon.Result <> vbOK Then Exit Function
-    
+
                 '再描画。
                 If RedrawWindow(Me.hWnd, 0, 0, RDW_UPDATENOW) = 0 Then Call Err.Raise(ERR_FATAL, , GetLastErrorMessage())
-    
+
                 '砂時計。
                 Dim clsWaitCursor As New WaitCursor
                 Set clsWaitCursor.Object = Me
-    
+
                 '設定。
                 Call m_clsDocument.SetAttributeCommon(clsObservationPoint, frmAttributeCommon.PointNumber, frmAttributeCommon.PointName, frmAttributeCommon.Fixed, frmAttributeCommon.CoordinateFixed)
-    
+
                 Call clsWaitCursor.Back
-    
+
                 EditAttributeCommon = True
-    
+
             End Function
             [VB]*/
         //------------------------------------------------------------------------------------------

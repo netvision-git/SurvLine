@@ -53,14 +53,21 @@ using System.Windows.Forms;
 using System.Xml.Linq;
 using static System.Net.WebRequestMethods;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.Rebar;
+using static SurvLine.mdl.DEFINE;
 using static SurvLine.mdl.MdlNSDefine;
-using static SurvLine.mdl.MdlNSSDefine;
 using static SurvLine.mdl.MdlUtility;
+using static SurvLine.mdl.MdlAccountMake;
+using static SurvLine.mdl.MdlNSGUI;
+using static SurvLine.mdl.MdlNSSDefine;
+using static SurvLine.mdl.MdiVBfunctions;
+using static SurvLine.mdl.MdlMain;
+using static SurvLine.mdl.MdlGUI;
+using static SurvLine.mdl.MdlNSUtility;
+using static SurvLine.mdl.MdlRINEXTYPE;
 using System.Collections.ObjectModel;
 using System.Collections;
 using System.Runtime.InteropServices;
 using SurvLine.mdl;
-using static SurvLine.mdl.DEFINE;
 using Microsoft.VisualBasic;
 //using static System.Net.Mime.MediaTypeNames;
 using System.Globalization;
@@ -68,6 +75,8 @@ using System.Drawing;
 using System.Security.Cryptography;
 using static System.Net.Mime.MediaTypeNames;
 using System.Net;
+using System.Diagnostics.Eventing.Reader;
+using static SurvLine.mdl.MdlBaseLineAnalyser;
 
 namespace SurvLine
 {
@@ -2579,18 +2588,29 @@ namespace SurvLine
         End Function
         [VB]*/
         //------------------------------------------------------------------------------------------
-        //[C#]
-        /*
-        '基線ベクトルチェインコレクションを作成する。
-        '
-        'm_clsBaseLineVectorHead リストの ChainList オブジェクトのコレクションを作成する。
-        '先頭である m_clsBaseLineVectorHead オブジェクトは含まない。
-        '
-        '戻り値：作成した基線ベクトルチェインコレクションを返す。要素は ChainList オブジェクト。キーは BaseLineVector オブジェクトのポインタ。
-        */
-        public ICollection MakeBaseLineVectorChainCollection()
+        //[C#]  //5
+        /// <summary>
+        /// 基線ベクトルチェインコレクションを作成する。
+        /// '
+        /// m_clsBaseLineVectorHead リストの ChainList オブジェクトのコレクションを作成する。
+        /// 先頭である m_clsBaseLineVectorHead オブジェクトは含まない。
+        /// 
+        /// </summary>
+        /// <returns>
+        /// 戻り値：
+        /// 作成した基線ベクトルチェインコレクションを返す。要素は ChainList オブジェクト。キーは BaseLineVector オブジェクトのポインタ。
+        /// </returns>
+        public Dictionary<string, object> MakeBaseLineVectorChainCollection()       //5
         {
-            return null;
+            Dictionary<string, object> MakeBaseLineVectorChainCollection = new Dictionary<string, object>();
+            ChainList clsChainList;
+            clsChainList = m_clsBaseLineVectorHead.NextList();
+            while (clsChainList != null)
+            {
+                MakeBaseLineVectorChainCollection.Add(GetPointer(clsChainList.Element).ToString(), clsChainList);
+                clsChainList = clsChainList.NextList();
+            }
+            return MakeBaseLineVectorChainCollection;
         }
         //==========================================================================================
 
@@ -2622,7 +2642,7 @@ namespace SurvLine
         '
         '戻り値：作成した孤立観測点チェインコレクションを返す。要素は ChainList オブジェクト。キーは ObservationPoint オブジェクト(実観測点)のポインタ。
         */
-        public ICollection MakeIsolatePointChainCollection()
+        public Dictionary<string, object> MakeIsolatePointChainCollection()
         {
             return null;
         }
@@ -2720,8 +2740,269 @@ namespace SurvLine
         'objIsolatePointChainCollection 孤立観測点チェインコレクション。要素は ChainList オブジェクト。キーは ObservationPoint オブジェクト(実観測点)のポインタ。
         'objBaseLineVectorChainCollection 基線ベクトルチェインコレクション。要素は ChainList オブジェクト。キーは BaseLineVector オブジェクトのポインタ。
         */
-        public void RemoveRepresentPoint(ObservationPoint clsRepresentPoint, string sObsPointPath, ICollection objIsolatePointChainCollection, ICollection objBaseLineVectorChainCollection)
+        public void RemoveRepresentPoint(ObservationPoint clsRepresentPoint, string sObsPointPath, Dictionary<string, object> objIsolatePointChainCollection, Dictionary<string, object> objBaseLineVectorChainCollection)
         {
+            /*------------------------------------------------------------------
+                '代表観測点リストから削除する。
+                Call clsRepresentPoint.Owner.Remove
+                '代表観測点を分離。
+                Call clsRepresentPoint.LeaveParentPoint
+             */
+            //'代表観測点リストから削除する。
+            clsRepresentPoint.Remove();
+            //'代表観測点を分離。
+            clsRepresentPoint.LeaveParentPoint();
+
+            ObservationPoint clsConnectPoint;
+
+            clsConnectPoint = clsRepresentPoint.ChildPoint().ChildPoint();
+            if (clsConnectPoint != null)
+            {
+                /*-----------------------------------------------------------
+                    '孤立観測点であった場合、孤立観測点リストから削除する。
+                    Dim sKey As String
+                    sKey = Hex$(GetPointer(clsRepresentPoint.ChildPoint))
+                    Dim clsChainList As ChainList
+                    If LookupCollectionObject(objIsolatePointChainCollection, clsChainList, sKey) Then
+                        Call objIsolatePointChainCollection.Remove(sKey)
+                        Call clsChainList.Remove
+                    End If
+                 */
+                string sKey;
+                sKey = GetPointer(clsRepresentPoint.ChildPoint()).ToString();
+                ChainList clsChainList;
+                object oChainList = new object();
+                if (LookupCollectionObject(objIsolatePointChainCollection, ref oChainList, sKey))
+                {
+                    _ = objIsolatePointChainCollection.Remove(sKey);
+
+                    clsChainList = (ChainList)oChainList;
+                    clsChainList.Remove();
+
+                }
+            }
+            else
+            {
+                /*---------------------------------------------------------------------------
+                    '基線ベクトルを削除する。
+                    Do While Not clsConnectPoint Is Nothing
+                        Dim clsBaseLineVector As BaseLineVector
+                        Set clsBaseLineVector = clsConnectPoint.Owner
+                        '反対側の接合観測点。
+                        Dim clsBuddyPoint As ObservationPoint
+                        If clsBaseLineVector.StrPoint Is clsConnectPoint Then
+                            Set clsBuddyPoint = clsBaseLineVector.EndPoint
+                        Else
+                            Set clsBuddyPoint = clsBaseLineVector.StrPoint
+                        End If
+                        '基線ベクトルを削除する。
+                        sKey = Hex$(GetPointer(clsBaseLineVector))
+                        If LookupCollectionObject(objBaseLineVectorChainCollection, clsChainList, sKey) Then
+                            Call objBaseLineVectorChainCollection.Remove(sKey)
+                            Call clsChainList.Remove
+                        End If
+                        Call clsBaseLineVector.Terminate
+                        '反対側の接合観測点を削除する。
+                        Dim clsBuddyParent As ObservationPoint
+                        Set clsBuddyParent = clsBuddyPoint.ParentPoint
+                        Call clsBuddyPoint.LeaveParentPoint
+                        Call clsBuddyPoint.Terminate
+                        '反対側の観測点が孤立したら孤立観測点リストに追加する。
+                        If clsBuddyParent.ChildPoint Is Nothing Then
+                            Set clsChainList = m_clsIsolatePointHead.TailList.InsertNext(clsBuddyParent)
+                            Call objIsolatePointChainCollection.Add(clsChainList, Hex$(GetPointer(clsBuddyParent)))
+                        End If
+                        Set clsConnectPoint = clsConnectPoint.NextPoint
+                    Loop
+                 */
+
+                //'基線ベクトルを削除する。
+                while (clsConnectPoint != null)
+                {
+
+
+                    BaseLineVector clsBaseLineVector;
+                    clsBaseLineVector = (BaseLineVector)clsConnectPoint.Owner;
+                    /*-------------------------------------------------------------
+                        '反対側の接合観測点。
+                        Dim clsBuddyPoint As ObservationPoint
+                        If clsBaseLineVector.StrPoint Is clsConnectPoint Then
+                            Set clsBuddyPoint = clsBaseLineVector.EndPoint
+                        Else
+                            Set clsBuddyPoint = clsBaseLineVector.StrPoint
+                        End If
+                     */
+                    //'反対側の接合観測点。
+                    ObservationPoint clsBuddyPoint;
+#if true
+                    clsBuddyPoint = clsBaseLineVector.EndPoint();
+#else
+　   検討必要
+                    if (clsBaseLineVector.StrPoint() is (BaseLineVector)clsConnectPoint)
+                    {
+                        clsBuddyPoint = clsBaseLineVector.EndPoint();
+                    }
+                   else
+                    {
+                        clsBuddyPoint = clsBaseLineVector.StrPoint();
+                    }
+#endif
+
+                    /*----------------------------------------------------------------
+                        '基線ベクトルを削除する。
+                        sKey = Hex$(GetPointer(clsBaseLineVector))
+                        If LookupCollectionObject(objBaseLineVectorChainCollection, clsChainList, sKey) Then
+                            Call objBaseLineVectorChainCollection.Remove(sKey)
+                            Call clsChainList.Remove
+                        End If
+                     */
+
+                    //'基線ベクトルを削除する。
+                    object objChainList = new object();
+
+                    ChainList clsChainList; //5
+                    string sKey = GetPointer(clsBaseLineVector).ToString();
+                    if (LookupCollectionObject(objBaseLineVectorChainCollection, ref objChainList, sKey))
+                    {
+
+                        clsChainList = (ChainList)objChainList;
+
+                        _ = objBaseLineVectorChainCollection.Remove(sKey);
+                        clsChainList.Remove();
+
+                    }
+                    clsBaseLineVector.Terminate();
+
+                    /*-------------------------------------------------------------------------------
+                        '反対側の接合観測点を削除する。
+                        Dim clsBuddyParent As ObservationPoint
+                        Set clsBuddyParent = clsBuddyPoint.ParentPoint
+                        Call clsBuddyPoint.LeaveParentPoint
+                        Call clsBuddyPoint.Terminate
+                        '反対側の観測点が孤立したら孤立観測点リストに追加する。
+                        If clsBuddyParent.ChildPoint Is Nothing Then
+                            Set clsChainList = m_clsIsolatePointHead.TailList.InsertNext(clsBuddyParent)
+                            Call objIsolatePointChainCollection.Add(clsChainList, Hex$(GetPointer(clsBuddyParent)))
+                        End If
+                        Set clsConnectPoint = clsConnectPoint.NextPoint
+                     */
+
+                    //反対側の接合観測点を削除する。
+                    ObservationPoint clsBuddyParent;
+                    clsBuddyParent = clsBuddyPoint.ParentPoint();
+                    clsBuddyPoint.LeaveParentPoint();
+                    clsBuddyPoint.Terminate();
+                    //'反対側の観測点が孤立したら孤立観測点リストに追加する。
+                    if (clsBuddyParent.ChildPoint() != null)
+                    {
+                        clsChainList = m_clsIsolatePointHead.TailList().InsertNext(clsBuddyParent);
+                        objIsolatePointChainCollection.Add(GetPointer(clsBuddyParent).ToString(), clsChainList);
+                    }
+                    clsConnectPoint = clsConnectPoint.NextPoint();
+
+
+                }//while (clsConnectPoint != null)
+
+
+            }
+
+            /*-------------------------------------------------------------------------------
+                '観測点ファイルを削除する。
+            On Error Resume Next
+                If Not clsRepresentPoint.Genuine Then
+                    Call RemoveFile(sObsPointPath & clsRepresentPoint.ChildPoint.FileTitle & "." & clsRepresentPoint.ChildPoint.RinexExt & RNX_OBS_EXTENSION)
+                    Call RemoveFile(sObsPointPath & clsRepresentPoint.ChildPoint.FileTitle & "." & clsRepresentPoint.ChildPoint.RinexExt & RNX_NAV_EXTENSION)
+                    Call RemoveFile(sObsPointPath & clsRepresentPoint.ChildPoint.FileTitle & "." & clsRepresentPoint.ChildPoint.RinexExt & RNX_GLO_EXTENSION)
+                    Call RemoveFile(sObsPointPath & clsRepresentPoint.ChildPoint.FileTitle & "." & RNX_SV_EXTENSION)
+                    '2017/07/05 NS6000対応。'''''''''''''''''''''''''''''''''''''''''''''''''''''''
+                    Call RemoveFile(sObsPointPath & clsRepresentPoint.ChildPoint.FileTitle & "." & clsRepresentPoint.ChildPoint.RinexExt & RNX_QZS_EXTENSION)
+                    Call RemoveFile(sObsPointPath & clsRepresentPoint.ChildPoint.FileTitle & "." & clsRepresentPoint.ChildPoint.RinexExt & RNX_GAL_EXTENSION)
+                    Call RemoveFile(sObsPointPath & clsRepresentPoint.ChildPoint.FileTitle & "." & clsRepresentPoint.ChildPoint.RinexExt & RNX_BEI_EXTENSION)
+                    Call RemoveFile(sObsPointPath & clsRepresentPoint.ChildPoint.FileTitle & "." & clsRepresentPoint.ChildPoint.RinexExt & RNX_MIX_EXTENSION)
+                    '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+                End If
+            On Error GoTo 0
+    
+                '観測点を削除する。
+                Call clsRepresentPoint.Terminate
+             */
+
+            //'観測点ファイルを削除する。
+            try
+            {
+                _ = RemoveFile(sObsPointPath + clsRepresentPoint.ChildPoint().FileTitle() + "." + clsRepresentPoint.ChildPoint().RinexExt() + RNX_OBS_EXTENSION);
+            }
+            catch (Exception)
+            {
+            }
+
+            try
+            {
+                _ = RemoveFile(sObsPointPath + clsRepresentPoint.ChildPoint().FileTitle() + "." + clsRepresentPoint.ChildPoint().RinexExt() + RNX_OBS_EXTENSION);
+            }
+            catch (Exception)
+            {
+            }
+
+            try
+            {
+                _ = RemoveFile(sObsPointPath + clsRepresentPoint.ChildPoint().FileTitle() + "." + clsRepresentPoint.ChildPoint().RinexExt() + RNX_GLO_EXTENSION);
+            }
+            catch (Exception)
+            {
+            }
+
+            try
+            {
+                _ = RemoveFile(sObsPointPath + clsRepresentPoint.ChildPoint().FileTitle() + "." + clsRepresentPoint.ChildPoint().RinexExt() + RNX_SV_EXTENSION);
+            }
+            catch (Exception)
+            {
+            }
+            //'2017/07/05 NS6000対応。'''''''''''''''''''''''''''''''''''''''''''''''''''''''
+            try
+            {
+                _ = RemoveFile(sObsPointPath + clsRepresentPoint.ChildPoint().FileTitle() + "." + clsRepresentPoint.ChildPoint().RinexExt() + RNX_QZS_EXTENSION);
+            }
+            catch (Exception)
+            {
+            }
+
+            try
+            {
+                _ = RemoveFile(sObsPointPath + clsRepresentPoint.ChildPoint().FileTitle() + "." + clsRepresentPoint.ChildPoint().RinexExt() + RNX_GAL_EXTENSION);
+            }
+            catch (Exception)
+            {
+            }
+
+            try
+            {
+                _ = RemoveFile(sObsPointPath + clsRepresentPoint.ChildPoint().FileTitle() + "." + clsRepresentPoint.ChildPoint().RinexExt() + RNX_BEI_EXTENSION);
+            }
+            catch (Exception)
+            {
+            }
+
+            try
+            {
+                _ = RemoveFile(sObsPointPath + clsRepresentPoint.ChildPoint().FileTitle() + "." + clsRepresentPoint.ChildPoint().RinexExt() + RNX_MIX_EXTENSION);
+            }
+            catch (Exception)
+            {
+            }
+
+            //'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+            try
+            {
+                //'観測点を削除する。
+                clsRepresentPoint.Terminate();
+            }
+            catch (Exception)
+            {
+            }
+
             return;
         }
         //==========================================================================================
@@ -3009,15 +3290,23 @@ namespace SurvLine
         End Sub
         [VB]*/
         //------------------------------------------------------------------------------------------
-        //[C#]
+        //[C#]  //5
         /*
         '解析結果を削除する。
         '
         '引き数：
         'objBaseLineVectors 対象とする基線ベクトル。要素は BaseLineVector オブジェクト。キーは任意。
         */
-        public void DeleteAnalysis(ICollection objBaseLineVectors)
+        public void DeleteAnalysis(Dictionary<string, object> objBaseLineVectors)
         {
+            BaseLineVector clsBaseLineVector;
+
+            foreach (BaseLineVector obj in objBaseLineVectors.Values.Cast<BaseLineVector>())
+            {
+                clsBaseLineVector = obj;
+                clsBaseLineVector.Analysis = ANALYSIS_STATUS.ANALYSIS_STATUS_NOT;
+            }
+
             return;
         }
         //==========================================================================================
@@ -3940,15 +4229,31 @@ namespace SurvLine
         End Sub
         [VB]*/
         //------------------------------------------------------------------------------------------
-        //[C#]
-        /*
-        '指定された基線ベクトルの始点と終点を置き換える。
-        '
-        '引き数：
-        'clsBaseLineVector 対象とする基線ベクトル。
-        */
+        //[C#]  //5
+        /// <summary>
+        /// 指定された基線ベクトルの始点と終点を置き換える。
+        /// '
+        /// 引き数：
+        /// clsBaseLineVector 対象とする基線ベクトル。
+        /// 
+        /// </summary>
+        /// <param name="clsBaseLineVector"></param>
         public void ReplaceBaseLineVector(BaseLineVector clsBaseLineVector)
         {
+            if (clsBaseLineVector.Analysis <= ANALYSIS_STATUS.ANALYSIS_STATUS_FIX)
+            {
+                //'解析結果の削除。
+                Dictionary<string, object> objElements = new Dictionary<string, object>();
+                objElements.Add(GetPointer(clsBaseLineVector).ToString(), (object)clsBaseLineVector);
+                DeleteAnalysis(objElements);
+
+            }
+            //'反転。
+            clsBaseLineVector.Replace();
+
+            //'基線解析向きも反転する。(Reversは常にFalseにする。)
+            clsBaseLineVector.Revers(false);    //'Not clsBaseLineVector.Revers
+
             return;
         }
         //==========================================================================================
