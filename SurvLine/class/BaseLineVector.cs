@@ -2185,7 +2185,29 @@ namespace SurvLine
         //==========================================================================================
 
 
-
+        //5==========================================================================================
+        /*[VB]
+            '始点と終点を入れ替える。
+            Public Sub Replace()
+                Dim clsObservationPoint As ObservationPoint
+                Set clsObservationPoint = m_clsStrPoint
+                Set m_clsStrPoint = m_clsEndPoint
+                Set m_clsEndPoint = clsObservationPoint
+            End Sub
+            [VB]*/
+        //------------------------------------------------------------------------------------------
+        //[C#] //5
+        /// <summary>
+        /// 始点と終点を入れ替える。
+        /// 
+        /// </summary>
+        public void Replace()
+        {
+            ObservationPoint clsObservationPoint;
+            clsObservationPoint = m_clsStrPoint;
+            m_clsStrPoint = m_clsEndPoint;
+            m_clsEndPoint = clsObservationPoint;
+        }
 
 
 
@@ -3671,10 +3693,9 @@ namespace SurvLine
 
         }
 
+
+        //****************************************
+        //****************************************
     }
-
-
-
-
 
 }

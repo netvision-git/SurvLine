@@ -18,10 +18,10 @@ namespace SurvLine
         //***************************************************************************
         //***************************************************************************
         //プログラム＜プロジェクト＞
-        //Git管理：コメント＞(ブランチ:B240323A-0)24/03/26(完)編集:採用／点検
+        //Git管理：コメント＞(ブランチ:B240327-0)24/03/31-5(完)編集＞基線ベクトルの向きの自動整列
         //
         //＜コメント＞
-        //修正要 saka -> K.Setoguchi(4)
+        //修正要 saka -> K.Setoguchi(5)
         //ここは、重要では無い為、後で対応（瀬戸口）
         //
         //***************************************************************************
@@ -29,13 +29,13 @@ namespace SurvLine
         //<<<<<<<<<-----------24/03/22(--)編集メニュー K.setoguchi@NV
         //***************************************************************************
 
-        //4==========================================================================================
+        //5==========================================================================================
         /*[VB]
             [VB]*/
         //------------------------------------------------------------------------------------------
-        //[C#] //4
+        //[C#] //5
 
-        //4==========================================================================================
+        //5==========================================================================================
         /*[VB]
 
 
@@ -49,6 +49,12 @@ namespace SurvLine
         #endif
         */
 #if false
+
+                Call MakeBaseLineVectorChainCollection.Add(clsChainList, Hex$(GetPointer(clsChainList.Element)))
+                    ↓       ↓       ↓       ↓
+                MakeBaseLineVectorChainCollection.Add(GetPointer(clsChainList.Element).ToString(), clsChainList));
+
+
                 //'砂時計。
                 Cursor = Cursors.WaitCursor;
                 Cursor = Cursors.Default;
@@ -74,7 +80,7 @@ MdlNSGUI
         using static SurvLine.mdl.MdiVBfunctions;
         using static SurvLine.mdl.MdlMain;
         using static SurvLine.mdl.MdlGUI;
-        using static SurvLine.mdl.MdlNSUtility
+        using static SurvLine.mdl.MdlNSUtility;
 
 
         //==========================================================================================
@@ -162,6 +168,18 @@ private void button1_Click(object sender, EventArgs e)
   //何かしらの処理
   WirteBinaryData(data);
 }
+            /*[VB]----------------------------------------------------------------
+                '再描画。
+                If RedrawWindow(Me.hWnd, 0, 0, RDW_UPDATENOW) = 0 Then Call Err.Raise(ERR_FATAL, , GetLastErrorMessage())
+            [VB] */
+            /*[C#]*/
+            //再描画
+            if (RedrawWindow(this.Handle, IntPtr.Zero, IntPtr.Zero, (int)DEFINE.RDW_UPDATENOW) == false)
+            {
+                return false;
+            }
+
+
 
                 //'砂時計。
                 Cursor = Cursors.WaitCursor;

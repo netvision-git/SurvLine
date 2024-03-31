@@ -14,6 +14,7 @@ using Microsoft.VisualBasic.FileIO;
 using System.Runtime.Remoting;
 using System.Xml.Linq;
 using System.Security.Cryptography;
+using System.Runtime.Remoting.Metadata.W3cXsd2001;
 
 namespace SurvLine.mdl
 {
@@ -458,8 +459,16 @@ namespace SurvLine.mdl
         //public static extern int MoveMemory(int Dest, object Src, int SIZE);
         //public static extern int RtlMoveMemory(ref IntPtr Dest, ref IntPtr Src, int SIZE);
         //[DllImport("ntdll.dll", EntryPoint = "RtlMoveMemory", SetLastError = false)]
+#if false   //5
         [DllImport("ntdll.dll")]
-        public static extern void RtlMoveMemory(ref IntPtr dest, ref object src, [MarshalAs(UnmanagedType.U4)] int length);
+        public static extern long RtlMoveMemory(ref IntPtr dest, ref object src, [MarshalAs(UnmanagedType.U4)] int length);
+#else
+        [DllImport("kernel32.dll")]
+        public static extern long RtlMoveMemory(ref IntPtr dest, ref object src, [MarshalAs(UnmanagedType.U4)] int length);
+        [DllImport("kernel32.dll", EntryPoint = "RtlMoveMemory")]
+        public static extern void MoveIt(object Destination, object Source, long Length);
+
+#endif
 
 
         [DllImport("user32.dll")]
