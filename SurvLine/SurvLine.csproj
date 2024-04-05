@@ -179,6 +179,12 @@
     <Compile Include="frmFileDialog.Designer.cs">
       <DependentUpon>frmFileDialog.cs</DependentUpon>
     </Compile>
+    <Compile Include="frmInputCoordinate.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmInputCoordinate.Designer.cs">
+      <DependentUpon>frmInputCoordinate.cs</DependentUpon>
+    </Compile>
     <Compile Include="frmJobEdit.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -297,6 +303,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="frmFileDialog.resx">
       <DependentUpon>frmFileDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmInputCoordinate.resx">
+      <DependentUpon>frmInputCoordinate.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmJobEdit.resx">
       <DependentUpon>frmJobEdit.cs</DependentUpon>

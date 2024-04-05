@@ -110,6 +110,7 @@ namespace SurvLine
         MdlMain mdlMain;
         //==========================================================================================
 
+
         //==========================================================================================
         /*[VB]
         '*******************************************************************************
@@ -521,6 +522,10 @@ namespace SurvLine
         //'参照座標。
         public CoordinatePoint CoordinateReference()
         {
+            if (Fixed())
+            {
+                return m_clsAttributes.Common().CoordinateFixed();
+            }
 #if false
             if (Fixed())
             {
@@ -2628,34 +2633,43 @@ namespace SurvLine
 
         //==========================================================================================
         /*[VB]
-        'リスト更新必要フラグ。
-        Property Let IsList(ByVal bIsList As Boolean)
-            m_clsAttributes.IsList = bIsList
-        End Property
+            'リスト更新必要フラグ。
+            Property Let IsList(ByVal bIsList As Boolean)
+                m_clsAttributes.IsList = bIsList
+            End Property
+
+            'リスト更新必要フラグ。
+            Property Get IsList() As Boolean
+                IsList = m_clsAttributes.IsList
+            End Property
         [VB]*/
         //------------------------------------------------------------------------------------------
-        //[C#]
+        //[C#]  //6 にてプロパティ対応に変更
+#if true    
+        /// <summary>
+        /// プロパティ対応に変更
+        ///     get:リスト更新必要フラグ。
+        ///     set:リスト更新必要フラグ。
+        /// 
+        /// </summary>
+        public bool IsList
+        {
+            get => m_clsAttributes.IsList;
+            set => m_clsAttributes.IsList = value;
+        }
+
+#else
         //'リスト更新必要フラグ。
         public void IsList(bool bIsList)
         {
             m_clsAttributes.IsList = bIsList;
         }
-        //==========================================================================================
-
-        //==========================================================================================
-        /*[VB]
-        'リスト更新必要フラグ。
-        Property Get IsList() As Boolean
-            IsList = m_clsAttributes.IsList
-        End Property
-        [VB]*/
-        //------------------------------------------------------------------------------------------
-        //[C#]
         //'リスト更新必要フラグ。
         public bool IsList()
         {
             return m_clsAttributes.IsList;
         }
+#endif
         //==========================================================================================
 
         //==========================================================================================
@@ -3025,7 +3039,7 @@ namespace SurvLine
             m_bEnable = Genba_S.m_bEnable;
 
             //[VB]  Get #nFile, , ObjectType    public long OP_ObjectType;      //As Long 'オブジェクト種別。                        //-2147483520
-#if true   
+#if true
             Genba_S.OP_ObjectType = br.ReadInt32(); //BUG:240317_0517 K.S
             //  Genba_S.OP_ObjectType = br.ReadInt64(); //BUG:240317_0517 K.S
 #endif
@@ -4042,9 +4056,9 @@ namespace SurvLine
         */
         public long GetCoordinateAnalysisEnd(ref object objOwner, bool bWork)
         {
-#if false
             long nResult;
             nResult = 0;
+#if false
 
             if ((ObjectType & OBS_TYPE_CONNECT) != 0)
             {

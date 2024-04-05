@@ -4476,17 +4476,21 @@ namespace SurvLine
         {
             try
             {
-#if true    // DEBUG 画面レイアウト確認------------------------------------
-                frmEccentricCorrection frmEccentricCorrection = new frmEccentricCorrection();
-                frmEccentricCorrection.ShowDialog();  //編集＞偏心設定
-#endif      // DEBUG 画面レイアウト確認------------------------------------
-
-
-
 
                 ObservationPoint clsObservationPoint;
                 clsObservationPoint = (ObservationPoint)objListPane.SelectedElement((long)LIST_NUM_PANE.LIST_NUM_OBSPNT);
-#if false
+
+#if true        // DEBUG -----------------------------------------------------------------------------
+                //      <<< 選択されていない場合は、無いが、現在は開発途中の為、入れておく。
+                if (clsObservationPoint == null)
+                {
+                    MessageBox.Show("観測点を選択して下さい！", "エラー発生", MessageBoxButtons.OKCancel, MessageBoxIcon.Question);
+                    return;
+                }
+#endif          //-------------------------------------------------------------------------------
+
+
+
                 if (clsObservationPoint.Genuine())
                 {
                     clsObservationPoint = clsObservationPoint.CorrectPoint();
@@ -4494,7 +4498,7 @@ namespace SurvLine
 
                 bool bEccentric;
                 bEccentric = clsObservationPoint.Eccentric();
-#endif
+
 
                 //'偏心補正設定。
                 if (!EditEccentric(clsObservationPoint.HeadPoint()))
@@ -5224,10 +5228,50 @@ namespace SurvLine
             End Sub
             [VB]*/
         //------------------------------------------------------------------------------------------
-        //[C#]
+        //[C#]  //6
         //編集＞重複
-        private void mnuEditDuplicate_Click(object sender, EventArgs e)
+        /// <summary>
+        /// 'オブジェクトに重複を設定する。
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void mnuEditDuplicate_Click(object sender, EventArgs e) //6
         {
+            try
+            {
+
+
+#if true        //本来選択できないのですが、デバック中の為、チェックを入れました
+                //***********************************************************************
+                //      観測点選択は不可（ベクトル選択のみ実行可能）
+                //***********************************************************************
+                long nPosA;
+                nPosA = objListPane.StartSelectedAssoc((long)LIST_NUM_PANE.LIST_NUM_OBSPNT);
+                if (nPosA >= 0)
+                {
+                    _ = MessageBox.Show("重複：ベクトル側で選択して下さい！", "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+                //***********************************************************************
+#endif
+
+
+                if (objListPane.StartSelectedAssoc((long)LIST_NUM_PANE.LIST_NUM_VECTOR) >= 0)
+                {
+                    EditLineType(OBJ_MODE.OBJ_MODE_DUPLICATE);
+                }
+                else
+                {
+                    EditObsPntMode(OBJ_MODE.OBJ_MODE_DUPLICATE);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                //ErrorHandler:
+                //    Call mdlMain.ErrorExit
+                _ = MessageBox.Show(ex.Message, "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
 
         }
         //1==========================================================================================
@@ -5255,8 +5299,46 @@ namespace SurvLine
         //------------------------------------------------------------------------------------------
         //[C#]
         //編集＞前半
+        //'2023/06/26 Hitz H.Nakamura **************************************************
+        /// <summary>
+        /// GNSS水準測量対応。
+        /// 前半後半較差の追加。
+        /// オブジェクトに前半を設定する。
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void mnuEditHalfFst_Click(object sender, EventArgs e)
         {
+            try
+            {
+
+#if true        //本来選択できないのですが、デバック中の為、チェックを入れました
+                //***********************************************************************
+                //      観測点選択は不可（ベクトル選択のみ実行可能）
+                //***********************************************************************
+                long nPosA;
+                nPosA = objListPane.StartSelectedAssoc((long)LIST_NUM_PANE.LIST_NUM_OBSPNT);
+                if (nPosA >= 0)
+                {
+                    _ = MessageBox.Show("前半：ベクトル側で選択して下さい！", "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+                //***********************************************************************
+#endif
+
+                if (objListPane.StartSelectedAssoc((long)LIST_NUM_PANE.LIST_NUM_VECTOR) >= 0)
+                {
+                    EditLineType(OBJ_MODE.OBJ_MODE_HALF_FST);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                //ErrorHandler:
+                //    Call mdlMain.ErrorExit
+                _ = MessageBox.Show(ex.Message, "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
 
         }
         //1==========================================================================================
@@ -5281,8 +5363,43 @@ namespace SurvLine
         //------------------------------------------------------------------------------------------
         //[C#]
         //編集＞後半
+        /// <summary>
+        /// オブジェクトに後半を設定する。
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void mnuEditHalfLst_Click(object sender, EventArgs e)
         {
+            try
+            {
+
+#if true        //本来選択できないのですが、デバック中の為、チェックを入れました
+                //***********************************************************************
+                //      観測点選択は不可（ベクトル選択のみ実行可能）
+                //***********************************************************************
+                long nPosA;
+                nPosA = objListPane.StartSelectedAssoc((long)LIST_NUM_PANE.LIST_NUM_OBSPNT);
+                if (nPosA >= 0)
+                {
+                    _ = MessageBox.Show("後半：ベクトル側で選択して下さい！", "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+                //***********************************************************************
+#endif
+
+                if (objListPane.StartSelectedAssoc((long)LIST_NUM_PANE.LIST_NUM_VECTOR) >= 0)
+                {
+                    EditLineType(OBJ_MODE.OBJ_MODE_HALF_LST);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                //ErrorHandler:
+                //    Call mdlMain.ErrorExit
+                _ = MessageBox.Show(ex.Message, "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
 
         }
         //1==========================================================================================
@@ -5364,10 +5481,197 @@ namespace SurvLine
             End Sub
             [VB]*/
         //------------------------------------------------------------------------------------------
-        //[C#]
+        //[C#]      //6
         //編集＞反転
+        /// <summary>基線ベクトルの向きを反転する。
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void mnuEditReverse_Click(object sender, EventArgs e)
         {
+            try
+            {
+
+#if true        //本来選択できないのですが、デバック中の為、チェックを入れました
+                long nPosA;
+                nPosA = objListPane.StartSelectedAssoc((long)LIST_NUM_PANE.LIST_NUM_OBSPNT);
+                if (nPosA >= 0)
+                {
+                    _ = MessageBox.Show("観測点の選択では、反転できません", "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+#endif
+
+                //'砂時計。
+                Cursor = Cursors.WaitCursor;
+
+                //'再描画抑制。
+                CtrlValue clsCtrlValue = new CtrlValue();
+                clsCtrlValue.SetObject(m_clsChangeSelRow, false);
+
+                /*--------------------------------------------------------------------
+                    '同じ向きの重複する基線ベクトルも一緒に反転させる。
+                    Dim nPos As Long
+                    nPos = objListPane.StartSelectedAssoc(LIST_NUM_VECTOR)
+                    Dim objBaseLineVectors As New Collection
+                    Do While (nPos > 0)
+                        Dim clsBaseLineVector As BaseLineVector
+                        Set clsBaseLineVector = objListPane.GetNextAssoc(nPos)
+                        Call SetAtCollectionObject(objBaseLineVectors, clsBaseLineVector, GetPointer(clsBaseLineVector))
+                        Dim clsDuplicationBaseLineVectors() As BaseLineVector
+                        clsDuplicationBaseLineVectors = m_clsDocument.NetworkModel.GetDuplicationBaseLineVectors(clsBaseLineVector)
+                        Dim i As Long
+                        For i = 0 To UBound(clsDuplicationBaseLineVectors)
+                            If clsBaseLineVector.StrPoint.HeadPoint Is clsDuplicationBaseLineVectors(i).StrPoint.HeadPoint Then Call SetAtCollectionObject(objBaseLineVectors, clsDuplicationBaseLineVectors(i), GetPointer(clsDuplicationBaseLineVectors(i)))
+                        Next
+                    Loop
+                 */
+                //*******************************************************
+                //同じ向きの重複する基線ベクトルも一緒に反転させる。
+                //*******************************************************
+                long nPos;
+                nPos = objListPane.StartSelectedAssoc((long)LIST_NUM_PANE.LIST_NUM_VECTOR);
+                Dictionary<string, object> objBaseLineVectors = new Dictionary<string, object>();
+                while(nPos >= 0)
+                {
+                    BaseLineVector clsBaseLineVector;
+                    clsBaseLineVector = (BaseLineVector)objListPane.GetNextAssoc(ref nPos, (long)LIST_NUM_PANE.LIST_NUM_VECTOR);
+
+                    SetAtCollectionObject(objBaseLineVectors, clsBaseLineVector, GetPointer(clsBaseLineVector).ToString());
+                    List<BaseLineVector> clsDuplicationBaseLineVectors = new List<BaseLineVector>();
+                    clsDuplicationBaseLineVectors = m_clsDocument.NetworkModel().GetDuplicationBaseLineVectors(clsBaseLineVector);
+                    int i;
+                    for (i = 0; i < clsDuplicationBaseLineVectors.Count; i++)
+                    {
+                        if (clsDuplicationBaseLineVectors[i] != null)
+                        {
+                            if (ReferenceEquals(clsDuplicationBaseLineVectors[i].StrPoint().HeadPoint(), clsBaseLineVector.StrPoint().HeadPoint()))
+                            {
+                                SetAtCollectionObject(objBaseLineVectors, clsDuplicationBaseLineVectors[i], GetPointer(clsDuplicationBaseLineVectors[i]).ToString());
+                            }
+                        }
+
+                    }
+                }//while(nPos >= 0)
+
+                /*--------------------------------------------------------------------
+                    '解析結果削除確認。
+                    For Each clsBaseLineVector In objBaseLineVectors
+                        If clsBaseLineVector.Analysis < ANALYSIS_STATUS_FAILED Then
+                            If MsgBox("解析済みの基線ベクトルが含まれています。反転を行いますと解析の結果が失われます。よろしいですか?", vbExclamation Or vbOKCancel) = vbOK Then
+                                Exit For
+                            Else
+                                Exit Sub
+                            End If
+                        End If
+                    Next
+    
+                    '汎用作業キーを利用して、設定が変更された観測点を記憶する。
+                    Call m_clsDocument.NetworkModel.ClearIsList
+                 */
+                //*******************************************************
+                //解析結果削除確認。
+                //*******************************************************
+                foreach (object obj2 in objBaseLineVectors.Values)
+                {
+                    BaseLineVector clsBaseLineVector = (BaseLineVector)obj2;
+
+                    if (clsBaseLineVector.Analysis <  ANALYSIS_STATUS.ANALYSIS_STATUS_FAILED)
+                    {
+                        if( MessageBox.Show("解析済みの基線ベクトルが含まれています。反転を行いますと解析の結果が失われます。よろしいですか?", "エラー発生", MessageBoxButtons.OKCancel, MessageBoxIcon.Error) == DialogResult.OK)
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            return;
+                        }
+                    }
+                }
+
+                //'汎用作業キーを利用して、設定が変更された観測点を記憶する。
+                m_clsDocument.NetworkModel().ClearIsList();
+
+                /*---------------------------------------------------------------------
+                '反転。
+                For Each clsBaseLineVector In objBaseLineVectors
+                    Call m_clsDocument.ReplaceBaseLineVector(clsBaseLineVector)
+                    clsBaseLineVector.IsList = True
+                    '偏心補正の再計算の有無にかかわらず更新する。方位票の評価にはコストがかかる。
+                    Call m_clsDocument.NetworkModel.SetConnectBaseLineVectorsIsListEx(clsBaseLineVector.StrPoint)
+                    Call m_clsDocument.NetworkModel.SetConnectBaseLineVectorsIsListEx(clsBaseLineVector.EndPoint)
+                Next
+                 */
+                //*******************************************************
+                //反転。
+                //*******************************************************
+                foreach (object obj2 in objBaseLineVectors.Values)
+                {
+
+                    BaseLineVector clsBaseLineVector = (BaseLineVector)obj2;
+
+                    m_clsDocument.ReplaceBaseLineVector(clsBaseLineVector);
+                    clsBaseLineVector.IsList = true;
+
+                    //偏心補正の再計算の有無にかかわらず更新する。方位票の評価にはコストがかかる。
+                    //  m_clsDocument.NetworkModel().SetConnectBaseLineVectorsIsListEx(clsBaseLineVector.StrPoint());
+                    //  m_clsDocument.NetworkModel().SetConnectBaseLineVectorsIsListEx(clsBaseLineVector.EndPoint());
+                }
+
+
+
+                /*[VB]
+                'スクロールはしないようにする。
+                objListPane.RowLock = True
+                'リストの更新。
+                Call objListPane.UpdateRowIsList
+                'スクロールを元に戻す。
+                objListPane.RowLock = False
+                [VB] */
+
+
+
+                /*[VB]
+                'リストの作成。
+                [VB] */
+                /*[C#]*/
+#if true
+                objListPane.SelectElement(null);
+                objListPane.RemakeList(false);
+#endif
+
+                /*[VB]
+                'プロットの再描画。
+                Call objPlotPane.UpdateLogicalDrawArea(False)
+                Call objPlotPane.Redraw
+                [VB] */
+                /*[C#]*/
+                //objPlotPane.PlotPane_Initialize();
+                Bitmap btmp = objPlotPane.Dis_Get_btmp();
+                objPlotPane.List_Genba_set(m_List_Genba_S);
+                objPlotPane.UpdateLogicalDrawArea(true);
+                objPlotPane.Redraw();
+                objPlotPane.Refresh();
+
+
+                /*[VB]
+                'メニューの更新。
+                Call clsCtrlValue.Back
+                Call objListPane_ChangeSelRow(objListPane.List)
+                [VB] */
+
+
+                Cursor = Cursors.Default;
+
+
+            }
+            catch (Exception ex)
+            {
+                _ = MessageBox.Show(ex.Message + "（反転）", "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+            }
+
 
         }
         //1==========================================================================================
@@ -5423,12 +5727,17 @@ namespace SurvLine
         //------------------------------------------------------------------------------------------
         //[C#]
         //編集＞削除
+        /// <summary>
+        /// '観測点を削除する。
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void mnuEditRemove_Click(object sender, EventArgs e)
         {
 
             try
             {
-
 
 #if true        //本来選択できないのですが、デバック中の為、チェックを入れました
                 long nPosA;
@@ -5480,7 +5789,7 @@ namespace SurvLine
                     m_clsMdlMain.PaneSelectedTab = (long)LIST_NUM_PANE.LIST_NUM_OBSPNT;      //PaneのTab（観測点/座標／ベクトル      //2
                     m_clsMdlMain.PaneSelcttedNo = nPos;                                      //Paneの選択行(0～）                    //2
                     objElement = objListPane.GetNextAssoc(ref nPos, (long)LIST_NUM_PANE.LIST_NUM_OBSPNT);
-                    objElements.Add(nPos.ToString(), objElement);
+                    objElements.Add(GetPointer(objElement).ToString(), objElement);
                 }
 
 
@@ -5488,7 +5797,6 @@ namespace SurvLine
                     Call m_clsDocument.RemoveObservationPoint(objElements)
                 */
                 m_clsDocument.RemoveObservationPoint(objElements);
-
 
                 /*[VB]
                 'リストの作成。
@@ -6135,16 +6443,14 @@ namespace SurvLine
 
             bool EditEccentric = false;
 
-            frmEccentricCorrection frmEccentricCorrection = new frmEccentricCorrection();
-
-
-#if false
-            '既存の値。
-            Let frmEccentricCorrection.GenuineNumber = clsObservationPoint.GenuineNumber
-            Let frmEccentricCorrection.GenuineName = clsObservationPoint.GenuineName
-            Let frmEccentricCorrection.EccentricCorrectionParam = clsObservationPoint.EccentricCorrectionParam
-            Set frmEccentricCorrection.ObservationPoint = clsObservationPoint
-#endif
+            frmEccentricCorrection frmEccentricCorrection = new frmEccentricCorrection(m_clsMdlMain)
+            {
+                //'既存の値。
+                GenuineNumber = clsObservationPoint.GenuineNumber(),
+                GenuineName = clsObservationPoint.GenuineName()
+            };
+            frmEccentricCorrection.EccentricCorrectionParam(clsObservationPoint.EccentricCorrectionParam());
+            frmEccentricCorrection.ObservationPoint(clsObservationPoint);
 
             //'偏心設定ダイアログ。
             _ = frmEccentricCorrection.ShowDialog();

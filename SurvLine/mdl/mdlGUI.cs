@@ -411,7 +411,7 @@ namespace SurvLine.mdl
         //[C#]k.s
         public static string MakeRangeMessage(string sMin, string sMax, string sLabel)
         {
-            string MakeRangeMessage = sLabel + "の入力値が範囲外です。" + vbCrLf + sMin + "以上" + sMax + "未満の値を入力してください。";
+            string MakeRangeMessage = sLabel + "の入力値が範囲外です。\n" + sMin + "以上" + sMax + "未満の値を入力してください。";
 
             return MakeRangeMessage;
         }
@@ -554,7 +554,8 @@ namespace SurvLine.mdl
             System.Windows.Forms.TextBox txtTextBox2 = (System.Windows.Forms.TextBox)txtTextBox;
 
             //'文字数検査。
-            if (CheckLength(txtTextBox2.Text, nMax))
+            //  if (CheckLength(txtTextBox2.Text, nMax))    //6
+            if (!CheckLength(txtTextBox2.Text, nMax))       //6
             {
                 _ = MessageBox.Show($" {sLabel} に {nMax + 1} {GUI_MSG_LENGTH}", "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 if (bFocus)

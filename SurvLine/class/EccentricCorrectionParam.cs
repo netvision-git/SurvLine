@@ -17,22 +17,24 @@ using static SurvLine.mdl.MdlUtility;
 using static SurvLine.mdl.MdlAccountMake;
 using static SurvLine.mdl.MdlNSGUI;
 using static SurvLine.mdl.MdlNSSDefine;
-
+using System.Windows.Forms;
 
 namespace SurvLine
 {
     public class EccentricCorrectionParam
     {
-        ////Document document = new Document();
 
         public EccentricCorrectionParam(MdlMain mdlMain)
         {
-            this.mdlMain = mdlMain;
+            m_mdlMain = mdlMain;
+
             document = mdlMain.GetDocument();
+
+            Class_Initialize();
         }
 
         private Document document;
-        private MdlMain mdlMain;
+        private MdlMain m_mdlMain;
 
 
         //==========================================================================================
@@ -80,8 +82,8 @@ namespace SurvLine
         //------------------------------------------------------------------------------------------
         //[C#]
         //'プロパティ
-        //public ANGLE_TYPE AngleType;            //'角度種別。
-        public int AngleType;                   //'角度種別。
+        //  public ANGLE_TYPE AngleType;            //'角度種別。
+        public long AngleType;                   //'角度種別。
         public string Marker;                   //'方位標(基線ベクトルのキー)。
         public string UsePoint;                 //'偏心に使用する基線(基線ベクトルのキー)。//'2009/11 H.Nakamura
         public double Horizontal;               //'水平角(ラジアン)。
@@ -100,8 +102,8 @@ namespace SurvLine
         //'2007/3/15 追加 NGS Yamada
         public string MarkNumber;               //'手入力時の方位標のNo
         public string MarkName;                 //'手入力時の方位標の名称
-        //public EDITCODE_STYLE MarkEditCode;     //'編集コード。0の時はデフォルト。
-        public int MarkEditCode;                //'編集コード。0の時はデフォルト。
+        //  public EDITCODE_STYLE MarkEditCode;     //'編集コード。0の時はデフォルト。
+        public long MarkEditCode;               //'編集コード。0の時はデフォルト。
         public double MarkLat;                  //'緯度(度)。
         public double MarkLon;                  //'経度(度)。
         public double MarkX;                    //'平面直角X(ｍ)。
@@ -110,11 +112,14 @@ namespace SurvLine
         public double MarkAlt;                  //'標高(ｍ)。
         //==========================================================================================
 
+
+        //'*******************************************************************************
+        //'プロパティ
+        //'*******************************************************************************
+
+
         //==========================================================================================
         /*[VB]
-        '*******************************************************************************
-        'プロパティ
-
         '偏心補正パラメータ。
         '
         'このプロパティはデフォルトプロパティである。Letを使えば｢値の代入｣ができる。いわゆるC++で言うところのoperator=である。
@@ -153,6 +158,46 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        /// <summary>
+        /// 偏心補正パラメータ。
+        /// '
+        /// このプロパティはデフォルトプロパティである。Letを使えば｢値の代入｣ができる。いわゆるC++で言うところのoperator=である。
+        /// '
+        /// 引き数：
+        /// clsEccentricCorrectionParam コピー元のオブジェクト。
+        /// 
+        /// </summary>
+        /// <param name="clsEccentricCorrectionParam"></param>
+        public void EccentricCorrectionParam2(EccentricCorrectionParam clsEccentricCorrectionParam)
+        {
+            AngleType = clsEccentricCorrectionParam.AngleType;
+            Marker = clsEccentricCorrectionParam.Marker;
+            UsePoint = clsEccentricCorrectionParam.UsePoint;        //'2009/11 H.Nakamura
+            Horizontal = clsEccentricCorrectionParam.Horizontal;
+            Direction = clsEccentricCorrectionParam.Direction;
+            Distance = clsEccentricCorrectionParam.Distance;
+            UseTS = clsEccentricCorrectionParam.UseTS;
+            FromHeightTS = clsEccentricCorrectionParam.FromHeightTS;
+            ToHeightTS = clsEccentricCorrectionParam.ToHeightTS;
+            ElevationBC = clsEccentricCorrectionParam.ElevationBC;
+            FromHeightBC = clsEccentricCorrectionParam.FromHeightBC;
+            ToHeightBC = clsEccentricCorrectionParam.ToHeightBC;
+            ElevationCB = clsEccentricCorrectionParam.ElevationCB;
+            FromHeightCB = clsEccentricCorrectionParam.FromHeightCB;
+            ToHeightCB = clsEccentricCorrectionParam.ToHeightCB;
+
+            //'2007/3/15 追加 NGS Yamada
+            MarkNumber = clsEccentricCorrectionParam.MarkNumber;
+            MarkName = clsEccentricCorrectionParam.MarkName;
+            MarkEditCode = clsEccentricCorrectionParam.MarkEditCode;
+            MarkLat = clsEccentricCorrectionParam.MarkLat;
+            MarkLon = clsEccentricCorrectionParam.MarkLon;
+            MarkX = clsEccentricCorrectionParam.MarkX;
+            MarkY = clsEccentricCorrectionParam.MarkY;
+            MarkHeight = clsEccentricCorrectionParam.MarkHeight;
+            MarkAlt = clsEccentricCorrectionParam.MarkAlt;
+        }
+
         //==========================================================================================
 
         //==========================================================================================
@@ -199,13 +244,54 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        /// <summary>
+        /// 初期化。
+        /// 
+        /// </summary>
+        private void Class_Initialize()
+        {
+            try
+            {
+                AngleType = (long)ANGLE_TYPE.ANGLETYPE_HORIZONTAL;
+                Marker = "";
+                UsePoint = "";  //'2009/11 H.Nakamura
+                Horizontal = 0;
+                Direction = 0;
+                Distance = 0;
+                UseTS = false;
+                FromHeightTS = 0;
+                ToHeightTS = 0;
+                ElevationBC = 0;
+                FromHeightBC = 0;
+                ToHeightBC = 0;
+                ElevationCB = 0;
+                FromHeightCB = 0;
+                ToHeightCB = 0;
+                MarkNumber = "";
+                MarkName = "";
+                MarkEditCode = 0;
+                MarkLat = 0;
+                MarkLon = 0;
+                MarkX = 0;
+                MarkY = 0;
+                MarkHeight = 0;
+                MarkAlt = 0;
+            }
+            catch (Exception ex)
+            {
+                _ = MessageBox.Show(ex.Message, "エラー発生", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
         //==========================================================================================
+
+        //'*******************************************************************************
+        //'メソッド
+        //'*******************************************************************************
+
 
         //==========================================================================================
         /*[VB]
-        '*******************************************************************************
-        'メソッド
-
         '保存。
         '
         '引き数：
@@ -245,6 +331,10 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        public void Save(int nFile)
+        {
+
+        }
         //==========================================================================================
 
         //==========================================================================================
@@ -296,6 +386,11 @@ namespace SurvLine
         [VB]*/
         //------------------------------------------------------------------------------------------
         //[C#]
+        public void Load(int nFile, long nVersion)
+        {
+
+        }
+
         //***************************************************************************
         //***************************************************************************
         /// <summary>
