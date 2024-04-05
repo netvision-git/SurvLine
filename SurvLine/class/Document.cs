@@ -328,7 +328,13 @@ namespace SurvLine
 
         private MdlSession m_clsMdlSession; //2
 
-        private MdlAutoOrderVector m_clsMdlAutoOrderVector; //5
+        private MdlAutoOrderVector m_clsMdlAutoOrderVector;          //5
+        //  private AutoOrderVectorParam m_clsAutoOrderVectorParam;     //'基線ベクトルの向きの自動整列パラメータ。 //6
+        private frmEccentricCorrection m_clsfrmEccentricCorrection; //偏心設定
+        private frmInputCoordinate m_clsfrmInputCoordinate;         //偏心設定
+
+
+
 
 
         //---------------------------------------------------------
@@ -2003,47 +2009,51 @@ namespace SurvLine
                         clsAccountCadastralParam.Load(br, nVersion);
                     }
 
-                    //[VB]  Dim clsAutoOrderVectorParam As New AutoOrderVectorParam
-                    //[VB]  If nVersion >= 2500 Then Call clsAutoOrderVectorParam.Load(clsFile.Number, nVersion)
+                    /*[VB]-----------------------------------------------------------
+                    Dim clsAutoOrderVectorParam As New AutoOrderVectorParam
+                    If nVersion >= 2500 Then Call clsAutoOrderVectorParam.Load(clsFile.Number, nVersion)
+                    [VB]*/
                     AutoOrderVectorParam clsAutoOrderVectorParam = new AutoOrderVectorParam();
                     if (nVersion >= 2500)
                     {
                         clsAutoOrderVectorParam.Load(br, nVersion);
                     }
 
-                    //[VB]  Dim clsAccountParamResultBase As New AccountParam   '2007/7/18 NGS Yamada
-                    //[VB]  If nVersion >= 7900 Then Call clsAccountParamResultBase.Load(clsFile.Number, nVersion)
+                    /*[VB]-----------------------------------------------------------
+                        Dim clsAccountParamResultBase As New AccountParam   '2007/7/18 NGS Yamada
+                        If nVersion >= 7900 Then Call clsAccountParamResultBase.Load(clsFile.Number, nVersion)
+                    [VB]*/
                     AccountParam clsAccountParamResultBase = new AccountParam();    //'2007/7/18 NGS Yamada
                     if (nVersion >= 7900)
                     {
                         clsAccountParamResultBase.Load(br, nVersion);
                     }
 #endif
-                    /*[VB]
-                    Dim i As Long
-                    Dim clsOutputParam(OUTPUT_TYPE_COUNT -1) As OutputParam
-                    If nVersion< 3300 Then
-                        For i = 0 To OUTPUT_TYPE_COUNT -1
-                            Set clsOutputParam(i) = New OutputParam
-                        Next
-                        Call clsOutputParam(OUTPUT_TYPE_NVF).Load(clsFile.Number, nVersion)
-                        Call clsOutputParam(OUTPUT_TYPE_JOB).Load(clsFile.Number, nVersion)
-                        If nVersion >= 1500 Then Call clsOutputParam(OUTPUT_TYPE_RINEX).Load(clsFile.Number, nVersion)
-                    ElseIf nVersion< 7100 Then
-                        For i = 0 To OUTPUT_TYPE_CSV -1
-                            Set clsOutputParam(i) = New OutputParam
-                            Call clsOutputParam(i).Load(clsFile.Number, nVersion)
-                        Next
-                        Set clsOutputParam(OUTPUT_TYPE_CSV) = New OutputParam
-                    Else
-                        For i = 0 To OUTPUT_TYPE_COUNT -1
-                            Set clsOutputParam(i) = New OutputParam
-                            Call clsOutputParam(i).Load(clsFile.Number, nVersion)
-                        Next
-                    End If
+                    /*[VB]-----------------------------------------------------------
+                        Dim i As Long
+                        Dim clsOutputParam(OUTPUT_TYPE_COUNT -1) As OutputParam
+                        If nVersion< 3300 Then
+                            For i = 0 To OUTPUT_TYPE_COUNT -1
+                                Set clsOutputParam(i) = New OutputParam
+                            Next
+                            Call clsOutputParam(OUTPUT_TYPE_NVF).Load(clsFile.Number, nVersion)
+                            Call clsOutputParam(OUTPUT_TYPE_JOB).Load(clsFile.Number, nVersion)
+                            If nVersion >= 1500 Then Call clsOutputParam(OUTPUT_TYPE_RINEX).Load(clsFile.Number, nVersion)
+                        ElseIf nVersion< 7100 Then
+                            For i = 0 To OUTPUT_TYPE_CSV -1
+                                Set clsOutputParam(i) = New OutputParam
+                                Call clsOutputParam(i).Load(clsFile.Number, nVersion)
+                            Next
+                            Set clsOutputParam(OUTPUT_TYPE_CSV) = New OutputParam
+                        Else
+                            For i = 0 To OUTPUT_TYPE_COUNT -1
+                                Set clsOutputParam(i) = New OutputParam
+                                Call clsOutputParam(i).Load(clsFile.Number, nVersion)
+                            Next
+                        End If
                     [VB]*/
-#if false
                     //[C#]
+#if false
                     long i;
                     OutputParam[] clsOutputParam;
                     OutputParam[] clsOutputParam = new OutputParam[OUTPUT_TYPE_COUNT -1];
@@ -3783,7 +3793,7 @@ namespace SurvLine
         End Sub
         [VB]*/
         //------------------------------------------------------------------------------------------
-        //[C#]
+        //[C#]  //6
         /*
         '指定された基線ベクトルの始点と終点を置き換える。
         '
@@ -3792,7 +3802,52 @@ namespace SurvLine
         */
         public void ReplaceBaseLineVector(BaseLineVector clsBaseLineVector)
         {
-            return;
+            /*-----------------------------------------------------------------
+                '偏心補正の再計算が必要な偏心点。
+                Dim objEccentricPoints As New Collection
+                If clsBaseLineVector.Analysis <= ANALYSIS_STATUS_FIX Then
+                    '基線ベクトルの終点となっている偏心点は再計算する。
+                    If clsBaseLineVector.AnalysisEndPoint.Eccentric Then Call SetAtCollectionObject(objEccentricPoints, clsBaseLineVector.AnalysisEndPoint.HeadPoint, clsBaseLineVector.AnalysisEndPoint.Number)
+                    '基線ベクトルを方位標としている偏心点は再計算する。
+                    Dim objEccentricPointsTemp As New Collection
+                    Call m_clsNetworkModel.GetMarkedEccentricPoints2(clsBaseLineVector, objEccentricPointsTemp)
+                    Dim clsEccentricPoint As ObservationPoint
+                    For Each clsEccentricPoint In objEccentricPointsTemp
+                        Call SetAtCollectionObject(objEccentricPoints, clsEccentricPoint.HeadPoint, clsEccentricPoint.Number)
+                    Next
+                End If
+            */
+            //***********************************************
+            //'偏心補正の再計算が必要な偏心点。
+            //***********************************************
+
+
+            /*-----------------------------------------------------------------
+                '反転。
+                Call m_clsNetworkModel.ReplaceBaseLineVector(clsBaseLineVector)
+            */
+            //******************
+            //  '反転。
+            //******************
+            m_clsNetworkModel.ReplaceBaseLineVector(clsBaseLineVector);
+
+
+            /*-----------------------------------------------------------------
+                '偏心補正の再計算。
+                For Each clsEccentricPoint In objEccentricPoints
+                    Call m_clsNetworkModel.CorrectEccentric(clsEccentricPoint)
+                    Call m_clsNetworkModel.EnableGenuinePoint(clsEccentricPoint)
+                Next
+            */
+            //******************
+            //'偏心補正の再計算。
+            //******************
+
+
+            m_bModifyed = true;
+
+
+
         }
         //==========================================================================================
 
@@ -3871,18 +3926,18 @@ namespace SurvLine
 
         End Sub
         [VB]*/
-        //------------------------------------------------------------------------------------------
-        //[C#]
-        /*
-        '基線解析を行う。
-        '
-        '引き数：
-        'clsBaseLineAnalysisParam 基線解析パラメータ。
-        'objAnalysisBaseLineVectors 対象とする基線ベクトル。要素は BaseLineVector オブジェクト。キーは任意。
-        'bOrderModify 解析順更新許可フラグ。True=解析順は更新する。False=解析順は更新しない。
-        'nFailedCount 基線解析に失敗した基線ベクトルの数が設定される。
-        'clsProgressInterface ProgressInterface オブジェクト。
-        */
+            //------------------------------------------------------------------------------------------
+            //[C#]
+            /*
+            '基線解析を行う。
+            '
+            '引き数：
+            'clsBaseLineAnalysisParam 基線解析パラメータ。
+            'objAnalysisBaseLineVectors 対象とする基線ベクトル。要素は BaseLineVector オブジェクト。キーは任意。
+            'bOrderModify 解析順更新許可フラグ。True=解析順は更新する。False=解析順は更新しない。
+            'nFailedCount 基線解析に失敗した基線ベクトルの数が設定される。
+            'clsProgressInterface ProgressInterface オブジェクト。
+            */
 #if false
         /*
          *************************** 修正要 sakai
@@ -3893,56 +3948,56 @@ namespace SurvLine
             return;
         }
 #endif
-        //==========================================================================================
+            //==========================================================================================
 
-        //==========================================================================================
-        /*[VB]
-        '解析結果を削除する。
-        '
-        '引き数：
-        'objElements 対象とする基線ベクトル。要素は BaseLineVector オブジェクト。キーは任意。
-        Public Sub DeleteAnalysis(ByVal objElements As Collection)
+            //==========================================================================================
+            /*[VB]
+            '解析結果を削除する。
+            '
+            '引き数：
+            'objElements 対象とする基線ベクトル。要素は BaseLineVector オブジェクト。キーは任意。
+            Public Sub DeleteAnalysis(ByVal objElements As Collection)
 
-            '偏心補正の再計算が必要な偏心点。
-            Dim objEccentricPoints As New Collection
-            Dim clsBaseLineVector As BaseLineVector
-            For Each clsBaseLineVector In objElements
-                If clsBaseLineVector.Analysis <= ANALYSIS_STATUS_FIX Then
-                    '基線ベクトルの終点となっている偏心点は再計算する。
-                    If clsBaseLineVector.AnalysisEndPoint.Eccentric Then Call SetAtCollectionObject(objEccentricPoints, clsBaseLineVector.AnalysisEndPoint.HeadPoint, clsBaseLineVector.AnalysisEndPoint.Number)
-                    '基線ベクトルを方位標としている偏心点は再計算する。
-                    Dim objEccentricPointsTemp As New Collection
-                    Call m_clsNetworkModel.GetMarkedEccentricPoints2(clsBaseLineVector, objEccentricPointsTemp)
-                    Dim clsEccentricPoint As ObservationPoint
-                    For Each clsEccentricPoint In objEccentricPointsTemp
-                        Call SetAtCollectionObject(objEccentricPoints, clsEccentricPoint.HeadPoint, clsEccentricPoint.Number)
-                    Next
-                End If
-            Next
-    
-            '解析結果の削除。
-            Call m_clsNetworkModel.DeleteAnalysis(objElements)
-    
-            '偏心補正の再計算。
-            For Each clsEccentricPoint In objEccentricPoints
-                Call m_clsNetworkModel.CorrectEccentric(clsEccentricPoint)
-                Call m_clsNetworkModel.EnableGenuinePoint(clsEccentricPoint)
-            Next
+                '偏心補正の再計算が必要な偏心点。
+                Dim objEccentricPoints As New Collection
+                Dim clsBaseLineVector As BaseLineVector
+                For Each clsBaseLineVector In objElements
+                    If clsBaseLineVector.Analysis <= ANALYSIS_STATUS_FIX Then
+                        '基線ベクトルの終点となっている偏心点は再計算する。
+                        If clsBaseLineVector.AnalysisEndPoint.Eccentric Then Call SetAtCollectionObject(objEccentricPoints, clsBaseLineVector.AnalysisEndPoint.HeadPoint, clsBaseLineVector.AnalysisEndPoint.Number)
+                        '基線ベクトルを方位標としている偏心点は再計算する。
+                        Dim objEccentricPointsTemp As New Collection
+                        Call m_clsNetworkModel.GetMarkedEccentricPoints2(clsBaseLineVector, objEccentricPointsTemp)
+                        Dim clsEccentricPoint As ObservationPoint
+                        For Each clsEccentricPoint In objEccentricPointsTemp
+                            Call SetAtCollectionObject(objEccentricPoints, clsEccentricPoint.HeadPoint, clsEccentricPoint.Number)
+                        Next
+                    End If
+                Next
 
+                '解析結果の削除。
+                Call m_clsNetworkModel.DeleteAnalysis(objElements)
 
-            m_bModifyed = True
+                '偏心補正の再計算。
+                For Each clsEccentricPoint In objEccentricPoints
+                    Call m_clsNetworkModel.CorrectEccentric(clsEccentricPoint)
+                    Call m_clsNetworkModel.EnableGenuinePoint(clsEccentricPoint)
+                Next
 
 
-        End Sub
-        [VB]*/
-        //------------------------------------------------------------------------------------------
-        //[C#]
-        /*
-        '解析結果を削除する。
-        '
-        '引き数：
-        'objElements 対象とする基線ベクトル。要素は BaseLineVector オブジェクト。キーは任意。
-        */
+                m_bModifyed = True
+
+
+            End Sub
+            [VB]*/
+            //------------------------------------------------------------------------------------------
+            //[C#]
+            /*
+            '解析結果を削除する。
+            '
+            '引き数：
+            'objElements 対象とする基線ベクトル。要素は BaseLineVector オブジェクト。キーは任意。
+            */
 #if false
         /*
          *************************** 修正要 sakai
@@ -3952,38 +4007,38 @@ namespace SurvLine
             return;
         }
 #endif
-        //==========================================================================================
+            //==========================================================================================
 
-        //==========================================================================================
-        /*[VB]
-        'データ表示。
-        '
-        '引き数：
-        'objElement 対象とするオブジェクト。
-        '
-        '戻り値：作成した ActiveReport オブジェクトを返す。
-        Public Function MakeAccountDataView(ByVal objElement As Object) As ActiveReport
+            //==========================================================================================
+            /*[VB]
+            'データ表示。
+            '
+            '引き数：
+            'objElement 対象とするオブジェクト。
+            '
+            '戻り値：作成した ActiveReport オブジェクトを返す。
+            Public Function MakeAccountDataView(ByVal objElement As Object) As ActiveReport
 
-            '作成。
-            If(objElement.ObjectType And OBJ_TYPE_OBSERVATIONPOINT) <> 0 Then
-                Set MakeAccountDataView = m_clsAccountMaker.MakeDataViewObservation(objElement)
-            Else
-                Set MakeAccountDataView = m_clsAccountMaker.MakeDataViewBaseLineVector(objElement)
-            End If
+                '作成。
+                If(objElement.ObjectType And OBJ_TYPE_OBSERVATIONPOINT) <> 0 Then
+                    Set MakeAccountDataView = m_clsAccountMaker.MakeDataViewObservation(objElement)
+                Else
+                    Set MakeAccountDataView = m_clsAccountMaker.MakeDataViewBaseLineVector(objElement)
+                End If
 
 
-        End Function
-        [VB]*/
-        //------------------------------------------------------------------------------------------
-        //[C#]
-        /*
-        'データ表示。
-        '
-        '引き数：
-        'objElement 対象とするオブジェクト。
-        '
-        '戻り値：作成した ActiveReport オブジェクトを返す。
-        */
+            End Function
+            [VB]*/
+            //------------------------------------------------------------------------------------------
+            //[C#]
+            /*
+            'データ表示。
+            '
+            '引き数：
+            'objElement 対象とするオブジェクト。
+            '
+            '戻り値：作成した ActiveReport オブジェクトを返す。
+            */
 #if false
         /*
          *************************** 修正要 sakai
@@ -4001,42 +4056,42 @@ namespace SurvLine
             }
         }
 #endif
-        //==========================================================================================
+            //==========================================================================================
 
-        //==========================================================================================
-        /*[VB]
-        '観測手簿を作成する。
-        '
-        '引き数：
-        'clsAccountParam 観測手簿パラメータ。
-        'bModify 更新許可フラグ。True=パラメータを更新することを許可する。False=パラメータの更新は不可。
-        '
-        '戻り値：作成した ActiveReport オブジェクトを返す。
-        Public Function MakeAccountHand(ByVal clsAccountParam As AccountParam, ByVal bModify As Boolean) As ActiveReport
+            //==========================================================================================
+            /*[VB]
+            '観測手簿を作成する。
+            '
+            '引き数：
+            'clsAccountParam 観測手簿パラメータ。
+            'bModify 更新許可フラグ。True=パラメータを更新することを許可する。False=パラメータの更新は不可。
+            '
+            '戻り値：作成した ActiveReport オブジェクトを返す。
+            Public Function MakeAccountHand(ByVal clsAccountParam As AccountParam, ByVal bModify As Boolean) As ActiveReport
 
-            If bModify Then
-                '一致しない場合、更新フラグをONにする。
-                If Not m_clsAccountParamHand.Compare(clsAccountParam) Then m_bModifyed = True
-                Let m_clsAccountParamHand = clsAccountParam
-            End If
-    
-            '作成。
-            Set MakeAccountHand = m_clsAccountMaker.MakeHand(PageNumberVisible, NumberOfMinSV, clsAccountParam)
+                If bModify Then
+                    '一致しない場合、更新フラグをONにする。
+                    If Not m_clsAccountParamHand.Compare(clsAccountParam) Then m_bModifyed = True
+                    Let m_clsAccountParamHand = clsAccountParam
+                End If
+
+                '作成。
+                Set MakeAccountHand = m_clsAccountMaker.MakeHand(PageNumberVisible, NumberOfMinSV, clsAccountParam)
 
 
-        End Function
-        [VB]*/
-        //------------------------------------------------------------------------------------------
-        //[C#]
-        /*
-        '観測手簿を作成する。
-        '
-        '引き数：
-        'clsAccountParam 観測手簿パラメータ。
-        'bModify 更新許可フラグ。True=パラメータを更新することを許可する。False=パラメータの更新は不可。
-        '
-        '戻り値：作成した ActiveReport オブジェクトを返す。
-        */
+            End Function
+            [VB]*/
+            //------------------------------------------------------------------------------------------
+            //[C#]
+            /*
+            '観測手簿を作成する。
+            '
+            '引き数：
+            'clsAccountParam 観測手簿パラメータ。
+            'bModify 更新許可フラグ。True=パラメータを更新することを許可する。False=パラメータの更新は不可。
+            '
+            '戻り値：作成した ActiveReport オブジェクトを返す。
+            */
 #if false
         /*
          *************************** 修正要 sakai
@@ -4056,54 +4111,54 @@ namespace SurvLine
             return m_clsAccountMaker.MakeHand(PageNumberVisible, NumberOfMinSV, clsAccountParam);
         }
 #endif
-        //==========================================================================================
+            //==========================================================================================
 
-        //==========================================================================================
-        /*[VB]
-        '観測記簿を作成する。
-        '
-        '引き数：
-        'clsAccountParam 観測記簿パラメータ。
-        'bModify 更新許可フラグ。True=パラメータを更新することを許可する。False=パラメータの更新は不可。
-        'hWnd オーナーウィンドウ。メッセージボックス表示後、再描画するウィンドウのハンドル。
-        '
-        '戻り値：作成した ActiveReport オブジェクトを返す。
-        '2020/10/20 FDC 既知点の統一'''''''''''''''''''''''''''''''''''''''''''
-        'Public Function MakeAccountWrite(ByVal clsAccountParam As AccountParam, ByVal bModify As Boolean, ByVal hWnd As Long) As ActiveReport
-        '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-        Public Function MakeAccountWrite(ByVal clsAccountParam As AccountParam, ByVal bModify As Boolean, ByVal hWnd As Long, ByVal clsAccountOverlapParam As AccountOverlapParam) As ActiveReport
-        '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-            If bModify Then
-                '一致しない場合、更新フラグをONにする。
-                If Not m_clsAccountParamWrite.Compare(clsAccountParam) Then m_bModifyed = True
-                Let m_clsAccountParamWrite = clsAccountParam
-                '2020/10/20 FDC 既知点の統一'''''''''''''''''''''''''''''''''''''''''''
-                Let m_clsAccountOverlapParam = clsAccountOverlapParam
-                '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-            End If
-    
-            '作成。
+            //==========================================================================================
+            /*[VB]
+            '観測記簿を作成する。
+            '
+            '引き数：
+            'clsAccountParam 観測記簿パラメータ。
+            'bModify 更新許可フラグ。True=パラメータを更新することを許可する。False=パラメータの更新は不可。
+            'hWnd オーナーウィンドウ。メッセージボックス表示後、再描画するウィンドウのハンドル。
+            '
+            '戻り値：作成した ActiveReport オブジェクトを返す。
             '2020/10/20 FDC 既知点の統一'''''''''''''''''''''''''''''''''''''''''''
-            'Set MakeAccountWrite = m_clsAccountMaker.MakeWrite(PageNumberVisible, IIf(m_bGeoidoEnable, m_sGeoidoPath, ""), clsAccountParam, hWnd)
+            'Public Function MakeAccountWrite(ByVal clsAccountParam As AccountParam, ByVal bModify As Boolean, ByVal hWnd As Long) As ActiveReport
             '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-            Set MakeAccountWrite = m_clsAccountMaker.MakeWrite(PageNumberVisible, IIf(m_bGeoidoEnable, m_sGeoidoPath, ""), clsAccountParam, hWnd, clsAccountOverlapParam)
+            Public Function MakeAccountWrite(ByVal clsAccountParam As AccountParam, ByVal bModify As Boolean, ByVal hWnd As Long, ByVal clsAccountOverlapParam As AccountOverlapParam) As ActiveReport
             '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+                If bModify Then
+                    '一致しない場合、更新フラグをONにする。
+                    If Not m_clsAccountParamWrite.Compare(clsAccountParam) Then m_bModifyed = True
+                    Let m_clsAccountParamWrite = clsAccountParam
+                    '2020/10/20 FDC 既知点の統一'''''''''''''''''''''''''''''''''''''''''''
+                    Let m_clsAccountOverlapParam = clsAccountOverlapParam
+                    '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+                End If
+
+                '作成。
+                '2020/10/20 FDC 既知点の統一'''''''''''''''''''''''''''''''''''''''''''
+                'Set MakeAccountWrite = m_clsAccountMaker.MakeWrite(PageNumberVisible, IIf(m_bGeoidoEnable, m_sGeoidoPath, ""), clsAccountParam, hWnd)
+                '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+                Set MakeAccountWrite = m_clsAccountMaker.MakeWrite(PageNumberVisible, IIf(m_bGeoidoEnable, m_sGeoidoPath, ""), clsAccountParam, hWnd, clsAccountOverlapParam)
+                '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 
-        End Function
-        [VB]*/
-        //------------------------------------------------------------------------------------------
-        //[C#]
-        /*
-        '観測記簿を作成する。
-        '
-        '引き数：
-        'clsAccountParam 観測記簿パラメータ。
-        'bModify 更新許可フラグ。True=パラメータを更新することを許可する。False=パラメータの更新は不可。
-        'hWnd オーナーウィンドウ。メッセージボックス表示後、再描画するウィンドウのハンドル。
-        '
-        '戻り値：作成した ActiveReport オブジェクトを返す。
-        */
+            End Function
+            [VB]*/
+            //------------------------------------------------------------------------------------------
+            //[C#]
+            /*
+            '観測記簿を作成する。
+            '
+            '引き数：
+            'clsAccountParam 観測記簿パラメータ。
+            'bModify 更新許可フラグ。True=パラメータを更新することを許可する。False=パラメータの更新は不可。
+            'hWnd オーナーウィンドウ。メッセージボックス表示後、再描画するウィンドウのハンドル。
+            '
+            '戻り値：作成した ActiveReport オブジェクトを返す。
+            */
 #if false
         /*
          *************************** 修正要 sakai
@@ -4113,42 +4168,42 @@ namespace SurvLine
             return null;
         }
 #endif
-        //==========================================================================================
+            //==========================================================================================
 
-        //==========================================================================================
-        /*[VB]
-        '座標計算簿を作成する。
-        '
-        '引き数：
-        'clsAccountParam 座標計算簿パラメータ。
-        'bModify 更新許可フラグ。True=パラメータを更新することを許可する。False=パラメータの更新は不可。
-        '
-        '戻り値：作成した ActiveReport オブジェクトを返す。
-        Public Function MakeAccountCoordinate(ByVal clsAccountParam As AccountParam, ByVal bModify As Boolean) As ActiveReport
+            //==========================================================================================
+            /*[VB]
+            '座標計算簿を作成する。
+            '
+            '引き数：
+            'clsAccountParam 座標計算簿パラメータ。
+            'bModify 更新許可フラグ。True=パラメータを更新することを許可する。False=パラメータの更新は不可。
+            '
+            '戻り値：作成した ActiveReport オブジェクトを返す。
+            Public Function MakeAccountCoordinate(ByVal clsAccountParam As AccountParam, ByVal bModify As Boolean) As ActiveReport
 
-            If bModify Then
-                '一致しない場合、更新フラグをONにする。
-                If Not m_clsAccountParamCoordinate.Compare(clsAccountParam) Then m_bModifyed = True
-                Let m_clsAccountParamCoordinate = clsAccountParam
-            End If
-    
-            '作成。
-            Set MakeAccountCoordinate = m_clsAccountMaker.MakeCoordinate(PageNumberVisible, IIf(m_bGeoidoEnable, m_sGeoidoPath, ""), clsAccountParam)
+                If bModify Then
+                    '一致しない場合、更新フラグをONにする。
+                    If Not m_clsAccountParamCoordinate.Compare(clsAccountParam) Then m_bModifyed = True
+                    Let m_clsAccountParamCoordinate = clsAccountParam
+                End If
+
+                '作成。
+                Set MakeAccountCoordinate = m_clsAccountMaker.MakeCoordinate(PageNumberVisible, IIf(m_bGeoidoEnable, m_sGeoidoPath, ""), clsAccountParam)
 
 
-        End Function
-        [VB]*/
-        //------------------------------------------------------------------------------------------
-        //[C#]
-        /*
-        '座標計算簿を作成する。
-        '
-        '引き数：
-        'clsAccountParam 座標計算簿パラメータ。
-        'bModify 更新許可フラグ。True=パラメータを更新することを許可する。False=パラメータの更新は不可。
-        '
-        '戻り値：作成した ActiveReport オブジェクトを返す。
-        */
+            End Function
+            [VB]*/
+            //------------------------------------------------------------------------------------------
+            //[C#]
+            /*
+            '座標計算簿を作成する。
+            '
+            '引き数：
+            'clsAccountParam 座標計算簿パラメータ。
+            'bModify 更新許可フラグ。True=パラメータを更新することを許可する。False=パラメータの更新は不可。
+            '
+            '戻り値：作成した ActiveReport オブジェクトを返す。
+            */
 #if false
         /*
          *************************** 修正要 sakai
@@ -4158,42 +4213,42 @@ namespace SurvLine
             return null;
         }
 #endif
-        //==========================================================================================
+            //==========================================================================================
 
-        //==========================================================================================
-        /*[VB]
-        '点検計算簿(重複基線)を作成する。
-        '
-        '引き数：
-        'clsAccountOverlapParam 点検計算簿(重複基線)パラメータ。
-        'bCheck 点検測量フラグ。True=点検測量。False=標準(点検計算簿)。
-        'bMax 最大値表示フラグ。
-        '
-        '戻り値：作成した ActiveReport オブジェクト。
-        Public Function MakeAccountOverlap(ByVal clsAccountOverlapParam As AccountOverlapParam, ByVal bCheck As Boolean, ByVal bMax As Boolean) As ActiveReport
+            //==========================================================================================
+            /*[VB]
+            '点検計算簿(重複基線)を作成する。
+            '
+            '引き数：
+            'clsAccountOverlapParam 点検計算簿(重複基線)パラメータ。
+            'bCheck 点検測量フラグ。True=点検測量。False=標準(点検計算簿)。
+            'bMax 最大値表示フラグ。
+            '
+            '戻り値：作成した ActiveReport オブジェクト。
+            Public Function MakeAccountOverlap(ByVal clsAccountOverlapParam As AccountOverlapParam, ByVal bCheck As Boolean, ByVal bMax As Boolean) As ActiveReport
 
-            '一致しない場合、更新フラグをONにする。
-            If Not m_clsAccountOverlapParam.Compare(clsAccountOverlapParam) Then m_bModifyed = True
-            Let m_clsAccountOverlapParam = clsAccountOverlapParam
-    
-            '作成。
-            Set MakeAccountOverlap = m_clsAccountMaker.MakeOverlap(PageNumberVisible, m_clsAccountOverlapParam, IIf(bCheck, 1, 0), bMax)
+                '一致しない場合、更新フラグをONにする。
+                If Not m_clsAccountOverlapParam.Compare(clsAccountOverlapParam) Then m_bModifyed = True
+                Let m_clsAccountOverlapParam = clsAccountOverlapParam
+
+                '作成。
+                Set MakeAccountOverlap = m_clsAccountMaker.MakeOverlap(PageNumberVisible, m_clsAccountOverlapParam, IIf(bCheck, 1, 0), bMax)
 
 
-        End Function
-        [VB]*/
-        //------------------------------------------------------------------------------------------
-        //[C#]
-        /*
-        '点検計算簿(重複基線)を作成する。
-        '
-        '引き数：
-        'clsAccountOverlapParam 点検計算簿(重複基線)パラメータ。
-        'bCheck 点検測量フラグ。True=点検測量。False=標準(点検計算簿)。
-        'bMax 最大値表示フラグ。
-        '
-        '戻り値：作成した ActiveReport オブジェクト。
-        */
+            End Function
+            [VB]*/
+            //------------------------------------------------------------------------------------------
+            //[C#]
+            /*
+            '点検計算簿(重複基線)を作成する。
+            '
+            '引き数：
+            'clsAccountOverlapParam 点検計算簿(重複基線)パラメータ。
+            'bCheck 点検測量フラグ。True=点検測量。False=標準(点検計算簿)。
+            'bMax 最大値表示フラグ。
+            '
+            '戻り値：作成した ActiveReport オブジェクト。
+            */
 #if false
         /*
          *************************** 修正要 sakai
@@ -4203,53 +4258,53 @@ namespace SurvLine
             return null;
         }
 #endif
-        //==========================================================================================
+            //==========================================================================================
 
-        //==========================================================================================
-        /*[VB]
-        '点検計算簿(環閉合差)を作成する。
-        '
-        'objSelectedAngleDiffs で指定された閉合差の帳票を作成する。
-        '
-        '引き数：
-        'objSelectedAngleDiffs 出力する閉合差。要素は AngleDiff オブジェクト。キーは AngleDiff オブジェクトの Number。
-        '
-        '戻り値：作成した ActiveReport オブジェクトを返す。
-        Public Function MakeAccountRing(ByVal objSelectedAngleDiffs As Collection) As ActiveReport
+            //==========================================================================================
+            /*[VB]
+            '点検計算簿(環閉合差)を作成する。
+            '
+            'objSelectedAngleDiffs で指定された閉合差の帳票を作成する。
+            '
+            '引き数：
+            'objSelectedAngleDiffs 出力する閉合差。要素は AngleDiff オブジェクト。キーは AngleDiff オブジェクトの Number。
+            '
+            '戻り値：作成した ActiveReport オブジェクトを返す。
+            Public Function MakeAccountRing(ByVal objSelectedAngleDiffs As Collection) As ActiveReport
 
-            ReDim clsAngleDiffs(-1 To -1)
-            Dim i As Long
-            For i = 0 To m_clsAngleDiffParamRing.Count - 1
-                Dim clsAngleDiff As AngleDiff
-                If LookupCollectionObject(objSelectedAngleDiffs, clsAngleDiff, m_clsAngleDiffParamRing.AngleDiffs(i).Number) Then
-                    '一致しない場合、更新フラグをONにする。
-                    If Not m_clsAngleDiffParamRing.AngleDiffs(i).Account Then m_bModifyed = True
-                    m_clsAngleDiffParamRing.AngleDiffs(i).Account = True
-                Else
-                    '一致しない場合、更新フラグをONにする。
-                    If m_clsAngleDiffParamRing.AngleDiffs(i).Account Then m_bModifyed = True
-                    m_clsAngleDiffParamRing.AngleDiffs(i).Account = False
-                End If
-            Next
-    
-            '作成。
-            Set MakeAccountRing = m_clsAccountMaker.MakeRing(PageNumberVisible, IIf(m_bGeoidoEnable, m_sGeoidoPath, ""), objSelectedAngleDiffs)
+                ReDim clsAngleDiffs(-1 To -1)
+                Dim i As Long
+                For i = 0 To m_clsAngleDiffParamRing.Count - 1
+                    Dim clsAngleDiff As AngleDiff
+                    If LookupCollectionObject(objSelectedAngleDiffs, clsAngleDiff, m_clsAngleDiffParamRing.AngleDiffs(i).Number) Then
+                        '一致しない場合、更新フラグをONにする。
+                        If Not m_clsAngleDiffParamRing.AngleDiffs(i).Account Then m_bModifyed = True
+                        m_clsAngleDiffParamRing.AngleDiffs(i).Account = True
+                    Else
+                        '一致しない場合、更新フラグをONにする。
+                        If m_clsAngleDiffParamRing.AngleDiffs(i).Account Then m_bModifyed = True
+                        m_clsAngleDiffParamRing.AngleDiffs(i).Account = False
+                    End If
+                Next
+
+                '作成。
+                Set MakeAccountRing = m_clsAccountMaker.MakeRing(PageNumberVisible, IIf(m_bGeoidoEnable, m_sGeoidoPath, ""), objSelectedAngleDiffs)
 
 
-        End Function
-        [VB]*/
-        //------------------------------------------------------------------------------------------
-        //[C#]
-        /*
-        '点検計算簿(環閉合差)を作成する。
-        '
-        'objSelectedAngleDiffs で指定された閉合差の帳票を作成する。
-        '
-        '引き数：
-        'objSelectedAngleDiffs 出力する閉合差。要素は AngleDiff オブジェクト。キーは AngleDiff オブジェクトの Number。
-        '
-        '戻り値：作成した ActiveReport オブジェクトを返す。
-        */
+            End Function
+            [VB]*/
+            //------------------------------------------------------------------------------------------
+            //[C#]
+            /*
+            '点検計算簿(環閉合差)を作成する。
+            '
+            'objSelectedAngleDiffs で指定された閉合差の帳票を作成する。
+            '
+            '引き数：
+            'objSelectedAngleDiffs 出力する閉合差。要素は AngleDiff オブジェクト。キーは AngleDiff オブジェクトの Number。
+            '
+            '戻り値：作成した ActiveReport オブジェクトを返す。
+            */
 #if false
         /*
          *************************** 修正要 sakai
@@ -4259,53 +4314,53 @@ namespace SurvLine
             return null;
         }
 #endif
-        //==========================================================================================
+            //==========================================================================================
 
-        //==========================================================================================
-        /*[VB]
-        '点検計算簿(電子基準点間の閉合差)を作成する。
-        '
-        'objSelectedAngleDiffs で指定された閉合差の帳票を作成する。
-        '
-        '引き数：
-        'objSelectedAngleDiffs 出力する閉合差。要素は AngleDiff オブジェクト。キーは AngleDiff オブジェクトの Number。
-        '
-        '戻り値：作成した ActiveReport オブジェクトを返す。
-        Public Function MakeAccountBetween(ByVal objSelectedAngleDiffs As Collection) As ActiveReport
+            //==========================================================================================
+            /*[VB]
+            '点検計算簿(電子基準点間の閉合差)を作成する。
+            '
+            'objSelectedAngleDiffs で指定された閉合差の帳票を作成する。
+            '
+            '引き数：
+            'objSelectedAngleDiffs 出力する閉合差。要素は AngleDiff オブジェクト。キーは AngleDiff オブジェクトの Number。
+            '
+            '戻り値：作成した ActiveReport オブジェクトを返す。
+            Public Function MakeAccountBetween(ByVal objSelectedAngleDiffs As Collection) As ActiveReport
 
-            ReDim clsAngleDiffs(-1 To -1)
-            Dim i As Long
-            For i = 0 To m_clsAngleDiffParamBetween.Count - 1
-                Dim clsAngleDiff As AngleDiff
-                If LookupCollectionObject(objSelectedAngleDiffs, clsAngleDiff, m_clsAngleDiffParamBetween.AngleDiffs(i).Number) Then
-                    '一致しない場合、更新フラグをONにする。
-                    If Not m_clsAngleDiffParamBetween.AngleDiffs(i).Account Then m_bModifyed = True
-                    m_clsAngleDiffParamBetween.AngleDiffs(i).Account = True
-                Else
-                    '一致しない場合、更新フラグをONにする。
-                    If m_clsAngleDiffParamBetween.AngleDiffs(i).Account Then m_bModifyed = True
-                    m_clsAngleDiffParamBetween.AngleDiffs(i).Account = False
-                End If
-            Next
-    
-            '作成。
-            Set MakeAccountBetween = m_clsAccountMaker.MakeBetween(PageNumberVisible, IIf(m_bGeoidoEnable, m_sGeoidoPath, ""), m_bSemiDynaEnable, objSelectedAngleDiffs)
+                ReDim clsAngleDiffs(-1 To -1)
+                Dim i As Long
+                For i = 0 To m_clsAngleDiffParamBetween.Count - 1
+                    Dim clsAngleDiff As AngleDiff
+                    If LookupCollectionObject(objSelectedAngleDiffs, clsAngleDiff, m_clsAngleDiffParamBetween.AngleDiffs(i).Number) Then
+                        '一致しない場合、更新フラグをONにする。
+                        If Not m_clsAngleDiffParamBetween.AngleDiffs(i).Account Then m_bModifyed = True
+                        m_clsAngleDiffParamBetween.AngleDiffs(i).Account = True
+                    Else
+                        '一致しない場合、更新フラグをONにする。
+                        If m_clsAngleDiffParamBetween.AngleDiffs(i).Account Then m_bModifyed = True
+                        m_clsAngleDiffParamBetween.AngleDiffs(i).Account = False
+                    End If
+                Next
+
+                '作成。
+                Set MakeAccountBetween = m_clsAccountMaker.MakeBetween(PageNumberVisible, IIf(m_bGeoidoEnable, m_sGeoidoPath, ""), m_bSemiDynaEnable, objSelectedAngleDiffs)
 
 
-        End Function
-        [VB]*/
-        //------------------------------------------------------------------------------------------
-        //[C#]
-        /*
-        '点検計算簿(電子基準点間の閉合差)を作成する。
-        '
-        'objSelectedAngleDiffs で指定された閉合差の帳票を作成する。
-        '
-        '引き数：
-        'objSelectedAngleDiffs 出力する閉合差。要素は AngleDiff オブジェクト。キーは AngleDiff オブジェクトの Number。
-        '
-        '戻り値：作成した ActiveReport オブジェクトを返す。
-        */
+            End Function
+            [VB]*/
+            //------------------------------------------------------------------------------------------
+            //[C#]
+            /*
+            '点検計算簿(電子基準点間の閉合差)を作成する。
+            '
+            'objSelectedAngleDiffs で指定された閉合差の帳票を作成する。
+            '
+            '引き数：
+            'objSelectedAngleDiffs 出力する閉合差。要素は AngleDiff オブジェクト。キーは AngleDiff オブジェクトの Number。
+            '
+            '戻り値：作成した ActiveReport オブジェクトを返す。
+            */
 #if false
         /*
          *************************** 修正要 sakai
@@ -4315,56 +4370,56 @@ namespace SurvLine
             return null;
         }
 #endif
-        //==========================================================================================
+            //==========================================================================================
 
-        //==========================================================================================
-        /*[VB]
-        '2023/05/19 Hitz H.Nakamura **************************************************
-        '楕円体高の閉合差を追加。
-        '点検計算簿(楕円体高の閉合差)を作成する。
-        '
-        'objSelectedAngleDiffs で指定された閉合差の帳票を作成する。
-        '
-        '引き数：
-        'objSelectedAngleDiffs 出力する閉合差。要素は AngleDiff オブジェクト。キーは AngleDiff オブジェクトの Number。
-        '
-        '戻り値：作成した ActiveReport オブジェクトを返す。
-        Public Function MakeAccountAngleDiffHeight(ByVal objSelectedAngleDiffs As Collection) As ActiveReport
+            //==========================================================================================
+            /*[VB]
+            '2023/05/19 Hitz H.Nakamura **************************************************
+            '楕円体高の閉合差を追加。
+            '点検計算簿(楕円体高の閉合差)を作成する。
+            '
+            'objSelectedAngleDiffs で指定された閉合差の帳票を作成する。
+            '
+            '引き数：
+            'objSelectedAngleDiffs 出力する閉合差。要素は AngleDiff オブジェクト。キーは AngleDiff オブジェクトの Number。
+            '
+            '戻り値：作成した ActiveReport オブジェクトを返す。
+            Public Function MakeAccountAngleDiffHeight(ByVal objSelectedAngleDiffs As Collection) As ActiveReport
 
-            ReDim clsAngleDiffs(-1 To -1)
-            Dim i As Long
-            For i = 0 To m_clsAngleDiffParamHeight.Count - 1
-                Dim clsAngleDiff As AngleDiff
-                If LookupCollectionObject(objSelectedAngleDiffs, clsAngleDiff, m_clsAngleDiffParamHeight.AngleDiffs(i).Number) Then
-                    '一致しない場合、更新フラグをONにする。
-                    If Not m_clsAngleDiffParamHeight.AngleDiffs(i).Account Then m_bModifyed = True
-                    m_clsAngleDiffParamHeight.AngleDiffs(i).Account = True
-                Else
-                    '一致しない場合、更新フラグをONにする。
-                    If m_clsAngleDiffParamHeight.AngleDiffs(i).Account Then m_bModifyed = True
-                    m_clsAngleDiffParamHeight.AngleDiffs(i).Account = False
-                End If
-            Next
-    
-            '作成。
-            Set MakeAccountAngleDiffHeight = m_clsAccountMaker.MakeAngleDiffHeight(PageNumberVisible, IIf(m_bGeoidoEnable, m_sGeoidoPath, ""), m_bSemiDynaEnable, objSelectedAngleDiffs)
+                ReDim clsAngleDiffs(-1 To -1)
+                Dim i As Long
+                For i = 0 To m_clsAngleDiffParamHeight.Count - 1
+                    Dim clsAngleDiff As AngleDiff
+                    If LookupCollectionObject(objSelectedAngleDiffs, clsAngleDiff, m_clsAngleDiffParamHeight.AngleDiffs(i).Number) Then
+                        '一致しない場合、更新フラグをONにする。
+                        If Not m_clsAngleDiffParamHeight.AngleDiffs(i).Account Then m_bModifyed = True
+                        m_clsAngleDiffParamHeight.AngleDiffs(i).Account = True
+                    Else
+                        '一致しない場合、更新フラグをONにする。
+                        If m_clsAngleDiffParamHeight.AngleDiffs(i).Account Then m_bModifyed = True
+                        m_clsAngleDiffParamHeight.AngleDiffs(i).Account = False
+                    End If
+                Next
+
+                '作成。
+                Set MakeAccountAngleDiffHeight = m_clsAccountMaker.MakeAngleDiffHeight(PageNumberVisible, IIf(m_bGeoidoEnable, m_sGeoidoPath, ""), m_bSemiDynaEnable, objSelectedAngleDiffs)
 
 
-        End Function
-        '*****************************************************************************
-        [VB]*/
-        //------------------------------------------------------------------------------------------
-        //[C#]
-        /*
-        '点検計算簿(楕円体高の閉合差)を作成する。
-        '
-        'objSelectedAngleDiffs で指定された閉合差の帳票を作成する。
-        '
-        '引き数：
-        'objSelectedAngleDiffs 出力する閉合差。要素は AngleDiff オブジェクト。キーは AngleDiff オブジェクトの Number。
-        '
-        '戻り値：作成した ActiveReport オブジェクトを返す。
-        */
+            End Function
+            '*****************************************************************************
+            [VB]*/
+            //------------------------------------------------------------------------------------------
+            //[C#]
+            /*
+            '点検計算簿(楕円体高の閉合差)を作成する。
+            '
+            'objSelectedAngleDiffs で指定された閉合差の帳票を作成する。
+            '
+            '引き数：
+            'objSelectedAngleDiffs 出力する閉合差。要素は AngleDiff オブジェクト。キーは AngleDiff オブジェクトの Number。
+            '
+            '戻り値：作成した ActiveReport オブジェクトを返す。
+            */
 #if false
         /*
          *************************** 修正要 sakai
@@ -4374,42 +4429,42 @@ namespace SurvLine
             return null;
         }
 #endif
-        //==========================================================================================
+            //==========================================================================================
 
-        //==========================================================================================
-        /*[VB]
-        '2023/07/12 Hitz H.Nakamura **************************************************
-        'GNSS水準測量対応。
-        '点検計算簿(前後半基線較差)の追加。
-        '点検計算簿(前後半基線較差)を作成する。
-        '
-        '引き数：
-        'clsAccountOverlapParam 点検計算簿(前後半基線較差)パラメータ。
-        '
-        '戻り値：作成した ActiveReport オブジェクト。
-        Public Function MakeAccountOverlapHalf(ByVal clsAccountOverlapParam As AccountOverlapParam) As ActiveReport
+            //==========================================================================================
+            /*[VB]
+            '2023/07/12 Hitz H.Nakamura **************************************************
+            'GNSS水準測量対応。
+            '点検計算簿(前後半基線較差)の追加。
+            '点検計算簿(前後半基線較差)を作成する。
+            '
+            '引き数：
+            'clsAccountOverlapParam 点検計算簿(前後半基線較差)パラメータ。
+            '
+            '戻り値：作成した ActiveReport オブジェクト。
+            Public Function MakeAccountOverlapHalf(ByVal clsAccountOverlapParam As AccountOverlapParam) As ActiveReport
 
-            '一致しない場合、更新フラグをONにする。
-            If StrComp(m_clsAccountOverlapParam.Fixed, clsAccountOverlapParam.Fixed) <> 0 Then m_bModifyed = True
-            m_clsAccountOverlapParam.Fixed = clsAccountOverlapParam.Fixed
-    
-            '作成。
-            Set MakeAccountOverlapHalf = m_clsAccountMaker.MakeOverlap(PageNumberVisible, m_clsAccountOverlapParam, 2, True)
+                '一致しない場合、更新フラグをONにする。
+                If StrComp(m_clsAccountOverlapParam.Fixed, clsAccountOverlapParam.Fixed) <> 0 Then m_bModifyed = True
+                m_clsAccountOverlapParam.Fixed = clsAccountOverlapParam.Fixed
+
+                '作成。
+                Set MakeAccountOverlapHalf = m_clsAccountMaker.MakeOverlap(PageNumberVisible, m_clsAccountOverlapParam, 2, True)
 
 
-        End Function
-        '*****************************************************************************
-        [VB]*/
-        //------------------------------------------------------------------------------------------
-        //[C#]
-        /*
-        '点検計算簿(前後半基線較差)を作成する。
-        '
-        '引き数：
-        'clsAccountOverlapParam 点検計算簿(前後半基線較差)パラメータ。
-        '
-        '戻り値：作成した ActiveReport オブジェクト。
-        */
+            End Function
+            '*****************************************************************************
+            [VB]*/
+            //------------------------------------------------------------------------------------------
+            //[C#]
+            /*
+            '点検計算簿(前後半基線較差)を作成する。
+            '
+            '引き数：
+            'clsAccountOverlapParam 点検計算簿(前後半基線較差)パラメータ。
+            '
+            '戻り値：作成した ActiveReport オブジェクト。
+            */
 #if false
         /*
          *************************** 修正要 sakai
@@ -4419,42 +4474,42 @@ namespace SurvLine
             return null;
         }
 #endif
-        //==========================================================================================
+            //==========================================================================================
 
-        //==========================================================================================
-        /*[VB]
-        '偏心計算簿を作成する。
-        '
-        '引き数：
-        'clsAccountParam 偏心計算簿パラメータ。
-        'bModify 更新許可フラグ。True=パラメータを更新することを許可する。False=パラメータの更新は不可。
-        '
-        '戻り値：作成した ActiveReport オブジェクトを返す。
-        Public Function MakeAccountEccentricCorrect(ByVal clsAccountParam As AccountParam, ByVal bModify As Boolean) As ActiveReport
+            //==========================================================================================
+            /*[VB]
+            '偏心計算簿を作成する。
+            '
+            '引き数：
+            'clsAccountParam 偏心計算簿パラメータ。
+            'bModify 更新許可フラグ。True=パラメータを更新することを許可する。False=パラメータの更新は不可。
+            '
+            '戻り値：作成した ActiveReport オブジェクトを返す。
+            Public Function MakeAccountEccentricCorrect(ByVal clsAccountParam As AccountParam, ByVal bModify As Boolean) As ActiveReport
 
-            If bModify Then
-                '一致しない場合、更新フラグをONにする。
-                If Not m_clsAccountParamEccentricCorrect.Compare(clsAccountParam) Then m_bModifyed = True
-                Let m_clsAccountParamEccentricCorrect = clsAccountParam
-            End If
-    
-            '作成。
-            Set MakeAccountEccentricCorrect = m_clsAccountMaker.MakeEccentricCorrect(PageNumberVisible, IIf(m_bGeoidoEnable, m_sGeoidoPath, ""), clsAccountParam)
+                If bModify Then
+                    '一致しない場合、更新フラグをONにする。
+                    If Not m_clsAccountParamEccentricCorrect.Compare(clsAccountParam) Then m_bModifyed = True
+                    Let m_clsAccountParamEccentricCorrect = clsAccountParam
+                End If
+
+                '作成。
+                Set MakeAccountEccentricCorrect = m_clsAccountMaker.MakeEccentricCorrect(PageNumberVisible, IIf(m_bGeoidoEnable, m_sGeoidoPath, ""), clsAccountParam)
 
 
-        End Function
-        [VB]*/
-        //------------------------------------------------------------------------------------------
-        //[C#]
-        /*
-        '偏心計算簿を作成する。
-        '
-        '引き数：
-        'clsAccountParam 偏心計算簿パラメータ。
-        'bModify 更新許可フラグ。True=パラメータを更新することを許可する。False=パラメータの更新は不可。
-        '
-        '戻り値：作成した ActiveReport オブジェクトを返す。
-        */
+            End Function
+            [VB]*/
+            //------------------------------------------------------------------------------------------
+            //[C#]
+            /*
+            '偏心計算簿を作成する。
+            '
+            '引き数：
+            'clsAccountParam 偏心計算簿パラメータ。
+            'bModify 更新許可フラグ。True=パラメータを更新することを許可する。False=パラメータの更新は不可。
+            '
+            '戻り値：作成した ActiveReport オブジェクトを返す。
+            */
 #if false
         /*
          *************************** 修正要 sakai
@@ -4464,43 +4519,43 @@ namespace SurvLine
             return null;
         }
 #endif
-        //==========================================================================================
+            //==========================================================================================
 
-        //==========================================================================================
-        /*[VB]
-        '2009/11 H.Nakamura
-        '元期→今期補正表を作成する。
-        '
-        '引き数：
-        'clsAccountParam セミ・ダイナミック補正表パラメータ。
-        'bModify 更新許可フラグ。True=パラメータを更新することを許可する。False=パラメータの更新は不可。
-        '
-        '戻り値：作成した ActiveReport オブジェクトを返す。
-        Public Function MakeAccountSemiDynaGAN2KON(ByVal clsAccountParam As AccountParam, ByVal bModify As Boolean) As ActiveReport
+            //==========================================================================================
+            /*[VB]
+            '2009/11 H.Nakamura
+            '元期→今期補正表を作成する。
+            '
+            '引き数：
+            'clsAccountParam セミ・ダイナミック補正表パラメータ。
+            'bModify 更新許可フラグ。True=パラメータを更新することを許可する。False=パラメータの更新は不可。
+            '
+            '戻り値：作成した ActiveReport オブジェクトを返す。
+            Public Function MakeAccountSemiDynaGAN2KON(ByVal clsAccountParam As AccountParam, ByVal bModify As Boolean) As ActiveReport
 
-            If bModify Then
-                '一致しない場合、更新フラグをONにする。
-                If Not m_clsAccountParamSemiDyna.Compare(clsAccountParam) Then m_bModifyed = True
-                Let m_clsAccountParamSemiDyna = clsAccountParam
-            End If
-    
-            '作成。
-            Set MakeAccountSemiDynaGAN2KON = m_clsAccountMaker.MakeSemiDynaGAN2KON(PageNumberVisible, IIf(m_bGeoidoEnable, m_sGeoidoPath, ""), m_bSemiDynaEnable, clsAccountParam)
+                If bModify Then
+                    '一致しない場合、更新フラグをONにする。
+                    If Not m_clsAccountParamSemiDyna.Compare(clsAccountParam) Then m_bModifyed = True
+                    Let m_clsAccountParamSemiDyna = clsAccountParam
+                End If
+
+                '作成。
+                Set MakeAccountSemiDynaGAN2KON = m_clsAccountMaker.MakeSemiDynaGAN2KON(PageNumberVisible, IIf(m_bGeoidoEnable, m_sGeoidoPath, ""), m_bSemiDynaEnable, clsAccountParam)
 
 
-        End Function
-        [VB]*/
-        //------------------------------------------------------------------------------------------
-        //[C#]
-        /*
-        '元期→今期補正表を作成する。
-        '
-        '引き数：
-        'clsAccountParam セミ・ダイナミック補正表パラメータ。
-        'bModify 更新許可フラグ。True=パラメータを更新することを許可する。False=パラメータの更新は不可。
-        '
-        '戻り値：作成した ActiveReport オブジェクトを返す。
-        */
+            End Function
+            [VB]*/
+            //------------------------------------------------------------------------------------------
+            //[C#]
+            /*
+            '元期→今期補正表を作成する。
+            '
+            '引き数：
+            'clsAccountParam セミ・ダイナミック補正表パラメータ。
+            'bModify 更新許可フラグ。True=パラメータを更新することを許可する。False=パラメータの更新は不可。
+            '
+            '戻り値：作成した ActiveReport オブジェクトを返す。
+            */
 #if false
         /*
          *************************** 修正要 sakai
@@ -4510,58 +4565,58 @@ namespace SurvLine
             return null;
         }
 #endif
-        //==========================================================================================
+            //==========================================================================================
 
-        //==========================================================================================
-        /*[VB]
-        '地籍図根三角測量精度管理表(環閉合差)を作成する。
-        '
-        'objSelectedAngleDiffs で指定された閉合差の帳票を作成する。
-        '
-        '引き数：
-        'objSelectedAngleDiffs 出力する閉合差。要素は AngleDiff オブジェクト。キーは AngleDiff オブジェクトの Number。
-        'clsAccountCadastralParam 地籍図根三角測量精度管理表パラメータ。
-        '
-        '戻り値：作成した ActiveReport オブジェクトを返す。
-        Public Function MakeAccountCadastralAccuracyRing(ByVal objSelectedAngleDiffs As Collection, ByVal clsAccountCadastralParam As AccountCadastralParam) As ActiveReport
+            //==========================================================================================
+            /*[VB]
+            '地籍図根三角測量精度管理表(環閉合差)を作成する。
+            '
+            'objSelectedAngleDiffs で指定された閉合差の帳票を作成する。
+            '
+            '引き数：
+            'objSelectedAngleDiffs 出力する閉合差。要素は AngleDiff オブジェクト。キーは AngleDiff オブジェクトの Number。
+            'clsAccountCadastralParam 地籍図根三角測量精度管理表パラメータ。
+            '
+            '戻り値：作成した ActiveReport オブジェクトを返す。
+            Public Function MakeAccountCadastralAccuracyRing(ByVal objSelectedAngleDiffs As Collection, ByVal clsAccountCadastralParam As AccountCadastralParam) As ActiveReport
 
-            ReDim clsAngleDiffs(-1 To -1)
-            Dim i As Long
-            For i = 0 To m_clsAngleDiffParamRing.Count - 1
-                Dim clsAngleDiff As AngleDiff
-                If LookupCollectionObject(objSelectedAngleDiffs, clsAngleDiff, m_clsAngleDiffParamRing.AngleDiffs(i).Number) Then
-                    '一致しない場合、更新フラグをONにする。
-                    If Not m_clsAngleDiffParamRing.AngleDiffs(i).Account(1) Then m_bModifyed = True
-                    m_clsAngleDiffParamRing.AngleDiffs(i).Account(1) = True
-                Else
-                    '一致しない場合、更新フラグをONにする。
-                    If m_clsAngleDiffParamRing.AngleDiffs(i).Account(1) Then m_bModifyed = True
-                    m_clsAngleDiffParamRing.AngleDiffs(i).Account(1) = False
-                End If
-            Next
-            '一致しない場合、更新フラグをONにする。
-            If Not m_clsAccountCadastralParam.Compare(clsAccountCadastralParam) Then m_bModifyed = True
-            Let m_clsAccountCadastralParam = clsAccountCadastralParam
-    
-            '作成。
-            Set MakeAccountCadastralAccuracyRing = m_clsAccountMaker.MakeCadastralAccuracyRing(PageNumberVisible, objSelectedAngleDiffs, clsAccountCadastralParam)
+                ReDim clsAngleDiffs(-1 To -1)
+                Dim i As Long
+                For i = 0 To m_clsAngleDiffParamRing.Count - 1
+                    Dim clsAngleDiff As AngleDiff
+                    If LookupCollectionObject(objSelectedAngleDiffs, clsAngleDiff, m_clsAngleDiffParamRing.AngleDiffs(i).Number) Then
+                        '一致しない場合、更新フラグをONにする。
+                        If Not m_clsAngleDiffParamRing.AngleDiffs(i).Account(1) Then m_bModifyed = True
+                        m_clsAngleDiffParamRing.AngleDiffs(i).Account(1) = True
+                    Else
+                        '一致しない場合、更新フラグをONにする。
+                        If m_clsAngleDiffParamRing.AngleDiffs(i).Account(1) Then m_bModifyed = True
+                        m_clsAngleDiffParamRing.AngleDiffs(i).Account(1) = False
+                    End If
+                Next
+                '一致しない場合、更新フラグをONにする。
+                If Not m_clsAccountCadastralParam.Compare(clsAccountCadastralParam) Then m_bModifyed = True
+                Let m_clsAccountCadastralParam = clsAccountCadastralParam
+
+                '作成。
+                Set MakeAccountCadastralAccuracyRing = m_clsAccountMaker.MakeCadastralAccuracyRing(PageNumberVisible, objSelectedAngleDiffs, clsAccountCadastralParam)
 
 
-        End Function
-        [VB]*/
-        //------------------------------------------------------------------------------------------
-        //[C#]
-        /*
-        '地籍図根三角測量精度管理表(環閉合差)を作成する。
-        '
-        'objSelectedAngleDiffs で指定された閉合差の帳票を作成する。
-        '
-        '引き数：
-        'objSelectedAngleDiffs 出力する閉合差。要素は AngleDiff オブジェクト。キーは AngleDiff オブジェクトの Number。
-        'clsAccountCadastralParam 地籍図根三角測量精度管理表パラメータ。
-        '
-        '戻り値：作成した ActiveReport オブジェクトを返す。
-        */
+            End Function
+            [VB]*/
+            //------------------------------------------------------------------------------------------
+            //[C#]
+            /*
+            '地籍図根三角測量精度管理表(環閉合差)を作成する。
+            '
+            'objSelectedAngleDiffs で指定された閉合差の帳票を作成する。
+            '
+            '引き数：
+            'objSelectedAngleDiffs 出力する閉合差。要素は AngleDiff オブジェクト。キーは AngleDiff オブジェクトの Number。
+            'clsAccountCadastralParam 地籍図根三角測量精度管理表パラメータ。
+            '
+            '戻り値：作成した ActiveReport オブジェクトを返す。
+            */
 #if false
         /*
          *************************** 修正要 sakai
@@ -4571,42 +4626,42 @@ namespace SurvLine
             return null;
         }
 #endif
-        //==========================================================================================
+            //==========================================================================================
 
-        //==========================================================================================
-        /*[VB]
-        '地籍図根三角測量精度管理表(重複辺の較差)を作成する。
-        '
-        '引き数：
-        'clsAccountOverlapParam 点検計算簿(重複基線)パラメータ。
-        'clsAccountCadastralParam 地籍図根三角測量精度管理表パラメータ。
-        '
-        '戻り値：作成した ActiveReport オブジェクトを返す。
-        Public Function MakeAccountCadastralAccuracyOverlap(ByVal clsAccountOverlapParam As AccountOverlapParam, ByVal clsAccountCadastralParam As AccountCadastralParam) As ActiveReport
+            //==========================================================================================
+            /*[VB]
+            '地籍図根三角測量精度管理表(重複辺の較差)を作成する。
+            '
+            '引き数：
+            'clsAccountOverlapParam 点検計算簿(重複基線)パラメータ。
+            'clsAccountCadastralParam 地籍図根三角測量精度管理表パラメータ。
+            '
+            '戻り値：作成した ActiveReport オブジェクトを返す。
+            Public Function MakeAccountCadastralAccuracyOverlap(ByVal clsAccountOverlapParam As AccountOverlapParam, ByVal clsAccountCadastralParam As AccountCadastralParam) As ActiveReport
 
-            '一致しない場合、更新フラグをONにする。
-            If Not m_clsAccountOverlapParam.Compare(clsAccountOverlapParam) Then m_bModifyed = True
-            Let m_clsAccountOverlapParam = clsAccountOverlapParam
-            If Not m_clsAccountCadastralParam.Compare(clsAccountCadastralParam) Then m_bModifyed = True
-            Let m_clsAccountCadastralParam = clsAccountCadastralParam
-    
-            '作成。
-            Set MakeAccountCadastralAccuracyOverlap = m_clsAccountMaker.MakeCadastralAccuracyOverlap(PageNumberVisible, m_clsAccountOverlapParam, clsAccountCadastralParam)
+                '一致しない場合、更新フラグをONにする。
+                If Not m_clsAccountOverlapParam.Compare(clsAccountOverlapParam) Then m_bModifyed = True
+                Let m_clsAccountOverlapParam = clsAccountOverlapParam
+                If Not m_clsAccountCadastralParam.Compare(clsAccountCadastralParam) Then m_bModifyed = True
+                Let m_clsAccountCadastralParam = clsAccountCadastralParam
+
+                '作成。
+                Set MakeAccountCadastralAccuracyOverlap = m_clsAccountMaker.MakeCadastralAccuracyOverlap(PageNumberVisible, m_clsAccountOverlapParam, clsAccountCadastralParam)
 
 
-        End Function
-        [VB]*/
-        //------------------------------------------------------------------------------------------
-        //[C#]
-        /*
-        '地籍図根三角測量精度管理表(重複辺の較差)を作成する。
-        '
-        '引き数：
-        'clsAccountOverlapParam 点検計算簿(重複基線)パラメータ。
-        'clsAccountCadastralParam 地籍図根三角測量精度管理表パラメータ。
-        '
-        '戻り値：作成した ActiveReport オブジェクトを返す。
-        */
+            End Function
+            [VB]*/
+            //------------------------------------------------------------------------------------------
+            //[C#]
+            /*
+            '地籍図根三角測量精度管理表(重複辺の較差)を作成する。
+            '
+            '引き数：
+            'clsAccountOverlapParam 点検計算簿(重複基線)パラメータ。
+            'clsAccountCadastralParam 地籍図根三角測量精度管理表パラメータ。
+            '
+            '戻り値：作成した ActiveReport オブジェクトを返す。
+            */
 #if false
         /*
          *************************** 修正要 sakai
@@ -4616,53 +4671,53 @@ namespace SurvLine
             return null;
         }
 #endif
-        //==========================================================================================
+            //==========================================================================================
 
-        //==========================================================================================
-        /*[VB]
-        '地籍測量、点検計算簿(環閉合差)を作成する。
-        '
-        'objSelectedAngleDiffs で指定された閉合差の帳票を作成する。
-        '
-        '引き数：
-        'objSelectedAngleDiffs 出力する閉合差。要素は AngleDiff オブジェクト。キーは AngleDiff オブジェクトの Number。
-        '
-        '戻り値：作成した ActiveReport オブジェクトを返す。
-        Public Function MakeAccountCadastralRing(ByVal objSelectedAngleDiffs As Collection) As ActiveReport
+            //==========================================================================================
+            /*[VB]
+            '地籍測量、点検計算簿(環閉合差)を作成する。
+            '
+            'objSelectedAngleDiffs で指定された閉合差の帳票を作成する。
+            '
+            '引き数：
+            'objSelectedAngleDiffs 出力する閉合差。要素は AngleDiff オブジェクト。キーは AngleDiff オブジェクトの Number。
+            '
+            '戻り値：作成した ActiveReport オブジェクトを返す。
+            Public Function MakeAccountCadastralRing(ByVal objSelectedAngleDiffs As Collection) As ActiveReport
 
-            ReDim clsAngleDiffs(-1 To -1)
-            Dim i As Long
-            For i = 0 To m_clsAngleDiffParamRing.Count - 1
-                Dim clsAngleDiff As AngleDiff
-                If LookupCollectionObject(objSelectedAngleDiffs, clsAngleDiff, m_clsAngleDiffParamRing.AngleDiffs(i).Number) Then
-                    '一致しない場合、更新フラグをONにする。
-                    If Not m_clsAngleDiffParamRing.AngleDiffs(i).Account(3) Then m_bModifyed = True
-                    m_clsAngleDiffParamRing.AngleDiffs(i).Account(3) = True
-                Else
-                    '一致しない場合、更新フラグをONにする。
-                    If m_clsAngleDiffParamRing.AngleDiffs(i).Account(3) Then m_bModifyed = True
-                    m_clsAngleDiffParamRing.AngleDiffs(i).Account(3) = False
-                End If
-            Next
-    
-            '作成。
-            Set MakeAccountCadastralRing = m_clsAccountMaker.MakeCadastralRing(PageNumberVisible, objSelectedAngleDiffs)
+                ReDim clsAngleDiffs(-1 To -1)
+                Dim i As Long
+                For i = 0 To m_clsAngleDiffParamRing.Count - 1
+                    Dim clsAngleDiff As AngleDiff
+                    If LookupCollectionObject(objSelectedAngleDiffs, clsAngleDiff, m_clsAngleDiffParamRing.AngleDiffs(i).Number) Then
+                        '一致しない場合、更新フラグをONにする。
+                        If Not m_clsAngleDiffParamRing.AngleDiffs(i).Account(3) Then m_bModifyed = True
+                        m_clsAngleDiffParamRing.AngleDiffs(i).Account(3) = True
+                    Else
+                        '一致しない場合、更新フラグをONにする。
+                        If m_clsAngleDiffParamRing.AngleDiffs(i).Account(3) Then m_bModifyed = True
+                        m_clsAngleDiffParamRing.AngleDiffs(i).Account(3) = False
+                    End If
+                Next
+
+                '作成。
+                Set MakeAccountCadastralRing = m_clsAccountMaker.MakeCadastralRing(PageNumberVisible, objSelectedAngleDiffs)
 
 
-        End Function
-        [VB]*/
-        //------------------------------------------------------------------------------------------
-        //[C#]
-        /*
-        '地籍測量、点検計算簿(環閉合差)を作成する。
-        '
-        'objSelectedAngleDiffs で指定された閉合差の帳票を作成する。
-        '
-        '引き数：
-        'objSelectedAngleDiffs 出力する閉合差。要素は AngleDiff オブジェクト。キーは AngleDiff オブジェクトの Number。
-        '
-        '戻り値：作成した ActiveReport オブジェクトを返す。
-        */
+            End Function
+            [VB]*/
+            //------------------------------------------------------------------------------------------
+            //[C#]
+            /*
+            '地籍測量、点検計算簿(環閉合差)を作成する。
+            '
+            'objSelectedAngleDiffs で指定された閉合差の帳票を作成する。
+            '
+            '引き数：
+            'objSelectedAngleDiffs 出力する閉合差。要素は AngleDiff オブジェクト。キーは AngleDiff オブジェクトの Number。
+            '
+            '戻り値：作成した ActiveReport オブジェクトを返す。
+            */
 #if false
         /*
          *************************** 修正要 sakai
@@ -4672,53 +4727,53 @@ namespace SurvLine
             return null;
         }
 #endif
-        //==========================================================================================
+            //==========================================================================================
 
-        //==========================================================================================
-        /*[VB]
-        '地籍測量、点検計算簿(電子基準点間の閉合差)を作成する。
-        '
-        'objSelectedAngleDiffs で指定された閉合差の帳票を作成する。
-        '
-        '引き数：
-        'objSelectedAngleDiffs 出力する閉合差。要素は AngleDiff オブジェクト。キーは AngleDiff オブジェクトの Number。
-        '
-        '戻り値：作成した ActiveReport オブジェクトを返す。
-        Public Function MakeAccountCadastralBetween(ByVal objSelectedAngleDiffs As Collection) As ActiveReport
+            //==========================================================================================
+            /*[VB]
+            '地籍測量、点検計算簿(電子基準点間の閉合差)を作成する。
+            '
+            'objSelectedAngleDiffs で指定された閉合差の帳票を作成する。
+            '
+            '引き数：
+            'objSelectedAngleDiffs 出力する閉合差。要素は AngleDiff オブジェクト。キーは AngleDiff オブジェクトの Number。
+            '
+            '戻り値：作成した ActiveReport オブジェクトを返す。
+            Public Function MakeAccountCadastralBetween(ByVal objSelectedAngleDiffs As Collection) As ActiveReport
 
-            ReDim clsAngleDiffs(-1 To -1)
-            Dim i As Long
-            For i = 0 To m_clsAngleDiffParamBetween.Count - 1
-                Dim clsAngleDiff As AngleDiff
-                If LookupCollectionObject(objSelectedAngleDiffs, clsAngleDiff, m_clsAngleDiffParamBetween.AngleDiffs(i).Number) Then
-                    '一致しない場合、更新フラグをONにする。
-                    If Not m_clsAngleDiffParamBetween.AngleDiffs(i).Account(3) Then m_bModifyed = True
-                    m_clsAngleDiffParamBetween.AngleDiffs(i).Account(3) = True
-                Else
-                    '一致しない場合、更新フラグをONにする。
-                    If m_clsAngleDiffParamBetween.AngleDiffs(i).Account(3) Then m_bModifyed = True
-                    m_clsAngleDiffParamBetween.AngleDiffs(i).Account(3) = False
-                End If
-            Next
-    
-            '作成。
-            Set MakeAccountCadastralBetween = m_clsAccountMaker.MakeCadastralBetween(PageNumberVisible, IIf(m_bGeoidoEnable, m_sGeoidoPath, ""), m_bSemiDynaEnable, objSelectedAngleDiffs)
+                ReDim clsAngleDiffs(-1 To -1)
+                Dim i As Long
+                For i = 0 To m_clsAngleDiffParamBetween.Count - 1
+                    Dim clsAngleDiff As AngleDiff
+                    If LookupCollectionObject(objSelectedAngleDiffs, clsAngleDiff, m_clsAngleDiffParamBetween.AngleDiffs(i).Number) Then
+                        '一致しない場合、更新フラグをONにする。
+                        If Not m_clsAngleDiffParamBetween.AngleDiffs(i).Account(3) Then m_bModifyed = True
+                        m_clsAngleDiffParamBetween.AngleDiffs(i).Account(3) = True
+                    Else
+                        '一致しない場合、更新フラグをONにする。
+                        If m_clsAngleDiffParamBetween.AngleDiffs(i).Account(3) Then m_bModifyed = True
+                        m_clsAngleDiffParamBetween.AngleDiffs(i).Account(3) = False
+                    End If
+                Next
+
+                '作成。
+                Set MakeAccountCadastralBetween = m_clsAccountMaker.MakeCadastralBetween(PageNumberVisible, IIf(m_bGeoidoEnable, m_sGeoidoPath, ""), m_bSemiDynaEnable, objSelectedAngleDiffs)
 
 
-        End Function
-        [VB]*/
-        //------------------------------------------------------------------------------------------
-        //[C#]
-        /*
-        '地籍測量、点検計算簿(電子基準点間の閉合差)を作成する。
-        '
-        'objSelectedAngleDiffs で指定された閉合差の帳票を作成する。
-        '
-        '引き数：
-        'objSelectedAngleDiffs 出力する閉合差。要素は AngleDiff オブジェクト。キーは AngleDiff オブジェクトの Number。
-        '
-        '戻り値：作成した ActiveReport オブジェクトを返す。
-        */
+            End Function
+            [VB]*/
+            //------------------------------------------------------------------------------------------
+            //[C#]
+            /*
+            '地籍測量、点検計算簿(電子基準点間の閉合差)を作成する。
+            '
+            'objSelectedAngleDiffs で指定された閉合差の帳票を作成する。
+            '
+            '引き数：
+            'objSelectedAngleDiffs 出力する閉合差。要素は AngleDiff オブジェクト。キーは AngleDiff オブジェクトの Number。
+            '
+            '戻り値：作成した ActiveReport オブジェクトを返す。
+            */
 #if false
         /*
          *************************** 修正要 sakai
@@ -4728,53 +4783,53 @@ namespace SurvLine
             return null;
         }
 #endif
-        //==========================================================================================
+            //==========================================================================================
 
-        //==========================================================================================
-        /*[VB]
-        'ΔXYZからΔNEUへの変換(環閉合差)を作成する。
-        '
-        'objSelectedAngleDiffs で指定された閉合差の帳票を作成する。
-        '
-        '引き数：
-        'objSelectedAngleDiffs 出力する閉合差。要素は AngleDiff オブジェクト。キーは AngleDiff オブジェクトの Number。
-        '
-        '戻り値：作成した ActiveReport オブジェクトを返す。
-        Public Function MakeAccount⊿XYZ2⊿NEURing(ByVal objSelectedAngleDiffs As Collection) As ActiveReport
+            //==========================================================================================
+            /*[VB]
+            'ΔXYZからΔNEUへの変換(環閉合差)を作成する。
+            '
+            'objSelectedAngleDiffs で指定された閉合差の帳票を作成する。
+            '
+            '引き数：
+            'objSelectedAngleDiffs 出力する閉合差。要素は AngleDiff オブジェクト。キーは AngleDiff オブジェクトの Number。
+            '
+            '戻り値：作成した ActiveReport オブジェクトを返す。
+            Public Function MakeAccount⊿XYZ2⊿NEURing(ByVal objSelectedAngleDiffs As Collection) As ActiveReport
 
-            ReDim clsAngleDiffs(-1 To -1)
-            Dim i As Long
-            For i = 0 To m_clsAngleDiffParamRing.Count - 1
-                Dim clsAngleDiff As AngleDiff
-                If LookupCollectionObject(objSelectedAngleDiffs, clsAngleDiff, m_clsAngleDiffParamRing.AngleDiffs(i).Number) Then
-                    '一致しない場合、更新フラグをONにする。
-                    If Not m_clsAngleDiffParamRing.AngleDiffs(i).Account(2) Then m_bModifyed = True
-                    m_clsAngleDiffParamRing.AngleDiffs(i).Account(2) = True
-                Else
-                    '一致しない場合、更新フラグをONにする。
-                    If m_clsAngleDiffParamRing.AngleDiffs(i).Account(2) Then m_bModifyed = True
-                    m_clsAngleDiffParamRing.AngleDiffs(i).Account(2) = False
-                End If
-            Next
-    
-            '作成。
-            Set MakeAccount⊿XYZ2⊿NEURing = m_clsAccountMaker.Make⊿XYZ2⊿NEURing(PageNumberVisible, objSelectedAngleDiffs)
+                ReDim clsAngleDiffs(-1 To -1)
+                Dim i As Long
+                For i = 0 To m_clsAngleDiffParamRing.Count - 1
+                    Dim clsAngleDiff As AngleDiff
+                    If LookupCollectionObject(objSelectedAngleDiffs, clsAngleDiff, m_clsAngleDiffParamRing.AngleDiffs(i).Number) Then
+                        '一致しない場合、更新フラグをONにする。
+                        If Not m_clsAngleDiffParamRing.AngleDiffs(i).Account(2) Then m_bModifyed = True
+                        m_clsAngleDiffParamRing.AngleDiffs(i).Account(2) = True
+                    Else
+                        '一致しない場合、更新フラグをONにする。
+                        If m_clsAngleDiffParamRing.AngleDiffs(i).Account(2) Then m_bModifyed = True
+                        m_clsAngleDiffParamRing.AngleDiffs(i).Account(2) = False
+                    End If
+                Next
+
+                '作成。
+                Set MakeAccount⊿XYZ2⊿NEURing = m_clsAccountMaker.Make⊿XYZ2⊿NEURing(PageNumberVisible, objSelectedAngleDiffs)
 
 
-        End Function
-        [VB]*/
-        //------------------------------------------------------------------------------------------
-        //[C#]
-        /*
-        'ΔXYZからΔNEUへの変換(環閉合差)を作成する。
-        '
-        'objSelectedAngleDiffs で指定された閉合差の帳票を作成する。
-        '
-        '引き数：
-        'objSelectedAngleDiffs 出力する閉合差。要素は AngleDiff オブジェクト。キーは AngleDiff オブジェクトの Number。
-        '
-        '戻り値：作成した ActiveReport オブジェクトを返す。
-        */
+            End Function
+            [VB]*/
+            //------------------------------------------------------------------------------------------
+            //[C#]
+            /*
+            'ΔXYZからΔNEUへの変換(環閉合差)を作成する。
+            '
+            'objSelectedAngleDiffs で指定された閉合差の帳票を作成する。
+            '
+            '引き数：
+            'objSelectedAngleDiffs 出力する閉合差。要素は AngleDiff オブジェクト。キーは AngleDiff オブジェクトの Number。
+            '
+            '戻り値：作成した ActiveReport オブジェクトを返す。
+            */
 #if false
         /*
          *************************** 修正要 sakai
@@ -4784,53 +4839,53 @@ namespace SurvLine
             return null;
         }
 #endif
-        //==========================================================================================
+            //==========================================================================================
 
-        //==========================================================================================
-        /*[VB]
-        'ΔXYZからΔNEUへの変換(電子基準点間の閉合差)を作成する。
-        '
-        'objSelectedAngleDiffs で指定された閉合差の帳票を作成する。
-        '
-        '引き数：
-        'objSelectedAngleDiffs 出力する閉合差。要素は AngleDiff オブジェクト。キーは AngleDiff オブジェクトの Number。
-        '
-        '戻り値：作成した ActiveReport オブジェクトを返す。
-        Public Function MakeAccount⊿XYZ2⊿NEUBetween(ByVal objSelectedAngleDiffs As Collection) As ActiveReport
+            //==========================================================================================
+            /*[VB]
+            'ΔXYZからΔNEUへの変換(電子基準点間の閉合差)を作成する。
+            '
+            'objSelectedAngleDiffs で指定された閉合差の帳票を作成する。
+            '
+            '引き数：
+            'objSelectedAngleDiffs 出力する閉合差。要素は AngleDiff オブジェクト。キーは AngleDiff オブジェクトの Number。
+            '
+            '戻り値：作成した ActiveReport オブジェクトを返す。
+            Public Function MakeAccount⊿XYZ2⊿NEUBetween(ByVal objSelectedAngleDiffs As Collection) As ActiveReport
 
-            ReDim clsAngleDiffs(-1 To -1)
-            Dim i As Long
-            For i = 0 To m_clsAngleDiffParamBetween.Count - 1
-                Dim clsAngleDiff As AngleDiff
-                If LookupCollectionObject(objSelectedAngleDiffs, clsAngleDiff, m_clsAngleDiffParamBetween.AngleDiffs(i).Number) Then
-                    '一致しない場合、更新フラグをONにする。
-                    If Not m_clsAngleDiffParamBetween.AngleDiffs(i).Account(2) Then m_bModifyed = True
-                    m_clsAngleDiffParamBetween.AngleDiffs(i).Account(2) = True
-                Else
-                    '一致しない場合、更新フラグをONにする。
-                    If m_clsAngleDiffParamBetween.AngleDiffs(i).Account(2) Then m_bModifyed = True
-                    m_clsAngleDiffParamBetween.AngleDiffs(i).Account(2) = False
-                End If
-            Next
+                ReDim clsAngleDiffs(-1 To -1)
+                Dim i As Long
+                For i = 0 To m_clsAngleDiffParamBetween.Count - 1
+                    Dim clsAngleDiff As AngleDiff
+                    If LookupCollectionObject(objSelectedAngleDiffs, clsAngleDiff, m_clsAngleDiffParamBetween.AngleDiffs(i).Number) Then
+                        '一致しない場合、更新フラグをONにする。
+                        If Not m_clsAngleDiffParamBetween.AngleDiffs(i).Account(2) Then m_bModifyed = True
+                        m_clsAngleDiffParamBetween.AngleDiffs(i).Account(2) = True
+                    Else
+                        '一致しない場合、更新フラグをONにする。
+                        If m_clsAngleDiffParamBetween.AngleDiffs(i).Account(2) Then m_bModifyed = True
+                        m_clsAngleDiffParamBetween.AngleDiffs(i).Account(2) = False
+                    End If
+                Next
 
-            '作成。
-            Set MakeAccount⊿XYZ2⊿NEUBetween = m_clsAccountMaker.Make⊿XYZ2⊿NEUBetween(PageNumberVisible, objSelectedAngleDiffs)
+                '作成。
+                Set MakeAccount⊿XYZ2⊿NEUBetween = m_clsAccountMaker.Make⊿XYZ2⊿NEUBetween(PageNumberVisible, objSelectedAngleDiffs)
 
 
-        End Function
-        [VB]*/
-        //------------------------------------------------------------------------------------------
-        //[C#]
-        /*
-        'ΔXYZからΔNEUへの変換(電子基準点間の閉合差)を作成する。
-        '
-        'objSelectedAngleDiffs で指定された閉合差の帳票を作成する。
-        '
-        '引き数：
-        'objSelectedAngleDiffs 出力する閉合差。要素は AngleDiff オブジェクト。キーは AngleDiff オブジェクトの Number。
-        '
-        '戻り値：作成した ActiveReport オブジェクトを返す。
-        */
+            End Function
+            [VB]*/
+            //------------------------------------------------------------------------------------------
+            //[C#]
+            /*
+            'ΔXYZからΔNEUへの変換(電子基準点間の閉合差)を作成する。
+            '
+            'objSelectedAngleDiffs で指定された閉合差の帳票を作成する。
+            '
+            '引き数：
+            'objSelectedAngleDiffs 出力する閉合差。要素は AngleDiff オブジェクト。キーは AngleDiff オブジェクトの Number。
+            '
+            '戻り値：作成した ActiveReport オブジェクトを返す。
+            */
 #if false
         /*
          *************************** 修正要 sakai
@@ -4840,45 +4895,45 @@ namespace SurvLine
             return null;
         }
 #endif
-        //==========================================================================================
+            //==========================================================================================
 
 
-        //==========================================================================================
-        /*[VB]
-        '座標一覧表を作成する。   2007/7/18 NGS Yamada
-        '
-        '引き数：
-        'clsAccountParam 観測記簿パラメータ。
-        'bModify 更新許可フラグ。True=パラメータを更新することを許可する。False=パラメータの更新は不可。
-        'hWnd オーナーウィンドウ。メッセージボックス表示後、再描画するウィンドウのハンドル。
-        '
-        '戻り値：作成した ActiveReport オブジェクトを返す。
-        Public Function MakeAccountResultBase(ByVal clsAccountParam As AccountParam, ByVal bModify As Boolean, ByVal hWnd As Long) As ActiveReport
+            //==========================================================================================
+            /*[VB]
+            '座標一覧表を作成する。   2007/7/18 NGS Yamada
+            '
+            '引き数：
+            'clsAccountParam 観測記簿パラメータ。
+            'bModify 更新許可フラグ。True=パラメータを更新することを許可する。False=パラメータの更新は不可。
+            'hWnd オーナーウィンドウ。メッセージボックス表示後、再描画するウィンドウのハンドル。
+            '
+            '戻り値：作成した ActiveReport オブジェクトを返す。
+            Public Function MakeAccountResultBase(ByVal clsAccountParam As AccountParam, ByVal bModify As Boolean, ByVal hWnd As Long) As ActiveReport
 
-            If bModify Then
-                '一致しない場合、更新フラグをONにする。
-                If Not m_clsAccountParamResultBase.Compare(clsAccountParam) Then m_bModifyed = True
-                Let m_clsAccountParamResultBase = clsAccountParam
-            End If
-    
-            '作成。
-            Set MakeAccountResultBase = m_clsAccountMaker.MakeResultBase(PageNumberVisible, m_nCoordNum, IIf(m_bGeoidoEnable, m_sGeoidoPath, ""), m_bSemiDynaEnable, clsAccountParam, hWnd)
+                If bModify Then
+                    '一致しない場合、更新フラグをONにする。
+                    If Not m_clsAccountParamResultBase.Compare(clsAccountParam) Then m_bModifyed = True
+                    Let m_clsAccountParamResultBase = clsAccountParam
+                End If
+
+                '作成。
+                Set MakeAccountResultBase = m_clsAccountMaker.MakeResultBase(PageNumberVisible, m_nCoordNum, IIf(m_bGeoidoEnable, m_sGeoidoPath, ""), m_bSemiDynaEnable, clsAccountParam, hWnd)
 
 
-        End Function
-        [VB]*/
-        //------------------------------------------------------------------------------------------
-        //[C#]
-        /*
-        '座標一覧表を作成する。   2007/7/18 NGS Yamada
-        '
-        '引き数：
-        'clsAccountParam 観測記簿パラメータ。
-        'bModify 更新許可フラグ。True=パラメータを更新することを許可する。False=パラメータの更新は不可。
-        'hWnd オーナーウィンドウ。メッセージボックス表示後、再描画するウィンドウのハンドル。
-        '
-        '戻り値：作成した ActiveReport オブジェクトを返す。
-        */
+            End Function
+            [VB]*/
+            //------------------------------------------------------------------------------------------
+            //[C#]
+            /*
+            '座標一覧表を作成する。   2007/7/18 NGS Yamada
+            '
+            '引き数：
+            'clsAccountParam 観測記簿パラメータ。
+            'bModify 更新許可フラグ。True=パラメータを更新することを許可する。False=パラメータの更新は不可。
+            'hWnd オーナーウィンドウ。メッセージボックス表示後、再描画するウィンドウのハンドル。
+            '
+            '戻り値：作成した ActiveReport オブジェクトを返す。
+            */
 #if false
         /*
          *************************** 修正要 sakai
@@ -4888,62 +4943,62 @@ namespace SurvLine
             return null;
         }
 #endif
-        //==========================================================================================
+            //==========================================================================================
 
 
 
-        //==========================================================================================
-        /*[VB]
-        '外部出力ファイルを出力する。
-        '
-        '引き数：
-        'nType 外部出力ファイル種別。
-        'clsOutputParam 外部出力ファイル出力パラメータ。
-        'bModify 更新許可フラグ。True=パラメータを更新することを許可する。False=パラメータの更新は不可。
-        'clsOutputInterface 外部ファイル出力インターフェース。
-        'clsProgressInterface ProgressInterface オブジェクト。
-        Public Sub GenerateOutput(ByVal nType As OUTPUT_TYPE, ByVal clsOutputParam As OutputParam, ByVal bModify As Boolean, ByVal clsOutputInterface As OutputInterface, ByVal clsProgressInterface As ProgressInterface)
+            //==========================================================================================
+            /*[VB]
+            '外部出力ファイルを出力する。
+            '
+            '引き数：
+            'nType 外部出力ファイル種別。
+            'clsOutputParam 外部出力ファイル出力パラメータ。
+            'bModify 更新許可フラグ。True=パラメータを更新することを許可する。False=パラメータの更新は不可。
+            'clsOutputInterface 外部ファイル出力インターフェース。
+            'clsProgressInterface ProgressInterface オブジェクト。
+            Public Sub GenerateOutput(ByVal nType As OUTPUT_TYPE, ByVal clsOutputParam As OutputParam, ByVal bModify As Boolean, ByVal clsOutputInterface As OutputInterface, ByVal clsProgressInterface As ProgressInterface)
 
-            'NVB は NVF に書き込む。
-            If nType = OUTPUT_TYPE_NVB Then nType = OUTPUT_TYPE_NVF
-    
-            '出力。
-            Call GenerateOutputFile(clsOutputParam, Me, clsOutputInterface, clsProgressInterface)
-    
-            '更新許可されていない場合、帳票パラメータは更新しない。パスは更新する。
-            If Not bModify Then Let clsOutputParam.AccountParam = m_clsOutputParam(nType).AccountParam
-    
-            'OLEオートメーションがONの場合、パスは更新しない。
-            If clsOutputParam.Automation Then Let clsOutputParam.Path = m_clsOutputParam(nType).Path
-    
-            '一致しない場合、更新フラグをONにする。
-            If Not m_clsOutputParam(nType).Compare(clsOutputParam) Then m_bModifyed = True
-            Let m_clsOutputParam(nType) = clsOutputParam
-    
-            '2023/06/26 Hitz H.Nakamura **************************************************
-            'GNSS水準測量対応。
-            '前半後半較差の追加。
-            If m_clsAccountOverlapParam.Fixed<> clsOutputParam.Fixed Then
-                m_clsAccountOverlapParam.Fixed = clsOutputParam.Fixed
-                m_bModifyed = True
-            End If
-            '*****************************************************************************
+                'NVB は NVF に書き込む。
+                If nType = OUTPUT_TYPE_NVB Then nType = OUTPUT_TYPE_NVF
+
+                '出力。
+                Call GenerateOutputFile(clsOutputParam, Me, clsOutputInterface, clsProgressInterface)
+
+                '更新許可されていない場合、帳票パラメータは更新しない。パスは更新する。
+                If Not bModify Then Let clsOutputParam.AccountParam = m_clsOutputParam(nType).AccountParam
+
+                'OLEオートメーションがONの場合、パスは更新しない。
+                If clsOutputParam.Automation Then Let clsOutputParam.Path = m_clsOutputParam(nType).Path
+
+                '一致しない場合、更新フラグをONにする。
+                If Not m_clsOutputParam(nType).Compare(clsOutputParam) Then m_bModifyed = True
+                Let m_clsOutputParam(nType) = clsOutputParam
+
+                '2023/06/26 Hitz H.Nakamura **************************************************
+                'GNSS水準測量対応。
+                '前半後半較差の追加。
+                If m_clsAccountOverlapParam.Fixed<> clsOutputParam.Fixed Then
+                    m_clsAccountOverlapParam.Fixed = clsOutputParam.Fixed
+                    m_bModifyed = True
+                End If
+                '*****************************************************************************
 
 
-        End Sub
-        [VB]*/
-        //------------------------------------------------------------------------------------------
-        //[C#]
-        /*
-        '外部出力ファイルを出力する。
-        '
-        '引き数：
-        'nType 外部出力ファイル種別。
-        'clsOutputParam 外部出力ファイル出力パラメータ。
-        'bModify 更新許可フラグ。True=パラメータを更新することを許可する。False=パラメータの更新は不可。
-        'clsOutputInterface 外部ファイル出力インターフェース。
-        'clsProgressInterface ProgressInterface オブジェクト。
-        */
+            End Sub
+            [VB]*/
+            //------------------------------------------------------------------------------------------
+            //[C#]
+            /*
+            '外部出力ファイルを出力する。
+            '
+            '引き数：
+            'nType 外部出力ファイル種別。
+            'clsOutputParam 外部出力ファイル出力パラメータ。
+            'bModify 更新許可フラグ。True=パラメータを更新することを許可する。False=パラメータの更新は不可。
+            'clsOutputInterface 外部ファイル出力インターフェース。
+            'clsProgressInterface ProgressInterface オブジェクト。
+            */
 #if false
         /*
          *************************** 修正要 sakai
@@ -4953,80 +5008,80 @@ namespace SurvLine
             return;
         }
 #endif
-        //==========================================================================================
+            //==========================================================================================
 
-        //==========================================================================================
-        /*[VB]
-        'DXFファイルを出力する。
-        '
-        '引き数：
-        'nType DXFファイル種別。
-        'sDefPath デフォルトのパス。
-        Public Sub GenerateDXF(ByVal nType As DXF_TYPE, ByVal sDefPath As String)
+            //==========================================================================================
+            /*[VB]
+            'DXFファイルを出力する。
+            '
+            '引き数：
+            'nType DXFファイル種別。
+            'sDefPath デフォルトのパス。
+            Public Sub GenerateDXF(ByVal nType As DXF_TYPE, ByVal sDefPath As String)
 
-            Dim sTitle As String
-            Select Case nType
-            Case DXF_TYPE_OBS
-                sTitle = DXF_TITLE_OBS
-            End Select
-
-
-            Dim sPath As String
-            Dim sSectionName As String
-            Dim sWorkYear As String
-            Dim sWorkType As String
-            Dim sSurveyMethod As String
-            Dim sSurveyPlanOrganization As String
-            Dim sSurveyWorkOrganization As String
-            sPath = IIf(m_clsDXFParam(nType).Path<> "", m_clsDXFParam(nType).Path, sDefPath)
-            sSectionName = m_sDistrictName
-            'iniファイルを使わずに標準機能を使うように変更 2006/10/12 NGS Yamada
-            sWorkYear = Format(Now, "ggge") + "年度"
-        '    sWorkYear = GetPrivateProfileString(PROFILE_DEF_SEC_ERA, PROFILE_DEF_KEY_NAME, "", App.Path & "\" & PROFILE_DEF_NAME) & CStr(GetEraFiscal(Now)) & "年度"
-            sWorkType = m_clsDXFParam(nType).WorkType
-            sSurveyMethod = m_clsDXFParam(nType).SurveyMethod
-            sSurveyPlanOrganization = m_clsDXFParam(nType).SurveyPlanOrganization
-            sSurveyWorkOrganization = m_clsDXFParam(nType).SurveyWorkOrganization
-    
-            '出力。
-            Dim objVectors As New Collection
-            Dim objIsolatePoints As New Collection
-            Call GetNSDVectorsNSS(NetworkModel, CoordNum, ACCOUNT_DECIMAL_XYZ, objVectors, objIsolatePoints)
-            On Error GoTo CancelHandler
-            Dim objNSD As New NSDObject
-            Call objNSD.Make2(sPath, -1, sSectionName, sWorkYear, sWorkType, sSurveyMethod, sSurveyPlanOrganization, sSurveyWorkOrganization, sTitle, m_nCoordNum, objVectors, objIsolatePoints, True, True)
-            On Error GoTo 0
-    
-            '一致しない場合、更新フラグをONにする。
-            Dim clsDXFParam As New DXFParam
-            Let clsDXFParam = m_clsDXFParam(nType)
-            clsDXFParam.Path = sPath
-            'clsDXFParam.WorkYear = sWorkYear '作業年度は記憶しない。
-            clsDXFParam.WorkType = sWorkType
-            clsDXFParam.SurveyMethod = sSurveyMethod
-            clsDXFParam.SurveyPlanOrganization = sSurveyPlanOrganization
-            clsDXFParam.SurveyWorkOrganization = sSurveyWorkOrganization
-            If Not m_clsDXFParam(nType).Compare(clsDXFParam) Then m_bModifyed = True
-            Let m_clsDXFParam(nType) = clsDXFParam
+                Dim sTitle As String
+                Select Case nType
+                Case DXF_TYPE_OBS
+                    sTitle = DXF_TITLE_OBS
+                End Select
 
 
-            Exit Sub
+                Dim sPath As String
+                Dim sSectionName As String
+                Dim sWorkYear As String
+                Dim sWorkType As String
+                Dim sSurveyMethod As String
+                Dim sSurveyPlanOrganization As String
+                Dim sSurveyWorkOrganization As String
+                sPath = IIf(m_clsDXFParam(nType).Path<> "", m_clsDXFParam(nType).Path, sDefPath)
+                sSectionName = m_sDistrictName
+                'iniファイルを使わずに標準機能を使うように変更 2006/10/12 NGS Yamada
+                sWorkYear = Format(Now, "ggge") + "年度"
+            '    sWorkYear = GetPrivateProfileString(PROFILE_DEF_SEC_ERA, PROFILE_DEF_KEY_NAME, "", App.Path & "\" & PROFILE_DEF_NAME) & CStr(GetEraFiscal(Now)) & "年度"
+                sWorkType = m_clsDXFParam(nType).WorkType
+                sSurveyMethod = m_clsDXFParam(nType).SurveyMethod
+                sSurveyPlanOrganization = m_clsDXFParam(nType).SurveyPlanOrganization
+                sSurveyWorkOrganization = m_clsDXFParam(nType).SurveyWorkOrganization
+
+                '出力。
+                Dim objVectors As New Collection
+                Dim objIsolatePoints As New Collection
+                Call GetNSDVectorsNSS(NetworkModel, CoordNum, ACCOUNT_DECIMAL_XYZ, objVectors, objIsolatePoints)
+                On Error GoTo CancelHandler
+                Dim objNSD As New NSDObject
+                Call objNSD.Make2(sPath, -1, sSectionName, sWorkYear, sWorkType, sSurveyMethod, sSurveyPlanOrganization, sSurveyWorkOrganization, sTitle, m_nCoordNum, objVectors, objIsolatePoints, True, True)
+                On Error GoTo 0
+
+                '一致しない場合、更新フラグをONにする。
+                Dim clsDXFParam As New DXFParam
+                Let clsDXFParam = m_clsDXFParam(nType)
+                clsDXFParam.Path = sPath
+                'clsDXFParam.WorkYear = sWorkYear '作業年度は記憶しない。
+                clsDXFParam.WorkType = sWorkType
+                clsDXFParam.SurveyMethod = sSurveyMethod
+                clsDXFParam.SurveyPlanOrganization = sSurveyPlanOrganization
+                clsDXFParam.SurveyWorkOrganization = sSurveyWorkOrganization
+                If Not m_clsDXFParam(nType).Compare(clsDXFParam) Then m_bModifyed = True
+                Let m_clsDXFParam(nType) = clsDXFParam
 
 
-        CancelHandler:
-            If Err.Number<> cdlCancel Then Call Err.Raise(Err.Number, Err.Source, Err.Description, Err.HelpFile, Err.HelpContext)
+                Exit Sub
 
-        End Sub
-        [VB]*/
-        //------------------------------------------------------------------------------------------
-        //[C#]
-        /*
-        'DXFファイルを出力する。
-        '
-        '引き数：
-        'nType DXFファイル種別。
-        'sDefPath デフォルトのパス。
-        */
+
+            CancelHandler:
+                If Err.Number<> cdlCancel Then Call Err.Raise(Err.Number, Err.Source, Err.Description, Err.HelpFile, Err.HelpContext)
+
+            End Sub
+            [VB]*/
+            //------------------------------------------------------------------------------------------
+            //[C#]
+            /*
+            'DXFファイルを出力する。
+            '
+            '引き数：
+            'nType DXFファイル種別。
+            'sDefPath デフォルトのパス。
+            */
 #if false
         /*
          *************************** 修正要 sakai
@@ -5036,29 +5091,29 @@ namespace SurvLine
             return;
         }
 #endif
-        //==========================================================================================
+            //==========================================================================================
 
-        //==========================================================================================
-        /*[VB]
-        '本点を削除する。
-        '
-        '引き数：
-        'clsGenuinePoints 本点(実観測点)。
-        Public Sub RemoveGenuinePoint(ByVal clsGenuinePoints As ObservationPoint)
-            Call clsGenuinePoints.CorrectPoint.UpdateCorrectPoint(Nothing)
-            Dim objObservationPoints As New Collection
-            Call objObservationPoints.Add(clsGenuinePoints.TopParentPoint, Hex$(GetPointer(clsGenuinePoints.TopParentPoint)))
-            Call RemoveObservationPoint(objObservationPoints)
-        End Sub
-        [VB]*/
-        //------------------------------------------------------------------------------------------
-        //[C#]
-        /*
-        '本点を削除する。
-        '
-        '引き数：
-        'clsGenuinePoints 本点(実観測点)。
-        */
+            //==========================================================================================
+            /*[VB]
+            '本点を削除する。
+            '
+            '引き数：
+            'clsGenuinePoints 本点(実観測点)。
+            Public Sub RemoveGenuinePoint(ByVal clsGenuinePoints As ObservationPoint)
+                Call clsGenuinePoints.CorrectPoint.UpdateCorrectPoint(Nothing)
+                Dim objObservationPoints As New Collection
+                Call objObservationPoints.Add(clsGenuinePoints.TopParentPoint, Hex$(GetPointer(clsGenuinePoints.TopParentPoint)))
+                Call RemoveObservationPoint(objObservationPoints)
+            End Sub
+            [VB]*/
+            //------------------------------------------------------------------------------------------
+            //[C#]
+            /*
+            '本点を削除する。
+            '
+            '引き数：
+            'clsGenuinePoints 本点(実観測点)。
+            */
 #if false
         /*
          *************************** 修正要 sakai
@@ -5068,116 +5123,116 @@ namespace SurvLine
             return;
         }
 #endif
-        //==========================================================================================
+            //==========================================================================================
 
-        //==========================================================================================
-        /*[VB]
-        '観測点を削除する。
-        '
-        '引き数：
-        'objObservationPoints 対象とする観測点。要素は ObservationPoint オブジェクト(代表観測点)。キーは任意。
-        Public Sub RemoveObservationPoint(ByVal objObservationPoints As Collection)
+            //==========================================================================================
+            /*[VB]
+            '観測点を削除する。
+            '
+            '引き数：
+            'objObservationPoints 対象とする観測点。要素は ObservationPoint オブジェクト(代表観測点)。キーは任意。
+            Public Sub RemoveObservationPoint(ByVal objObservationPoints As Collection)
 
-            '観測点フォルダ。
-            Dim sObsPointPath As String
-            sObsPointPath = App.Path & TEMPORARY_PATH & "." & OBSPOINT_PATH
+                '観測点フォルダ。
+                Dim sObsPointPath As String
+                sObsPointPath = App.Path & TEMPORARY_PATH & "." & OBSPOINT_PATH
 
-            Dim objIsolatePointChainCollection As Collection
-            Set objIsolatePointChainCollection = m_clsNetworkModel.MakeIsolatePointChainCollection
-            Dim objBaseLineVectorChainCollection As Collection
-            Set objBaseLineVectorChainCollection = m_clsNetworkModel.MakeBaseLineVectorChainCollection
+                Dim objIsolatePointChainCollection As Collection
+                Set objIsolatePointChainCollection = m_clsNetworkModel.MakeIsolatePointChainCollection
+                Dim objBaseLineVectorChainCollection As Collection
+                Set objBaseLineVectorChainCollection = m_clsNetworkModel.MakeBaseLineVectorChainCollection
 
-            Dim objObservationPoints2 As New Collection
-            Dim clsObservationPoint As ObservationPoint
-            '本点の削除。
-            For Each clsObservationPoint In objObservationPoints
-                m_bModifyed = True
-                If clsObservationPoint.Genuine Then
-                    '偏心補正をOFFにする。
-                    Call clsObservationPoint.CorrectPoint.UpdateCorrectPoint(Nothing)
-                    '削除。
-                    Call m_clsNetworkModel.RemoveRepresentPoint(clsObservationPoint.TopParentPoint, sObsPointPath, objIsolatePointChainCollection, objBaseLineVectorChainCollection)
-                Else
-                    Call objObservationPoints2.Add(clsObservationPoint)
-                End If
-            Next
-    
-            '偏心補正の再計算が必要な本点。
-            Dim objGenuinePoints As New Collection
-    
-            '残りの削除。
-            For Each clsObservationPoint In objObservationPoints2
-                m_bModifyed = True
-                Dim clsEccentricPoint As ObservationPoint
-                Set clsEccentricPoint = Nothing
-                If clsObservationPoint.Eccentric Then
-                    '偏心点の場合、リンクを変更する。
-                    If clsObservationPoint.TopParentPoint.PrevPoint Is Nothing Then
-                        'リンクを変更。
-                        Set clsEccentricPoint = clsObservationPoint.TopParentPoint.NextPoint
+                Dim objObservationPoints2 As New Collection
+                Dim clsObservationPoint As ObservationPoint
+                '本点の削除。
+                For Each clsObservationPoint In objObservationPoints
+                    m_bModifyed = True
+                    If clsObservationPoint.Genuine Then
+                        '偏心補正をOFFにする。
+                        Call clsObservationPoint.CorrectPoint.UpdateCorrectPoint(Nothing)
+                        '削除。
+                        Call m_clsNetworkModel.RemoveRepresentPoint(clsObservationPoint.TopParentPoint, sObsPointPath, objIsolatePointChainCollection, objBaseLineVectorChainCollection)
                     Else
-                        Set clsEccentricPoint = clsObservationPoint.HeadPoint
+                        Call objObservationPoints2.Add(clsObservationPoint)
                     End If
-                    If clsEccentricPoint Is Nothing Then
-                        '観測点がなくなる場合は、本点も削除する。
-                        Call RemoveAtCollection(objGenuinePoints, clsObservationPoint.Number)
-                        Call m_clsNetworkModel.RemoveRepresentPoint(clsObservationPoint.CorrectPoint.TopParentPoint, sObsPointPath, objIsolatePointChainCollection, objBaseLineVectorChainCollection)
-                    Else
-                        Call SetAtCollectionObject(objGenuinePoints, clsEccentricPoint.CorrectPoint, clsEccentricPoint.Number)
-                        Call clsObservationPoint.CorrectPoint.UpdateCorrectPoint(clsEccentricPoint)
-                    End If
-                End If
-                '基線ベクトルの反対側の観測点。
-                Dim clsBaseLineVectors() As BaseLineVector
-                ReDim clsBaseLineVectors(-1 To -1)
-                Call m_clsNetworkModel.GetConnectBaseLineVectors(clsObservationPoint.TopParentPoint, clsBaseLineVectors)
-                Dim clsBuddyPoints() As ObservationPoint
-                ReDim clsBuddyPoints(-1 To UBound(clsBaseLineVectors))
-                Dim i As Long
-                For i = 0 To UBound(clsBaseLineVectors)
-                    '基線ベクトルの反対側の観測点。
-                    If clsBaseLineVectors(i).StrPoint.Number = clsObservationPoint.Number Then
-                        Set clsBuddyPoints(i) = clsBaseLineVectors(i).EndPoint.TopParentPoint
-                    Else
-                        Set clsBuddyPoints(i) = clsBaseLineVectors(i).StrPoint.TopParentPoint
-                    End If
-                    '解析済み基線ベクトルの終点が反対側であり、偏心点である場合、その偏心補正を再計算する。
-                    If clsBaseLineVectors(i).Analysis <= ANALYSIS_STATUS_FIX Then
-                        If clsBaseLineVectors(i).AnalysisStrPoint.Number = clsObservationPoint.Number Then
-                            If clsBaseLineVectors(i).AnalysisEndPoint.Eccentric Then
-                                Set clsEccentricPoint = clsBaseLineVectors(i).AnalysisEndPoint
-                                Call SetAtCollectionObject(objGenuinePoints, clsEccentricPoint.CorrectPoint, clsEccentricPoint.Number)
-                            End If
+                Next
+
+                '偏心補正の再計算が必要な本点。
+                Dim objGenuinePoints As New Collection
+
+                '残りの削除。
+                For Each clsObservationPoint In objObservationPoints2
+                    m_bModifyed = True
+                    Dim clsEccentricPoint As ObservationPoint
+                    Set clsEccentricPoint = Nothing
+                    If clsObservationPoint.Eccentric Then
+                        '偏心点の場合、リンクを変更する。
+                        If clsObservationPoint.TopParentPoint.PrevPoint Is Nothing Then
+                            'リンクを変更。
+                            Set clsEccentricPoint = clsObservationPoint.TopParentPoint.NextPoint
+                        Else
+                            Set clsEccentricPoint = clsObservationPoint.HeadPoint
+                        End If
+                        If clsEccentricPoint Is Nothing Then
+                            '観測点がなくなる場合は、本点も削除する。
+                            Call RemoveAtCollection(objGenuinePoints, clsObservationPoint.Number)
+                            Call m_clsNetworkModel.RemoveRepresentPoint(clsObservationPoint.CorrectPoint.TopParentPoint, sObsPointPath, objIsolatePointChainCollection, objBaseLineVectorChainCollection)
+                        Else
+                            Call SetAtCollectionObject(objGenuinePoints, clsEccentricPoint.CorrectPoint, clsEccentricPoint.Number)
+                            Call clsObservationPoint.CorrectPoint.UpdateCorrectPoint(clsEccentricPoint)
                         End If
                     End If
+                    '基線ベクトルの反対側の観測点。
+                    Dim clsBaseLineVectors() As BaseLineVector
+                    ReDim clsBaseLineVectors(-1 To -1)
+                    Call m_clsNetworkModel.GetConnectBaseLineVectors(clsObservationPoint.TopParentPoint, clsBaseLineVectors)
+                    Dim clsBuddyPoints() As ObservationPoint
+                    ReDim clsBuddyPoints(-1 To UBound(clsBaseLineVectors))
+                    Dim i As Long
+                    For i = 0 To UBound(clsBaseLineVectors)
+                        '基線ベクトルの反対側の観測点。
+                        If clsBaseLineVectors(i).StrPoint.Number = clsObservationPoint.Number Then
+                            Set clsBuddyPoints(i) = clsBaseLineVectors(i).EndPoint.TopParentPoint
+                        Else
+                            Set clsBuddyPoints(i) = clsBaseLineVectors(i).StrPoint.TopParentPoint
+                        End If
+                        '解析済み基線ベクトルの終点が反対側であり、偏心点である場合、その偏心補正を再計算する。
+                        If clsBaseLineVectors(i).Analysis <= ANALYSIS_STATUS_FIX Then
+                            If clsBaseLineVectors(i).AnalysisStrPoint.Number = clsObservationPoint.Number Then
+                                If clsBaseLineVectors(i).AnalysisEndPoint.Eccentric Then
+                                    Set clsEccentricPoint = clsBaseLineVectors(i).AnalysisEndPoint
+                                    Call SetAtCollectionObject(objGenuinePoints, clsEccentricPoint.CorrectPoint, clsEccentricPoint.Number)
+                                End If
+                            End If
+                        End If
+                    Next
+                    '削除。
+                    Call m_clsNetworkModel.RemoveRepresentPoint(clsObservationPoint.TopParentPoint, sObsPointPath, objIsolatePointChainCollection, objBaseLineVectorChainCollection)
+                    '本点の有効/無効を更新する。
+                    For i = 0 To UBound(clsBuddyPoints)
+                        If clsBuddyPoints(i).Eccentric Then Call m_clsNetworkModel.EnableGenuinePoint(clsBuddyPoints(i))
+                    Next
                 Next
-                '削除。
-                Call m_clsNetworkModel.RemoveRepresentPoint(clsObservationPoint.TopParentPoint, sObsPointPath, objIsolatePointChainCollection, objBaseLineVectorChainCollection)
-                '本点の有効/無効を更新する。
-                For i = 0 To UBound(clsBuddyPoints)
-                    If clsBuddyPoints(i).Eccentric Then Call m_clsNetworkModel.EnableGenuinePoint(clsBuddyPoints(i))
+
+                '偏心補正の再計算。
+                For Each clsEccentricPoint In objGenuinePoints
+                    Set clsEccentricPoint = clsEccentricPoint.CorrectPoint.HeadPoint
+                    Call m_clsNetworkModel.CorrectEccentric(clsEccentricPoint)
+                    Call m_clsNetworkModel.EnableGenuinePoint(clsEccentricPoint)
                 Next
-            Next
-    
-            '偏心補正の再計算。
-            For Each clsEccentricPoint In objGenuinePoints
-                Set clsEccentricPoint = clsEccentricPoint.CorrectPoint.HeadPoint
-                Call m_clsNetworkModel.CorrectEccentric(clsEccentricPoint)
-                Call m_clsNetworkModel.EnableGenuinePoint(clsEccentricPoint)
-            Next
 
 
-        End Sub
-        [VB]*/
-        //------------------------------------------------------------------------------------------
-        //[C#]  //5
-        /*
-        '観測点を削除する。
-        '
-        '引き数：
-        'objObservationPoints 対象とする観測点。要素は ObservationPoint オブジェクト(代表観測点)。キーは任意。
-        */
-        public void RemoveObservationPoint(Dictionary<string, object> objObservationPoints)
+            End Sub
+            [VB]*/
+            //------------------------------------------------------------------------------------------
+            //[C#]  //5
+            /*
+            '観測点を削除する。
+            '
+            '引き数：
+            'objObservationPoints 対象とする観測点。要素は ObservationPoint オブジェクト(代表観測点)。キーは任意。
+            */
+            public void RemoveObservationPoint(Dictionary<string, object> objObservationPoints)
         {
 
             //'観測点フォルダ。
@@ -5218,7 +5273,9 @@ namespace SurvLine
              */
             Dictionary<string, object> objObservationPoints2 = new Dictionary<string, object>();
             ObservationPoint clsObservationPoint;
+            //*********************************
             //'本点の削除。
+            //*********************************
             foreach (ObservationPoint obj in objObservationPoints.Values.Cast<ObservationPoint>())
             //  foreach (object obj in objObservationPoints)
             {
@@ -5240,6 +5297,76 @@ namespace SurvLine
                 {
                     objObservationPoints2.Add("", clsObservationPoint);
                 }
+            }
+            /*-----------------------------------------------------------------------------------------------------------------------
+                '偏心補正の再計算が必要な本点。
+                Dim objGenuinePoints As New Collection
+    
+                '残りの削除。
+                For Each clsObservationPoint In objObservationPoints2
+                    m_bModifyed = True
+                    Dim clsEccentricPoint As ObservationPoint
+                    Set clsEccentricPoint = Nothing
+                    If clsObservationPoint.Eccentric Then
+                        '偏心点の場合、リンクを変更する。
+                        If clsObservationPoint.TopParentPoint.PrevPoint Is Nothing Then
+                            'リンクを変更。
+                            Set clsEccentricPoint = clsObservationPoint.TopParentPoint.NextPoint
+                        Else
+                            Set clsEccentricPoint = clsObservationPoint.HeadPoint
+                        End If
+                        If clsEccentricPoint Is Nothing Then
+                            '観測点がなくなる場合は、本点も削除する。
+                            Call RemoveAtCollection(objGenuinePoints, clsObservationPoint.Number)
+                            Call m_clsNetworkModel.RemoveRepresentPoint(clsObservationPoint.CorrectPoint.TopParentPoint, sObsPointPath, objIsolatePointChainCollection, objBaseLineVectorChainCollection)
+                        Else
+                            Call SetAtCollectionObject(objGenuinePoints, clsEccentricPoint.CorrectPoint, clsEccentricPoint.Number)
+                            Call clsObservationPoint.CorrectPoint.UpdateCorrectPoint(clsEccentricPoint)
+                        End If
+                    End If
+            */
+            //*********************************
+            //'偏心補正の再計算が必要な本点。
+            //*********************************
+            Dictionary<string, Object> objGenuinePoints = new Dictionary<string, object>();
+
+            //*********************************
+            //残りの削除。
+            //*********************************
+            foreach (ObservationPoint obj in objObservationPoints2.Values.Cast<ObservationPoint>())
+            {
+                clsObservationPoint = obj;
+
+                m_bModifyed = true;
+                ObservationPoint clsEccentricPoint;
+                clsEccentricPoint = null;
+
+                if (clsObservationPoint.Eccentric())
+                {
+                    //偏心点の場合、リンクを変更する。
+                    if (clsObservationPoint.TopParentPoint().PrevPoint() == null)
+                    {
+                        //リンクを変更。
+                        clsEccentricPoint = clsObservationPoint.TopParentPoint().NextPoint();
+                    }
+                    else
+                    {
+                        clsEccentricPoint = clsObservationPoint.HeadPoint();
+                    }
+                    //----------------------------------------------
+                    if (clsEccentricPoint == null)
+                    {
+                        //'観測点がなくなる場合は、本点も削除する。
+                        RemoveAtCollection(objGenuinePoints, clsObservationPoint.Number());
+                        m_clsNetworkModel.RemoveRepresentPoint(clsObservationPoint.CorrectPoint().TopParentPoint(), sObsPointPath, objIsolatePointChainCollection, objBaseLineVectorChainCollection);
+                    }
+                    else
+                    {
+                        SetAtCollectionObject(objGenuinePoints, clsEccentricPoint.CorrectPoint(), clsEccentricPoint.Number());
+                        clsObservationPoint.CorrectPoint().UpdateCorrectPoint(clsEccentricPoint);
+                    }
+
+                }//if (clsObservationPoint.Eccentric())
 
                 /*-----------------------------------------------------------------------------------------------------------------------
                     '基線ベクトルの反対側の観測点。
@@ -5267,7 +5394,9 @@ namespace SurvLine
                         End If
                     Next
                  */
+                //*********************************
                 //基線ベクトルの反対側の観測点。
+                //*********************************
                 //      BaseLineVector oBaseLineVectors; 
                 //      ReDim clsBaseLineVectors(-1 To - 1)
                 List<BaseLineVector> clsBaseLineVectors = new List<BaseLineVector>();
@@ -5306,13 +5435,12 @@ namespace SurvLine
                     {
                         if (clsBaseLineVectors[i].AnalysisStrPoint().Number() == clsObservationPoint.Number())
                         {
-                            //  if (clsBaseLineVectors[i].AnalysisEndPoint().Eccentric()){
-                            //      clsEccentricPoint = clsBaseLineVectors[i].AnalysisEndPoint;
-                            //    SetAtCollectionObject(objGenuinePoints, clsEccentricPoint.CorrectPoint, clsEccentricPoint.Number);
-                            //  }
+                            if (clsBaseLineVectors[i].AnalysisEndPoint().Eccentric()){
+                                clsEccentricPoint = clsBaseLineVectors[i].AnalysisEndPoint();
+                                SetAtCollectionObject(objGenuinePoints, clsEccentricPoint.CorrectPoint(), clsEccentricPoint.Number());
+                            }
                         }
                     }
-
                 }//for (int i = 0; i <clsBaseLineVectors.Count; i++)
 
 

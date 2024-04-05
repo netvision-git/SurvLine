@@ -77,6 +77,8 @@ using static System.Net.Mime.MediaTypeNames;
 using System.Net;
 using System.Diagnostics.Eventing.Reader;
 using static SurvLine.mdl.MdlBaseLineAnalyser;
+using System.Linq;
+using System.Reflection;
 
 namespace SurvLine
 {
@@ -1021,28 +1023,14 @@ namespace SurvLine
                 clsBaseLineVector = (BaseLineVector)clsChainList.Element;
                 //'フラグが0なら代表観測点として加える。
                 clsObservationPoint = clsBaseLineVector.StrPoint().TopParentPoint();
-                if (clsObservationPoint.WorkKey == 0)
+                if (clsObservationPoint.WorkKey == 0)   //6
                 {
-#if false
-                    if (i1 == 0)
-                    {
-                        m_clsObservationShared.Class_Initialize();
-                        i1 = 1;
-                    }
-#endif
                     clsRepresentTail = InsertRepresentPoint(clsRepresentTail, clsObservationPoint);
                     clsObservationPoint.WorkKey = 1;
                 }
                 clsObservationPoint = clsBaseLineVector.EndPoint().TopParentPoint();
-                if (clsObservationPoint.WorkKey == 0)
+                if (clsObservationPoint.WorkKey == 0)   //6
                 {
-#if false
-                    if (i1 == 0)
-                    {
-                        m_clsObservationShared.Class_Initialize();
-                        i1 = 1;
-                    }
-#endif
                     clsRepresentTail = InsertRepresentPoint(clsRepresentTail, clsObservationPoint);
                     clsObservationPoint.WorkKey = 1;
                 }
@@ -1800,15 +1788,33 @@ namespace SurvLine
         End Sub
         [VB]*/
         //------------------------------------------------------------------------------------------
-        //[C#]
+        //[C#]  //6
         /*
-        'リスト更新必要フラグを初期化する。
-        '
-        'IsList をOFFにする。
-        '観測点、基線ベクトルの IsList を初期化する。
+            'リスト更新必要フラグを初期化する。
+            '
+            'IsList をOFFにする。
+            '観測点、基線ベクトルの IsList を初期化する。
         */
         public void ClearIsList()
         {
+            ChainList clsChainList;
+            clsChainList = m_clsBaseLineVectorHead.NextList();
+
+            while (clsChainList != null)
+            {
+              //  clsChainList.Element.IsList = false;
+              //  clsChainList.Element.ClearIsList();
+                clsChainList = clsChainList.NextList();
+            }
+            clsChainList = m_clsIsolatePointHead.NextList();
+
+            while (clsChainList != null)
+            {
+                //  clsChainList.Element.IsList = false;
+                clsChainList = clsChainList.NextList();
+            }
+
+
             return;
         }
 
@@ -1853,14 +1859,14 @@ namespace SurvLine
 
             clsBaseLineVector.Enable(bEnable);
             clsBaseLineVector.IsList = true;
-            clsBaseLineVector.StrPoint().TopParentPoint().IsList(true);
-            clsBaseLineVector.EndPoint().TopParentPoint().IsList(true);
+            clsBaseLineVector.StrPoint().TopParentPoint().IsList = true;
+            clsBaseLineVector.EndPoint().TopParentPoint().IsList = true;
 
             //'本点。
             if (clsBaseLineVector.StrPoint().Eccentric())
             {
-                clsBaseLineVector.StrPoint().CorrectPoint().TopParentPoint().IsList(true);
-                clsBaseLineVector.EndPoint().CorrectPoint().TopParentPoint().IsList(true);
+                clsBaseLineVector.StrPoint().CorrectPoint().TopParentPoint().IsList = true;
+                clsBaseLineVector.EndPoint().CorrectPoint().TopParentPoint().IsList = true;
             }
 
 
@@ -1923,11 +1929,11 @@ namespace SurvLine
             if (clsBaseLineVectors.Count < 0)
             {
                 clsObservationPoint.Enable(bEnable);
-                clsObservationPoint.IsList(true);
+                clsObservationPoint.IsList = true;
                 //'本点。
                 if (clsObservationPoint.Eccentric())
                 {
-                    clsObservationPoint.CorrectPoint().TopParentPoint().IsList(true);
+                    clsObservationPoint.CorrectPoint().TopParentPoint().IsList = true;
                 }
             }
             else
@@ -2193,9 +2199,83 @@ namespace SurvLine
         '
         '戻り値：重複基線ベクトルの配列を返す。配列の要素は(-1 To ...)、要素 -1 は未使用。
         */
-        public unsafe BaseLineVector* GetDuplicationBaseLineVectors(BaseLineVector clsBaseLineVector)
+        public List<BaseLineVector> GetDuplicationBaseLineVectors(BaseLineVector clsBaseLineVector)
         {
-            return null;
+
+            List<BaseLineVector> GetDuplicationBaseLineVectors = new List<BaseLineVector>();
+
+            ObservationPoint clsStrPoint;
+            ObservationPoint clsEndPoint;
+
+            clsStrPoint = clsBaseLineVector.StrPoint().RootPoint();
+            clsEndPoint = clsBaseLineVector.EndPoint().RootPoint();
+
+            //********************************************
+            //'始点に接続している基線ベクトルを取得。
+            //********************************************
+            List<BaseLineVector> clsConnectBaseLineVectors = new List<BaseLineVector>();
+            //      ReDim clsConnectBaseLineVectors(-1 To - 1)
+            //      Call GetConnectBaseLineVectorsEx(clsStrPoint, clsConnectBaseLineVectors)
+            m_clsMdlMain.GetDocument().Session_GetConnectBaseLineVectors(clsStrPoint, ref clsConnectBaseLineVectors);     //5
+
+            //********************************************
+            //'始点と終点が同じ基線ベクトルを抽出。
+            //********************************************
+            //  Dim clsDuplicationBaseLineVectors() As BaseLineVector
+            long nCount;
+            int i;
+            BaseLineVector[] clsDuplicationBaseLineVectors = new BaseLineVector[clsConnectBaseLineVectors.Count];
+            nCount = -1;
+            /*-------------------------------------------------------
+                For i = 0 To UBound(clsConnectBaseLineVectors)
+                    If Not clsBaseLineVector Is clsConnectBaseLineVectors(i) Then
+                        If clsStrPoint Is clsConnectBaseLineVectors(i).StrPoint.RootPoint Then
+                            If clsEndPoint Is clsConnectBaseLineVectors(i).EndPoint.RootPoint Then
+                                nCount = nCount + 1
+                                Set clsDuplicationBaseLineVectors(nCount) = clsConnectBaseLineVectors(i)
+                            End If
+                        ElseIf clsEndPoint Is clsConnectBaseLineVectors(i).StrPoint.RootPoint Then
+                            If clsStrPoint Is clsConnectBaseLineVectors(i).EndPoint.RootPoint Then
+                                nCount = nCount + 1
+                                Set clsDuplicationBaseLineVectors(nCount) = clsConnectBaseLineVectors(i)
+                            End If
+                        End If
+                    End If
+                Next
+             */
+            for (i = 0; i < clsConnectBaseLineVectors.Count; i++)
+            {
+                if (!ReferenceEquals(clsBaseLineVector, clsConnectBaseLineVectors[i]))
+                //BaseLineVector obj99 = clsConnectBaseLineVectors[i];
+                //if (clsBaseLineVector is BaseLineVector obj99)
+                {
+                    if (ReferenceEquals(clsStrPoint, clsConnectBaseLineVectors[i].StrPoint().RootPoint()))
+                    {
+                        if (ReferenceEquals(clsEndPoint,clsConnectBaseLineVectors[i].EndPoint().RootPoint()))
+                        {
+                            nCount = nCount + 1;
+                            clsDuplicationBaseLineVectors[nCount] = clsConnectBaseLineVectors[i];
+                        }
+                    }
+                    else if (ReferenceEquals(clsEndPoint, clsConnectBaseLineVectors[i].StrPoint().RootPoint()))
+                    {
+                        if (ReferenceEquals(clsStrPoint, clsConnectBaseLineVectors[i].EndPoint().RootPoint()))
+                        {
+                            nCount = nCount + 1;
+                            clsDuplicationBaseLineVectors[nCount] = clsConnectBaseLineVectors[i];
+                        }
+
+                    }
+
+                }//if (clsBaseLineVector != clsConnectBaseLineVectors[(int)i])
+            }//for (i = 0; i < clsConnectBaseLineVectors.Count; i++)
+
+            //      ReDim Preserve clsDuplicationBaseLineVectors(-1 To nCount)
+            for (i = 0; i < clsDuplicationBaseLineVectors.Length; i++)
+            {
+                GetDuplicationBaseLineVectors.Add(clsDuplicationBaseLineVectors[i]);
+            }
+            return GetDuplicationBaseLineVectors;
         }
         //==========================================================================================
 
@@ -2233,7 +2313,8 @@ namespace SurvLine
         */
         public void GetConnectBaseLineVectorsEx(ObservationPoint clsObservationPoint, List<BaseLineVector> clsBaseLineVectors)
         {
-            return;
+            m_clsMdlMain.GetDocument().Session_GetConnectBaseLineVectors(clsObservationPoint, ref clsBaseLineVectors);  //6
+
         }
         //==========================================================================================
 
@@ -2428,7 +2509,7 @@ namespace SurvLine
         End Sub
         [VB]*/
         //------------------------------------------------------------------------------------------
-        //[C#]  //3
+        //[C#]  //3 //6
         /*
         '指定された観測点と連結している基線ベクトルの IsList を設定する。
         '
@@ -2440,6 +2521,14 @@ namespace SurvLine
         */
         public void SetConnectBaseLineVectorsIsListEx(ObservationPoint clsObservationPoint)   //2)
         {
+            clsObservationPoint = clsObservationPoint.HeadPoint();          //6
+            while (clsObservationPoint != null)                             //6
+            {
+                GetConnectBaseLineVectorsIsList(clsObservationPoint);       //6
+                clsObservationPoint = clsObservationPoint.NextPoint();      //6
+            }
+
+#if false   //3 追加し、//6で下記を削除************************************
             ChainList clsChainList;
             clsChainList = m_clsMdlMain.GetDocument().NetworkModel().BaseLineVectorHead();
             List<BaseLineVector> clsBaseLineVectors = new List<BaseLineVector>();
@@ -2452,7 +2541,7 @@ namespace SurvLine
 
                 clsChainList = clsChainList.NextList();
             }
-
+#endif      //3 で変更********************************************************
         }
         /*
         public void SetConnectBaseLineVectorsIsListEx(ObservationPoint pclsObservationPoint)
@@ -2499,7 +2588,7 @@ namespace SurvLine
         End Sub
         [VB]*/
         //------------------------------------------------------------------------------------------
-        //[C#]
+        //[C#]  //6
         /*
         '指定された観測点と連結している基線ベクトルの IsList を設定する。
         '
@@ -2511,36 +2600,51 @@ namespace SurvLine
 #if true
         public void GetConnectBaseLineVectorsIsList(ObservationPoint clsObservationPoint)
         {
-            ChainList clsChainList;
-            clsChainList = m_clsMdlMain.GetDocument().NetworkModel().BaseLineVectorHead();
-            List<BaseLineVector> clsBaseLineVectors = new List<BaseLineVector>();
 
             ObservationPoint clsChildPoint;
             clsChildPoint = clsObservationPoint.ChildPoint();
-
+            //  List<BaseLineVector> clsBaseLineVectors = new List<BaseLineVector>();
 
             if (clsChildPoint == null)
             {
+                /*-----------------------------------------------
+                    '接合観測点の場合、基線ベクトルに設定する。
+                    If (clsObservationPoint.ObjectType And OBS_TYPE_CONNECT) <> 0 Then
+                        clsObservationPoint.Owner.IsList = True
+                    End If
+                 */
+                //***********************************
                 //'接合観測点の場合、基線ベクトルに設定する。
+                //***********************************
                 if ((clsObservationPoint.ObjectType & OBS_TYPE_CONNECT) != 0)
                 {
-                    //  clsObservationPoint.Owner.IsList(true);
-                    clsObservationPoint.IsList(true);
+                    ObservationPoint obj = (ObservationPoint)clsObservationPoint.Owner;
+                    //obj.Element.IsList = true;
                 }
 
             }
             else
             {
-                m_clsMdlMain.GetDocument().Session_GetConnectBaseLineVectors(clsObservationPoint, ref clsBaseLineVectors);
+                /*------------------------------------------------
+                    '子観測点すべてを巡回する。
+                    Do While Not clsChildPoint Is Nothing
+                        Call GetConnectBaseLineVectorsIsList(clsChildPoint)
+                        Set clsChildPoint = clsChildPoint.NextPoint
+                    Loop
+                 */
+                //***********************************
+                // '子観測点すべてを巡回する。
+                //***********************************
                 while (clsObservationPoint != null)
                 {
-                    clsChainList = clsChainList.NextList();
+                    GetConnectBaseLineVectorsIsList(clsChildPoint);
+                    clsChildPoint = clsChildPoint.NextPoint();
                 }
             }
-
-
         }
 #else
+        //  m_clsMdlMain.GetDocument().Session_GetConnectBaseLineVectors(clsObservationPoint, ref clsBaseLineVectors);
+
         public void GetConnectBaseLineVectorsIsList(ObservationPoint clsObservationPoint)
         {
             ObservationPoint clsChildPoint;
@@ -2616,35 +2720,46 @@ namespace SurvLine
 
         //==========================================================================================
         /*[VB]
-        '孤立観測点チェインコレクションを作成する。
-        '
-        'm_clsIsolatePointHead リストの ChainList オブジェクトのコレクションを作成する。
-        '先頭である m_clsIsolatePointHead オブジェクトは含まない。
-        '
-        '戻り値：作成した孤立観測点チェインコレクションを返す。要素は ChainList オブジェクト。キーは ObservationPoint オブジェクト(実観測点)のポインタ。
-        Public Function MakeIsolatePointChainCollection() As Collection
-            Set MakeIsolatePointChainCollection = New Collection
-            Dim clsChainList As ChainList
-            Set clsChainList = m_clsIsolatePointHead.NextList
-            Do While Not clsChainList Is Nothing
-                Call MakeIsolatePointChainCollection.Add(clsChainList, Hex$(GetPointer(clsChainList.Element)))
-                Set clsChainList = clsChainList.NextList
-            Loop
-        End Function
+            '孤立観測点チェインコレクションを作成する。
+            '
+            'm_clsIsolatePointHead リストの ChainList オブジェクトのコレクションを作成する。
+            '先頭である m_clsIsolatePointHead オブジェクトは含まない。
+            '
+            '戻り値：作成した孤立観測点チェインコレクションを返す。要素は ChainList オブジェクト。キーは ObservationPoint オブジェクト(実観測点)のポインタ。
+            Public Function MakeIsolatePointChainCollection() As Collection
+                Set MakeIsolatePointChainCollection = New Collection
+                Dim clsChainList As ChainList
+                Set clsChainList = m_clsIsolatePointHead.NextList
+                Do While Not clsChainList Is Nothing
+                    Call MakeIsolatePointChainCollection.Add(clsChainList, Hex$(GetPointer(clsChainList.Element)))
+                    Set clsChainList = clsChainList.NextList
+                Loop
+            End Function
         [VB]*/
         //------------------------------------------------------------------------------------------
-        //[C#]
-        /*
-        '孤立観測点チェインコレクションを作成する。
-        '
-        'm_clsIsolatePointHead リストの ChainList オブジェクトのコレクションを作成する。
-        '先頭である m_clsIsolatePointHead オブジェクトは含まない。
-        '
-        '戻り値：作成した孤立観測点チェインコレクションを返す。要素は ChainList オブジェクト。キーは ObservationPoint オブジェクト(実観測点)のポインタ。
-        */
+        //[C#]  //6
+        /// <summary>
+        /// 孤立観測点チェインコレクションを作成する。
+        /// '
+        /// m_clsIsolatePointHead リストの ChainList オブジェクトのコレクションを作成する。
+        /// 先頭である m_clsIsolatePointHead オブジェクトは含まない。
+        /// 
+        /// </summary>
+        /// <returns>
+        /// 戻り値：作成した孤立観測点チェインコレクションを返す。要素は ChainList オブジェクト。キーは ObservationPoint オブジェクト(実観測点)のポインタ。
+        /// </returns>
         public Dictionary<string, object> MakeIsolatePointChainCollection()
         {
-            return null;
+            Dictionary<string, object> MakeIsolatePointChainCollection = new Dictionary<string, object>();
+            ChainList clsChainList;
+            clsChainList = m_clsIsolatePointHead.NextList();
+            while (clsChainList != null)
+            {
+                MakeIsolatePointChainCollection.Add(GetPointer(clsChainList.Element).ToString(), clsChainList);
+                clsChainList = clsChainList.NextList();
+            }
+
+            return MakeIsolatePointChainCollection;
         }
         //==========================================================================================
 
@@ -2742,6 +2857,7 @@ namespace SurvLine
         */
         public void RemoveRepresentPoint(ObservationPoint clsRepresentPoint, string sObsPointPath, Dictionary<string, object> objIsolatePointChainCollection, Dictionary<string, object> objBaseLineVectorChainCollection)
         {
+
             /*------------------------------------------------------------------
                 '代表観測点リストから削除する。
                 Call clsRepresentPoint.Owner.Remove
@@ -2753,10 +2869,15 @@ namespace SurvLine
             //'代表観測点を分離。
             clsRepresentPoint.LeaveParentPoint();
 
-            ObservationPoint clsConnectPoint;
 
+            /*------------------------------------------------------------------
+                Dim clsConnectPoint As ObservationPoint
+                Set clsConnectPoint = clsRepresentPoint.ChildPoint.ChildPoint
+                If clsConnectPoint Is Nothing Then
+             */
+            ObservationPoint clsConnectPoint;
             clsConnectPoint = clsRepresentPoint.ChildPoint().ChildPoint();
-            if (clsConnectPoint != null)
+            if (clsConnectPoint == null)
             {
                 /*-----------------------------------------------------------
                     '孤立観測点であった場合、孤立観測点リストから削除する。
@@ -2795,32 +2916,14 @@ namespace SurvLine
                         Else
                             Set clsBuddyPoint = clsBaseLineVector.StrPoint
                         End If
-                        '基線ベクトルを削除する。
-                        sKey = Hex$(GetPointer(clsBaseLineVector))
-                        If LookupCollectionObject(objBaseLineVectorChainCollection, clsChainList, sKey) Then
-                            Call objBaseLineVectorChainCollection.Remove(sKey)
-                            Call clsChainList.Remove
-                        End If
-                        Call clsBaseLineVector.Terminate
-                        '反対側の接合観測点を削除する。
-                        Dim clsBuddyParent As ObservationPoint
-                        Set clsBuddyParent = clsBuddyPoint.ParentPoint
-                        Call clsBuddyPoint.LeaveParentPoint
-                        Call clsBuddyPoint.Terminate
-                        '反対側の観測点が孤立したら孤立観測点リストに追加する。
-                        If clsBuddyParent.ChildPoint Is Nothing Then
-                            Set clsChainList = m_clsIsolatePointHead.TailList.InsertNext(clsBuddyParent)
-                            Call objIsolatePointChainCollection.Add(clsChainList, Hex$(GetPointer(clsBuddyParent)))
-                        End If
-                        Set clsConnectPoint = clsConnectPoint.NextPoint
+                    :   :   :   :   :   :   :
+                    :   :   :   :   :   :   :
                     Loop
                  */
 
                 //'基線ベクトルを削除する。
                 while (clsConnectPoint != null)
                 {
-
-
                     BaseLineVector clsBaseLineVector;
                     clsBaseLineVector = (BaseLineVector)clsConnectPoint.Owner;
                     /*-------------------------------------------------------------
@@ -2834,11 +2937,22 @@ namespace SurvLine
                      */
                     //'反対側の接合観測点。
                     ObservationPoint clsBuddyPoint;
-#if true
-                    clsBuddyPoint = clsBaseLineVector.EndPoint();
-#else
-　   検討必要
-                    if (clsBaseLineVector.StrPoint() is (BaseLineVector)clsConnectPoint)
+                    //---------------------------------------------------------
+
+                    //  clsBuddyPoint = clsBaseLineVector.EndPoint();
+#if false
+                    if (ReferenceEquals(clsBaseLineVector.StrPoint(), clsConnectPoint))
+                    {
+                        clsBuddyPoint = clsBaseLineVector.EndPoint();
+                    }
+                    else
+                    {
+                        clsBuddyPoint = clsBaseLineVector.StrPoint();
+
+                    }
+#else   //-------------
+
+                    if (clsBaseLineVector.StrPoint() == clsConnectPoint)
                     {
                         clsBuddyPoint = clsBaseLineVector.EndPoint();
                     }
@@ -2847,7 +2961,6 @@ namespace SurvLine
                         clsBuddyPoint = clsBaseLineVector.StrPoint();
                     }
 #endif
-
                     /*----------------------------------------------------------------
                         '基線ベクトルを削除する。
                         sKey = Hex$(GetPointer(clsBaseLineVector))
@@ -2855,6 +2968,7 @@ namespace SurvLine
                             Call objBaseLineVectorChainCollection.Remove(sKey)
                             Call clsChainList.Remove
                         End If
+                        Call clsBaseLineVector.Terminate
                      */
 
                     //'基線ベクトルを削除する。
@@ -4174,7 +4288,7 @@ namespace SurvLine
         {
             //'設定。
             clsObservationPoint.Mode(nMode);
-            clsObservationPoint.IsList(true);
+            clsObservationPoint.IsList = true;
             return;
         }
         //==========================================================================================

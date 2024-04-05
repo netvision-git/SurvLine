@@ -38,6 +38,9 @@ namespace SurvLine
             m_clsStrPoint = new ObservationPoint(mdlMain);          //'始点(接合観測点)。
             m_clsEndPoint = new ObservationPoint(mdlMain);          //'終点(接合観測点)。
             m_clsObsDataMask = new ObsDataMask(mdlMain);            //'観測データマスク。
+
+
+            Class_Initialize();
         }
 
 
@@ -1993,8 +1996,8 @@ namespace SurvLine
         */
         public void ClearIsList()
         {
-            m_clsStrPoint.IsList(false);
-            m_clsEndPoint.IsList(false);
+            m_clsStrPoint.IsList = false;
+            m_clsEndPoint.IsList = false;
         }
         //==========================================================================================
 

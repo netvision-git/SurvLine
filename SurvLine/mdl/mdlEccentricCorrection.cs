@@ -91,7 +91,7 @@ namespace SurvLine.mdl
         '計算が可能である場合 True を返す。
         'それ以外の場合 False を返す。
         */
-        public bool CheckParame(EccentricCorrectionParam clsEccentricCorrectionParam)
+        public static bool CheckParame(EccentricCorrectionParam clsEccentricCorrectionParam)
         {
             try
             {
@@ -436,7 +436,7 @@ namespace SurvLine.mdl
         'δα1 高度角補正量CB(ラジアン)が設定される。
         'δα2 高度角補正量BC(ラジアン)が設定される。
         */
-        public void CorrectDα(EccentricCorrectionParam clsEccentricCorrectionParam, ref double δαRep1, ref double δαRep2, ref double i1, ref double i2,
+        public static void CorrectDα(EccentricCorrectionParam clsEccentricCorrectionParam, ref double δαRep1, ref double δαRep2, ref double i1, ref double i2,
             ref double f1, ref double f2, ref double D, ref double δα1, ref double δα2)
         {
             //'i≠f補正。
@@ -641,10 +641,12 @@ namespace SurvLine.mdl
                 }
                 else
                 {
-                    clsEccentricPoint = new CoordinatePointXYZ();
-                    clsEccentricPoint.X = clsBaseLineVector.CoordinateAnalysis().RoundXX() + clsBaseLineVector.VectorAnalysis().RoundXX();
-                    clsEccentricPoint.Y = clsBaseLineVector.CoordinateAnalysis().RoundYY() + clsBaseLineVector.VectorAnalysis().RoundYY();
-                    clsEccentricPoint.Z = clsBaseLineVector.CoordinateAnalysis().RoundZZ() + clsBaseLineVector.VectorAnalysis().RoundZZ();
+                    clsEccentricPoint = new CoordinatePointXYZ
+                    {
+                        X = clsBaseLineVector.CoordinateAnalysis().RoundXX() + clsBaseLineVector.VectorAnalysis().RoundXX(),
+                        Y = clsBaseLineVector.CoordinateAnalysis().RoundYY() + clsBaseLineVector.VectorAnalysis().RoundYY(),
+                        Z = clsBaseLineVector.CoordinateAnalysis().RoundZZ() + clsBaseLineVector.VectorAnalysis().RoundZZ()
+                    };
                 }
             }
             else

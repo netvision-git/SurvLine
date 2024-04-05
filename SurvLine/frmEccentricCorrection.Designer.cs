@@ -31,12 +31,29 @@
             this.Label4 = new System.Windows.Forms.Label();
             this.lblEccentricPoint = new System.Windows.Forms.Label();
             this.fraTab0 = new System.Windows.Forms.GroupBox();
+            this.fraDirection = new System.Windows.Forms.GroupBox();
+            this.cmbUsePointDrct = new System.Windows.Forms.ComboBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
+            this.txtDrctS = new System.Windows.Forms.TextBox();
+            this.label6 = new System.Windows.Forms.Label();
+            this.txtDrctM = new System.Windows.Forms.TextBox();
+            this.label7 = new System.Windows.Forms.Label();
+            this.txtDrctH = new System.Windows.Forms.TextBox();
+            this.lblDirection = new System.Windows.Forms.Label();
+            this.optDirection = new System.Windows.Forms.RadioButton();
+            this.optHorizontal = new System.Windows.Forms.RadioButton();
             this.fraHorizontal = new System.Windows.Forms.GroupBox();
             this.fraInput = new System.Windows.Forms.GroupBox();
+            this.lblH = new System.Windows.Forms.Label();
+            this.lblY = new System.Windows.Forms.Label();
+            this.lblX = new System.Windows.Forms.Label();
             this.cmbUsePointHori = new System.Windows.Forms.ComboBox();
             this.label8 = new System.Windows.Forms.Label();
             this.lblNo = new System.Windows.Forms.Label();
             this.cmdInput = new System.Windows.Forms.Button();
+            this.fraGpsVector = new System.Windows.Forms.GroupBox();
+            this.cmbMarker = new System.Windows.Forms.ComboBox();
             this.optInput = new System.Windows.Forms.RadioButton();
             this.optGPS = new System.Windows.Forms.RadioButton();
             this.lblMarker = new System.Windows.Forms.Label();
@@ -47,8 +64,6 @@
             this.lblHoriH = new System.Windows.Forms.Label();
             this.txtHoriH = new System.Windows.Forms.TextBox();
             this.lblHorizontal = new System.Windows.Forms.Label();
-            this.optDirection = new System.Windows.Forms.RadioButton();
-            this.optHorizontal = new System.Windows.Forms.RadioButton();
             this.fraTab1 = new System.Windows.Forms.GroupBox();
             this.label13 = new System.Windows.Forms.Label();
             this.txtToHeightTS = new System.Windows.Forms.TextBox();
@@ -98,8 +113,10 @@
             this.CancelButton = new System.Windows.Forms.Button();
             this.OKButton = new System.Windows.Forms.Button();
             this.fraTab0.SuspendLayout();
+            this.fraDirection.SuspendLayout();
             this.fraHorizontal.SuspendLayout();
             this.fraInput.SuspendLayout();
+            this.fraGpsVector.SuspendLayout();
             this.fraTab1.SuspendLayout();
             this.fraTab2.SuspendLayout();
             this.fraCtrls1.SuspendLayout();
@@ -126,20 +143,152 @@
             // 
             // fraTab0
             // 
-            this.fraTab0.Controls.Add(this.fraHorizontal);
+            this.fraTab0.Controls.Add(this.fraDirection);
             this.fraTab0.Controls.Add(this.optDirection);
             this.fraTab0.Controls.Add(this.optHorizontal);
             this.fraTab0.Location = new System.Drawing.Point(18, 49);
             this.fraTab0.Name = "fraTab0";
-            this.fraTab0.Size = new System.Drawing.Size(309, 255);
+            this.fraTab0.Size = new System.Drawing.Size(310, 255);
             this.fraTab0.TabIndex = 2;
             this.fraTab0.TabStop = false;
             this.fraTab0.Tag = "";
             this.fraTab0.Text = "角度";
             // 
+            // fraDirection
+            // 
+            this.fraDirection.Controls.Add(this.cmbUsePointDrct);
+            this.fraDirection.Controls.Add(this.label3);
+            this.fraDirection.Controls.Add(this.label5);
+            this.fraDirection.Controls.Add(this.txtDrctS);
+            this.fraDirection.Controls.Add(this.label6);
+            this.fraDirection.Controls.Add(this.txtDrctM);
+            this.fraDirection.Controls.Add(this.label7);
+            this.fraDirection.Controls.Add(this.txtDrctH);
+            this.fraDirection.Controls.Add(this.lblDirection);
+            this.fraDirection.Location = new System.Drawing.Point(4, 49);
+            this.fraDirection.Name = "fraDirection";
+            this.fraDirection.Size = new System.Drawing.Size(301, 202);
+            this.fraDirection.TabIndex = 26;
+            this.fraDirection.TabStop = false;
+            this.fraDirection.Tag = "";
+            // 
+            // cmbUsePointDrct
+            // 
+            this.cmbUsePointDrct.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbUsePointDrct.ForeColor = System.Drawing.SystemColors.MenuText;
+            this.cmbUsePointDrct.FormattingEnabled = true;
+            this.cmbUsePointDrct.Location = new System.Drawing.Point(56, 91);
+            this.cmbUsePointDrct.Name = "cmbUsePointDrct";
+            this.cmbUsePointDrct.RightToLeft = System.Windows.Forms.RightToLeft.No;
+            this.cmbUsePointDrct.Size = new System.Drawing.Size(214, 20);
+            this.cmbUsePointDrct.TabIndex = 29;
+            this.cmbUsePointDrct.SelectedIndexChanged += new System.EventHandler(this.cmbUsePointDrct_SelectedIndexChanged);
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Font = new System.Drawing.Font("ＭＳ Ｐゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.label3.Location = new System.Drawing.Point(18, 66);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(79, 12);
+            this.label3.TabIndex = 21;
+            this.label3.Text = "偏心座標候補:";
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Font = new System.Drawing.Font("ＭＳ Ｐゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.label5.Location = new System.Drawing.Point(234, 26);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(17, 12);
+            this.label5.TabIndex = 20;
+            this.label5.Text = "″";
+            // 
+            // txtDrctS
+            // 
+            this.txtDrctS.Font = new System.Drawing.Font("ＭＳ Ｐゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.txtDrctS.Location = new System.Drawing.Point(194, 23);
+            this.txtDrctS.Name = "txtDrctS";
+            this.txtDrctS.Size = new System.Drawing.Size(39, 19);
+            this.txtDrctS.TabIndex = 19;
+            this.txtDrctS.Text = "1234";
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Font = new System.Drawing.Font("ＭＳ Ｐゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.label6.Location = new System.Drawing.Point(178, 26);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(17, 12);
+            this.label6.TabIndex = 18;
+            this.label6.Text = "′";
+            // 
+            // txtDrctM
+            // 
+            this.txtDrctM.Font = new System.Drawing.Font("ＭＳ Ｐゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.txtDrctM.Location = new System.Drawing.Point(143, 23);
+            this.txtDrctM.Name = "txtDrctM";
+            this.txtDrctM.Size = new System.Drawing.Size(32, 19);
+            this.txtDrctM.TabIndex = 17;
+            this.txtDrctM.Text = "1234";
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Font = new System.Drawing.Font("ＭＳ Ｐゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.label7.Location = new System.Drawing.Point(130, 26);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(17, 12);
+            this.label7.TabIndex = 16;
+            this.label7.Text = "°";
+            // 
+            // txtDrctH
+            // 
+            this.txtDrctH.Font = new System.Drawing.Font("ＭＳ Ｐゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.txtDrctH.Location = new System.Drawing.Point(87, 23);
+            this.txtDrctH.Name = "txtDrctH";
+            this.txtDrctH.Size = new System.Drawing.Size(40, 19);
+            this.txtDrctH.TabIndex = 15;
+            this.txtDrctH.Text = "12345";
+            // 
+            // lblDirection
+            // 
+            this.lblDirection.AutoSize = true;
+            this.lblDirection.Font = new System.Drawing.Font("ＭＳ Ｐゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.lblDirection.Location = new System.Drawing.Point(18, 27);
+            this.lblDirection.Name = "lblDirection";
+            this.lblDirection.Size = new System.Drawing.Size(58, 12);
+            this.lblDirection.TabIndex = 14;
+            this.lblDirection.Text = "方位角(T):";
+            // 
+            // optDirection
+            // 
+            this.optDirection.AutoSize = true;
+            this.optDirection.Location = new System.Drawing.Point(121, 20);
+            this.optDirection.Name = "optDirection";
+            this.optDirection.Size = new System.Drawing.Size(94, 16);
+            this.optDirection.TabIndex = 1;
+            this.optDirection.TabStop = true;
+            this.optDirection.Text = "方位角で入力";
+            this.optDirection.UseVisualStyleBackColor = true;
+            this.optDirection.CheckedChanged += new System.EventHandler(this.optDirection_CheckedChanged);
+            // 
+            // optHorizontal
+            // 
+            this.optHorizontal.AutoSize = true;
+            this.optHorizontal.Location = new System.Drawing.Point(18, 20);
+            this.optHorizontal.Name = "optHorizontal";
+            this.optHorizontal.Size = new System.Drawing.Size(94, 16);
+            this.optHorizontal.TabIndex = 0;
+            this.optHorizontal.TabStop = true;
+            this.optHorizontal.Text = "水平角で入力";
+            this.optHorizontal.UseVisualStyleBackColor = true;
+            this.optHorizontal.CheckedChanged += new System.EventHandler(this.optHorizontal_CheckedChanged);
+            // 
             // fraHorizontal
             // 
             this.fraHorizontal.Controls.Add(this.fraInput);
+            this.fraHorizontal.Controls.Add(this.fraGpsVector);
             this.fraHorizontal.Controls.Add(this.optInput);
             this.fraHorizontal.Controls.Add(this.optGPS);
             this.fraHorizontal.Controls.Add(this.lblMarker);
@@ -150,33 +299,60 @@
             this.fraHorizontal.Controls.Add(this.lblHoriH);
             this.fraHorizontal.Controls.Add(this.txtHoriH);
             this.fraHorizontal.Controls.Add(this.lblHorizontal);
-            this.fraHorizontal.Location = new System.Drawing.Point(3, 47);
+            this.fraHorizontal.Location = new System.Drawing.Point(728, 98);
             this.fraHorizontal.Name = "fraHorizontal";
-            this.fraHorizontal.Size = new System.Drawing.Size(301, 202);
+            this.fraHorizontal.Size = new System.Drawing.Size(301, 344);
             this.fraHorizontal.TabIndex = 25;
             this.fraHorizontal.TabStop = false;
             this.fraHorizontal.Tag = "";
-            this.fraHorizontal.Enter += new System.EventHandler(this.groupBox1_Enter);
             // 
             // fraInput
             // 
+            this.fraInput.Controls.Add(this.lblH);
+            this.fraInput.Controls.Add(this.lblY);
+            this.fraInput.Controls.Add(this.lblX);
             this.fraInput.Controls.Add(this.cmbUsePointHori);
             this.fraInput.Controls.Add(this.label8);
             this.fraInput.Controls.Add(this.lblNo);
             this.fraInput.Controls.Add(this.cmdInput);
-            this.fraInput.Location = new System.Drawing.Point(0, 86);
+            this.fraInput.Location = new System.Drawing.Point(6, 129);
             this.fraInput.Name = "fraInput";
-            this.fraInput.Size = new System.Drawing.Size(301, 104);
+            this.fraInput.Size = new System.Drawing.Size(301, 119);
             this.fraInput.TabIndex = 25;
             this.fraInput.TabStop = false;
             // 
+            // lblH
+            // 
+            this.lblH.Location = new System.Drawing.Point(114, 58);
+            this.lblH.Name = "lblH";
+            this.lblH.Size = new System.Drawing.Size(25, 12);
+            this.lblH.TabIndex = 31;
+            // 
+            // lblY
+            // 
+            this.lblY.AutoSize = true;
+            this.lblY.Location = new System.Drawing.Point(115, 45);
+            this.lblY.Name = "lblY";
+            this.lblY.Size = new System.Drawing.Size(0, 12);
+            this.lblY.TabIndex = 30;
+            // 
+            // lblX
+            // 
+            this.lblX.AutoSize = true;
+            this.lblX.Location = new System.Drawing.Point(115, 30);
+            this.lblX.Name = "lblX";
+            this.lblX.Size = new System.Drawing.Size(0, 12);
+            this.lblX.TabIndex = 29;
+            // 
             // cmbUsePointHori
             // 
+            this.cmbUsePointHori.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbUsePointHori.FormattingEnabled = true;
             this.cmbUsePointHori.Location = new System.Drawing.Point(49, 72);
             this.cmbUsePointHori.Name = "cmbUsePointHori";
             this.cmbUsePointHori.Size = new System.Drawing.Size(211, 20);
             this.cmbUsePointHori.TabIndex = 28;
+            this.cmbUsePointHori.SelectedIndexChanged += new System.EventHandler(this.cmbUsePointHori_SelectedIndexChanged);
             // 
             // label8
             // 
@@ -195,7 +371,6 @@
             this.lblNo.Size = new System.Drawing.Size(138, 26);
             this.lblNo.TabIndex = 26;
             this.lblNo.Text = "123456789012345678901";
-            this.lblNo.Click += new System.EventHandler(this.label1_Click);
             // 
             // cmdInput
             // 
@@ -205,6 +380,26 @@
             this.cmdInput.TabIndex = 25;
             this.cmdInput.Text = "座標入力";
             this.cmdInput.UseVisualStyleBackColor = true;
+            this.cmdInput.Click += new System.EventHandler(this.cmdInput_Click);
+            // 
+            // fraGpsVector
+            // 
+            this.fraGpsVector.Controls.Add(this.cmbMarker);
+            this.fraGpsVector.Location = new System.Drawing.Point(34, 85);
+            this.fraGpsVector.Name = "fraGpsVector";
+            this.fraGpsVector.Size = new System.Drawing.Size(260, 45);
+            this.fraGpsVector.TabIndex = 30;
+            this.fraGpsVector.TabStop = false;
+            // 
+            // cmbMarker
+            // 
+            this.cmbMarker.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbMarker.FormattingEnabled = true;
+            this.cmbMarker.Location = new System.Drawing.Point(21, 12);
+            this.cmbMarker.Name = "cmbMarker";
+            this.cmbMarker.Size = new System.Drawing.Size(201, 20);
+            this.cmbMarker.TabIndex = 30;
+            this.cmbMarker.SelectedIndexChanged += new System.EventHandler(this.cmbMarker_SelectedIndexChanged);
             // 
             // optInput
             // 
@@ -216,6 +411,7 @@
             this.optInput.TabStop = true;
             this.optInput.Text = "手入力";
             this.optInput.UseVisualStyleBackColor = true;
+            this.optInput.CheckedChanged += new System.EventHandler(this.optInput_CheckedChanged);
             // 
             // optGPS
             // 
@@ -227,6 +423,7 @@
             this.optGPS.TabStop = true;
             this.optGPS.Text = "GPSベクトル";
             this.optGPS.UseVisualStyleBackColor = true;
+            this.optGPS.CheckedChanged += new System.EventHandler(this.optGPS_CheckedChanged);
             // 
             // lblMarker
             // 
@@ -247,7 +444,6 @@
             this.lblHoriS.Size = new System.Drawing.Size(17, 12);
             this.lblHoriS.TabIndex = 20;
             this.lblHoriS.Text = "″";
-            this.lblHoriS.Click += new System.EventHandler(this.label3_Click);
             // 
             // txtHoriS
             // 
@@ -257,7 +453,6 @@
             this.txtHoriS.Size = new System.Drawing.Size(39, 19);
             this.txtHoriS.TabIndex = 19;
             this.txtHoriS.Text = "1234";
-            this.txtHoriS.TextChanged += new System.EventHandler(this.textBox1_TextChanged);
             // 
             // lblHoriM
             // 
@@ -268,7 +463,6 @@
             this.lblHoriM.Size = new System.Drawing.Size(17, 12);
             this.lblHoriM.TabIndex = 18;
             this.lblHoriM.Text = "′";
-            this.lblHoriM.Click += new System.EventHandler(this.label5_Click);
             // 
             // txtHoriM
             // 
@@ -278,7 +472,6 @@
             this.txtHoriM.Size = new System.Drawing.Size(32, 19);
             this.txtHoriM.TabIndex = 17;
             this.txtHoriM.Text = "1234";
-            this.txtHoriM.TextChanged += new System.EventHandler(this.textBox2_TextChanged);
             // 
             // lblHoriH
             // 
@@ -289,7 +482,6 @@
             this.lblHoriH.Size = new System.Drawing.Size(17, 12);
             this.lblHoriH.TabIndex = 16;
             this.lblHoriH.Text = "°";
-            this.lblHoriH.Click += new System.EventHandler(this.label6_Click);
             // 
             // txtHoriH
             // 
@@ -299,7 +491,6 @@
             this.txtHoriH.Size = new System.Drawing.Size(40, 19);
             this.txtHoriH.TabIndex = 15;
             this.txtHoriH.Text = "12345";
-            this.txtHoriH.TextChanged += new System.EventHandler(this.textBox4_TextChanged);
             // 
             // lblHorizontal
             // 
@@ -310,29 +501,6 @@
             this.lblHorizontal.Size = new System.Drawing.Size(63, 12);
             this.lblHorizontal.TabIndex = 14;
             this.lblHorizontal.Text = "水平角(Φ):";
-            this.lblHorizontal.Click += new System.EventHandler(this.label7_Click);
-            // 
-            // optDirection
-            // 
-            this.optDirection.AutoSize = true;
-            this.optDirection.Location = new System.Drawing.Point(121, 20);
-            this.optDirection.Name = "optDirection";
-            this.optDirection.Size = new System.Drawing.Size(94, 16);
-            this.optDirection.TabIndex = 1;
-            this.optDirection.TabStop = true;
-            this.optDirection.Text = "方位角で入力";
-            this.optDirection.UseVisualStyleBackColor = true;
-            // 
-            // optHorizontal
-            // 
-            this.optHorizontal.AutoSize = true;
-            this.optHorizontal.Location = new System.Drawing.Point(18, 20);
-            this.optHorizontal.Name = "optHorizontal";
-            this.optHorizontal.Size = new System.Drawing.Size(94, 16);
-            this.optHorizontal.TabIndex = 0;
-            this.optHorizontal.TabStop = true;
-            this.optHorizontal.Text = "水平角で入力";
-            this.optHorizontal.UseVisualStyleBackColor = true;
             // 
             // fraTab1
             // 
@@ -421,6 +589,7 @@
             this.chkTS.TabIndex = 22;
             this.chkTS.Text = "測距儀を使用";
             this.chkTS.UseVisualStyleBackColor = true;
+            this.chkTS.CheckedChanged += new System.EventHandler(this.chkTS_CheckedChanged);
             // 
             // label10
             // 
@@ -803,9 +972,10 @@
             // 
             // picEccentricPicture
             // 
-            this.picEccentricPicture.Location = new System.Drawing.Point(344, 69);
+            this.picEccentricPicture.BackColor = System.Drawing.SystemColors.ControlLightLight;
+            this.picEccentricPicture.Location = new System.Drawing.Point(336, 69);
             this.picEccentricPicture.Name = "picEccentricPicture";
-            this.picEccentricPicture.Size = new System.Drawing.Size(369, 350);
+            this.picEccentricPicture.Size = new System.Drawing.Size(377, 350);
             this.picEccentricPicture.TabIndex = 11;
             this.picEccentricPicture.TabStop = false;
             // 
@@ -813,10 +983,11 @@
             // 
             this.CancelButton.Location = new System.Drawing.Point(619, 528);
             this.CancelButton.Name = "CancelButton";
-            this.CancelButton.Size = new System.Drawing.Size(94, 22);
+            this.CancelButton.Size = new System.Drawing.Size(95, 25);
             this.CancelButton.TabIndex = 14;
             this.CancelButton.Text = "キャンセル";
             this.CancelButton.UseVisualStyleBackColor = true;
+            this.CancelButton.Click += new System.EventHandler(this.CancelButton_Click);
             // 
             // OKButton
             // 
@@ -826,12 +997,15 @@
             this.OKButton.TabIndex = 13;
             this.OKButton.Text = "OK";
             this.OKButton.UseVisualStyleBackColor = true;
+            this.OKButton.Click += new System.EventHandler(this.OKButton_Click);
             // 
             // frmEccentricCorrection
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(731, 573);
+            this.AutoSize = true;
+            this.ClientSize = new System.Drawing.Size(1062, 622);
+            this.Controls.Add(this.fraHorizontal);
             this.Controls.Add(this.CancelButton);
             this.Controls.Add(this.OKButton);
             this.Controls.Add(this.picEccentricPicture);
@@ -847,14 +1021,18 @@
             this.Controls.Add(this.Label4);
             this.Font = new System.Drawing.Font("ＭＳ Ｐゴシック", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
             this.Name = "frmEccentricCorrection";
+            this.RightToLeft = System.Windows.Forms.RightToLeft.No;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "偏心設定";
             this.fraTab0.ResumeLayout(false);
             this.fraTab0.PerformLayout();
+            this.fraDirection.ResumeLayout(false);
+            this.fraDirection.PerformLayout();
             this.fraHorizontal.ResumeLayout(false);
             this.fraHorizontal.PerformLayout();
             this.fraInput.ResumeLayout(false);
             this.fraInput.PerformLayout();
+            this.fraGpsVector.ResumeLayout(false);
             this.fraTab1.ResumeLayout(false);
             this.fraTab1.PerformLayout();
             this.fraTab2.ResumeLayout(false);
@@ -939,5 +1117,20 @@
         private System.Windows.Forms.PictureBox picEccentricPicture;
         internal System.Windows.Forms.Button CancelButton;
         internal System.Windows.Forms.Button OKButton;
+        private System.Windows.Forms.GroupBox fraDirection;
+        private System.Windows.Forms.ComboBox cmbUsePointDrct;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.TextBox txtDrctS;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.TextBox txtDrctM;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.TextBox txtDrctH;
+        private System.Windows.Forms.Label lblDirection;
+        private System.Windows.Forms.GroupBox fraGpsVector;
+        private System.Windows.Forms.ComboBox cmbMarker;
+        private System.Windows.Forms.Label lblY;
+        private System.Windows.Forms.Label lblX;
+        private System.Windows.Forms.Label lblH;
     }
 }

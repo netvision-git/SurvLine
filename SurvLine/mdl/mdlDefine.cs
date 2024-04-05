@@ -33,7 +33,8 @@ namespace SurvLine.mdl
 
         public const long vbBSNone = 0;              //GroupBox
 
-        public const string vbCrLf = @"\r";           //キャレッジリターン
+        //  public const string vbCrLf = @"\r";       //キャレッジリターン
+        public const string vbCrLf = @"\n";           //改行
 
         //***************************************************
         //  StrConv 関数
